@@ -40,28 +40,28 @@
         "source": "C:\\Users\\Tycho\\.android\\build-cache\\e9136640b95101c029f09922ae3077ae0f6e33db\\output\\res\\layout\\design_layout_snackbar_include.xml"
     },
     {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\design_navigation_item_subheader.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\e9136640b95101c029f09922ae3077ae0f6e33db\\output\\res\\layout\\design_navigation_item_subheader.xml"
-    },
-    {
         "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\list_item_saved_file_large.xml",
         "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\layout\\list_item_saved_file_large.xml"
     },
     {
-        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\abc_screen_simple.xml",
-        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\layout\\abc_screen_simple.xml"
+        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\design_navigation_item_subheader.xml",
+        "source": "C:\\Users\\Tycho\\.android\\build-cache\\e9136640b95101c029f09922ae3077ae0f6e33db\\output\\res\\layout\\design_navigation_item_subheader.xml"
     },
     {
         "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\notification_template_part_time.xml",
         "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\layout\\notification_template_part_time.xml"
     },
     {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\abc_list_menu_item_checkbox.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\layout\\abc_list_menu_item_checkbox.xml"
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\abc_screen_simple.xml",
+        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\layout\\abc_screen_simple.xml"
     },
     {
         "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\abc_action_mode_close_item_material.xml",
         "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\layout\\abc_action_mode_close_item_material.xml"
+    },
+    {
+        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\abc_list_menu_item_checkbox.xml",
+        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\layout\\abc_list_menu_item_checkbox.xml"
     },
     {
         "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\activity_list_files.xml",

@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/PrimeNumberFinder.iml" filepath="$PROJECT_DIR$/PrimeNumberFinder.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/prime-number-finder.iml" filepath="$PROJECT_DIR$/prime-number-finder.iml" />
       <module fileurl="file://$PROJECT_DIR$/simplegraphs/simplegraphs.iml" filepath="$PROJECT_DIR$/simplegraphs/simplegraphs.iml" />
     </modules>
   </component>
