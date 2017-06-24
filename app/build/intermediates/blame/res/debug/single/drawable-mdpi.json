@@ -4,12 +4,12 @@
         "source": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\src\\main\\res\\drawable-mdpi\\ic_arrow_down.png"
     },
     {
-        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi\\ic_play_arrow_white_24dp.png",
-        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-mdpi\\ic_play_arrow_white_24dp.png"
-    },
-    {
         "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi\\ic_menu_white_24dp.png",
         "source": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\src\\main\\res\\drawable-mdpi\\ic_menu_white_24dp.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi\\ic_play_arrow_white_24dp.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-mdpi\\ic_play_arrow_white_24dp.png"
     },
     {
         "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi\\ic_timer_black_24dp.png",

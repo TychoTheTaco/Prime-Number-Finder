@@ -36,12 +36,12 @@
         "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\drawable-xhdpi-v4\\abc_ic_menu_paste_mtrl_am_alpha.png"
     },
     {
-        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\abc_textfield_default_mtrl_alpha.9.png",
-        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\drawable-xhdpi-v4\\abc_textfield_default_mtrl_alpha.9.png"
-    },
-    {
         "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\abc_spinner_mtrl_am_alpha.9.png",
         "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\drawable-xhdpi-v4\\abc_spinner_mtrl_am_alpha.9.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\abc_textfield_default_mtrl_alpha.9.png",
+        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\drawable-xhdpi-v4\\abc_textfield_default_mtrl_alpha.9.png"
     },
     {
         "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\abc_ic_star_black_16dp.png",
@@ -72,12 +72,12 @@
         "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\drawable-xhdpi-v4\\notification_bg_normal.9.png"
     },
     {
-        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\abc_ic_star_black_16dp.png",
-        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\drawable-xhdpi-v4\\abc_ic_star_black_16dp.png"
-    },
-    {
         "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\abc_ic_star_black_48dp.png",
         "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\drawable-xhdpi-v4\\abc_ic_star_black_48dp.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\abc_ic_star_black_16dp.png",
+        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\drawable-xhdpi-v4\\abc_ic_star_black_16dp.png"
     },
     {
         "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\abc_scrubber_primary_mtrl_alpha.9.png",
