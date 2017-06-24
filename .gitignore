@@ -19,3 +19,4 @@ app/build/intermediates/manifest/tmp/
 app/build/intermediates/res/merged/androidTest/
 app/build/intermediates/rs/
 app/build/intermediates/symbols/androidTest/
+!/.idea/vcs.xml
