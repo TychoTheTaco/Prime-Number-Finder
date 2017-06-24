@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout android:id="@+id/coordinatorLayout_main"
+                                                 xmlns:android="http://schemas.android.com/apk/res/android"
+                                                 android:layout_width="match_parent"
+                                                 android:layout_height="match_parent"
+                                                 android:fitsSystemWindows="false">
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <!-- Number input -->
+        <TextView
+            android:id="@+id/input_number_label"
+            style="@style/SectionDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@+id/editText_input_number"
+            android:text="Enter a number below to generate a factor tree for it."/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@id/editText_input_number"
+                style="@style/NumberInput"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/button_generate_factor_tree"
+                style="@style/SearchButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/generate_factor_tree_button"/>
+
+        </LinearLayout>
+
+        <!-- Search status -->
+        <include
+            android:id="@+id/search_results"
+            layout="@layout/search_status"
+            android:visibility="gone"/>
+
+        <!-- Statistics -->
+        <!--<LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="48dp"
+            android:layout_weight="1"
+            android:gravity="bottom"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Statistics"
+                android:textColor="@color/secondary_text"
+                android:textSize="18sp"/>
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/statistics_viewpager"
+                android:layout_width="match_parent"
+                android:layout_height="128dp"
+                android:layout_marginTop="8dp"/>
+
+        </LinearLayout>-->
+
+        <!--<LinearLayout
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@android:color/darker_gray"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/sectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Prime?"/>
+
+            <TextView
+                style="@style/sectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Yes"
+                android:textColor="@android:color/holo_green_dark"
+                android:textSize="36sp"/>
+
+        </LinearLayout>-->
+
+        <TextView
+            style="@style/sectionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Factor tree"/>
+
+        <com.tycho.app.primenumberfinder.FactorTreeView
+            android:layout_width="match_parent"
+            android:layout_height="140dp"/>
+
+        <com.tycho.app.primenumberfinder.FactorTreeView
+            android:id="@+id/testTree"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"/>
+
+    </LinearLayout>
+</android.support.design.widget.CoordinatorLayout>

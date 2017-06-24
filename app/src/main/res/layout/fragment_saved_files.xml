@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout android:id="@+id/coordinatorLayout_main"
+                                                 xmlns:android="http://schemas.android.com/apk/res/android"
+                                                 android:layout_width="match_parent"
+                                                 android:layout_height="match_parent"
+                                                 android:fitsSystemWindows="false">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView_savedFiles"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:padding="8dp"/>
+
+    <TextView
+        android:id="@+id/textView_no_files"
+        style="@style/sectionTitle"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:text="You haven't saved any files yet."
+        android:layout_height="match_parent"/>
+
+</android.support.design.widget.CoordinatorLayout>

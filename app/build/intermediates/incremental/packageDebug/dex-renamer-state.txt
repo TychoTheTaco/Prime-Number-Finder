@@ -1,0 +1,7 @@
+#Wed May 24 17:22:24 PDT 2017
+base.0=E\:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10000\\instant-run-bootstrap_4fbceff72bb3f4694ea5fb4e4a693a491c875f68
+renamed.1=classes2.dex
+renamed.0=classes.dex
+file.1=E\:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10000\\instant-run_143afd201ef12d4f054777efa288b83fca55a9dd\\classes.dex
+base.1=E\:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10000\\instant-run_143afd201ef12d4f054777efa288b83fca55a9dd
+file.0=E\:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\10000\\instant-run-bootstrap_4fbceff72bb3f4694ea5fb4e4a693a491c875f68\\classes.dex

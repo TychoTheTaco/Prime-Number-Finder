@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group
+        android:id="@+id/group_main"
+        android:checkableBehavior="single">
+
+        <!--<item
+            android:id="@+id/drawer_item_number_tester"
+            android:icon="@drawable/circle_white"
+            app:actionLayout="@layout/navigation_drawer_item"
+            android:title="@string/title_number_tester"/>-->
+
+        <item
+            android:id="@+id/drawer_item_find_primes"
+            android:icon="@drawable/circle_white"
+            app:actionLayout="@layout/navigation_drawer_item"
+            android:title="@string/title_scan_for_primes"/>
+
+        <item
+            android:id="@+id/drawer_item_find_factors"
+            app:actionLayout="@layout/navigation_drawer_item"
+            android:icon="@drawable/circle_white"
+            android:title="@string/title_find_factors"/>
+
+        <item
+            android:id="@+id/drawer_item_factor_tree"
+            android:icon="@drawable/circle_white"
+            app:actionLayout="@layout/navigation_drawer_item"
+            android:title="@string/title_factor_tree"/>
+
+    </group>
+
+    <group
+        android:id="@+id/group_two"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/drawer_item_saved_files"
+            android:icon="@drawable/ic_file"
+            android:title="@string/title_saved_files" >
+        </item>
+    </group>
+
+    <group
+        android:id="@+id/group_settings"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/drawer_item_settings"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="@string/title_settings" >
+        </item>
+
+        <item
+            android:id="@+id/drawer_item_about"
+            android:icon="@drawable/ic_info_black_24dp"
+            android:title="@string/title_about" >
+        </item>
+    </group>
+
+    <item
+        android:id="@+id/test_fragment_a"
+        android:icon="@drawable/circle_white"
+        android:title="Fragment A" />
+
+    <item
+        android:id="@+id/test_fragment_b"
+        android:icon="@drawable/circle_white"
+        android:title="Fragment B" />
+
+</menu>

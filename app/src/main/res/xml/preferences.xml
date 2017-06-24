@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="allowBackgroundThreads"
+        android:summary="@string/preference_summary_allow_background_threads"
+        android:title="@string/preference_title_allow_background_threads"/>
+
+</PreferenceScreen>

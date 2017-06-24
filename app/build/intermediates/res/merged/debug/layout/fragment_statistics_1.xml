@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:custom="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:padding="4dp">
+
+    <com.tycho.app.simplegraphs.ui.ScrollingLineGraph
+        android:id="@+id/graphNumbersPerSecond"
+        android:layout_width="160dp"
+        android:layout_height="100dp"
+        android:layout_alignParentStart="true"
+        custom:graphTitle="Numbers scanned per second"
+        custom:labelXText="10 seconds"
+        custom:unitScaleX="1000"
+        custom:unitScaleY="1000"
+        custom:unitsX="10000"/>
+
+    <com.tycho.app.simplegraphs.ui.ScrollingLineGraph
+        android:id="@+id/graphPrimesPerSecond"
+        android:layout_width="160dp"
+        android:layout_height="100dp"
+        android:layout_alignParentEnd="true"
+        custom:graphTitle="Prime numbers found per second"
+        custom:highlightColor="#80FF0000"
+        custom:labelXText="10 seconds"
+        custom:lineColor="#FF0000"
+        custom:unitScaleX="1000"
+        custom:unitScaleY="250"
+        custom:unitsX="10000"/>
+
+</RelativeLayout>

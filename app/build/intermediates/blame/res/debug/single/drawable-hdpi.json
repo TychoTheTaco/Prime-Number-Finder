@@ -1,0 +1,94 @@
+[
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_sort_number_ascending.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_sort_number_ascending.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_arrow_right.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_arrow_right.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_arrow_down_black_18dp.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_arrow_down_black_18dp.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_arrow_down_gray.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_arrow_down_gray.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_play_arrow_white_24dp.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_play_arrow_white_24dp.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_arrow_left.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_arrow_left.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_pause_white_24dp.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_pause_white_24dp.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_delete_black_24dp.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_delete_black_24dp.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_reset.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_reset.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_save_white_24dp.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_save_white_24dp.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_share_black_24dp.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_share_black_24dp.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_replay_white_24dp.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_replay_white_24dp.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_launcher.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_open_latest_file.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_open_latest_file.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_arrow_up.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_arrow_up.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_menu_white_24dp.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_menu_white_24dp.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_timer_black_24dp.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_timer_black_24dp.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_settings_black_24dp.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_settings_black_24dp.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_arrow_down.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_arrow_down.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_sort_number_descending.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_sort_number_descending.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_arrow_up_gray.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_arrow_up_gray.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_open_folder.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_open_folder.png"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_info_black_24dp.png",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\drawable-hdpi\\ic_info_black_24dp.png"
+    }
+]
