@@ -1,5 +1,9 @@
 [
     {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_secondary_text_material_light.xml",
+        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\abc_secondary_text_material_light.xml"
+    },
+    {
         "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_secondary_text_material_dark.xml",
         "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\abc_secondary_text_material_dark.xml"
     },
@@ -8,8 +12,16 @@
         "source": "C:\\Users\\tycho\\.android\\build-cache\\c28868cfdfc49838db778b6d289fd287fcecacf6\\output\\res\\color\\design_tint_password_toggle.xml"
     },
     {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_primary_text_material_light.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\color\\abc_primary_text_material_light.xml"
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_hint_foreground_material_light.xml",
+        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\abc_hint_foreground_material_light.xml"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_tint_switch_track.xml",
+        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\abc_tint_switch_track.xml"
+    },
+    {
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_tint_spinner.xml",
+        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\abc_tint_spinner.xml"
     },
     {
         "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_btn_colored_borderless_text_material.xml",
@@ -28,124 +40,24 @@
         "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\switch_thumb_material_light.xml"
     },
     {
-        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\navigation_drawer_text_color.xml",
-        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\color\\navigation_drawer_text_color.xml"
-    },
-    {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_hint_foreground_material_dark.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\color\\abc_hint_foreground_material_dark.xml"
-    },
-    {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\switch_thumb_material_dark.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\color\\switch_thumb_material_dark.xml"
-    },
-    {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_tint_switch_thumb.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\color\\abc_tint_switch_thumb.xml"
-    },
-    {
-        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_primary_text_disable_only_material_dark.xml",
-        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\abc_primary_text_disable_only_material_dark.xml"
-    },
-    {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_primary_text_disable_only_material_light.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\color\\abc_primary_text_disable_only_material_light.xml"
-    },
-    {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_hint_foreground_material_light.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\color\\abc_hint_foreground_material_light.xml"
-    },
-    {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\design_error.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\e9136640b95101c029f09922ae3077ae0f6e33db\\output\\res\\color\\design_error.xml"
-    },
-    {
-        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\switch_thumb_material_dark.xml",
-        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\switch_thumb_material_dark.xml"
-    },
-    {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_btn_colored_borderless_text_material.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\color\\abc_btn_colored_borderless_text_material.xml"
-    },
-    {
-        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_btn_colored_text_material.xml",
-        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\abc_btn_colored_text_material.xml"
-    },
-    {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_tint_edittext.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\color\\abc_tint_edittext.xml"
-    },
-    {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_btn_colored_text_material.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\color\\abc_btn_colored_text_material.xml"
-    },
-    {
-        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_primary_text_disable_only_material_light.xml",
-        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\abc_primary_text_disable_only_material_light.xml"
-    },
-    {
-        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_secondary_text_material_light.xml",
-        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\abc_secondary_text_material_light.xml"
-    },
-    {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_tint_btn_checkable.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\color\\abc_tint_btn_checkable.xml"
-    },
-    {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_tint_seek_thumb.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\color\\abc_tint_seek_thumb.xml"
-    },
-    {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\navigation_drawer_text_color.xml",
-        "source": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\src\\main\\res\\color\\navigation_drawer_text_color.xml"
-    },
-    {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_tint_spinner.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\color\\abc_tint_spinner.xml"
-    },
-    {
-        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_hint_foreground_material_light.xml",
-        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\abc_hint_foreground_material_light.xml"
-    },
-    {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\switch_thumb_material_light.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\color\\switch_thumb_material_light.xml"
-    },
-    {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_secondary_text_material_dark.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\color\\abc_secondary_text_material_dark.xml"
-    },
-    {
-        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_tint_switch_track.xml",
-        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\abc_tint_switch_track.xml"
-    },
-    {
-        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_tint_spinner.xml",
-        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\abc_tint_spinner.xml"
-    },
-    {
         "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_primary_text_material_light.xml",
         "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\abc_primary_text_material_light.xml"
     },
     {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_primary_text_material_dark.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\color\\abc_primary_text_material_dark.xml"
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\navigation_drawer_text_color.xml",
+        "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\color\\navigation_drawer_text_color.xml"
     },
     {
         "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_primary_text_material_dark.xml",
         "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\abc_primary_text_material_dark.xml"
     },
     {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_secondary_text_material_light.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\color\\abc_secondary_text_material_light.xml"
-    },
-    {
         "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_tint_edittext.xml",
         "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\abc_tint_edittext.xml"
     },
     {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_tint_switch_track.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\color\\abc_tint_switch_track.xml"
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_primary_text_disable_only_material_dark.xml",
+        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\abc_primary_text_disable_only_material_dark.xml"
     },
     {
         "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_search_url_text.xml",
@@ -156,8 +68,8 @@
         "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\abc_tint_switch_thumb.xml"
     },
     {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_primary_text_disable_only_material_dark.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\color\\abc_primary_text_disable_only_material_dark.xml"
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\switch_thumb_material_dark.xml",
+        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\switch_thumb_material_dark.xml"
     },
     {
         "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_tint_seek_thumb.xml",
@@ -168,19 +80,15 @@
         "source": "C:\\Users\\tycho\\.android\\build-cache\\c28868cfdfc49838db778b6d289fd287fcecacf6\\output\\res\\color\\design_error.xml"
     },
     {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_tint_default.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\color\\abc_tint_default.xml"
-    },
-    {
         "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_hint_foreground_material_dark.xml",
         "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\abc_hint_foreground_material_dark.xml"
     },
     {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\design_tint_password_toggle.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\e9136640b95101c029f09922ae3077ae0f6e33db\\output\\res\\color\\design_tint_password_toggle.xml"
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_btn_colored_text_material.xml",
+        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\abc_btn_colored_text_material.xml"
     },
     {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_search_url_text.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\color\\abc_search_url_text.xml"
+        "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_primary_text_disable_only_material_light.xml",
+        "source": "C:\\Users\\tycho\\.android\\build-cache\\026b988ef8550052359ab5c43b39efe5e6623239\\output\\res\\color\\abc_primary_text_disable_only_material_light.xml"
     }
 ]

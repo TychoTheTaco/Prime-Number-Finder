@@ -1,4 +1,0 @@
-#Wed May 24 13:56:41 PDT 2017
-base.0=E\:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\5\\slice_4
-renamed.0=classes.dex
-file.0=E\:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\5\\slice_4\\classes.dex

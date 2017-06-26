@@ -1,15 +1,7 @@
 [
     {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\menu\\drawer.xml",
-        "source": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\src\\main\\res\\menu\\drawer.xml"
-    },
-    {
         "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\menu\\drawer.xml",
         "source": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\src\\main\\res\\menu\\drawer.xml"
-    },
-    {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\menu\\main.xml",
-        "source": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\src\\main\\res\\menu\\main.xml"
     },
     {
         "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\menu\\main.xml",
