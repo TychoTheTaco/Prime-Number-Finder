@@ -1,27 +1,27 @@
 [
     {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\search_status.xml",
-        "source": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\src\\main\\res\\layout\\search_status.xml"
+        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\abc_activity_chooser_view_list_item.xml",
+        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\layout\\abc_activity_chooser_view_list_item.xml"
     },
     {
         "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\design_navigation_item.xml",
         "source": "C:\\Users\\Tycho\\.android\\build-cache\\e9136640b95101c029f09922ae3077ae0f6e33db\\output\\res\\layout\\design_navigation_item.xml"
     },
     {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\abc_activity_chooser_view_list_item.xml",
-        "source": "C:\\Users\\Tycho\\.android\\build-cache\\227292dc543d22275952433582f917e144b142c0\\output\\res\\layout\\abc_activity_chooser_view_list_item.xml"
+        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\search_status.xml",
+        "source": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\src\\main\\res\\layout\\search_status.xml"
     },
     {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\list_item_saved_file_large.xml",
-        "source": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\src\\main\\res\\layout\\list_item_saved_file_large.xml"
+        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\list_item_number.xml",
+        "source": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\src\\main\\res\\layout\\list_item_number.xml"
     },
     {
         "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\factors_item.xml",
         "source": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\src\\main\\res\\layout\\factors_item.xml"
     },
     {
-        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\list_item_number.xml",
-        "source": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\src\\main\\res\\layout\\list_item_number.xml"
+        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\list_item_saved_file_large.xml",
+        "source": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\src\\main\\res\\layout\\list_item_saved_file_large.xml"
     },
     {
         "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\layout\\abc_select_dialog_material.xml",
