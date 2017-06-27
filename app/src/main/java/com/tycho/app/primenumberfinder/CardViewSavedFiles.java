@@ -9,7 +9,7 @@ import com.tycho.app.primenumberfinder.Adapters_old.TestAdapter;
  * @author Tycho Bellers
  *         Date Created: 11/4/2016
  */
-//pls
+//I really hope this works
 public class CardViewSavedFiles{
 
     private String title;

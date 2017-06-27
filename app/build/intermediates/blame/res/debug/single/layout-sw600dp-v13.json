@@ -2,5 +2,9 @@
     {
         "merged": "E:\\Android Studio Projects\\PrimeNumberFinder\\app\\build\\intermediates\\res\\merged\\debug\\layout-sw600dp-v13\\design_layout_snackbar.xml",
         "source": "C:\\Users\\tycho\\.android\\build-cache\\c28868cfdfc49838db778b6d289fd287fcecacf6\\output\\res\\layout-sw600dp-v13\\design_layout_snackbar.xml"
+    },
+    {
+        "merged": "C:\\Users\\Tycho\\Documents\\Android Studio Projects\\prime-number-finder\\app\\build\\intermediates\\res\\merged\\debug\\layout-sw600dp-v13\\design_layout_snackbar.xml",
+        "source": "C:\\Users\\Tycho\\.android\\build-cache\\e9136640b95101c029f09922ae3077ae0f6e33db\\output\\res\\layout-sw600dp-v13\\design_layout_snackbar.xml"
     }
 ]
