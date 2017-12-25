@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:gravity="center_horizontal"
+    android:layout_height="match_parent">
+
+    <include layout="@layout/app_bar" />
+
+    <TextView
+        android:id="@+id/title"
+        android:padding="8dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:padding="8dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:id="@+id/prime_factorization"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!--<com.tycho.app.primenumberfinder.TreeView
+        android:id="@+id/factor_tree"
+        android:layout_width="200dp"
+        android:layout_height="200dp" />-->
+
+</LinearLayout>

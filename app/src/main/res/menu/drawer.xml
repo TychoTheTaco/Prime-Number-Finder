@@ -37,7 +37,7 @@
 
         <item
             android:id="@+id/drawer_item_saved_files"
-            android:icon="@drawable/ic_file"
+            android:icon="@drawable/ic_insert_drive_file_white_24dp"
             android:title="@string/title_saved_files" >
         </item>
     </group>
@@ -48,18 +48,18 @@
 
         <item
             android:id="@+id/drawer_item_settings"
-            android:icon="@drawable/ic_settings_black_24dp"
+            android:icon="@drawable/ic_settings_white_24dp"
             android:title="@string/title_settings" >
         </item>
 
         <item
             android:id="@+id/drawer_item_about"
-            android:icon="@drawable/ic_info_black_24dp"
+            android:icon="@drawable/ic_info_outline_white_24dp"
             android:title="@string/title_about" >
         </item>
     </group>
 
-    <item
+    <!--<item
         android:id="@+id/test_fragment_a"
         android:icon="@drawable/circle_white"
         android:title="Fragment A" />
@@ -67,6 +67,6 @@
     <item
         android:id="@+id/test_fragment_b"
         android:icon="@drawable/circle_white"
-        android:title="Fragment B" />
+        android:title="Fragment B" />-->
 
 </menu>

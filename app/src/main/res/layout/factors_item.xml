@@ -18,7 +18,7 @@
         android:layout_height="26dp"
         android:textColor="#a3a3a3"
         android:gravity="center"
-        android:text=" x "
+        android:text="@string/factors_list_multiply_separator"
         android:textSize="12sp"/>
 
     <TextView

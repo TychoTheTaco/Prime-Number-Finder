@@ -1,36 +1,46 @@
 package com.tycho.app.primenumberfinder.Fragments_old;
 
 import android.app.Fragment;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.tycho.app.primenumberfinder.Adapters_old.AdapterSavedFiles;
+import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.SavedFileType;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AboutPageFragment extends Fragment{
-    /*public static ActionBar actionBar;
-    public static Window window;
-    public static View background;*/
+
+    /**
+     * Tag used for logging and debugging.
+     */
+    private static final String TAG = "AboutPageFragment";
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.fragment_about, container, false);
+		final View rootView = inflater.inflate(R.layout.about_page_fragment, container, false);
 
-        TextView textViewCredits = (TextView) rootView.findViewById(R.id.credits);
+        ((TextView) rootView.findViewById(R.id.app_version)).setText(getString(R.string.app_version_name, PrimeNumberFinder.getVersionName(getActivity())));
+
+        /*TextView textViewCredits = rootView.findViewById(R.id.credits);
         textViewCredits.setMovementMethod(LinkMovementMethod.getInstance());
 
-        ((CardView) rootView.findViewById(R.id.card)).setCardBackgroundColor(Color.GRAY);
+        ((TextView) rootView.findViewById(R.id.temporary)).setText(generateList());*/
 
-        final RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.card).findViewById(R.id.recyclerView);
+        //((CardView) rootView.findViewById(R.id.card)).setCardBackgroundColor(Color.GRAY);
+
+       /* final RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.card).findViewById(R.id.recyclerView);
 
         //The recycler view has a fixed size
         recyclerView.setHasFixedSize(true);
@@ -39,9 +49,7 @@ public class AboutPageFragment extends Fragment{
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         //Set the adapter
-        recyclerView.setAdapter(new AdapterSavedFiles(getActivity(), SavedFileType.PRIMES));
-
-        initFloatingActionButtons();
+        recyclerView.setAdapter(new SavedFilesSmallListAdapter(getActivity(), SavedFileType.PRIMES));*/
 
         //Disable item animations
         //recyclerViewSavedFilesCards.setItemAnimator(null);
@@ -49,28 +57,46 @@ public class AboutPageFragment extends Fragment{
 		return rootView;
 	}
 
-    private void initFloatingActionButtons(){
-        //((MainActivity) getActivity()).setFloatingActionButtonVisibility(0, View.GONE);
-        //((MainActivity) getActivity()).setFloatingActionButtonVisibility(1, View.GONE);
-    }
+	private String generateList(){
+	    final StringBuilder stringBuilder = new StringBuilder();
 
-    @Override
-    public void onSaveInstanceState(Bundle outState){
-        super.onSaveInstanceState(outState);
+        List<List<String>> list = new ArrayList<>();
 
-        //Save actionbar information
-        //outState.putCharSequence("actionBarTitle", MainActivity.actionBar.getTitle());
-        //outState.putCharSequence("actionBarSubTitle", MainActivity.actionBar.getSubtitle());
-    }
+        Pattern sectionPattern = Pattern.compile("\\[(.+)\\]");
+        Pattern itemPattern = Pattern.compile("\"(.+)\"");
+        Matcher matcher;
+        Matcher itemMatcher;
 
-    @Override
-    public void onViewStateRestored(Bundle savedInstanceState){
-        super.onViewStateRestored(savedInstanceState);
+        int section = -1;
 
-        if (savedInstanceState != null){
-            //Set the actionbar title and subtitle
-            //MainActivity.actionBar.setTitle(savedInstanceState.getCharSequence("actionBarTitle"));
-            //MainActivity.actionBar.setSubtitle(savedInstanceState.getCharSequence("actionBarSubTitle"));
+        String line;
+        try{
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(getResources().openRawResource(R.raw.icons)));
+            while ((line = bufferedReader.readLine()) != null){
+                matcher = sectionPattern.matcher(line);
+                itemMatcher = itemPattern.matcher(line);
+                if (matcher.find()){
+                    section++;
+                    list.add(new ArrayList<String>());
+                }else if (itemMatcher.find()){
+                    list.get(section).add(itemMatcher.group(1));
+                }else{
+                    Log.d(TAG, "String not recognized: " + line);
+                }
+            }
+            bufferedReader.close();
+        }catch (IOException e){
+            e.printStackTrace();
         }
+
+        for (List<String> strings : list){
+            for (String string : strings){
+                stringBuilder.append(string);
+                stringBuilder.append("\n");
+            }
+            stringBuilder.append("\n");
+        }
+
+	    return stringBuilder.toString();
     }
 }

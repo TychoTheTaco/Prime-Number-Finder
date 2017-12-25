@@ -9,7 +9,8 @@ public enum Statistic{
     TIME_ELAPSED("timeElapsed"),
     NUMBERS_PER_SECOND("numbersPerSecond"),
     PRIMES_PER_SECOND("primesPerSecond"),
-    FACTORS_PER_SECOND("factorsPerSecond");
+    FACTORS_PER_SECOND("factorsPerSecond"),
+    ESTIMATED_TIME_REMAINING("estimatedTimeRemaining");
 
     private final String key;
 

@@ -1,24 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppCompatTheme" parent="Theme.AppCompat.Light">
-        <item name="android:colorControlActivated">#000000</item>
-        <item name="android:colorControlNormal">#000000</item>
-        <item name="android:textColor">@color/primary_text</item>
-        <item name="android:textColorLink">#0000FF</item>
-        <item name="android:statusBarColor">#ff0000</item>
+
+    <!-- Base application theme -->
+    <style name="Default" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="colorControlActivated">@color/accent</item>
+
     </style>
 
-    <style name="AppTheme.NoActionBar">
+    <style name="Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+    <style name="Default.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <!--<item name="android:popupMenuStyle">@style/popupMenu</item>-->
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <style name="AppBarOverlay" parent="Default"/>
 
     <!-- Toolbar popup menu -->
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
+    <style name="PopupOverlay" parent="Default">
         <item name="android:colorBackground">@color/primary_light</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
@@ -69,27 +75,28 @@
 
 
 
-    <style name="PrimeNumbers" parent="AppTheme.NoActionBar">
+    <style name="PrimeNumbers" parent="Default.NoActionBar">
         <item name="colorPrimary">@color/purple</item>
         <item name="colorPrimaryDark">@color/purple_dark</item>
         <item name="colorAccent">@color/purple</item>
         <item name="colorControlActivated">@color/purple</item>
     </style>
 
-    <style name="Factors" parent="AppTheme.NoActionBar">
+    <style name="Factors" parent="Default.NoActionBar">
         <item name="colorPrimary">@color/orange</item>
         <item name="colorPrimaryDark">@color/orange_dark</item>
         <item name="colorAccent">@color/orange</item>
         <item name="colorControlActivated">@color/orange</item>
     </style>
 
-    <style name="FactorTrees" parent="AppTheme.NoActionBar">
+    <style name="FactorTrees" parent="Default.NoActionBar">
         <item name="android:statusBarColor">@color/green_dark</item>
     </style>
 
-    <style name="Default" parent="Theme.AppCompat.Light">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:statusBarColor">@color/primary_dark</item>
+    <style name="StatisticDescription">
+        <item name="android:textSize">12sp</item>
+        <item name="android:gravity">center_vertical|start</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:textColor">@color/secondary_text</item>
     </style>
 </resources>

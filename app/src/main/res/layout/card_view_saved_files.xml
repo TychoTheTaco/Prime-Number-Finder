@@ -28,7 +28,7 @@
                 android:textSize="24sp"/>
 
             <TextView
-                android:id="@+id/subTitle"
+                android:id="@+id/subtitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="@dimen/sub_title_padding_bottom"

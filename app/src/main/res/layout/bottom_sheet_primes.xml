@@ -21,20 +21,21 @@
         android:gravity="center_vertical"
         android:paddingBottom="8dp"
         android:paddingTop="8dp"
-        android:text="Search Options"
+        android:text="@string/bottom_sheet_title"
         android:textColor="@color/primary_text"
         android:textSize="16sp"/>
 
     <!-- Search method -->
     <RelativeLayout
         android:layout_width="match_parent"
+        android:layout_marginBottom="4dp"
         android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/search_method_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Search method"
+            android:text="@string/find_primes_search_method_label"
             android:textSize="14sp"/>
 
         <RadioGroup
@@ -47,64 +48,17 @@
                 android:id="@+id/brute_force"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Brute force"
+                android:text="@string/find_primes_search_method_brute_force"
                 android:textSize="14sp"/>
 
-            <RadioButton
+            <!--<RadioButton
                 android:id="@+id/sieve_of_eratosthenes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Sieve of Eratosthenes"
-                android:textSize="14sp"/>
+                android:text="@string/find_primes_search_method_sieve_of_eratosthenes"
+                android:textSize="14sp"/>-->
 
         </RadioGroup>
 
     </RelativeLayout>
-
-    <!-- Progress monitor -->
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp">
-
-        <TextView
-            android:id="@+id/progress_monitor_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Progress monitor"
-            android:textSize="14sp"/>
-
-        <RadioGroup
-            android:id="@+id/radio_group_monitor_type"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/progress_monitor_title">
-
-            <RadioButton
-                android:id="@+id/none"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="None"
-                android:textSize="14sp"/>
-
-            <RadioButton
-                android:id="@+id/simple"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Simple"
-                android:textSize="14sp"/>
-
-            <RadioButton
-                android:id="@+id/advanced"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Advanced"
-                android:textSize="14sp"/>
-
-        </RadioGroup>
-
-    </RelativeLayout>
-
 </LinearLayout>

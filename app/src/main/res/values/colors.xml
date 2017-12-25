@@ -7,36 +7,42 @@
     <color name="primary_dark">#37474F</color> <!-- 800 -->
 
     <!-- Secondary colors (Indigo) -->
+    <color name="accent_very_light">#E8EAF6</color> <!-- 50 -->
     <color name="accent_light">#C5CAE9</color> <!-- 100 -->
     <color name="accent">#536DFE</color> <!-- A200 -->
     <color name="accent_dark">#3D5AFE</color> <!-- A400 -->
 
-
-    <!-- Prime numbers (Deep Purple) -->
+    <!-- Find Primes (Deep Purple) -->
+    <color name="purple_very_light">#EDE7F6</color> <!-- 50 -->
     <color name="purple_light">#9575CD</color> <!-- 300 -->
     <color name="purple">#673AB7</color> <!-- 500 -->
     <color name="purple_dark">#4527A0</color> <!-- 800 -->
 
-    <!-- Factors (Orange) -->
-    <color name="orange_light">#FFB74D</color> <!-- 300 -->
-    <color name="orange">#FF9800</color> <!-- 500 -->
-    <color name="orange_dark">#EF6C00</color> <!-- 800 -->
+    <!-- Factors (Deep Orange) -->
+    <color name="orange_very_light">#FBE9E7</color> <!-- 50 -->
+    <color name="orange_light">#FF8A65</color> <!-- 300 -->
+    <color name="orange">#FF5722</color> <!-- 500 -->
+    <color name="orange_dark">#D84315</color> <!-- 800 -->
 
-    <!-- Prime factorization -->
+    <!-- Prime factorization (Green) -->
+    <color name="green_very_light">#E8F5E9</color> <!-- 50 -->
     <color name="green_light">#81C784</color> <!-- 300 -->
     <color name="green">#4CAF50</color> <!-- 500 -->
     <color name="green_dark">#2E7D32</color> <!-- 800 -->
 
-
+    <!-- Text colors -->
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#727272</color>
-    <color name="divider">#B6B6B6</color>
 
+    <!-- Colors -->
     <color name="gray">#757575</color> <!-- 600 -->
-
     <color name="white">#FFFFFF</color>
-
     <color name="red">#f44336</color>
 
+    <!-- Miscellaneous -->
+    <color name="divider">#B6B6B6</color>
+    <color name="item_disabled">#8C8C8C</color>
     <color name="background_light">#EEEEEE</color>
+    <color name="drawer_background">@color/background_light</color>
+
 </resources>

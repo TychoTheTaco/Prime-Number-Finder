@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:scaleType="fitStart"
+        android:layout_height="200dp"
+        android:src="@drawable/feature_graphic"/>
+
+    <TextView
+        android:id="@+id/app_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="@string/app_version_name"
+        android:textSize="16sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:padding="8dp"
+        android:layout_height="wrap_content"
+        android:text="Developed by: Tycho Bellers"
+        android:textSize="16sp" />
+
+   <!-- <TextView
+        android:id="@+id/aboutDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/about_description"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/temporary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Temporary TextView"
+        android:textSize="12sp" />-->
+
+    <TextView
+        android:layout_weight="1"
+        android:id="@+id/credits"
+        android:padding="8dp"
+        android:gravity="center_horizontal|bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:text="@string/about_page_icon_credits"
+        android:textSize="16sp" />
+
+</LinearLayout>

@@ -3,24 +3,31 @@ package com.tycho.app.primenumberfinder.utils;
 import android.content.Context;
 import android.util.Log;
 
-import com.tycho.app.primenumberfinder.PrimeNumberFinder;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+
+import simpletrees.Tokenizer;
+import simpletrees.Tree;
 
 /**
  * @author Tycho Bellers
  *         Date Created: 10/24/2016
  */
 
-public class FileManager{
+public final class FileManager {
 
     /**
      * Tag used for logging and debugging
@@ -33,30 +40,29 @@ public class FileManager{
     private static FileManager instance = null;
 
     /**
-     * Save directories.
+     * File directories.
      */
-    private final File directorySavedPrimes;
-    private final File directorySavedFactors;
+    private final File savedPrimesDirectory;
+    private final File savedFactorsDirectory;
+    private final File savedTreesDirectory;
 
-    private static final char SEPARATOR = ',';
-    private static final String EXTENSION = ".txt";
+    private static final char LIST_ITEM_SEPARATOR = ',';
+    public static final String EXTENSION = ".txt";
+    public static final String TREE_EXTENSION = ".tree";
 
     /**
-     * Gets the current FileManager instance.
+     * Initialize the file manager. This will create 1 instance that will be used throughout the
+     * lifetime of the application.
      *
-     * @param context The context to use to create the FileManager instance if it did not exist yet.
-     * @return FileManager instance.
+     * @param context Context used for getting the files directory.
      */
-    public static FileManager getInstance(final Context context){
-
-        if (instance == null){
+    public static void init(final Context context) {
+        if (instance == null) {
             instance = new FileManager(context);
         }
-
-        return instance;
     }
 
-    public static FileManager getInstance(){
+    public static FileManager getInstance() {
         if (instance == null) throw new RuntimeException("FileManager must be initialized first!");
         return instance;
     }
@@ -66,46 +72,77 @@ public class FileManager{
      *
      * @param context The context to use when initializing variables.
      */
-    private FileManager(final Context context){
+    private FileManager(final Context context) {
 
         //Initialize save directories
-        directorySavedPrimes = new File(context.getFilesDir().getAbsolutePath() + File.separator + "savedPrimes");
-        if (!directorySavedPrimes.exists()){
-            if (!directorySavedPrimes.mkdirs()){
-                if (PrimeNumberFinder.DEBUG)
-                    Log.e(TAG, "Failed to create save directory at " + directorySavedPrimes);
+        savedPrimesDirectory = new File(context.getFilesDir().getAbsolutePath() + File.separator + "savedPrimes");
+        if (!savedPrimesDirectory.exists()) {
+            if (!savedPrimesDirectory.mkdirs()) {
+                Log.e(TAG, "Failed to create save directory at " + savedPrimesDirectory);
             }
         }
 
-        directorySavedFactors = new File(context.getFilesDir().getAbsolutePath() + File.separator + "savedFactors");
-        if (!directorySavedFactors.exists()){
-            if (!directorySavedFactors.mkdirs()){
-                if (PrimeNumberFinder.DEBUG)
-                    Log.e(TAG, "Failed to create save directory at " + directorySavedFactors);
+        savedFactorsDirectory = new File(context.getFilesDir().getAbsolutePath() + File.separator + "savedFactors");
+        if (!savedFactorsDirectory.exists()) {
+            if (!savedFactorsDirectory.mkdirs()) {
+                Log.e(TAG, "Failed to create save directory at " + savedFactorsDirectory);
+            }
+        }
+
+        savedTreesDirectory = new File(context.getFilesDir().getAbsolutePath() + File.separator + "savedTrees");
+        if (!savedTreesDirectory.exists()) {
+            if (!savedTreesDirectory.mkdirs()) {
+                Log.e(TAG, "Failed to create save directory at " + savedTreesDirectory);
             }
         }
     }
 
-    //Write methods
-
-    public boolean savePrimes(final long startValue, final long endValue, final List<Long> primes){
-
-        final File file = new File(directorySavedPrimes.getAbsolutePath() + File.separator + "Prime numbers from " + startValue + " to " + endValue + EXTENSION);
-
+    public boolean savePrimes(final long startValue, final long endValue, final List<Long> primes) {
+        final File file = new File(savedPrimesDirectory.getAbsolutePath() + File.separator + "Prime numbers from " + startValue + " to " + endValue + EXTENSION);
         return writeNumbers(primes, file);
     }
 
-    public boolean saveFactors(final List<Long> factors){
+    public boolean savePrimes(final List<Long> primes, final File file) {
+        return writeNumbers(primes, file);
+    }
 
-        //Create new file
-        final File file = new File(directorySavedFactors.getAbsolutePath() + File.separator + "Factors of " + factors.get(factors.size() - 1) + EXTENSION);
-
+    public boolean saveFactors(final List<Long> factors, final long number) {
+        final File file = new File(savedFactorsDirectory.getAbsolutePath() + File.separator + "Factors of " + number + EXTENSION);
         return writeNumbers(factors, file);
     }
 
-    private boolean writeNumbers(final List<Long> numbers, final File file){
+    public boolean saveFactors(final List<Long> factors, final File file) {
+        return writeNumbers(factors, file);
+    }
 
-        try{
+    public boolean saveFactors(final List<Long> factors) {
+        return saveFactors(factors, factors.get(factors.size() - 1));
+    }
+
+    public boolean saveTree(final Tree<?> tree) {
+        final File file = new File(savedTreesDirectory.getAbsolutePath() + File.separator + "Factor tree of " + tree.getValue() + TREE_EXTENSION);
+        return saveTree(tree, file);
+    }
+
+    public boolean saveTree(final Tree<?> tree, final File file){
+        try {
+
+            final PrintWriter printWriter = new PrintWriter(file);
+            printWriter.write(tree.toString());
+            printWriter.flush();
+            printWriter.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean writeNumbers(final List<Long> numbers, final File file) {
+
+        try {
 
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
 
@@ -114,16 +151,16 @@ public class FileManager{
             for (long number : numbers){
                 bufferedWriter.write(String.valueOf(number));
 
-                if (number != lastNumber){
-                    bufferedWriter.write(SEPARATOR);
+                if (number != lastNumber) {
+                    bufferedWriter.write(LIST_ITEM_SEPARATOR);
                 }
-
             }
 
             bufferedWriter.flush();
             bufferedWriter.close();
 
-        }catch (IOException e){
+        } catch (IOException e) {
+            e.printStackTrace();
             return false;
         }
 
@@ -132,18 +169,18 @@ public class FileManager{
 
     //Read methods
 
-    public List<Long> readNumbers(final File file){
+    public List<Long> readNumbers(final File file) {
 
-        try{
-            final List<Long> numbers = new ArrayList<>();
+        final List<Long> numbers = new ArrayList<>();
 
+        try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
 
             String line;
 
             String output = "";
 
-            while ((line = bufferedReader.readLine()) != null){
+            while ((line = bufferedReader.readLine()) != null) {
                 output += line;
             }
 
@@ -151,25 +188,47 @@ public class FileManager{
 
             final List<String> stringNumbers = Arrays.asList(output.split(","));
 
-            for (String string : stringNumbers){
+            for (String string : stringNumbers) {
                 numbers.add(Long.valueOf(string));
             }
 
-            return numbers;
-        }catch (IOException e){
-            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
+        return numbers;
+    }
 
+    public Tree<Long> readTree(final File file) {
+        try {
+            InputStream inputStream = new FileInputStream(file);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            String line = bufferedReader.readLine();
+            StringBuilder stringBuilder = new StringBuilder();
+
+            while (line != null) {
+                stringBuilder.append(line);
+                line = bufferedReader.readLine();
+            }
+
+            return Tree.parse(stringBuilder.toString()).toLongTree();
+        } catch (IOException | Tokenizer.InvalidTokenException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     //Getters
 
-    public File getDirectorySavedPrimes(){
-        return directorySavedPrimes;
+    public File getSavedPrimesDirectory() {
+        return savedPrimesDirectory;
     }
 
-    public File getDirectorySavedFactors(){
-        return directorySavedFactors;
+    public File getSavedFactorsDirectory() {
+        return savedFactorsDirectory;
+    }
+
+    public File getSavedTreesDirectory() {
+        return savedTreesDirectory;
     }
 }
