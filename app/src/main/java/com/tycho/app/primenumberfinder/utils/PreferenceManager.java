@@ -37,16 +37,16 @@ public class PreferenceManager extends HashMap{
     //Utility methods
 
     private void loadPreferences(){
-        this.allowBackgroundTasks = sharedPreferences.getBoolean(Preferences.ALLOW_BACKGROUND_TASKS.getKey(), (boolean) Preferences.ALLOW_BACKGROUND_TASKS.getDefaultValue());
+        this.allowBackgroundTasks = sharedPreferences.getBoolean(Preference.ALLOW_BACKGROUND_TASKS.getKey(), (boolean) Preference.ALLOW_BACKGROUND_TASKS.getDefaultValue());
     }
 
     public void savePreferences(){
         sharedPreferences.edit()
-                .putBoolean(Preferences.ALLOW_BACKGROUND_TASKS.getKey(), this.allowBackgroundTasks)
+                .putBoolean(Preference.ALLOW_BACKGROUND_TASKS.getKey(), this.allowBackgroundTasks)
                 .apply();
     }
 
-    //Preferences
+    //Preference
 
     public boolean isAllowBackgroundTasks(){
         return allowBackgroundTasks;
@@ -58,13 +58,13 @@ public class PreferenceManager extends HashMap{
 
     //Options
 
-    public enum Preferences{
+    public enum Preference{
         ALLOW_BACKGROUND_TASKS("allowBackgroundTasks", false);
 
         private final String key;
         private final Object defaultValue;
 
-        Preferences(final String key, final Object defaultValue){
+        Preference(final String key, final Object defaultValue){
             this.key = key;
             this.defaultValue = defaultValue;
         }

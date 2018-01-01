@@ -12,10 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.tycho.app.primenumberfinder.utils.FileType;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesCardAdapter;
-import com.tycho.app.primenumberfinder.modules.savedfiles.SavedFilesCard;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.SavedFileType;
 import com.tycho.app.primenumberfinder.VerticalItemDecoration;
 
 import java.util.Iterator;
@@ -44,9 +43,9 @@ public class SavedFilesFragment extends Fragment{
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         cards = new SavedFilesCard[]{
-                new SavedFilesCard(getActivity(), "primeNumbers", "Prime numbers", "subTitle", R.color.purple, SavedFileType.PRIMES),
-                new SavedFilesCard(getActivity(), "factors", "Factors", "subTitle", R.color.orange, SavedFileType.FACTORS),
-                new SavedFilesCard(getActivity(), "factorTree", "Factor trees", "subTitle", R.color.green, SavedFileType.FACTOR_TREE)
+                new SavedFilesCard(getActivity(), "primeNumbers", "Prime numbers", "subTitle", R.color.purple, FileType.PRIMES),
+                new SavedFilesCard(getActivity(), "factors", "Factors", "subTitle", R.color.orange, FileType.FACTORS),
+                new SavedFilesCard(getActivity(), "factorTree", "Factor trees", "subTitle", R.color.green, FileType.TREE)
         };
     }
 

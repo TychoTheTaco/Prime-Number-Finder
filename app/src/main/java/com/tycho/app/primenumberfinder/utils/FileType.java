@@ -1,4 +1,4 @@
-package com.tycho.app.primenumberfinder;
+package com.tycho.app.primenumberfinder.utils;
 
 import android.content.res.Resources;
 
@@ -7,28 +7,28 @@ import android.content.res.Resources;
  *         Date Created: 11/3/2016
  */
 
-public enum SavedFileType{
+public enum FileType{
     PRIMES(0),
     FACTORS(1),
-    FACTOR_TREE(2);
+    TREE(2);
 
     private final int id;
 
-    SavedFileType(final int id){
+    FileType(final int id){
         this.id = id;
     }
 
     /**
-     * Find a SavedFileType by its ID.
+     * Find a FileType by its ID.
      * @param id The ID to search for
-     * @return The corresponding SavedFileType
+     * @return The corresponding FileType
      */
-    public static SavedFileType findById(final int id){
+    public static FileType findById(final int id){
 
-        //Search through each SavedFileType
-        for (SavedFileType savedFileType : SavedFileType.values()){
-            if (savedFileType.id == id){
-                return savedFileType;
+        //Search through each FileType
+        for (FileType fileType : FileType.values()){
+            if (fileType.id == id){
+                return fileType;
             }
         }
 

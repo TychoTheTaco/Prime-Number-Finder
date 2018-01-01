@@ -2,7 +2,7 @@ package com.tycho.app.primenumberfinder.modules.savedfiles;
 
 import android.content.Context;
 
-import com.tycho.app.primenumberfinder.SavedFileType;
+import com.tycho.app.primenumberfinder.utils.FileType;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesSmallListAdapter;
 
 /**
@@ -24,7 +24,7 @@ public class SavedFilesCard {
         this.tag = tag;
     }
 
-    public SavedFilesCard(final Context context, String tag, String title, String subTitle, int backgroundColor, final SavedFileType fileType){
+    public SavedFilesCard(final Context context, String tag, String title, String subTitle, int backgroundColor, final FileType fileType){
         this.title = title;
         this.subTitle = subTitle;
         this.tag = tag;

@@ -20,10 +20,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
-import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayFactorsActivity;
+import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimesActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
@@ -149,9 +148,7 @@ public class FindPrimesResultsFragment extends ResultsFragment implements FindPr
 
     @Override
     public void onProgressChanged(float progress) {
-        if (getTask() != null && getTask().getEndValue() != FindPrimesTask.END_VALUE_INFINITY){
-            requestUiUpdate();
-        }
+        requestUiUpdate();
     }
 
     @Override

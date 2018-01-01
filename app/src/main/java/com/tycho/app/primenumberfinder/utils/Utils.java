@@ -1,12 +1,18 @@
 package com.tycho.app.primenumberfinder.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.TypedValue;
+import android.view.inputmethod.InputMethodManager;
 
 import java.util.Locale;
 
 /**
+ *
+ * This class contains lots of random utility classes.
+ *
  * Created by tycho on 11/13/2017.
+ *
  */
 
 public final class Utils {
@@ -40,11 +46,11 @@ public final class Utils {
             return "infinity";
         }
 
-        int milliseconds = (int) (millis % 1000);
-        int seconds = (int) ((millis / 1000) % 60);
-        int minutes = (int) ((millis / (1000 * 60)) % 60);
-        int hours = (int) ((millis / (1000 * 60 * 60)) % 24);
-        int days = (int) ((millis / (1000 * 60 * 60 * 24)) % 7);
+        final int milliseconds = (int) (millis % 1000);
+        final int seconds = (int) ((millis / 1000) % 60);
+        final int minutes = (int) ((millis / (1000 * 60)) % 60);
+        final int hours = (int) ((millis / (1000 * 60 * 60)) % 24);
+        final int days = (int) ((millis / (1000 * 60 * 60 * 24)) % 7);
 
         final String time;
 
@@ -57,5 +63,14 @@ public final class Utils {
         }
 
         return time;
+    }
+
+    public static void hideKeyboard(final Context context) {
+        try {
+            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(((Activity) context).getCurrentFocus().getWindowToken(), 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

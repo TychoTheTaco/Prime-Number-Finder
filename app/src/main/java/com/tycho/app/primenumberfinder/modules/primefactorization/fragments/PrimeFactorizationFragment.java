@@ -5,10 +5,7 @@ import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -20,22 +17,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.adapters.FragmentAdapter;
-import com.tycho.app.primenumberfinder.activities.MainActivity;
-import com.tycho.app.primenumberfinder.modules.primefactorization.adapters.PrimeFactorizationTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
-import com.tycho.app.primenumberfinder.utils.Utils;
+import com.tycho.app.primenumberfinder.modules.primefactorization.adapters.PrimeFactorizationTaskListAdapter;
 
 import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.Locale;
 
 import easytasks.Task;
+
+import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
 /**
  * @author Tycho Bellers
@@ -177,13 +173,13 @@ public class PrimeFactorizationFragment extends Fragment {
                     fragmentAdapter.notifyDataSetChanged();
                     taskListFragment.getAdapter().addTask(task);
                     taskListFragment.update();
-                    PrimeNumberFinder.registerTask(task);
+                    PrimeNumberFinder.getTaskManager().registerTask(task);
 
                     //Start the task
                     task.startOnNewThread();
                     taskListFragment.getAdapter().setSelected(task);
 
-                    MainActivity.hideKeyboard(getActivity());
+                    hideKeyboard(getActivity());
 
                 } else {
                     Toast.makeText(getActivity(), "Invalid number", Toast.LENGTH_SHORT).show();

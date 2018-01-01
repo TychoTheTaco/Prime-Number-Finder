@@ -5,12 +5,6 @@
         android:id="@+id/group_main"
         android:checkableBehavior="single">
 
-        <!--<item
-            android:id="@+id/drawer_item_number_tester"
-            android:icon="@drawable/circle_white"
-            app:actionLayout="@layout/navigation_drawer_item"
-            android:title="@string/title_number_tester"/>-->
-
         <item
             android:id="@+id/drawer_item_find_primes"
             android:icon="@drawable/circle_white"
@@ -58,15 +52,5 @@
             android:title="@string/title_about" >
         </item>
     </group>
-
-    <!--<item
-        android:id="@+id/test_fragment_a"
-        android:icon="@drawable/circle_white"
-        android:title="Fragment A" />
-
-    <item
-        android:id="@+id/test_fragment_b"
-        android:icon="@drawable/circle_white"
-        android:title="Fragment B" />-->
 
 </menu>

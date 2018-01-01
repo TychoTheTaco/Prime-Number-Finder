@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.SavedFileType;
+import com.tycho.app.primenumberfinder.utils.FileType;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayFactorsActivity;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimeFactorizationActivity;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimesActivity;
@@ -49,13 +49,13 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private int selectedCount = 0;
     private boolean isSelecting = false;
 
-    private final SavedFileType fileType;
+    private final FileType fileType;
 
     private Context context;
 
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
 
-    public SavedFilesListAdapter(final Context context, final SavedFileType fileType) {
+    public SavedFilesListAdapter(final Context context, final FileType fileType) {
         this.fileType = fileType;
 
         this.context = context;
@@ -67,7 +67,7 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             case FACTORS:
                 files.addAll(Arrays.asList(FileManager.getInstance().getSavedFactorsDirectory().listFiles()));
                 break;
-            case FACTOR_TREE:
+            case TREE:
                 files.addAll(Arrays.asList(FileManager.getInstance().getSavedTreesDirectory().listFiles()));
                 break;
         }
@@ -122,7 +122,7 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 viewHolder.title.setText("Factors");
                 break;
 
-            case FACTOR_TREE:
+            case TREE:
                 viewHolder.title.setTextColor(ContextCompat.getColor(context, R.color.green_dark));
                 viewHolder.subTitle.setTextColor(ContextCompat.getColor(context, R.color.green_dark));
                 viewHolder.title.setText("Factor Trees");
@@ -134,7 +134,7 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     private void bindItem(final ViewHolderSavedFiles viewHolder, final int position) {
         final File file = files.get(position - 1);
-        final String fileName = file.getName().replace((fileType == SavedFileType.FACTOR_TREE ? FileManager.TREE_EXTENSION : FileManager.EXTENSION), "");
+        final String fileName = file.getName().replace((fileType == FileType.TREE ? FileManager.TREE_EXTENSION : FileManager.EXTENSION), "");
 
         viewHolder.fileName.setText(formatTitle(fileName));
 
@@ -150,7 +150,7 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 viewHolder.icon.setText("F");
                 break;
 
-            case FACTOR_TREE:
+            case TREE:
                 viewHolder.icon.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(viewHolder.itemView.getContext(), R.color.green)));
                 viewHolder.icon.setText("T");
                 break;
@@ -201,7 +201,7 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                             context.startActivity(intent);
                             break;
 
-                        case FACTOR_TREE:
+                        case TREE:
                             intent = new Intent(context, DisplayPrimeFactorizationActivity.class);
                             intent.putExtra("filePath", file.getAbsolutePath());
                             intent.putExtra("title", true);

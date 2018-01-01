@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,7 +13,7 @@ import android.view.MenuItem;
 
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.SavedFileType;
+import com.tycho.app.primenumberfinder.utils.FileType;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesListAdapter;
 
 /**
@@ -39,11 +38,11 @@ public class SavedFilesListActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        int savedFileTypeId = intent.getExtras().getInt("savedFileType");
+        int savedFileTypeId = intent.getExtras().getInt("fileType");
 
-        final SavedFileType savedFileType = SavedFileType.findById(savedFileTypeId);
+        final FileType fileType = FileType.findById(savedFileTypeId);
 
-        adapterSavedFilesList = new SavedFilesListAdapter(this, savedFileType);
+        adapterSavedFilesList = new SavedFilesListAdapter(this, fileType);
         adapterSavedFilesList.sortByDate();
         adapterSavedFilesList.notifyDataSetChanged();
 
@@ -52,7 +51,7 @@ public class SavedFilesListActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        switch (savedFileType) {
+        switch (fileType) {
             case PRIMES:
                 applyThemeColor(ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));
                 break;
@@ -61,7 +60,7 @@ public class SavedFilesListActivity extends AppCompatActivity {
                 applyThemeColor(ContextCompat.getColor(this, R.color.orange_dark), ContextCompat.getColor(this, R.color.orange));
                 break;
 
-            case FACTOR_TREE:
+            case TREE:
                 applyThemeColor(ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
                 break;
         }
@@ -128,14 +127,14 @@ public class SavedFilesListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        PrimeNumberFinder.resumeAllTasks();
+        PrimeNumberFinder.getTaskManager().resumeAllTasks();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         if (!PrimeNumberFinder.getPreferenceManager().isAllowBackgroundTasks()) {
-            PrimeNumberFinder.pauseAllTasks();
+            PrimeNumberFinder.getTaskManager().pauseAllTasks();
         }
     }
 }

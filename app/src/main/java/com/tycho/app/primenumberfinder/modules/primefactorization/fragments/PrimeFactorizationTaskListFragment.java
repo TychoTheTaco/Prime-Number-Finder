@@ -12,10 +12,6 @@ import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
-import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsTaskListAdapter;
-import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.adapters.PrimeFactorizationTaskListAdapter;
 
@@ -60,7 +56,7 @@ public class PrimeFactorizationTaskListFragment extends Fragment {
         rootView.post(new Runnable() {
             @Override
             public void run() {
-                for (Task task : PrimeNumberFinder.getTasks()){
+                for (Task task : PrimeNumberFinder.getTaskManager().getTasks()){
                     if (task instanceof PrimeFactorizationTask){
                         getAdapter().addTask(task);
                     }

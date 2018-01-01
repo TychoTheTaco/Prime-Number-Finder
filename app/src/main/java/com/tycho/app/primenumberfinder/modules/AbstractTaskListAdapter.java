@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsTaskListAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +25,7 @@ import easytasks.TaskListener;
  * Created by tycho on 12/12/2017.
  */
 
-public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<T> {
+public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<T>{
 
     /**
      * Tag used for logging and debugging.
@@ -49,7 +48,7 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
     private long lastUiUpdateTime = 0;
 
     @Override
-    public void onBindViewHolder(T holder, int position) {
+    public void onBindViewHolder(T holder, int position){
         final Task task = tasks.get(position);
         customEventListeners.get(task).setViewHolder(holder);
         doOnBindViewHolder(holder, position);
@@ -57,28 +56,28 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
 
     protected abstract void doOnBindViewHolder(RecyclerView.ViewHolder holder, int position);
 
-    protected abstract class CustomTaskEventListener implements TaskListener {
+    protected abstract class CustomTaskEventListener implements TaskListener{
         protected T holder;
 
-        private void setViewHolder(final T holder) {
+        private void setViewHolder(final T holder){
             this.holder = holder;
         }
     }
 
-    public void addTask(final Task task) {
+    public void addTask(final Task task){
         if (!tasks.contains(task)){
-            final CustomTaskEventListener customTaskEventListener = new CustomTaskEventListener() {
+            final CustomTaskEventListener customTaskEventListener = new CustomTaskEventListener(){
                 @Override
-                public void onTaskStarted() {
+                public void onTaskStarted(){
 
                 }
 
                 @Override
-                public void onTaskPaused() {
-                    handler.post(new Runnable() {
+                public void onTaskPaused(){
+                    handler.post(new Runnable(){
                         @Override
-                        public void run() {
-                            if (holder != null) {
+                        public void run(){
+                            if (holder != null){
                                 notifyItemChanged(holder.getAdapterPosition());
                             }
                         }
@@ -86,11 +85,11 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
                 }
 
                 @Override
-                public void onTaskResumed() {
-                    handler.post(new Runnable() {
+                public void onTaskResumed(){
+                    handler.post(new Runnable(){
                         @Override
-                        public void run() {
-                            if (holder != null) {
+                        public void run(){
+                            if (holder != null){
                                 notifyItemChanged(holder.getAdapterPosition());
                             }
                         }
@@ -98,11 +97,11 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
                 }
 
                 @Override
-                public void onTaskStopped() {
-                    handler.post(new Runnable() {
+                public void onTaskStopped(){
+                    handler.post(new Runnable(){
                         @Override
-                        public void run() {
-                            if (holder != null) {
+                        public void run(){
+                            if (holder != null){
                                 notifyItemChanged(holder.getAdapterPosition());
                             }
                         }
@@ -110,12 +109,12 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
                 }
 
                 @Override
-                public void onProgressChanged(float v) {
-                    if (System.currentTimeMillis() - lastUiUpdateTime >= PrimeNumberFinder.UPDATE_LIMIT_MS * 2) {
-                        handler.post(new Runnable() {
+                public void onProgressChanged(float v){
+                    if (System.currentTimeMillis() - lastUiUpdateTime >= PrimeNumberFinder.UPDATE_LIMIT_MS * 2){
+                        handler.post(new Runnable(){
                             @Override
-                            public void run() {
-                                if (holder != null) {
+                            public void run(){
+                                if (holder != null){
                                     notifyItemChanged(holder.getAdapterPosition());
                                 }
                             }
@@ -131,7 +130,7 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
         }
     }
 
-    public void setSelected(int index) {
+    public void setSelected(int index){
         final int changed = selectedItemPosition;
         selectedItemPosition = index;
         notifyItemChanged(selectedItemPosition);
@@ -144,15 +143,15 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
         }
     }
 
-    public void setSelected(final Task task) {
+    public void setSelected(final Task task){
         setSelected(tasks.indexOf(task));
     }
 
-    public int getSelectedItemPosition() {
+    public int getSelectedItemPosition(){
         return selectedItemPosition;
     }
 
-    public interface EventListener {
+    public interface EventListener{
         void onTaskSelected(final Task task);
 
         void onPausePressed(final Task task);
@@ -160,29 +159,29 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
         void onTaskRemoved(final Task task);
     }
 
-    public void addEventListener(final EventListener eventListener) {
+    public void addEventListener(final EventListener eventListener){
         Log.d(TAG, "Adding event listener: " + eventListener);
         if (!eventListeners.contains(eventListener)) eventListeners.add(eventListener);
     }
 
-    public boolean removeEventListener(final EventListener eventListener) {
+    public boolean removeEventListener(final EventListener eventListener){
         return eventListeners.remove(eventListener);
     }
 
-    protected void sendOnTaskSelected(final Task task) {
-        for (EventListener eventListener : eventListeners) {
+    protected void sendOnTaskSelected(final Task task){
+        for (EventListener eventListener : eventListeners){
             eventListener.onTaskSelected(task);
         }
     }
 
-    protected void sendOnPausePressed(final Task task) {
-        for (EventListener eventListener : eventListeners) {
+    protected void sendOnPausePressed(final Task task){
+        for (EventListener eventListener : eventListeners){
             eventListener.onPausePressed(task);
         }
     }
 
-    protected void sendOnDeletePressed(final Task task) {
-        for (EventListener eventListener : eventListeners) {
+    protected void sendOnDeletePressed(final Task task){
+        for (EventListener eventListener : eventListeners){
             eventListener.onTaskRemoved(task);
         }
     }
@@ -196,7 +195,7 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
         public final ImageButton pauseButton;
         public final ImageButton deleteButton;
 
-        public AbstractTaskListItemViewHolder(View itemView) {
+        public AbstractTaskListItemViewHolder(View itemView){
             super(itemView);
 
             root = itemView.findViewById(R.id.root);
@@ -206,9 +205,9 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
             pauseButton = itemView.findViewById(R.id.pause_button);
             deleteButton = itemView.findViewById(R.id.delete_button);
 
-            root.setOnClickListener(new View.OnClickListener() {
+            root.setOnClickListener(new View.OnClickListener(){
                 @Override
-                public void onClick(View v) {
+                public void onClick(View v){
 
                     if (selectedItemPosition == getAdapterPosition()){
                         setSelected(null);
@@ -219,11 +218,11 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
             });
 
             //Set button listeners
-            pauseButton.setOnClickListener(new View.OnClickListener() {
+            pauseButton.setOnClickListener(new View.OnClickListener(){
                 @Override
-                public void onClick(View v) {
+                public void onClick(View v){
 
-                    switch (tasks.get(getAdapterPosition()).getState()) {
+                    switch (tasks.get(getAdapterPosition()).getState()){
 
                         case PAUSED:
                             tasks.get(getAdapterPosition()).resume();
@@ -238,14 +237,14 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
                 }
             });
 
-            deleteButton.setOnClickListener(new View.OnClickListener() {
+            deleteButton.setOnClickListener(new View.OnClickListener(){
                 @Override
-                public void onClick(View v) {
+                public void onClick(View v){
                     tasks.get(getAdapterPosition()).stop();
 
-                    if (getAdapterPosition() < selectedItemPosition) {
+                    if (getAdapterPosition() < selectedItemPosition){
                         selectedItemPosition--;
-                    } else if (getAdapterPosition() == selectedItemPosition) {
+                    }else if (getAdapterPosition() == selectedItemPosition){
                         selectedItemPosition = -1;
                         sendOnTaskSelected(null);
                     }

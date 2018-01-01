@@ -87,17 +87,20 @@ public class FindFactorsTask extends Task {
 
             //Update statistics
             if (searchOptions.getMonitorType() != SearchOptions.MonitorType.NONE) {
-                if (System.currentTimeMillis() - statistics[0][2] >= 1000){
+
+                final long currentTime = System.currentTimeMillis();
+
+                if (currentTime - statistics[0][2] >= 1000){
                     statistics[0][1] = statistics[0][0];
                     statistics[0][0] = 0;
-                    statistics[0][2] = System.currentTimeMillis();
+                    statistics[0][2] = currentTime;
                 }
                 statistics[0][0]++;
 
-                if (System.currentTimeMillis() - statistics[1][2] >= 1000){
+                if (currentTime - statistics[1][2] >= 1000){
                     statistics[1][1] = statistics[1][0];
                     statistics[1][0] = 0;
-                    statistics[1][2] = System.currentTimeMillis();
+                    statistics[1][2] = currentTime;
                 }
             }
 

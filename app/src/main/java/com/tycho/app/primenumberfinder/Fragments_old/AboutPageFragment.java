@@ -49,7 +49,7 @@ public class AboutPageFragment extends Fragment{
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         //Set the adapter
-        recyclerView.setAdapter(new SavedFilesSmallListAdapter(getActivity(), SavedFileType.PRIMES));*/
+        recyclerView.setAdapter(new SavedFilesSmallListAdapter(getActivity(), FileType.PRIMES));*/
 
         //Disable item animations
         //recyclerViewSavedFilesCards.setItemAnimator(null);

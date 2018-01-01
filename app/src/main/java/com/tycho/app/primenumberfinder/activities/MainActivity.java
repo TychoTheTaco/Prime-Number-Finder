@@ -1,17 +1,9 @@
 package com.tycho.app.primenumberfinder.activities;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.content.res.ColorStateList;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -25,23 +17,18 @@ import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.Fragments_old.AboutPageFragment;
-import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
-import com.tycho.app.primenumberfinder.modules.findfactors.fragments.FindFactorsFragment;
-import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
-import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
-import com.tycho.app.primenumberfinder.modules.savedfiles.SavedFilesFragment;
 import com.tycho.app.primenumberfinder.Fragments_old.SettingsFragment;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.modules.findfactors.fragments.FindFactorsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesFragment;
 import com.tycho.app.primenumberfinder.modules.primefactorization.fragments.PrimeFactorizationFragment;
+import com.tycho.app.primenumberfinder.modules.savedfiles.SavedFilesFragment;
 
-import easytasks.Task;
+import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
 /**
  * @author Tycho Bellers
@@ -80,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
      * the corresponding fragment when a new drawer item is selected.
      */
     private SparseArray<String> fragmentIds = new SparseArray<>();
+    //TODO: This should be a map instead because these IDs are high numbers, the VM needs to create an array of lots of wasted space
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,8 +87,6 @@ public class MainActivity extends AppCompatActivity {
         fragmentIds.put(R.id.drawer_item_saved_files, "savedFiles");
         fragmentIds.put(R.id.drawer_item_settings, "settings");
         fragmentIds.put(R.id.drawer_item_about, "about");
-        //fragmentIds.put(R.id.test_fragment_a, "fragmentA");
-        //fragmentIds.put(R.id.test_fragment_b, "fragmentB");
 
         //Set up navigation drawer
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -307,55 +293,26 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void setActionBarColor(final int color) {
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(color));
-    }
-
-    private void setStatusBarColor(final int color) {
-        getWindow().setStatusBarColor(color);
-    }
-
     private void applyThemeColor(final int statusBarColor, final int actionBarColor) {
-        setStatusBarColor(statusBarColor);
-        setActionBarColor(actionBarColor);
-    }
 
-    public static void hideKeyboard(final Context context) {
-        try {
-            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(((Activity) context).getCurrentFocus().getWindowToken(), 0);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+        //Set status bar color
+        getWindow().setStatusBarColor(statusBarColor);
 
-    private Drawable repaintIcon(MenuItem menuItem, int color) {
-
-        Drawable oldIcon = menuItem.getIcon();
-
-        Canvas canvas = new Canvas();
-
-        Paint paint = new Paint();
-        paint.setColor(Color.RED);
-        paint.setColorFilter(new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY));
-        oldIcon.draw(canvas);
-        Drawable newIcon = oldIcon;
-
-
-        return newIcon;
+        //Set actionbar color
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(actionBarColor));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        PrimeNumberFinder.resumeAllTasks();
+        PrimeNumberFinder.getTaskManager().resumeAllTasks();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         if (!PrimeNumberFinder.getPreferenceManager().isAllowBackgroundTasks()) {
-            PrimeNumberFinder.pauseAllTasks();
+            PrimeNumberFinder.getTaskManager().pauseAllTasks();
         }
     }
 }

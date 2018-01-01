@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.SavedFileType;
+import com.tycho.app.primenumberfinder.utils.FileType;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimeFactorizationActivity;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayFactorsActivity;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimesActivity;
@@ -37,11 +37,11 @@ public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesS
     private final SparseBooleanArray selectedPositions = new SparseBooleanArray();
     private boolean isSelecting = false;
 
-    private final SavedFileType fileType;
+    private final FileType fileType;
 
     private Context context;
 
-    public SavedFilesSmallListAdapter(final Context context, final SavedFileType fileType){
+    public SavedFilesSmallListAdapter(final Context context, final FileType fileType){
         this.fileType = fileType;
 
         this.context = context;
@@ -53,7 +53,7 @@ public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesS
             case FACTORS:
                 files.addAll(Arrays.asList(FileManager.getInstance().getSavedFactorsDirectory().listFiles()));
                 break;
-            case FACTOR_TREE:
+            case TREE:
                 files.addAll(Arrays.asList(FileManager.getInstance().getSavedTreesDirectory().listFiles()));
                 break;
         }
@@ -70,7 +70,7 @@ public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesS
 
         final File file = files.get(position);
 
-        final String fileName = file.getName().replace((fileType == SavedFileType.FACTOR_TREE ? FileManager.TREE_EXTENSION : FileManager.EXTENSION), "");
+        final String fileName = file.getName().replace((fileType == FileType.TREE ? FileManager.TREE_EXTENSION : FileManager.EXTENSION), "");
 
         holder.fileName.setText(formatTitle(fileName));
 
@@ -105,7 +105,7 @@ public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesS
                 });
                 break;
 
-            case FACTOR_TREE:
+            case TREE:
                 holder.icon.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.green)));
                 holder.icon.setText("T");
                 holder.itemView.setOnClickListener(new View.OnClickListener(){
@@ -165,7 +165,7 @@ public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesS
             case FACTORS:
                 files.addAll(Arrays.asList(FileManager.getInstance().getSavedFactorsDirectory().listFiles()));
                 break;
-            case FACTOR_TREE:
+            case TREE:
                 files.addAll(Arrays.asList(FileManager.getInstance().getSavedTreesDirectory().listFiles()));
                 break;
         }
@@ -185,7 +185,7 @@ public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesS
         return files;
     }
 
-    public SavedFileType getFileType(){
+    public FileType getFileType(){
         return fileType;
     }
 

@@ -5,37 +5,32 @@ import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsTaskListAdapter;
 import com.tycho.app.primenumberfinder.adapters.FragmentAdapter;
-import com.tycho.app.primenumberfinder.activities.MainActivity;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
-import com.tycho.app.primenumberfinder.utils.Utils;
+import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsTaskListAdapter;
 
 import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.Locale;
 
 import easytasks.Task;
+
+import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
 /**
  * This {@linkplain Fragment} allows the user to input a number they want to factor. This fragment
@@ -178,13 +173,13 @@ public class FindFactorsFragment extends Fragment {
                     final Task task = new FindFactorsTask(searchOptions);
                     taskListFragment.getAdapter().addTask(task);
                     taskListFragment.update();
-                    PrimeNumberFinder.registerTask(task);
+                    PrimeNumberFinder.getTaskManager().registerTask(task);
 
                     //Start the task
                     task.startOnNewThread();
                     taskListFragment.getAdapter().setSelected(task);
 
-                    MainActivity.hideKeyboard(getActivity());
+                    hideKeyboard(getActivity());
                     taskListFragment.scrollToBottom();
 
                 } else {

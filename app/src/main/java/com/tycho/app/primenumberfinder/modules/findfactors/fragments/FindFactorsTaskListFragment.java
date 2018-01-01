@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +14,6 @@ import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsTaskListAdapter;
-import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 
 import easytasks.Task;
 
@@ -61,7 +58,7 @@ public class FindFactorsTaskListFragment extends Fragment {
         rootView.post(new Runnable() {
             @Override
             public void run() {
-                for (Task task : PrimeNumberFinder.getTasks()){
+                for (Task task : PrimeNumberFinder.getTaskManager().getTasks()){
                     if (task instanceof FindFactorsTask){
                         getAdapter().addTask(task);
                     }

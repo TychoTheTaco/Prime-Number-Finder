@@ -4,18 +4,10 @@ import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.util.Log;
-import android.util.TypedValue;
 
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import easytasks.Task;
+import com.tycho.app.primenumberfinder.utils.TaskManager;
 
 /**
  * @author Tycho Bellers
@@ -29,11 +21,9 @@ public class PrimeNumberFinder extends Application {
     private static final String TAG = "PrimeNumberFinder";
 
     /**
-     * List of all tasks.
+     * Task manager to manage all application tasks.
      */
-    private static final List<Task> tasks = new ArrayList<>();
-
-    private static final Map<Task, Task.State> previousTaskStates = new HashMap<>();
+    private static TaskManager taskManager;
 
     /**
      * Holds all user preferences.
@@ -51,38 +41,9 @@ public class PrimeNumberFinder extends Application {
     public void onCreate() {
         super.onCreate();
 
-        //Initialize file manager and preference manager
         FileManager.init(this);
+        taskManager = new TaskManager();
         preferenceManager = new PreferenceManager(this, "preferences");
-    }
-
-    //Utility methods
-
-    /**
-     * Pause all tasks.
-     */
-    public static void pauseAllTasks() {
-        for (Task task : tasks) {
-            previousTaskStates.put(task, task.getState());
-            task.pause();
-        }
-        Log.d(TAG, "Tasks paused");
-    }
-
-    /**
-     * Resume all tasks.
-     */
-    public static void resumeAllTasks() {
-        for (Task task : tasks) {
-            if (previousTaskStates.get(task) == Task.State.RUNNING) {
-                task.resume();
-            }
-        }
-        Log.d(TAG, "Tasks resumed");
-    }
-
-    public static List<Task> getTasks() {
-        return tasks;
     }
 
     //Utility methods
@@ -96,21 +57,13 @@ public class PrimeNumberFinder extends Application {
         }
     }
 
-    public static void registerTask(final Task task) {
-        if (!tasks.contains(task)) {
-            tasks.add(task);
-        } else {
-            Log.w(TAG, "Task already registered!");
-        }
-    }
-
-    public static boolean unregisterTask(final Task task) {
-        return tasks.remove(task);
-    }
-
     //Getters and setters
 
     public static PreferenceManager getPreferenceManager() {
         return preferenceManager;
+    }
+
+    public static TaskManager getTaskManager(){
+        return taskManager;
     }
 }

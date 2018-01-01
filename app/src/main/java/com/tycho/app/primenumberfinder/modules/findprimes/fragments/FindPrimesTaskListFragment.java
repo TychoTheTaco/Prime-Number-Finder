@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +12,7 @@ import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
@@ -56,16 +56,17 @@ public class FindPrimesTaskListFragment extends Fragment {
         //Set up "no tasks" message
         textViewNoTasks = rootView.findViewById(R.id.empty_message);
 
+        //Restore tasks if fragment was destroyed
         rootView.post(new Runnable() {
             @Override
             public void run() {
-                for (Task task : PrimeNumberFinder.getTasks()){
+                for (Task task : PrimeNumberFinder.getTaskManager().getTasks()){
                     if (task instanceof FindPrimesTask || task instanceof CheckPrimalityTask){
-                        getAdapter().addTask(task);
+                        taskListAdapter.addTask(task);
                     }
                 }
-                if (getAdapter().getItemCount() > 0){
-                    getAdapter().setSelected(0);
+                if (taskListAdapter.getItemCount() > 0){
+                    taskListAdapter.setSelected(0);
                 }
 
                 update();
@@ -75,8 +76,21 @@ public class FindPrimesTaskListFragment extends Fragment {
         return rootView;
     }
 
-    public FindPrimesTaskListAdapter getAdapter(){
-        return taskListAdapter;
+    public void addTask(final Task task){
+        taskListAdapter.addTask(task);
+        update();
+    }
+
+    public void setSelected(final int index){
+        taskListAdapter.setSelected(index);
+    }
+
+    public void setSelected(final Task task){
+        taskListAdapter.setSelected(task);
+    }
+
+    public void addEventListener(final AbstractTaskListAdapter.EventListener eventListener){
+        taskListAdapter.addEventListener(eventListener);
     }
 
     public void update(){

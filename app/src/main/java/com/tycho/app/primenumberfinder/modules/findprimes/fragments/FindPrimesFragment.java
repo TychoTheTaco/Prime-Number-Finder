@@ -3,17 +3,11 @@ package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 import android.app.Fragment;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,27 +15,22 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.adapters.FragmentAdapter;
-import com.tycho.app.primenumberfinder.activities.MainActivity;
-import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
-import com.tycho.app.primenumberfinder.utils.Utils;
+import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
 
 import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.Locale;
-import java.util.Queue;
-import java.util.Stack;
-import java.util.concurrent.ArrayBlockingQueue;
 
 import easytasks.Task;
-import easytasks.TaskListener;
+
+import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
 /**
  * @author Tycho Bellers
@@ -101,7 +90,7 @@ public class FindPrimesFragment extends Fragment{
         rootView.post(new Runnable() {
             @Override
             public void run() {
-                taskListFragment.getAdapter().addEventListener(new FindPrimesTaskListAdapter.EventListener() {
+                taskListFragment.addEventListener(new FindPrimesTaskListAdapter.EventListener() {
                     @Override
                     public void onTaskSelected(Task task) {
                         if (task instanceof FindPrimesTask){
@@ -152,7 +141,6 @@ public class FindPrimesFragment extends Fragment{
                 });
             }
         });
-
         fragmentAdapter.add("Results", generalResultsFragment);
         fragmentAdapter.add("Statistics", generalStatisticsFragment);
         generalResultsFragment.setContent(findPrimesResultsFragment);
@@ -205,6 +193,7 @@ public class FindPrimesFragment extends Fragment{
             }
         });
         editTextPrimalityInput.setOnTouchListener(new View.OnTouchListener() {
+
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 //Clear text on touch
@@ -256,16 +245,15 @@ public class FindPrimesFragment extends Fragment{
 
                         }
                     });*/
-                    taskListFragment.getAdapter().addTask(task);
-                    taskListFragment.update();
-                    PrimeNumberFinder.registerTask(task);
+                    taskListFragment.addTask(task);
+                    PrimeNumberFinder.getTaskManager().registerTask(task);
 
                     //Start the task
                     task.startOnNewThread();
-                    taskListFragment.getAdapter().setSelected(task);
+                    taskListFragment.setSelected(task);
 
                     //bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                    MainActivity.hideKeyboard(getActivity());
+                    hideKeyboard(getActivity());
 
                 } else {
                     Toast.makeText(getActivity(), getString(R.string.error_invalid_number), Toast.LENGTH_SHORT).show();
@@ -381,17 +369,17 @@ public class FindPrimesFragment extends Fragment{
                     //Create a new task
                     searchOptions.setStartValue(getStartValue());
                     searchOptions.setEndValue(getEndValue());
+                    searchOptions.setThreadCount(2);
                     final Task task = new FindPrimesTask(searchOptions);
-                    taskListFragment.getAdapter().addTask(task);
-                    taskListFragment.update();
-                    PrimeNumberFinder.registerTask(task);
+                    taskListFragment.addTask(task);
+                    PrimeNumberFinder.getTaskManager().registerTask(task);
 
                     //Start the task
                     task.startOnNewThread();
-                    taskListFragment.getAdapter().setSelected(task);
+                    taskListFragment.setSelected(task);
 
                     //bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                    MainActivity.hideKeyboard(getActivity());
+                    hideKeyboard(getActivity());
 
                 } else {
                     Toast.makeText(getActivity(), getString(R.string.error_invalid_range), Toast.LENGTH_SHORT).show();
