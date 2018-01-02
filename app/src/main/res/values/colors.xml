@@ -6,9 +6,10 @@
     <color name="primary">#546E7A</color> <!-- 500 -->
     <color name="primary_dark">#37474F</color> <!-- 800 -->
 
-    <!-- Secondary colors (Indigo) -->
+    <!-- Secondary colors (Blue) -->
     <color name="accent_very_light">#E8EAF6</color> <!-- 50 -->
     <color name="accent_light">#C5CAE9</color> <!-- 100 -->
+    <color name="accent_light_but_not_that_light">#64B5F6</color> <!-- 300 -->
     <color name="accent">#536DFE</color> <!-- A200 -->
     <color name="accent_dark">#3D5AFE</color> <!-- A400 -->
 

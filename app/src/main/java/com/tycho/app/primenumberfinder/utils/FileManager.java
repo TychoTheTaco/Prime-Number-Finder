@@ -3,6 +3,8 @@ package com.tycho.app.primenumberfinder.utils;
 import android.content.Context;
 import android.util.Log;
 
+import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -75,21 +77,21 @@ public final class FileManager {
     private FileManager(final Context context) {
 
         //Initialize save directories
-        savedPrimesDirectory = new File(context.getFilesDir().getAbsolutePath() + File.separator + "savedPrimes");
+        savedPrimesDirectory = new File(context.getFilesDir().getAbsolutePath() + File.separator + "primes");
         if (!savedPrimesDirectory.exists()) {
             if (!savedPrimesDirectory.mkdirs()) {
                 Log.e(TAG, "Failed to create save directory at " + savedPrimesDirectory);
             }
         }
 
-        savedFactorsDirectory = new File(context.getFilesDir().getAbsolutePath() + File.separator + "savedFactors");
+        savedFactorsDirectory = new File(context.getFilesDir().getAbsolutePath() + File.separator + "factors");
         if (!savedFactorsDirectory.exists()) {
             if (!savedFactorsDirectory.mkdirs()) {
                 Log.e(TAG, "Failed to create save directory at " + savedFactorsDirectory);
             }
         }
 
-        savedTreesDirectory = new File(context.getFilesDir().getAbsolutePath() + File.separator + "savedTrees");
+        savedTreesDirectory = new File(context.getFilesDir().getAbsolutePath() + File.separator + "trees");
         if (!savedTreesDirectory.exists()) {
             if (!savedTreesDirectory.mkdirs()) {
                 Log.e(TAG, "Failed to create save directory at " + savedTreesDirectory);
@@ -218,7 +220,58 @@ public final class FileManager {
         }
     }
 
-    //Getters
+    public void updateFileSystem(final Context context){
+
+        //Check for primes directory
+        final File primesDirectory = new File(context.getFilesDir().getAbsolutePath() + File.separator + "Prime numbers");
+        if (primesDirectory.exists()){
+            for (File file : primesDirectory.listFiles()){
+                final List<Long> numbers = new ArrayList<>();
+
+                //Read old file
+                try {
+                    BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        numbers.add(Long.valueOf(line));
+                    }
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                //Save as new file
+                savePrimes(numbers, new File(getSavedPrimesDirectory() + File.separator + file.getName()));
+                file.delete();
+            }
+            primesDirectory.delete();
+        }
+
+        //Check for factors directory
+        final File factorsDirectory = new File(context.getFilesDir().getAbsolutePath() + File.separator + "Factors");
+        if (factorsDirectory.exists()){
+            for (File file : factorsDirectory.listFiles()){
+                final List<Long> numbers = new ArrayList<>();
+
+                //Read old file
+                try {
+                    BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        numbers.add(Long.valueOf(line));
+                    }
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                //Save as new file
+                saveFactors(numbers, new File(getSavedFactorsDirectory() + File.separator + file.getName()));
+                file.delete();
+            }
+            factorsDirectory.delete();
+        }
+    }
 
     public File getSavedPrimesDirectory() {
         return savedPrimesDirectory;

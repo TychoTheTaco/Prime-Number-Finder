@@ -50,23 +50,10 @@ public class SavedFilesCardAdapter extends RecyclerView.Adapter<SavedFilesCardAd
         //Get the card at this position
         final SavedFilesCard card = cards.get(position);
 
-        /*holder.recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        holder.recyclerView.setItemAnimator(null);
-        holder.recyclerView.setAdapter(card.getSavedFilesAdapter());*/
-
         holder.recyclerView.setAdapter(card.getSavedFilesAdapter());
         card.getSavedFilesAdapter().refresh();
         card.getSavedFilesAdapter().sortByDate();
        // holder.listView.setAdapter(card.getAdapterSavedFilesTest());
-
-        holder.button.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Intent intent = new Intent(context, SavedFilesListActivity.class);
-                intent.putExtra("savedFileType", card.getSavedFilesAdapter().getFileType().getId());
-                context.startActivity(intent);
-            }
-        });
 
         final ViewGroup.LayoutParams layoutParams = holder.recyclerView.getLayoutParams();
         //final ViewGroup.LayoutParams layoutParams = holder.listView.getLayoutParams();
@@ -80,11 +67,7 @@ public class SavedFilesCardAdapter extends RecyclerView.Adapter<SavedFilesCardAd
 
         holder.title.setText(card.getTitle());
         holder.subTitle.setText(card.getSubTitle());
-        //((CardView)holder.itemView).setCardBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), card.getBackgroundColor()));
-        holder.layout_title.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), card.getBackgroundColor()));
-
-        float elevation = ((CardView) holder.itemView).getCardElevation();
-        holder.layout_title.setElevation(elevation * 1.3f);
+        holder.headerLayout.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), card.getBackgroundColor()));
     }
 
     @Override
@@ -98,30 +81,38 @@ public class SavedFilesCardAdapter extends RecyclerView.Adapter<SavedFilesCardAd
 
     protected class ViewHolderSavedFilesCard extends RecyclerView.ViewHolder{
 
-        private final View layout_title;
+        private final View headerLayout;
         private final TextView title;
         private final TextView subTitle;
         private final RecyclerView recyclerView;
-        //private final ListView listView;
         private final View bottomBar;
-        private final Button button;
+        private final Button viewAllButton;
 
         public ViewHolderSavedFilesCard(final View itemView){
             super(itemView);
-            layout_title = itemView.findViewById(R.id.layout_title);
-            title = (TextView) itemView.findViewById(R.id.title);
-            subTitle = (TextView) itemView.findViewById(R.id.subtitle);
-            recyclerView = (RecyclerView) itemView.findViewById(R.id.recyclerView);
-            //listView = (ListView) itemView.findViewById(R.id.recyclerView);
-            bottomBar = itemView.findViewById(R.id.layout_bottomBar);
-            button = (Button) itemView.findViewById(R.id.button);
 
-            initRecyclerView();
-        }
+            headerLayout = itemView.findViewById(R.id.layout_title);
+            headerLayout.setElevation(((CardView) itemView).getCardElevation() * 1.3f);
 
-        private void initRecyclerView(){
+            title = itemView.findViewById(R.id.title);
+            subTitle = itemView.findViewById(R.id.subtitle);
+
+            recyclerView = itemView.findViewById(R.id.recyclerView);
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             recyclerView.setItemAnimator(null);
+
+            bottomBar = itemView.findViewById(R.id.layout_bottomBar);
+
+            viewAllButton = itemView.findViewById(R.id.button);
+            viewAllButton.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view){
+                    final Intent intent = new Intent(context, SavedFilesListActivity.class);
+                    intent.putExtra("fileType", cards.get(getAdapterPosition()).getSavedFilesAdapter().getFileType().getId());
+                    context.startActivity(intent);
+                }
+            });
+
         }
     }
 }

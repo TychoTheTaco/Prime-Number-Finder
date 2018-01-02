@@ -83,7 +83,7 @@ public class FindPrimesTask extends Task {
         switch (searchMethod){
 
             case BRUTE_FORCE:
-                if (this.searchOptions.threadCount > 1){
+                /*if (this.searchOptions.threadCount > 1){
 
                     final Object LOCK = new Object();
 
@@ -144,9 +144,9 @@ public class FindPrimesTask extends Task {
 
                     }
 
-                }else{
+                }else{*/
                     searchBruteForce();
-                }
+                //}
 
                 break;
 
@@ -371,7 +371,7 @@ public class FindPrimesTask extends Task {
 
                 //Calculate total progress
                 if (endValue != END_VALUE_INFINITY){
-                   // setProgress(((float) (currentNumber - startValue) / (endValue - startValue)));
+                    setProgress(((float) (currentNumber - startValue) / (endValue - startValue)));
                 }
 
             }else{

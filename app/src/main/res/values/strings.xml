@@ -62,7 +62,7 @@
     </plurals>
 
     <!-- Saved files page -->
-    <string name="no_saved_files_message">No saved files.</string>
+    <string name="no_saved_files_message">You have no saved files.</string>
 
     <!-- About page -->
     <string name="about_description">FindPrime is an application that can be used to find prime numbers and factors of any number. Prime numbers and factors can be saved to a text file for later use.\n\nThis application was created by Tycho Bellers.</string>

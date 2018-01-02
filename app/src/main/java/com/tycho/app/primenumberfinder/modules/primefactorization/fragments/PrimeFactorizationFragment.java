@@ -130,21 +130,16 @@ public class PrimeFactorizationFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable editable) {
 
-                //Format the input with comma's
-                final String text = editable.toString();
-                final String numberString = text.replace(",", "");
-                if (numberString.trim().length() > 0) {
-                    final long number = Long.valueOf(numberString);
-                    final String formattedText = NumberFormat.getNumberInstance(Locale.getDefault()).format(number);
-                    if (!text.equals(formattedText)) {
+                //Check if the number is valid
+                if (isNumberValid()) {
+                    editTextInput.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.accent)));
+
+                    final String formattedText = NumberFormat.getNumberInstance(Locale.getDefault()).format(getNumberToFactor());
+                    if (!editable.toString().equals(formattedText)) {
                         editTextInput.setText(formattedText);
                     }
                     editTextInput.setSelection(formattedText.length());
-                }
 
-                //Change the underline color if the number is invalid
-                if (isNumberValid()) {
-                    editTextInput.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.accent)));
                 } else {
                     editTextInput.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.red)));
                 }

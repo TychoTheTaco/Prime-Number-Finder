@@ -151,7 +151,7 @@ public class FindPrimesFragment extends Fragment{
         tabLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                //TODO: We might not want to do this because the last fragment doesnt get even spacing. Either center it or allow scrolling.
+                //TODO: We might not want to do this because the last fragment doesn't get even spacing. Either center it or allow scrolling.
                 /**
                  * This empty touch listener is to prevent the scrolling behaviour of this
                  * TabLayout's parent HorizontalScrollView.
@@ -369,7 +369,7 @@ public class FindPrimesFragment extends Fragment{
                     //Create a new task
                     searchOptions.setStartValue(getStartValue());
                     searchOptions.setEndValue(getEndValue());
-                    searchOptions.setThreadCount(2);
+                    //searchOptions.setThreadCount(2);
                     final Task task = new FindPrimesTask(searchOptions);
                     taskListFragment.addTask(task);
                     PrimeNumberFinder.getTaskManager().registerTask(task);

@@ -237,7 +237,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                 spannableStringBuilder = new SpannableStringBuilder();
                 final Map map = getTask().getPrimeFactors();
                 for (Object factor : map.keySet()){
-                    spannableStringBuilder.append(NumberFormat.getInstance(Locale.getDefault()).format(factor));
+                    spannableStringBuilder.append(NumberFormat.getInstance(Locale.getDefault()).format(factor), new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.green_dark)), 0);
                     final int startIndex = spannableStringBuilder.length();
                     spannableStringBuilder.append(NumberFormat.getInstance(Locale.getDefault()).format(map.get(factor)), new SuperscriptSpan(), 0);
                     final int endIndex = spannableStringBuilder.length();
@@ -281,7 +281,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                     final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
                     final Map map = getTask().getPrimeFactors();
                     for (Object factor : map.keySet()){
-                        spannableStringBuilder.append(NumberFormat.getInstance(Locale.getDefault()).format(factor));
+                        spannableStringBuilder.append(NumberFormat.getInstance(Locale.getDefault()).format(factor), new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.green_dark)), 0);
                         final int startIndex = spannableStringBuilder.length();
                         spannableStringBuilder.append(NumberFormat.getInstance(Locale.getDefault()).format(map.get(factor)), new SuperscriptSpan(), 0);
                         final int endIndex = spannableStringBuilder.length();
@@ -294,12 +294,13 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
             }
 
             //Update progress
-            if (getTask().getState() != Task.State.STOPPED){
+            /*if (getTask().getState() != Task.State.STOPPED){
                 progress.setVisibility(View.VISIBLE);
                 progress.setText(getString(R.string.task_progress, decimalFormat.format(getTask().getProgress() * 100)));
             }else{
                 progress.setVisibility(View.GONE);
-            }
+            }*/
+            progress.setVisibility(View.GONE);
 
             //Format subtitle
             final String number = NumberFormat.getInstance(Locale.getDefault()).format(getTask().getNumber());

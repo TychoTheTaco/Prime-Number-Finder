@@ -5,7 +5,7 @@
     <item>
         <selector>
             <item android:state_selected="true">
-                <color android:color="@color/green_very_light" />
+                <color android:color="@color/accent_very_light" />
             </item>
 
             <item>
