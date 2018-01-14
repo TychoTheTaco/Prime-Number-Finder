@@ -1,6 +1,7 @@
 package com.tycho.app.primenumberfinder.modules.findfactors.fragments;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,8 +13,13 @@ import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsTaskListAdapter;
+import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
+
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import easytasks.Task;
 
@@ -34,10 +40,15 @@ public class FindFactorsTaskListFragment extends Fragment {
 
     private RecyclerView recyclerView;
 
+    private Queue<AbstractTaskListAdapter.EventListener> eventListenerQueue = new LinkedBlockingQueue<>(5);
+
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        taskListAdapter = new FindFactorsTaskListAdapter(getActivity());
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        taskListAdapter = new FindFactorsTaskListAdapter(context);
+        while (!eventListenerQueue.isEmpty()){
+            taskListAdapter.addEventListener(eventListenerQueue.poll());
+        }
     }
 
     @Nullable
@@ -60,11 +71,11 @@ public class FindFactorsTaskListFragment extends Fragment {
             public void run() {
                 for (Task task : PrimeNumberFinder.getTaskManager().getTasks()){
                     if (task instanceof FindFactorsTask){
-                        getAdapter().addTask(task);
+                        taskListAdapter.addTask(task);
                     }
                 }
-                if (getAdapter().getItemCount() > 0){
-                    getAdapter().setSelected(0);
+                if (taskListAdapter.getItemCount() > 0){
+                    taskListAdapter.setSelected(0);
                 }
 
                 update();
@@ -74,8 +85,25 @@ public class FindFactorsTaskListFragment extends Fragment {
         return rootView;
     }
 
-    public FindFactorsTaskListAdapter getAdapter(){
-        return taskListAdapter;
+    public void addEventListener(final AbstractTaskListAdapter.EventListener eventListener){
+        if (taskListAdapter == null){
+            eventListenerQueue.add(eventListener);
+        }else{
+            taskListAdapter.addEventListener(eventListener);
+        }
+    }
+
+    public void addTask(final Task task){
+        taskListAdapter.addTask(task);
+        update();
+    }
+
+    public void setSelected(final int index){
+        taskListAdapter.setSelected(index);
+    }
+
+    public void setSelected(final Task task){
+        taskListAdapter.setSelected(task);
     }
 
     public void update(){

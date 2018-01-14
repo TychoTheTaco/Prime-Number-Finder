@@ -1,6 +1,7 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,6 +17,12 @@ import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
+
+import java.util.Iterator;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import easytasks.Task;
 
@@ -34,11 +41,15 @@ public class FindPrimesTaskListFragment extends Fragment {
 
     private TextView textViewNoTasks;
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    private final Queue<AbstractTaskListAdapter.EventListener> eventListenerQueue = new LinkedBlockingQueue<>(5);
 
-        taskListAdapter = new FindPrimesTaskListAdapter(getActivity());
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        taskListAdapter = new FindPrimesTaskListAdapter(context);
+        while (!eventListenerQueue.isEmpty()){
+            taskListAdapter.addEventListener(eventListenerQueue.poll());
+        }
     }
 
     @Nullable
@@ -90,7 +101,11 @@ public class FindPrimesTaskListFragment extends Fragment {
     }
 
     public void addEventListener(final AbstractTaskListAdapter.EventListener eventListener){
-        taskListAdapter.addEventListener(eventListener);
+        if (taskListAdapter == null){
+            eventListenerQueue.add(eventListener);
+        }else{
+            taskListAdapter.addEventListener(eventListener);
+        }
     }
 
     public void update(){
