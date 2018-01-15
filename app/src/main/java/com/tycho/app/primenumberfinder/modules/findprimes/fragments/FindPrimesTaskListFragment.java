@@ -1,10 +1,13 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
+import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +19,12 @@ import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
+
+import java.util.Iterator;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import easytasks.Task;
 
@@ -34,11 +43,20 @@ public class FindPrimesTaskListFragment extends Fragment {
 
     private TextView textViewNoTasks;
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    private final Queue<AbstractTaskListAdapter.EventListener> eventListenerQueue = new LinkedBlockingQueue<>(5);
 
-        taskListAdapter = new FindPrimesTaskListAdapter(getActivity());
+    /**
+     * This deprecated version of {@linkplain Fragment#onAttach(Activity)} is needed in API < 22.
+     *
+     * @param activity
+     */
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        taskListAdapter = new FindPrimesTaskListAdapter(activity);
+        while (!eventListenerQueue.isEmpty()) {
+            taskListAdapter.addEventListener(eventListenerQueue.poll());
+        }
     }
 
     @Nullable
@@ -57,43 +75,42 @@ public class FindPrimesTaskListFragment extends Fragment {
         textViewNoTasks = rootView.findViewById(R.id.empty_message);
 
         //Restore tasks if fragment was destroyed
-        rootView.post(new Runnable() {
-            @Override
-            public void run() {
-                for (Task task : PrimeNumberFinder.getTaskManager().getTasks()){
-                    if (task instanceof FindPrimesTask || task instanceof CheckPrimalityTask){
-                        taskListAdapter.addTask(task);
-                    }
-                }
-                if (taskListAdapter.getItemCount() > 0){
-                    taskListAdapter.setSelected(0);
-                }
-
-                update();
+        for (Task task : PrimeNumberFinder.getTaskManager().getTasks()) {
+            if (task instanceof FindPrimesTask || task instanceof CheckPrimalityTask) {
+                taskListAdapter.addTask(task);
             }
-        });
+        }
+        if (taskListAdapter.getItemCount() > 0) {
+            taskListAdapter.setSelected(0);
+        }
+
+        update();
 
         return rootView;
     }
 
-    public void addTask(final Task task){
+    public void addTask(final Task task) {
         taskListAdapter.addTask(task);
         update();
     }
 
-    public void setSelected(final int index){
+    public void setSelected(final int index) {
         taskListAdapter.setSelected(index);
     }
 
-    public void setSelected(final Task task){
+    public void setSelected(final Task task) {
         taskListAdapter.setSelected(task);
     }
 
-    public void addEventListener(final AbstractTaskListAdapter.EventListener eventListener){
-        taskListAdapter.addEventListener(eventListener);
+    public void addEventListener(final AbstractTaskListAdapter.EventListener eventListener) {
+        if (taskListAdapter == null) {
+            eventListenerQueue.add(eventListener);
+        } else {
+            taskListAdapter.addEventListener(eventListener);
+        }
     }
 
-    public void update(){
+    public void update() {
         textViewNoTasks.setVisibility(taskListAdapter.getItemCount() > 0 ? View.GONE : View.VISIBLE);
     }
 }

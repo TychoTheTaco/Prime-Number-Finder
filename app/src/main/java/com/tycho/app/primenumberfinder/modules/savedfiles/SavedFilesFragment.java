@@ -85,14 +85,10 @@ public class SavedFilesFragment extends Fragment{
     }
 
     private void update(){
-
-        Log.d(TAG, "Update");
-
         for (SavedFilesCard card : cards){
             card.getSavedFilesAdapter().refresh();
             if (!cardAdapter.getCards().contains(card)){
                 cardAdapter.getCards().add(card);
-                Log.d(TAG, "Adding card: " + card.getTitle());
             }
         }
         final Iterator<SavedFilesCard> iterator = cardAdapter.getCards().iterator();
@@ -100,7 +96,6 @@ public class SavedFilesFragment extends Fragment{
             final SavedFilesCard card = iterator.next();
             if (card.getSavedFilesAdapter().getFiles().size() == 0){
                 iterator.remove();
-                Log.d(TAG, "Removing card: " + card.getTitle());
             }
         }
         cardAdapter.notifyDataSetChanged();

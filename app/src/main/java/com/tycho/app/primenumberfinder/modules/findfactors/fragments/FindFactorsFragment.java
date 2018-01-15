@@ -74,31 +74,27 @@ public class FindFactorsFragment extends Fragment {
         final FragmentAdapter fragmentAdapter = new FragmentAdapter(getChildFragmentManager());
         final ViewPager viewPager = rootView.findViewById(R.id.view_pager);
         fragmentAdapter.add("Tasks", taskListFragment);
-        rootView.post(new Runnable() {
+
+        taskListFragment.addEventListener(new FindFactorsTaskListAdapter.EventListener() {
             @Override
-            public void run() {
-                taskListFragment.getAdapter().addEventListener(new FindFactorsTaskListAdapter.EventListener() {
-                    @Override
-                    public void onTaskSelected(Task task) {
-                        resultsFragment.setTask(task);
-                        statisticsFragment.setTask(task);
-                    }
+            public void onTaskSelected(Task task) {
+                resultsFragment.setTask(task);
+                statisticsFragment.setTask(task);
+            }
 
-                    @Override
-                    public void onPausePressed(Task task) {
+            @Override
+            public void onPausePressed(Task task) {
 
-                    }
+            }
 
-                    @Override
-                    public void onTaskRemoved(Task task) {
-                        if (resultsFragment.getTask() == task){
-                            resultsFragment.setTask(null);
-                            statisticsFragment.setTask(null);
-                        }
+            @Override
+            public void onTaskRemoved(Task task) {
+                if (resultsFragment.getTask() == task) {
+                    resultsFragment.setTask(null);
+                    statisticsFragment.setTask(null);
+                }
 
-                        taskListFragment.update();
-                    }
-                });
+                taskListFragment.update();
             }
         });
 
@@ -171,13 +167,13 @@ public class FindFactorsFragment extends Fragment {
                     //Create a new task
                     searchOptions.setNumber(getNumberToFactor());
                     final Task task = new FindFactorsTask(searchOptions);
-                    taskListFragment.getAdapter().addTask(task);
+                    taskListFragment.addTask(task);
                     taskListFragment.update();
                     PrimeNumberFinder.getTaskManager().registerTask(task);
 
                     //Start the task
                     task.startOnNewThread();
-                    taskListFragment.getAdapter().setSelected(task);
+                    taskListFragment.setSelected(task);
 
                     hideKeyboard(getActivity());
                     taskListFragment.scrollToBottom();
@@ -189,11 +185,6 @@ public class FindFactorsFragment extends Fragment {
         });
 
         return rootView;
-    }
-
-    public void restoreTask(final Task task){
-        taskListFragment.getAdapter().addTask(task);
-        taskListFragment.update();
     }
 
     //Get inputs

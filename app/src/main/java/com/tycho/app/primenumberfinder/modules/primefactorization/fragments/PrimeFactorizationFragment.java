@@ -67,10 +67,8 @@ public class PrimeFactorizationFragment extends Fragment {
         final FragmentAdapter fragmentAdapter = new FragmentAdapter(getChildFragmentManager());
         final ViewPager viewPager = rootView.findViewById(R.id.view_pager);
         fragmentAdapter.add("Tasks", taskListFragment);
-        rootView.post(new Runnable() {
-            @Override
-            public void run() {
-                taskListFragment.getAdapter().addEventListener(new PrimeFactorizationTaskListAdapter.EventListener() {
+
+                taskListFragment.addEventListener(new PrimeFactorizationTaskListAdapter.EventListener() {
                     @Override
                     public void onTaskSelected(Task task) {
                         resultsFragment.setTask(task);
@@ -92,9 +90,7 @@ public class PrimeFactorizationFragment extends Fragment {
 
                         taskListFragment.update();
                     }
-                });
-            }
-        });
+                });/**/
 
         fragmentAdapter.add("Results", resultsFragment);
         fragmentAdapter.add("Statistics", statisticsFragment);
@@ -166,13 +162,13 @@ public class PrimeFactorizationFragment extends Fragment {
                     //Create a new task
                     final Task task = new PrimeFactorizationTask(getNumberToFactor());
                     fragmentAdapter.notifyDataSetChanged();
-                    taskListFragment.getAdapter().addTask(task);
+                    taskListFragment.addTask(task);
                     taskListFragment.update();
                     PrimeNumberFinder.getTaskManager().registerTask(task);
 
                     //Start the task
                     task.startOnNewThread();
-                    taskListFragment.getAdapter().setSelected(task);
+                    taskListFragment.setSelected(task);
 
                     hideKeyboard(getActivity());
 

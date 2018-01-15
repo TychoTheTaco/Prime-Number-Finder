@@ -8,6 +8,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,7 +37,7 @@ import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
  * @author Tycho Bellers
  *         Date Created: 11/12/2016
  */
-public class FindPrimesFragment extends Fragment{
+public class FindPrimesFragment extends Fragment {
 
     /**
      * Tag used for logging and debugging.
@@ -73,7 +74,6 @@ public class FindPrimesFragment extends Fragment{
     private final CheckPrimalityStatisticsFragment checkPrimalityStatisticsFragment = new CheckPrimalityStatisticsFragment();
 
 
-
     private final FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(0, FindPrimesTask.END_VALUE_INFINITY, FindPrimesTask.SearchOptions.Method.BRUTE_FORCE, FindPrimesTask.SearchOptions.MonitorType.SIMPLE);
 
     /*private BottomSheetBehavior bottomSheetBehavior;
@@ -87,58 +87,53 @@ public class FindPrimesFragment extends Fragment{
         final FragmentAdapter fragmentAdapter = new FragmentAdapter(getChildFragmentManager());
         final ViewPager viewPager = rootView.findViewById(R.id.view_pager);
         fragmentAdapter.add("Tasks", taskListFragment);
-        rootView.post(new Runnable() {
+        taskListFragment.addEventListener(new FindPrimesTaskListAdapter.EventListener() {
             @Override
-            public void run() {
-                taskListFragment.addEventListener(new FindPrimesTaskListAdapter.EventListener() {
-                    @Override
-                    public void onTaskSelected(Task task) {
-                        if (task instanceof FindPrimesTask){
-                            findPrimesResultsFragment.setTask(task);
-                            checkPrimalityResultsFragment.setTask(null);
-                            generalResultsFragment.setContent(findPrimesResultsFragment);
+            public void onTaskSelected(Task task) {
+                if (task instanceof FindPrimesTask) {
+                    findPrimesResultsFragment.setTask(task);
+                    checkPrimalityResultsFragment.setTask(null);
+                    generalResultsFragment.setContent(findPrimesResultsFragment);
 
-                            findPrimesStatisticsFragment.setTask(task);
-                            checkPrimalityStatisticsFragment.setTask(null);
-                            generalStatisticsFragment.setContent(findPrimesStatisticsFragment);
-                        }else if (task instanceof CheckPrimalityTask){
-                            findPrimesResultsFragment.setTask(null);
-                            checkPrimalityResultsFragment.setTask(task);
-                            generalResultsFragment.setContent(checkPrimalityResultsFragment);
+                    findPrimesStatisticsFragment.setTask(task);
+                    checkPrimalityStatisticsFragment.setTask(null);
+                    generalStatisticsFragment.setContent(findPrimesStatisticsFragment);
+                } else if (task instanceof CheckPrimalityTask) {
+                    findPrimesResultsFragment.setTask(null);
+                    checkPrimalityResultsFragment.setTask(task);
+                    generalResultsFragment.setContent(checkPrimalityResultsFragment);
 
-                            findPrimesStatisticsFragment.setTask(null);
-                            checkPrimalityStatisticsFragment.setTask(task);
-                            generalStatisticsFragment.setContent(checkPrimalityStatisticsFragment);
-                        }else{
-                            //generalResultsFragment.setContent(null);
-                            findPrimesResultsFragment.setTask(null);
-                            checkPrimalityResultsFragment.setTask(null);
+                    findPrimesStatisticsFragment.setTask(null);
+                    checkPrimalityStatisticsFragment.setTask(task);
+                    generalStatisticsFragment.setContent(checkPrimalityStatisticsFragment);
+                } else {
+                    //generalResultsFragment.setContent(null);
+                    findPrimesResultsFragment.setTask(null);
+                    checkPrimalityResultsFragment.setTask(null);
 
-                            //generalStatisticsFragment.setContent(null);
-                            findPrimesStatisticsFragment.setTask(null);
-                            checkPrimalityStatisticsFragment.setTask(null);
-                        }
-                    }
+                    //generalStatisticsFragment.setContent(null);
+                    findPrimesStatisticsFragment.setTask(null);
+                    checkPrimalityStatisticsFragment.setTask(null);
+                }
+            }
 
-                    @Override
-                    public void onPausePressed(Task task) {
+            @Override
+            public void onPausePressed(Task task) {
 
-                    }
+            }
 
-                    @Override
-                    public void onTaskRemoved(Task task) {
-                        if (findPrimesResultsFragment.getTask() == task){
-                            findPrimesResultsFragment.setTask(null);
-                            findPrimesStatisticsFragment.setTask(null);
-                        }
-                        if (checkPrimalityResultsFragment.getTask() == task){
-                            checkPrimalityResultsFragment.setTask(null);
-                            checkPrimalityResultsFragment.setTask(null);
-                        }
+            @Override
+            public void onTaskRemoved(Task task) {
+                if (findPrimesResultsFragment.getTask() == task) {
+                    findPrimesResultsFragment.setTask(null);
+                    findPrimesStatisticsFragment.setTask(null);
+                }
+                if (checkPrimalityResultsFragment.getTask() == task) {
+                    checkPrimalityResultsFragment.setTask(null);
+                    checkPrimalityResultsFragment.setTask(null);
+                }
 
-                        taskListFragment.update();
-                    }
-                });
+                taskListFragment.update();
             }
         });
         fragmentAdapter.add("Results", generalResultsFragment);
@@ -323,12 +318,12 @@ public class FindPrimesFragment extends Fragment{
                     editTextSearchRangeStart.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.accent)));
                     editTextSearchRangeEnd.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.accent)));
 
-                    if (getEndValue() == FindPrimesTask.END_VALUE_INFINITY){
+                    if (getEndValue() == FindPrimesTask.END_VALUE_INFINITY) {
                         if (!editable.toString().equals(getString(R.string.infinity_text))) {
                             editTextSearchRangeEnd.setText(getString(R.string.infinity_text));
                         }
                         editTextSearchRangeEnd.setSelection(editTextSearchRangeEnd.getText().length());
-                    }else{
+                    } else {
                         final String formattedText = NumberFormat.getNumberInstance(Locale.getDefault()).format(getEndValue());
                         if (!editable.toString().equals(formattedText)) {
                             editTextSearchRangeEnd.setText(formattedText);
@@ -503,20 +498,20 @@ public class FindPrimesFragment extends Fragment{
 
     private long getPrimalityInput() {
         final String input = editTextPrimalityInput.getText().toString().trim();
-        if (input.length() > 0){
+        if (input.length() > 0) {
             final BigInteger number = new BigInteger(editTextPrimalityInput.getText().toString().replace(",", ""));
             return number.longValue();
-        }else{
+        } else {
             return 0;
         }
     }
 
     private long getStartValue() {
         final String input = editTextSearchRangeStart.getText().toString().trim();
-        if (input.length() > 0){
+        if (input.length() > 0) {
             final BigInteger number = new BigInteger(editTextSearchRangeStart.getText().toString().replace(",", ""));
             return number.longValue();
-        }else{
+        } else {
             return 0;
         }
     }
@@ -524,14 +519,14 @@ public class FindPrimesFragment extends Fragment{
     private long getEndValue() {
         final String input = editTextSearchRangeEnd.getText().toString().trim();
 
-        if (input.length() > 0){
+        if (input.length() > 0) {
             if (input.equals("infinity")) {
                 return FindPrimesTask.END_VALUE_INFINITY;
             }
 
             final BigInteger endValue = new BigInteger(editTextSearchRangeEnd.getText().toString().replace(",", ""));
             return endValue.longValue();
-        }else{
+        } else {
             return 0;
         }
     }
@@ -571,9 +566,9 @@ public class FindPrimesFragment extends Fragment{
             final BigInteger startValue = new BigInteger(editTextSearchRangeStart.getText().toString().replace(",", ""));
             BigInteger endValue;
             final String searchRangeEndText = editTextSearchRangeEnd.getText().toString();
-            if (searchRangeEndText.equals(getString(R.string.infinity_text))){
+            if (searchRangeEndText.equals(getString(R.string.infinity_text))) {
                 endValue = BigInteger.valueOf(FindPrimesTask.END_VALUE_INFINITY);
-            }else{
+            } else {
                 endValue = new BigInteger(searchRangeEndText.replace(",", ""));
             }
 

@@ -160,7 +160,6 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
     }
 
     public void addEventListener(final EventListener eventListener){
-        Log.d(TAG, "Adding event listener: " + eventListener);
         if (!eventListeners.contains(eventListener)) eventListeners.add(eventListener);
     }
 
