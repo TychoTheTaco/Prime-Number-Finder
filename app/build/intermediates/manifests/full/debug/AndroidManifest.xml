@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.tycho.app.primenumberfinder"
-    android:versionCode="6"
-    android:versionName="1.2.1" >
+    android:versionCode="7"
+    android:versionName="1.2.2" >
 
     <uses-sdk
         android:minSdkVersion="21"
@@ -15,7 +15,6 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:testOnly="true"
         android:theme="@style/Default.NoActionBar" >
         <activity
             android:name="com.tycho.app.primenumberfinder.activities.MainActivity"
@@ -56,7 +55,5 @@
             android:name="android.arch.lifecycle.VERSION"
             android:value="27.0.0-SNAPSHOT" />
     </application>
-
-    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>
