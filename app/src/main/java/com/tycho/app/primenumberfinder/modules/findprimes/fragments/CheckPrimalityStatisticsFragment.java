@@ -69,6 +69,7 @@ public class CheckPrimalityStatisticsFragment extends StatisticsFragment{
     }
 
     public void updateData(StatisticData statisticData){
+        Log.d(TAG, "updateData " + getView());
         if (getView() != null){
             setTimeElapsed(statisticData.optLong(Statistic.TIME_ELAPSED));
            // textViewNumbersPerSecond.setText(NumberFormat.getInstance().format(statisticData.optInt(Statistic.NUMBERS_PER_SECOND)));
@@ -189,13 +190,21 @@ public class CheckPrimalityStatisticsFragment extends StatisticsFragment{
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
+        uiUpdater.stop();
+        Log.d(TAG, "onTaskStopped " + getTask());
         if (getTask() != null){
             try {
                 final StatisticData statisticData = new StatisticData();
                 statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
                 //statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getNumbersPerSecond());
                 statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
-                updateData(statisticData);
+                Log.d(TAG, "updateData called");
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateData(statisticData);
+                    }
+                });
             }catch (JSONException e){}
         }
     }

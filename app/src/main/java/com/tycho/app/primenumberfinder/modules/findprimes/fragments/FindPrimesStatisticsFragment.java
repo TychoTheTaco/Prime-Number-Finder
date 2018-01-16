@@ -198,6 +198,27 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
     }
 
     @Override
+    public void onTaskStopped() {
+        super.onTaskStopped();
+        uiUpdater.stop();
+        if (getTask() != null){
+            try {
+                final StatisticData statisticData = new StatisticData();
+                statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
+                statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
+                statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getNumbersPerSecond());
+                statisticData.put(Statistic.PRIMES_PER_SECOND, getTask().getPrimesPerSecond());
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateData(statisticData);
+                    }
+                });
+            }catch (JSONException e){}
+        }
+    }
+
+    @Override
     public FindPrimesTask getTask() {
         return (FindPrimesTask) super.getTask();
     }
@@ -212,25 +233,24 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
         protected void run() {
             while (true) {
 
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+                if (getTask() != null){
+                    try {
+                        statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
+                        statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getNumbersPerSecond());
+                        statisticData.put(Statistic.PRIMES_PER_SECOND, getTask().getPrimesPerSecond());
+                        if (System.currentTimeMillis() - lastUpdate >= 1000){
+                            statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
+                            lastUpdate = System.currentTimeMillis();
+                        }
+                    }catch (JSONException e){}
 
-                        if (getTask() != null){
-                            try {
-                                statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
-                                statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getNumbersPerSecond());
-                                statisticData.put(Statistic.PRIMES_PER_SECOND, getTask().getPrimesPerSecond());
-                                if (System.currentTimeMillis() - lastUpdate >= 1000){
-                                    statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
-                                    lastUpdate = System.currentTimeMillis();
-                                }
-                            }catch (JSONException e){}
-
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
                             updateData(statisticData);
                         }
-                    }
-                });
+                    });
+                }
 
                 tryPause();
 
