@@ -153,6 +153,26 @@ public class FindFactorsStatisticsFragment extends TaskFragment {
     }
 
     @Override
+    public void onTaskStopped() {
+        super.onTaskStopped();
+        uiUpdater.stop();
+        if (getTask() != null){
+            try {
+                final StatisticData statisticData = new StatisticData();
+                statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
+                statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
+                statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getNumbersPerSecond());
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateData(statisticData);
+                    }
+                });
+            }catch (JSONException e){}
+        }
+    }
+
+    @Override
     public FindFactorsTask getTask() {
         return (FindFactorsTask) super.getTask();
     }

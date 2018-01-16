@@ -175,6 +175,24 @@ public class PrimeFactorizationStatisticsFragment extends TaskFragment {
     }
 
     @Override
+    public void onTaskStopped() {
+        super.onTaskStopped();
+        uiUpdater.stop();
+        if (getTask() != null){
+            try {
+                final StatisticData statisticData = new StatisticData();
+                statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateData(statisticData);
+                    }
+                });
+            }catch (JSONException e){}
+        }
+    }
+
+    @Override
     public PrimeFactorizationTask getTask() {
         return (PrimeFactorizationTask) super.getTask();
     }
