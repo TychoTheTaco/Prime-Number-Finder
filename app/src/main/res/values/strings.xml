@@ -40,6 +40,7 @@
     <string name="find_primes_task_list_item_title">Primes from %1$s to %2$s</string>
     <string name="check_primality_task_status">Checking primality of %1$s</string>
     <string name="check_primality_subtitle_searching">Checking the primality of %1$s&#8230;</string>
+    <string name="primes_list_toast_message">%1$s is the %2$s prime number.</string>
 
     <!-- Find factors page -->
     <string name="find_factors_input_number_description">Enter a number to find its factors.</string>
@@ -49,6 +50,7 @@
         <item quantity="other">%1$s has %2$s factors.</item>
     </plurals>
     <string name="find_factors_task_list_item_title">Factors of %1$s</string>
+    <string name="factors_list_toast_message">%1$s is the %2$s factor.</string>
 
     <!-- Prime factorization page -->
     <string name="prime_factorization_input_number_description">Enter a number to find its prime factors.</string>

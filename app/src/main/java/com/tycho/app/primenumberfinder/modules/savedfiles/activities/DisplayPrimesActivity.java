@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
@@ -40,7 +39,7 @@ public class DisplayPrimesActivity extends AppCompatActivity{
 
     private RecyclerView recyclerView;
 
-    private PrimesAdapter adapter = new PrimesAdapter();
+    private PrimesAdapter primesAdapter;
 
     //private TextView subtitle;
 
@@ -52,7 +51,6 @@ public class DisplayPrimesActivity extends AppCompatActivity{
         //Set up the toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Saved Files");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         applyThemeColor(ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));
@@ -69,16 +67,22 @@ public class DisplayPrimesActivity extends AppCompatActivity{
                 final String filePath = extras.getString("filePath");
                 if (filePath != null){
 
+                    //Set up adapter
+                    primesAdapter = new PrimesAdapter(this);
+
                     //Set up RecyclerView
                     recyclerView = findViewById(R.id.recyclerView);
                     recyclerView.setHasFixedSize(true);
                     recyclerView.setLayoutManager(new LinearLayoutManager(this));
-                    recyclerView.setAdapter(adapter);
+                    recyclerView.setAdapter(primesAdapter);
                     recyclerView.setItemAnimator(null);
 
                     file = new File(filePath);
                     loadFile(file);
-                    setTitle(formatTitle(file.getName().split("\\.")[0]));
+
+                    if (extras.getBoolean("title", true)){
+                        setTitle(formatTitle(file.getName().split("\\.")[0]));
+                    }
 
                 }else{
                     Log.e(TAG, "Invalid file path!");
@@ -106,12 +110,12 @@ public class DisplayPrimesActivity extends AppCompatActivity{
             public void run(){
 
                 final List<Long> numbers = FileManager.getInstance().readNumbers(file);
-                adapter.getListNumbers().addAll(numbers);
+                primesAdapter.getPrimes().addAll(numbers);
 
                 new Handler(getMainLooper()).post(new Runnable(){
                     @Override
                     public void run(){
-                        adapter.notifyItemRangeInserted(0, adapter.getItemCount());
+                        primesAdapter.notifyItemRangeInserted(0, primesAdapter.getItemCount());
                         progressDialog.dismiss();
                     }
                 });

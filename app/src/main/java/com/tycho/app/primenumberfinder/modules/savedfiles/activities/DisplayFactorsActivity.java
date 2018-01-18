@@ -49,9 +49,7 @@ public class DisplayFactorsActivity extends AppCompatActivity{
 
     private RecyclerView recyclerView;
 
-    private FactorsListAdapter adapter = new FactorsListAdapter();
-
-    //private TextView subtitle;
+    private FactorsListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -76,6 +74,9 @@ public class DisplayFactorsActivity extends AppCompatActivity{
                 //Get the file path from the extras
                 final String filePath = extras.getString("filePath");
                 if (filePath != null){
+
+                    //Set up adapter
+                    adapter = new FactorsListAdapter(this);
 
                     //Set up RecyclerView
                     recyclerView = findViewById(R.id.recyclerView);
