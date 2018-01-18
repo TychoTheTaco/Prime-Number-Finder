@@ -3,8 +3,12 @@ package com.tycho.app.primenumberfinder.activities;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.res.ColorStateList;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
@@ -13,12 +17,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.Fragments_old.AboutPageFragment;
 import com.tycho.app.primenumberfinder.Fragments_old.SettingsFragment;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
@@ -28,13 +34,16 @@ import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesFr
 import com.tycho.app.primenumberfinder.modules.primefactorization.fragments.PrimeFactorizationFragment;
 import com.tycho.app.primenumberfinder.modules.savedfiles.SavedFilesFragment;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
 /**
  * @author Tycho Bellers
  *         Date Created: 1/10/2016
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
 
     /**
      * Tag used for logging and debugging.
@@ -62,11 +71,13 @@ public class MainActivity extends AppCompatActivity {
      */
     private Fragment currentFragment;
 
+    private final Handler handler = new Handler(Looper.getMainLooper());
+
     /**
      * Maps drawer item ids to the corresponding fragment tag. The ids and tags are used to find
      * the corresponding fragment when a new drawer item is selected.
      */
-    private SparseArray<String> fragmentIds = new SparseArray<>();
+    private Map<Integer, String> fragmentIds = new HashMap<>();
     //TODO: This should be a map instead because these IDs are high numbers, the VM needs to create an array of lots of wasted space
 
     @Override
@@ -93,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         navigationView = findViewById(R.id.navigation_view);
         ((TextView) navigationView.getHeaderView(0).findViewById(R.id.app_version)).setText(getString(R.string.app_version_name, PrimeNumberFinder.getVersionName(this)));
         for (int i = 0; i < navigationView.getMenu().size(); i++) {
-            hideActionView(i);
+            setActionViewVisibility(i, View.GONE);
         }
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -153,31 +164,16 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    //Utility methods
-
     /**
-     * Show the action view of the drawer item.
-     *
-     * @param index Index of the drawer item.
+     * Change the visibility of a menu item's action view.
+     * @param index
+     * @param visibility
      */
-    public void showActionView(final int index) {
+    private void setActionViewVisibility(final int index, final int visibility){
         try {
-            navigationView.getMenu().getItem(index).getActionView().setVisibility(View.VISIBLE);
-        } catch (Exception e) {
-            //Ignore
-        }
-    }
-
-    /**
-     * Hide the action view of the drawer item.
-     *
-     * @param index Index of the drawer item.
-     */
-    public void hideActionView(final int index) {
-        try {
-            navigationView.getMenu().getItem(index).getActionView().setVisibility(View.GONE);
-        } catch (NullPointerException e) {
-            //Ignore
+            navigationView.getMenu().getItem(index).getActionView().setVisibility(visibility);
+        }catch (NullPointerException e){
+            //Ignore exception
         }
     }
 
@@ -186,11 +182,17 @@ public class MainActivity extends AppCompatActivity {
         if (getFragmentManager().findFragmentByTag(fragmentIds.get(id)) == null) {
             switch (id) {
                 case R.id.drawer_item_find_primes:
-                    return new FindPrimesFragment();
+                    final FindPrimesFragment findPrimesFragment = new FindPrimesFragment();
+                    findPrimesFragment.addActionViewListener(getActionViewListener(0));
+                    return findPrimesFragment;
                 case R.id.drawer_item_find_factors:
-                    return new FindFactorsFragment();
+                    final FindFactorsFragment findFactorsFragment = new FindFactorsFragment();
+                    findFactorsFragment.addActionViewListener(getActionViewListener(1));
+                    return findFactorsFragment;
                 case R.id.drawer_item_factor_tree:
-                    return new PrimeFactorizationFragment();
+                    final PrimeFactorizationFragment primeFactorizationFragment = new PrimeFactorizationFragment();
+                    primeFactorizationFragment.addActionViewListener(getActionViewListener(2));
+                    return primeFactorizationFragment;
                 case R.id.drawer_item_saved_files:
                     return new SavedFilesFragment();
                 case R.id.drawer_item_settings:
@@ -201,6 +203,20 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return getFragmentManager().findFragmentByTag(fragmentIds.get(id));
+    }
+
+    private ActionViewListener getActionViewListener(final int index){
+        return new ActionViewListener() {
+            @Override
+            public void onTaskStatesChanged(final boolean active) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        setActionViewVisibility(index, active ? View.VISIBLE : View.GONE);
+                    }
+                });
+            }
+        };
     }
 
     private void selectDrawerItem(final int index) {
@@ -235,45 +251,52 @@ public class MainActivity extends AppCompatActivity {
         //Switch based on item id
         switch (menuItem.getItemId()) {
 
+            default:
+                setTitle(fragmentIds.get(menuItem.getItemId()));
+                navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.accent)));
+                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent_dark)));
+                applyThemeColor(ContextCompat.getColor(this, R.color.primary_dark), ContextCompat.getColor(this, R.color.primary));
+                break;
+
             case R.id.drawer_item_find_primes:
                 setTitle(getString(R.string.title_scan_for_primes));
                 navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.purple)));
-                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.purple)));
+                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.purple_dark)));
                 applyThemeColor(ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));
                 break;
 
             case R.id.drawer_item_find_factors:
                 setTitle(getString(R.string.title_find_factors));
                 navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.orange)));
-                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.orange)));
+                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.orange_dark)));
                 applyThemeColor(ContextCompat.getColor(this, R.color.orange_dark), ContextCompat.getColor(this, R.color.orange));
                 break;
 
             case R.id.drawer_item_factor_tree:
                 setTitle(getString(R.string.title_factor_tree));
                 navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.green)));
-                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.green)));
+                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.green_dark)));
                 applyThemeColor(ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
                 break;
 
             case R.id.drawer_item_saved_files:
                 setTitle(getString(R.string.title_saved_files));
                 navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.accent)));
-                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent)));
+                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent_dark)));
                 applyThemeColor(ContextCompat.getColor(this, R.color.primary_dark), ContextCompat.getColor(this, R.color.primary));
                 break;
 
             case R.id.drawer_item_settings:
                 setTitle(getString(R.string.title_settings));
                 navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.accent)));
-                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent)));
+                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent_dark)));
                 applyThemeColor(ContextCompat.getColor(this, R.color.primary_dark), ContextCompat.getColor(this, R.color.primary));
                 break;
 
             case R.id.drawer_item_about:
                 setTitle(getString(R.string.title_about));
                 navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.accent)));
-                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent)));
+                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent_dark)));
                 applyThemeColor(ContextCompat.getColor(this, R.color.primary_dark), ContextCompat.getColor(this, R.color.primary));
                 break;
         }

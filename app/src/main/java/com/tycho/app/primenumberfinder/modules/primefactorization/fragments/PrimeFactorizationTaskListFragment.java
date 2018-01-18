@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
@@ -41,6 +42,7 @@ public class PrimeFactorizationTaskListFragment extends Fragment {
     private TextView textViewNoTasks;
 
     private final Queue<AbstractTaskListAdapter.EventListener> eventListenerQueue = new LinkedBlockingQueue<>(5);
+    private final Queue<ActionViewListener> actionViewListenerQueue = new LinkedBlockingQueue<>(5);
 
     /**
      * This deprecated version of {@linkplain Fragment#onAttach(Activity)} is needed in API < 22.
@@ -53,6 +55,9 @@ public class PrimeFactorizationTaskListFragment extends Fragment {
         taskListAdapter = new PrimeFactorizationTaskListAdapter(activity);
         while (!eventListenerQueue.isEmpty()) {
             taskListAdapter.addEventListener(eventListenerQueue.poll());
+        }
+        while (!actionViewListenerQueue.isEmpty()) {
+            taskListAdapter.addActionViewListener(actionViewListenerQueue.poll());
         }
     }
 
@@ -109,5 +114,13 @@ public class PrimeFactorizationTaskListFragment extends Fragment {
 
     public void update() {
         textViewNoTasks.setVisibility(taskListAdapter.getItemCount() > 0 ? View.GONE : View.VISIBLE);
+    }
+
+    public void addActionViewListener(final ActionViewListener actionViewListener){
+        if (taskListAdapter == null) {
+            actionViewListenerQueue.add(actionViewListener);
+        } else {
+            taskListAdapter.addActionViewListener(actionViewListener);
+        }
     }
 }

@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.adapters.FragmentAdapter;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsTaskListAdapter;
@@ -27,8 +28,10 @@ import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsT
 import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import easytasks.Task;
+import easytasks.TaskListener;
 
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
@@ -217,5 +220,9 @@ public class FindFactorsFragment extends Fragment {
         }
 
         return true;
+    }
+
+    public void addActionViewListener(final ActionViewListener actionViewListener){
+        taskListFragment.addActionViewListener(actionViewListener);
     }
 }

@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
@@ -42,6 +43,7 @@ public class FindFactorsTaskListFragment extends Fragment {
     private RecyclerView recyclerView;
 
     private Queue<AbstractTaskListAdapter.EventListener> eventListenerQueue = new LinkedBlockingQueue<>(5);
+    private Queue<ActionViewListener> actionViewListenerQueue = new LinkedBlockingQueue<>(5);
 
     /**
      * This deprecated version of {@linkplain Fragment#onAttach(Activity)} is needed in API < 22.
@@ -54,6 +56,9 @@ public class FindFactorsTaskListFragment extends Fragment {
         taskListAdapter = new FindFactorsTaskListAdapter(activity);
         while (!eventListenerQueue.isEmpty()) {
             taskListAdapter.addEventListener(eventListenerQueue.poll());
+        }
+        while (!actionViewListenerQueue.isEmpty()) {
+            taskListAdapter.addActionViewListener(actionViewListenerQueue.poll());
         }
     }
 
@@ -114,5 +119,13 @@ public class FindFactorsTaskListFragment extends Fragment {
 
     public void scrollToBottom() {
         recyclerView.scrollToPosition(taskListAdapter.getItemCount() - 1);
+    }
+
+    public void addActionViewListener(final ActionViewListener actionViewListener){
+        if (taskListAdapter == null) {
+            actionViewListenerQueue.add(actionViewListener);
+        } else {
+            taskListAdapter.addActionViewListener(actionViewListener);
+        }
     }
 }

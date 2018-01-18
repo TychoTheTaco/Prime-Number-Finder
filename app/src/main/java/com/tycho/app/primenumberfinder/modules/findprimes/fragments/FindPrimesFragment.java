@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.adapters.FragmentAdapter;
@@ -622,5 +623,9 @@ public class FindPrimesFragment extends Fragment {
         }
 
         return true;
+    }
+
+    public void addActionViewListener(final ActionViewListener actionViewListener){
+        taskListFragment.addActionViewListener(actionViewListener);
     }
 }

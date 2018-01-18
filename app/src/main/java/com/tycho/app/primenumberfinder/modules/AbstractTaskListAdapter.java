@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import easytasks.Task;
 import easytasks.TaskListener;
@@ -44,6 +46,8 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
     private Map<Task, CustomTaskEventListener> customEventListeners = new HashMap<>();
 
     private final Handler handler = new Handler(Looper.getMainLooper());
+
+    private final CopyOnWriteArrayList<ActionViewListener> actionViewListeners = new CopyOnWriteArrayList<>();
 
     private long lastUiUpdateTime = 0;
 
@@ -124,6 +128,32 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
                 }
             };
             task.addTaskListener(customTaskEventListener);
+            task.addTaskListener(new TaskListener() {
+                @Override
+                public void onTaskStarted() {
+                    sendTaskStatesChanged();
+                }
+
+                @Override
+                public void onTaskPaused() {
+                    sendTaskStatesChanged();
+                }
+
+                @Override
+                public void onTaskResumed() {
+                    sendTaskStatesChanged();
+                }
+
+                @Override
+                public void onTaskStopped() {
+                    sendTaskStatesChanged();
+                }
+
+                @Override
+                public void onProgressChanged(float v) {
+
+                }
+            });
             this.tasks.add(task);
             notifyItemInserted(getItemCount());
             customEventListeners.put(task, customTaskEventListener);
@@ -258,6 +288,29 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
                     sendOnDeletePressed(task);
                 }
             });
+        }
+    }
+
+    public boolean addActionViewListener(final ActionViewListener actionViewListener){
+        return this.actionViewListeners.add(actionViewListener);
+    }
+
+    public boolean removeActionViewListener(final ActionViewListener actionViewListener){
+        return this.actionViewListeners.remove(actionViewListener);
+    }
+
+    private void sendTaskStatesChanged(){
+        boolean active = false;
+        for (Task task : this.tasks){
+            if (task.getState() == Task.State.RUNNING){
+                active = true;
+                break;
+            }
+        }
+
+        for (ActionViewListener actionViewListener : this.actionViewListeners){
+            Log.d(TAG, "Sending active: " + active);
+            actionViewListener.onTaskStatesChanged(active);
         }
     }
 }

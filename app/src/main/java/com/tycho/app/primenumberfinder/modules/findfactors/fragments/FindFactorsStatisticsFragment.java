@@ -187,24 +187,23 @@ public class FindFactorsStatisticsFragment extends TaskFragment {
         protected void run() {
             while (true) {
 
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+                if (getTask() != null){
+                    try {
+                        statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
+                        statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getNumbersPerSecond());
+                        if (System.currentTimeMillis() - lastUpdate >= 1000){
+                            statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
+                            lastUpdate = System.currentTimeMillis();
+                        }
+                    }catch (JSONException e){}
 
-                        if (getTask() != null){
-                            try {
-                                statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
-                                statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getNumbersPerSecond());
-                                if (System.currentTimeMillis() - lastUpdate >= 1000){
-                                    statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
-                                    lastUpdate = System.currentTimeMillis();
-                                }
-                            }catch (JSONException e){}
-
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
                             updateData(statisticData);
                         }
-                    }
-                });
+                    });
+                }
 
                 tryPause();
 

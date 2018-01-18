@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.adapters.FragmentAdapter;
@@ -214,5 +215,9 @@ public class PrimeFactorizationFragment extends Fragment {
         editTextInput.setEnabled(true);
         editTextInput.setText("");
         buttonFactorize.setEnabled(true);
+    }
+
+    public void addActionViewListener(final ActionViewListener actionViewListener){
+        taskListFragment.addActionViewListener(actionViewListener);
     }
 }
