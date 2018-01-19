@@ -71,7 +71,7 @@
     <string name="about_page_icon_credits">Application icons by:\n<a href="https://material.io/icons/">Material Icons</a>\n<a href="https://icons8.com/">Icons8</a></string>
 
     <!-- Bottom sheet -->
-    <string name="bottom_sheet_title">Options</string>
+    <string name="bottom_sheet_title">Task Options</string>
     <string name="statistics_monitor_level_none">None</string>
     <string name="statistics_monitor_level_simple">Simple</string>
     <string name="statistics_monitor_level_advanced">Advanced</string>

@@ -49,7 +49,7 @@ public class DisplayPrimesActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.display_factors_activity);
+        setContentView(R.layout.display_primes_activity);
 
         //Set up the toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);
