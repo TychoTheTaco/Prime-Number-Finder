@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
+import com.tycho.app.primenumberfinder.utils.CustomFileProvider;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;
@@ -125,16 +126,14 @@ public class DisplayFactorsActivity extends AppCompatActivity{
 
         switch (item.getItemId()){
 
-            /*case R.id.export:
-                Uri uri = Uri.parse("content://" + "com.tycho.app.primenumberfinder/" + file.getName());
-
-                Log.d(TAG, "Uri: " + uri);
-
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-                startActivity(shareIntent);
-                break;*/
+            case R.id.export:
+                final Uri path = CustomFileProvider.getUriForFile(this,"com.tycho.app.primenumberfinder", file);
+                final Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.putExtra(Intent.EXTRA_STREAM, path);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.setType("text/plain");
+                startActivity(intent);
+                break;
 
             case android.R.id.home:
                 onBackPressed();

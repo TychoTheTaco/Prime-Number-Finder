@@ -3,6 +3,7 @@ package com.tycho.app.primenumberfinder.modules.savedfiles.activities;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
@@ -11,11 +12,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter;
+import com.tycho.app.primenumberfinder.utils.CustomFileProvider;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;
@@ -167,11 +170,26 @@ public class DisplayPrimesActivity extends AppCompatActivity{
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.display_content_activity_menu, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()){
             case android.R.id.home:
                 onBackPressed();
+                break;
+
+            case R.id.export:
+                final Uri path = CustomFileProvider.getUriForFile(this,"com.tycho.app.primenumberfinder", file);
+                final Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.putExtra(Intent.EXTRA_STREAM, path);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.setType("text/plain");
+                startActivity(intent);
                 break;
         }
 
