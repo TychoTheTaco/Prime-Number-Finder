@@ -20,7 +20,6 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.TreeView;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.utils.CustomFileProvider;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;

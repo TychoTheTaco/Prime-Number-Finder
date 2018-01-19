@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,7 +26,6 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
-import com.tycho.app.primenumberfinder.utils.CustomFileProvider;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;
@@ -127,7 +127,7 @@ public class DisplayFactorsActivity extends AppCompatActivity{
         switch (item.getItemId()){
 
             case R.id.export:
-                final Uri path = CustomFileProvider.getUriForFile(this,"com.tycho.app.primenumberfinder", file);
+                final Uri path = FileProvider.getUriForFile(this,"com.tycho.app.primenumberfinder", file);
                 final Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.putExtra(Intent.EXTRA_STREAM, path);
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
