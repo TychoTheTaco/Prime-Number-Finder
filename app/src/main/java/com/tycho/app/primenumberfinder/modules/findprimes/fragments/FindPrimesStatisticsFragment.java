@@ -28,6 +28,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import easytasks.Task;
+import easytasks.TaskAdapter;
 import easytasks.TaskListener;
 
 import static com.tycho.app.primenumberfinder.utils.Utils.formatTime;
@@ -124,7 +125,7 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
             statisticsView.setVisibility(View.VISIBLE);
             noTaskView.setVisibility(View.GONE);
 
-            estimatedTimeRemainingLayout.setVisibility((getTask().getEndValue() == FindPrimesTask.END_VALUE_INFINITY) ? View.GONE : View.VISIBLE);
+            estimatedTimeRemainingLayout.setVisibility((getTask().getEndValue() == FindPrimesTask.INFINITY) ? View.GONE : View.VISIBLE);
 
             final StatisticData statisticData = new StatisticData();
             try {
@@ -137,7 +138,7 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
 
             //Start UI updater
             if (uiUpdater.getState() == Task.State.NOT_STARTED) {
-                uiUpdater.addTaskListener(new TaskListener() {
+                uiUpdater.addTaskListener(new TaskAdapter() {
                     @Override
                     public void onTaskStarted() {
                         Log.d(TAG, "UI updater started");

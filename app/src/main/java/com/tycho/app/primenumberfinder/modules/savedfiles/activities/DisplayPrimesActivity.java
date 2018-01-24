@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter;
+import com.tycho.app.primenumberfinder.modules.savedfiles.ExportOptionsDialog;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;
@@ -184,12 +185,14 @@ public class DisplayPrimesActivity extends AppCompatActivity{
                 break;
 
             case R.id.export:
-                final Uri path = FileProvider.getUriForFile(this,"com.tycho.app.primenumberfinder", file);
+                final ExportOptionsDialog exportOptionsDialog = new ExportOptionsDialog(this, file);
+                exportOptionsDialog.show();
+                /*final Uri path = FileProvider.getUriForFile(this,"com.tycho.app.primenumberfinder", file);
                 final Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.putExtra(Intent.EXTRA_STREAM, path);
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 intent.setType("text/plain");
-                startActivity(intent);
+                startActivity(intent);*/
                 break;
         }
 

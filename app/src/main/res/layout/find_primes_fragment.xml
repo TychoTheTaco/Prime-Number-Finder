@@ -40,7 +40,7 @@
 
             <Button
                 android:id="@+id/button_check_primality"
-                style="@style/SearchButton"
+                style="@style/Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/check_primality_button" />
@@ -107,7 +107,7 @@
 
             <Button
                 android:id="@+id/button_find_primes"
-                style="@style/SearchButton"
+                style="@style/Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/find_primes_button" />

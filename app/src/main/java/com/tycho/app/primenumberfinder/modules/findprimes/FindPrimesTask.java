@@ -3,198 +3,187 @@ package com.tycho.app.primenumberfinder.modules.findprimes;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import easytasks.MultithreadedTask;
 import easytasks.Task;
-import easytasks.TaskListener;
+import easytasks.TaskAdapter;
 
+public class FindPrimesTask extends MultithreadedTask {
 
-/**
- * @author Tycho Bellers
- *         Date Created: 11/12/2016
- */
-
-public class FindPrimesTask extends Task {
+    public static final int INFINITY = -1;
 
     /**
-     * Tag used for logging and debugging.
-     */
-    private static final String TAG = "FindPrimesTask";
-
-    /**
-     * List of all prime numbers found.
-     */
-    private final List<Long> primes = new LinkedList<>();
-
-    /*
-     * Start and end values. The end value can be modified after the task has started if the user
-     * pauses it first. If the end value is set to {@link #END_VALUE_INFINITY}, then the task will run
-     * forever until stopped by the user or interrupted.
+     * The starting value of the search. (inclusive).
      */
     private final long startValue;
+
+    /**
+     * The ending value of the search. (inclusive).
+     */
     private long endValue;
 
     /**
-     * If the end value is set to this, then the task will run forever until stopped by the
-     * user or interrupted.
+     * The number of threads to use. This must be at least 1.
      */
-    public static final int END_VALUE_INFINITY = -1;
+    private int threadCount;
+
+    public enum SearchMethod {
+        BRUTE_FORCE,
+        SIEVE_OF_ERATOSTHENES
+    }
+
+    private SearchMethod searchMethod;
 
     /**
-     * The current number we are checking.
+     * Create a new {@linkplain FindPrimesTask}.
+     *
+     * @param startValue  The start value (inclusive).
+     * @param endValue    The end value (inclusive).
+     * @param threadCount The number of threads to use.
      */
-    private long currentNumber;
+    public FindPrimesTask(final long startValue, final long endValue, final int threadCount, final SearchMethod searchMethod) {
+        this.startValue = startValue;
+        this.endValue = endValue;
+        this.threadCount = threadCount;
+        this.searchMethod = searchMethod;
+    }
 
-    private boolean finished = false;
-
-    private final SearchOptions.Method searchMethod;
-    private SearchOptions.MonitorType monitorType;
-
-    private final List<EventListener> eventListeners = new CopyOnWriteArrayList<>();
-
-    private long[][] statistics = new long[2][3];
-    private static final int NUMBERS_PER_SECOND = 0;
-    private static final int PRIMES_PER_SECOND = 1;
-    private static final int CURRENT_VALUE = 0;
-    private static final int SINCE_LAST = 1;
-    private static final int LAST_UPDATE_TIME = 2;
-
-    private final SearchOptions searchOptions;
-
-    private final List<BruteForceTask> bruteForceTasks = new ArrayList<>();
-
-    public FindPrimesTask(SearchOptions searchOptions){
-        this.startValue = searchOptions.getStartValue();
-        this.endValue = searchOptions.getEndValue();
-        this.searchMethod = searchOptions.getSearchMethod();
-        this.monitorType = searchOptions.getMonitorType();
-
-        this.searchOptions = searchOptions;
-
-        statistics[NUMBERS_PER_SECOND][CURRENT_VALUE] = -1;
-        statistics[PRIMES_PER_SECOND][CURRENT_VALUE] = -1;
+    public FindPrimesTask(final SearchOptions searchOptions) {
+        this(searchOptions.getStartValue(), searchOptions.getEndValue(), searchOptions.getThreadCount(), searchOptions.getSearchMethod());
     }
 
     @Override
-    public void run(){
+    protected void run() {
 
-        switch (searchMethod){
+        //Start worker threads
+        System.out.println("Starting " + threadCount + " threads...");
 
-            case BRUTE_FORCE:
-                /*if (this.searchOptions.threadCount > 1){
-
-                    final Object LOCK = new Object();
-
-                    for (int i = 0; i < searchOptions.threadCount; i++){
-                        final BruteForceTask bruteForceTask = new BruteForceTask(startValue + 1 + (2 * i), endValue, searchOptions.threadCount * 2);
-                        bruteForceTask.addTaskListener(new TaskListener(){
-                            @Override
-                            public void onTaskStarted(){
-
-                            }
-
-                            @Override
-                            public void onTaskPaused(){
-
-                            }
-
-                            @Override
-                            public void onTaskResumed(){
-
-                            }
-
-                            @Override
-                            public void onTaskStopped(){
-
-                                Log.d(TAG, "Thread " + bruteForceTask.startValue + " finished.");
-
-                                synchronized (LOCK){
-                                    boolean finished = true;
-                                    for (BruteForceTask task : bruteForceTasks){
-                                        if (task.getProgress() != 1){
-                                            finished = false;
-                                        }
-                                    }
-                                    if (finished) LOCK.notify();
-                                }
-                            }
-
-                            @Override
-                            public void onProgressChanged(float v){
-
-                            }
-                        });
-                        bruteForceTask.startOnNewThread();
-                        bruteForceTasks.add(bruteForceTask);
-                    }
-
-                    try{
-                        synchronized (LOCK){
-                            LOCK.wait();
-                        }
-                        finished = true;
-                        setProgress(1);
-                        Log.d(TAG, "All threads done. Times:");
-                        for (BruteForceTask task : bruteForceTasks){
-                            Log.d(TAG, (task.getElapsedTime() / 1) + " millis");
-                        }
-                    }catch (InterruptedException e){
-
-                    }
-
-                }else{*/
-                    searchBruteForce();
-                //}
-
-                break;
-
-            case SIEVE_OF_ERATOSTHENES:
-                try {
-                    searchSieveOfEratosthenes();
-                }catch (OutOfMemoryError e){
-                    sendOnExceptionOccurred(e);
+        for (int i = 0; i < threadCount; i++) {
+            long s = startValue + (2 * i + 1);
+            if (s % 2 == 0)
+                s -= 1;
+            final BruteForceTask task = new BruteForceTask(s, endValue, threadCount * 2);
+            task.addTaskListener(new TaskAdapter() {
+                @Override
+                public void onTaskStarted() {
+                    System.out.println("Thread " + task.startValue + " started.");
                 }
-                break;
+
+                @Override
+                public void onTaskPaused() {
+                    System.out.println("Thread " + task.startValue + " paused.");
+                }
+
+                @Override
+                public void onTaskResumed() {
+                    System.out.println("Thread " + task.startValue + " resumed.");
+                }
+
+                @Override
+                public void onTaskStopped() {
+                    System.out.println("Thread " + task.startValue + " finished.");
+                }
+
+                @Override
+                public void onProgressChanged(float v) {
+
+                }
+            });
+            addTask(task);
         }
 
-        //The task has finished
-        if (currentNumber == endValue){
-            finished = true;
+        executeTasks();
+
+        System.out.println("All threads stopped.");
+        long time = 0;
+        for (Task task : getTasks()) {
+            time += task.getElapsedTime();
+            System.out.println("Task " + ((BruteForceTask) task).startValue + "\n    " + ((BruteForceTask) task).primes.size() + " primes\n    "
+                    + task.getElapsedTime() + " milliseconds\n    " + ((BruteForceTask) task).totalDistance + " distance");
         }
-
-        Log.d(TAG, "Stopped with : " + statistics[NUMBERS_PER_SECOND][CURRENT_VALUE] + " " + statistics[NUMBERS_PER_SECOND][SINCE_LAST]);
-
+        System.out.println("Average time: " + (time / getTasks().size()) + " milliseconds.");
+        System.out.println("Elapsed time: " + getElapsedTime() + " milliseconds.");
     }
 
-    private final class BruteForceTask extends Task{
+    /**
+     * @return the endValue
+     */
+    public long getEndValue() {
+        return endValue;
+    }
 
+    /**
+     * @return the threadCount
+     */
+    public int getThreadCount() {
+        return threadCount;
+    }
+
+    /**
+     * @return the startValue
+     */
+    public long getStartValue() {
+        return startValue;
+    }
+
+    //final List<Long> primes = new ArrayList<>();
+
+    public List<Long> getPrimes() {
+        final List<Long> primes = new ArrayList<>();
+        for (Task task : getTasks()) {
+            primes.addAll(((BruteForceTask) task).getPrimes());
+        }
+        return primes;
+    }
+
+    public long getCurrentValue() {
+        if (getTasks().size() == 0) return 0;
+        long lowest = ((BruteForceTask) getTasks().get(0)).getCurrentValue();
+        for (Task task : getTasks()) {
+            if (((BruteForceTask) task).getCurrentValue() < lowest) {
+                lowest = ((BruteForceTask) task).getCurrentValue();
+            }
+        }
+        return lowest;
+    }
+
+    private class BruteForceTask extends MultithreadedTask.SubTask {
+
+        /**
+         * The starting value of the search. (inclusive).
+         */
         private final long startValue;
+
+        /**
+         * The ending value of the search. (inclusive).
+         */
         private long endValue;
 
         private long currentNumber;
 
         private final int increment;
 
-        public BruteForceTask(final long startValue, final long endValue, final int increment){
+        public final List<Long> primes = new ArrayList<>();
+
+        private int totalDistance = 0;
+
+        public BruteForceTask(final long startValue, final long endValue, final int increment) {
             this.startValue = startValue;
             this.endValue = endValue;
             this.increment = increment;
         }
 
         @Override
-        protected void run(){
+        protected void run() {
 
-            Log.d(TAG, "Starting Thread: " + startValue + " " + endValue + " " + increment);
-
-            if (startValue < 3){
-                if (endValue >= 2){
+            currentNumber = startValue;
+            if (startValue < 3) {
+                if (endValue == INFINITY || endValue >= 2) {
                     dispatchPrimeFound(2);
                 }
-                this.currentNumber = startValue + increment;
-            }else{
-                this.currentNumber = startValue;
+                currentNumber += increment;
             }
 
             int sqrtMax;
@@ -202,300 +191,114 @@ public class FindPrimesTask extends Task {
 
             boolean running = true;
 
-            //Loop forever
-            while (running){
+            while (running) {
 
-                //Check if the end value has been reached
-                if (this.currentNumber <= endValue || endValue == END_VALUE_INFINITY){
+                // Check if the end value has been reached
+                if (currentNumber <= endValue || endValue == -1) {
 
-                    //Check if the number is divisible by 2
-                    if (this.currentNumber % 2 != 0){
+                    // Check if the number is divisible by 2
+                    if (currentNumber % 2 != 0) {
 
-                        /*
+						/*
                          * Get the square root of the number. We only need to calculate up to the square
-                         * root to determine if the number is prime. The square root of a long will
-                         * always fit inside the value range of an int.
-                         */
-                        sqrtMax = (int) Math.sqrt(this.currentNumber);
+						 * root to determine if the number is prime. The square root of a long will
+						 * always fit inside the value range of an int.
+						 */
+                        sqrtMax = (int) Math.sqrt(currentNumber);
 
-                        //Assume the number is prime
+                        // Assume the number is prime
                         isPrime = true;
 
-                        /*
-                         * Check if the number is divisible by every odd number below it's square root.
-                         */
-                        for (int i = 3; i <= sqrtMax; i += 2){
+						/*
+						 * Check if the number is divisible by every odd number below it's square root.
+						 */
+                        for (int i = 3; i <= sqrtMax; i += 2) {
 
-                            //Check if the number divides perfectly
-                            if (this.currentNumber % i == 0){
+                            // Check if the number divides perfectly
+                            if (currentNumber % i == 0) {
                                 isPrime = false;
+                                totalDistance += i;
                                 break;
                             }
 
-                            //Check if we should pause
+                            // Check if we should pause
                             tryPause();
-                            if (/*shouldStop()*/requestStop){
+                            if (shouldStop()) {
                                 running = false;
                                 break;
                             }
                         }
 
-                        //Check if the number was prime
-                        if (isPrime){
-                            dispatchPrimeFound(this.currentNumber);
+                        // Check if the number was prime
+                        if (isPrime) {
+                            totalDistance += sqrtMax;
+                            dispatchPrimeFound(currentNumber);
                         }
                     }
 
-                    this.currentNumber += increment;
-                    statistics[NUMBERS_PER_SECOND][SINCE_LAST] += 1;
+                    currentNumber += increment;
 
-                    //Update statistics
-                   /* if (monitorType != SearchOptions.MonitorType.NONE) {
-
-                        final long currentTime = System.currentTimeMillis();
-
-                        if (currentTime - statistics[NUMBERS_PER_SECOND][LAST_UPDATE_TIME] >= 1000){
-                            statistics[NUMBERS_PER_SECOND][CURRENT_VALUE] = statistics[NUMBERS_PER_SECOND][SINCE_LAST];
-                            statistics[NUMBERS_PER_SECOND][SINCE_LAST] = 0;
-                            statistics[NUMBERS_PER_SECOND][LAST_UPDATE_TIME] = currentTime;
-                        }
-
-                        if (currentTime - statistics[PRIMES_PER_SECOND][LAST_UPDATE_TIME] >= 1000){
-                            statistics[PRIMES_PER_SECOND][CURRENT_VALUE] = statistics[PRIMES_PER_SECOND][SINCE_LAST];
-                            statistics[PRIMES_PER_SECOND][SINCE_LAST] = 0;
-                            statistics[PRIMES_PER_SECOND][LAST_UPDATE_TIME] = currentTime;
-                        }
-                    }*/
-
-                    //Calculate total progress
-                    if (endValue != END_VALUE_INFINITY){
-                        //setProgress(((float) (currentNumber - startValue) / (endValue - startValue)));
+                    // Calculate total progress
+                    if (endValue != -1) {
+                        setProgress(((float) (currentNumber - startValue) / (endValue - startValue)));
                     }
 
-                }else{
-                    this.currentNumber = endValue;
+                } else {
+                    currentNumber = endValue;
                     setProgress(1);
                     break;
                 }
             }
         }
-    }
 
-    private void searchBruteForce(){
-
-        statistics[NUMBERS_PER_SECOND][LAST_UPDATE_TIME] = System.currentTimeMillis();
-        statistics[PRIMES_PER_SECOND][LAST_UPDATE_TIME] = System.currentTimeMillis();
-
-        /*
-         * Set the current number to the start value. If the start value is less then 2, then set
-         * it to 2 because that is the lowest prime number.
-         */
-        if (startValue < 3){
-            if (endValue == END_VALUE_INFINITY || endValue >= 2){
-                dispatchPrimeFound(2);
-            }
-            currentNumber = 3;
-        }else{
-            currentNumber = startValue;
+        public long getCurrentValue() {
+            return this.currentNumber;
         }
 
-        int sqrtMax;
-        boolean isPrime;
-
-        boolean running = true;
-
-        //Loop forever
-        while (running){
-
-            //Check if the end value has been reached
-            if (currentNumber <= endValue || endValue == END_VALUE_INFINITY){
-
-                //Check if the number is divisible by 2
-                if (currentNumber % 2 != 0){
-
-                    /*
-                     * Get the square root of the number. We only need to calculate up to the square
-                     * root to determine if the number is prime. The square root of a long will
-                     * always fit inside the value range of an int.
-                     */
-                    sqrtMax = (int) Math.sqrt(currentNumber);
-
-                    //Assume the number is prime
-                    isPrime = true;
-
-                    /*
-                     * Check if the number is divisible by every odd number below it's square root.
-                     */
-                    for (int i = 3; i <= sqrtMax; i += 2){
-
-                        //Check if the number divides perfectly
-                        if (currentNumber % i == 0){
-                            isPrime = false;
-                            break;
-                        }
-
-                        //Check if we should pause
-                        tryPause();
-                        if (/*shouldStop()*/requestStop){
-                            running = false;
-                            break;
-                        }
-                    }
-
-                    //Check if the number was prime
-                    if (isPrime){
-                        dispatchPrimeFound(currentNumber);
-                    }
-                }
-
-                currentNumber++;
-                statistics[NUMBERS_PER_SECOND][SINCE_LAST] += 1;
-
-                //Update statistics
-                if (monitorType != SearchOptions.MonitorType.NONE) {
-
-                    final long currentTime = System.currentTimeMillis();
-
-                    if (currentTime - statistics[NUMBERS_PER_SECOND][LAST_UPDATE_TIME] >= 1000){
-                        statistics[NUMBERS_PER_SECOND][CURRENT_VALUE] = statistics[NUMBERS_PER_SECOND][SINCE_LAST];
-                        statistics[NUMBERS_PER_SECOND][SINCE_LAST] = 0;
-                        statistics[NUMBERS_PER_SECOND][LAST_UPDATE_TIME] = currentTime;
-                    }
-
-                    if (currentTime - statistics[PRIMES_PER_SECOND][LAST_UPDATE_TIME] >= 1000){
-                        statistics[PRIMES_PER_SECOND][CURRENT_VALUE] = statistics[PRIMES_PER_SECOND][SINCE_LAST];
-                        statistics[PRIMES_PER_SECOND][SINCE_LAST] = 0;
-                        statistics[PRIMES_PER_SECOND][LAST_UPDATE_TIME] = currentTime;
-                    }
-                }
-
-                //Calculate total progress
-                if (endValue != END_VALUE_INFINITY){
-                    setProgress(((float) (currentNumber - startValue) / (endValue - startValue)));
-                }
-
-            }else{
-                currentNumber = endValue;
-                setProgress(1);
-                break;
-            }
-        }
-    }
-
-    private void dispatchPrimeFound(final long number){
-        synchronized (LOCK){
+        private void dispatchPrimeFound(final long number) {
             primes.add(number);
-        }
-        statistics[PRIMES_PER_SECOND][SINCE_LAST]++;
-        sendOnPrimeFound(number);
-    }
-
-    private void searchSieveOfEratosthenes(){
-
-        // initially assume all integers are prime
-        boolean[] isPrime = new boolean[(int) (endValue + 1)];
-        //final List<Boolean> isPrime = new ArrayList();
-        for (int i = (int) startValue; i <= endValue; i++) {
-            isPrime[i] = true;
-            //isPrime.add(i, true);
+            sendOnPrimeFound(number);
         }
 
-        // mark non-primes <= n using Sieve of Eratosthenes
-        for (int factor = 2; factor*factor <= endValue; factor++) {
-
-            currentNumber = factor;
-            // if factor is prime, then mark multiples of factor as nonprime
-            // suffices to consider mutiples factor, factor+1, ...,  n/factor
-            if (isPrime[factor] /*isPrime.get(factor)*/) {
-                for (int j = factor; factor*j <= endValue; j++) {
-                    isPrime[factor*j] = false;
-                    //isPrime.set(factor * j, false);
-                }
-            }
-
-            setProgress((float) ((factor * factor) / 2) / endValue);
+        public List<Long> getPrimes() {
+            return this.primes;
         }
 
-        // count primes
-        int primes = 0;
-        for (int i = 2; i <= endValue; i++) {
-            if (isPrime[i]){
-                this.primes.add((long) i);
-                sendOnPrimeFound(i);
-                tryPause();
-                primes++;
-            }
-            //setProgress((float) ((i / 2) + (endValue / 2)) / endValue);
-        }
-        System.out.println("The number of primes <= " + endValue + " is " + primes);
-
-        currentNumber = endValue;
     }
 
-    public void setEndValue(long endValue){
-        this.endValue = endValue;
-    }
+    // Android
 
-    public long getCurrentNumber(){
-        return currentNumber;
-    }
+    private final List<EventListener> eventListeners = new CopyOnWriteArrayList<>();
 
-    public long getEndValue(){
-        return endValue;
-    }
-
-    public long getStartValue(){
-        return startValue;
-    }
-
-    public long getNumbersPerSecond(){
-        if (statistics[NUMBERS_PER_SECOND][CURRENT_VALUE] == -1){
-            return statistics[NUMBERS_PER_SECOND][SINCE_LAST];
-        }
-        return statistics[NUMBERS_PER_SECOND][CURRENT_VALUE];
-    }
-
-    public List<Long> getPrimes(){
-        return primes;
-    }
-
-    public long getPrimesPerSecond(){
-        if (statistics[PRIMES_PER_SECOND][CURRENT_VALUE] == -1){
-            return statistics[PRIMES_PER_SECOND][SINCE_LAST];
-        }
-        return statistics[PRIMES_PER_SECOND][CURRENT_VALUE];
-    }
-
-    public void addEventListener(final EventListener eventListener){
-        if (!eventListeners.contains(eventListener)) eventListeners.add(eventListener);
-    }
-
-    public boolean removeEventListener(final EventListener eventListener){
-        return eventListeners.remove(eventListener);
-    }
-
-    public interface EventListener{
+    public interface EventListener {
         void onPrimeFound(final long prime);
+
         void onErrorOccurred(final Object error);
     }
 
-    private void sendOnPrimeFound(final long prime){
-        for (int i = 0; i < eventListeners.size(); i++){
+    private void sendOnPrimeFound(final long prime) {
+        for (int i = 0; i < eventListeners.size(); i++) {
             eventListeners.get(i).onPrimeFound(prime);
         }
     }
 
-    private void sendOnExceptionOccurred(final Object error){
-        for (int i = 0; i < eventListeners.size(); i++){
-            eventListeners.get(i).onErrorOccurred(error);
-        }
+    public long getPrimesPerSecond() {
+        return 0;
     }
 
-    public boolean isFinished(){
-        return this.finished;
+    public long getNumbersPerSecond() {
+        return System.currentTimeMillis();
     }
 
-    public static class SearchOptions{
+    public void addEventListener(final EventListener eventListener) {
+        if (!eventListeners.contains(eventListener)) eventListeners.add(eventListener);
+    }
+
+    public boolean removeEventListener(final EventListener eventListener) {
+        return eventListeners.remove(eventListener);
+    }
+
+    public static class SearchOptions {
 
         /**
          * The value to start the search from. Inclusive.
@@ -507,12 +310,7 @@ public class FindPrimesTask extends Task {
          */
         private long endValue;
 
-        public enum Method{
-            BRUTE_FORCE,
-            SIEVE_OF_ERATOSTHENES
-        }
-
-        public enum MonitorType{
+        public enum MonitorType {
             NONE,
             SIMPLE,
             ADVANCED
@@ -521,61 +319,61 @@ public class FindPrimesTask extends Task {
         /**
          * The search method to use.
          */
-        private Method searchMethod;
+        private SearchMethod searchMethod;
 
         private MonitorType monitorType;
 
         private int threadCount;
 
-        public SearchOptions(final long startValue, final long endValue, final Method searchMethod, final MonitorType monitorType){
+        public SearchOptions(final long startValue, final long endValue, final SearchMethod searchMethod, final MonitorType monitorType) {
             this.startValue = startValue;
             this.endValue = endValue;
             this.searchMethod = searchMethod;
             this.monitorType = monitorType;
         }
 
-        public SearchOptions(final long startValue, final long endValue, final Method searchMethod, final MonitorType monitorType, final int threadCount){
+        public SearchOptions(final long startValue, final long endValue, final SearchMethod searchMethod, final MonitorType monitorType, final int threadCount) {
             this(startValue, endValue, searchMethod, monitorType);
             this.threadCount = threadCount;
         }
 
-        public long getStartValue(){
+        public long getStartValue() {
             return startValue;
         }
 
-        public void setStartValue(long startValue){
+        public void setStartValue(long startValue) {
             this.startValue = startValue;
         }
 
-        public long getEndValue(){
+        public long getEndValue() {
             return endValue;
         }
 
-        public void setEndValue(long endValue){
+        public void setEndValue(long endValue) {
             this.endValue = endValue;
         }
 
-        public Method getSearchMethod(){
+        public SearchMethod getSearchMethod() {
             return searchMethod;
         }
 
-        public void setSearchMethod(Method searchMethod){
+        public void setSearchMethod(SearchMethod searchMethod) {
             this.searchMethod = searchMethod;
         }
 
-        public MonitorType getMonitorType(){
+        public MonitorType getMonitorType() {
             return monitorType;
         }
 
-        public void setMonitorType(MonitorType monitorType){
+        public void setMonitorType(MonitorType monitorType) {
             this.monitorType = monitorType;
         }
 
-        public int getThreadCount(){
+        public int getThreadCount() {
             return threadCount;
         }
 
-        public void setThreadCount(int threadCount){
+        public void setThreadCount(int threadCount) {
             this.threadCount = threadCount;
         }
     }

@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
     <files-path
-        name="primes"
-        path="primes"/>
-    <files-path
-        name="factors"
-        path="factors"/>
-    <!--<files-path
-        name="trees"
-        path="trees"/>-->
+        name="export"
+        path="export"/>
 </paths>

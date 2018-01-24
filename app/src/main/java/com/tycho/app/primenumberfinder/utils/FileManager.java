@@ -52,6 +52,8 @@ public final class FileManager {
     public static final String EXTENSION = ".txt";
     public static final String TREE_EXTENSION = ".tree";
 
+    private final Context context;
+
     /**
      * Initialize the file manager. This will create 1 instance that will be used throughout the
      * lifetime of the application.
@@ -75,6 +77,8 @@ public final class FileManager {
      * @param context The context to use when initializing variables.
      */
     private FileManager(final Context context) {
+
+        this.context = context;
 
         //Initialize save directories
         savedPrimesDirectory = new File(context.getFilesDir().getAbsolutePath() + File.separator + "primes");
@@ -273,6 +277,39 @@ public final class FileManager {
         }
     }
 
+    public File convert(final File file, final String fileName, final String itemSeparator){
+        final List<Long> items = readNumbers(file);
+
+        if (!getExportCacheDirectory().exists()){
+            getExportCacheDirectory().mkdir();
+        }
+
+        final File output = new File(getExportCacheDirectory() + File.separator + fileName);
+
+        try {
+
+            final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(output));
+
+            final long lastItem = items.get(items.size() - 1);
+
+            for (long number : items){
+                bufferedWriter.write(String.valueOf(number));
+
+                if (number != lastItem) {
+                    bufferedWriter.write(itemSeparator);
+                }
+            }
+
+            bufferedWriter.flush();
+            bufferedWriter.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return output;
+    }
+
     public File getSavedPrimesDirectory() {
         return savedPrimesDirectory;
     }
@@ -283,5 +320,9 @@ public final class FileManager {
 
     public File getSavedTreesDirectory() {
         return savedTreesDirectory;
+    }
+
+    public File getExportCacheDirectory(){
+        return new File(context.getFilesDir() + File.separator + "export" + File.separator);
     }
 }
