@@ -78,7 +78,7 @@ public class FindPrimesFragment extends Fragment {
     private final CheckPrimalityStatisticsFragment checkPrimalityStatisticsFragment = new CheckPrimalityStatisticsFragment();
 
 
-    private final FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(0, FindPrimesTask.END_VALUE_INFINITY, FindPrimesTask.SearchOptions.Method.BRUTE_FORCE, FindPrimesTask.SearchOptions.MonitorType.SIMPLE);
+    private final FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(0, FindPrimesTask.INFINITY, FindPrimesTask.SearchMethod.BRUTE_FORCE, FindPrimesTask.SearchOptions.MonitorType.SIMPLE);
 
     //private BottomSheetBehavior bottomSheetBehavior;
     //private RadioGroup radioGroupSearchMethod;
@@ -322,7 +322,7 @@ public class FindPrimesFragment extends Fragment {
                     editTextSearchRangeStart.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.accent)));
                     editTextSearchRangeEnd.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.accent)));
 
-                    if (getEndValue() == FindPrimesTask.END_VALUE_INFINITY) {
+                    if (getEndValue() == FindPrimesTask.INFINITY) {
                         if (!editable.toString().equals(getString(R.string.infinity_text))) {
                             editTextSearchRangeEnd.setText(getString(R.string.infinity_text));
                         }
@@ -368,7 +368,7 @@ public class FindPrimesFragment extends Fragment {
                     //Create a new task
                     searchOptions.setStartValue(getStartValue());
                     searchOptions.setEndValue(getEndValue());
-                    //searchOptions.setThreadCount(2);
+                    searchOptions.setThreadCount(1);
                     final Task task = new FindPrimesTask(searchOptions);
                     taskListFragment.addTask(task);
                     PrimeNumberFinder.getTaskManager().registerTask(task);
@@ -472,7 +472,7 @@ public class FindPrimesFragment extends Fragment {
         //Reset search options
         searchOptions.setStartValue(0);
         searchOptions.setEndValue(1000000);
-        searchOptions.setSearchMethod(FindPrimesTask.SearchOptions.Method.BRUTE_FORCE);
+        searchOptions.setSearchMethod(FindPrimesTask.SearchMethod.BRUTE_FORCE);
         searchOptions.setMonitorType(FindPrimesTask.SearchOptions.MonitorType.SIMPLE);
 
         //Reset view states
@@ -525,7 +525,7 @@ public class FindPrimesFragment extends Fragment {
 
         if (input.length() > 0) {
             if (input.equals("infinity")) {
-                return FindPrimesTask.END_VALUE_INFINITY;
+                return FindPrimesTask.INFINITY;
             }
 
             final BigInteger endValue = new BigInteger(editTextSearchRangeEnd.getText().toString().replace(",", ""));
@@ -571,7 +571,7 @@ public class FindPrimesFragment extends Fragment {
             BigInteger endValue;
             final String searchRangeEndText = editTextSearchRangeEnd.getText().toString();
             if (searchRangeEndText.equals(getString(R.string.infinity_text))) {
-                endValue = BigInteger.valueOf(FindPrimesTask.END_VALUE_INFINITY);
+                endValue = BigInteger.valueOf(FindPrimesTask.INFINITY);
             } else {
                 endValue = new BigInteger(searchRangeEndText.replace(",", ""));
             }
@@ -596,7 +596,7 @@ public class FindPrimesFragment extends Fragment {
                     }
 
                     //The end value cannot be infinity
-                    if (endValue.compareTo(BigInteger.valueOf(FindPrimesTask.END_VALUE_INFINITY)) == 0) {
+                    if (endValue.compareTo(BigInteger.valueOf(FindPrimesTask.INFINITY)) == 0) {
                         return false;
                     }
 
@@ -606,7 +606,7 @@ public class FindPrimesFragment extends Fragment {
                     break;
             }
 
-            if (endValue.compareTo(BigInteger.valueOf(FindPrimesTask.END_VALUE_INFINITY)) != 0) {
+            if (endValue.compareTo(BigInteger.valueOf(FindPrimesTask.INFINITY)) != 0) {
 
                 //End value must be greater than start value
                 if (startValue.compareTo(endValue) >= 0) {

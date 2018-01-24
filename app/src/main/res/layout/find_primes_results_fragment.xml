@@ -89,7 +89,7 @@
 
             <Button
                 android:id="@+id/button_view_all"
-                style="@style/SearchButton"
+                style="@style/Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/view_all" />
@@ -101,7 +101,7 @@
 
             <Button
                 android:id="@+id/button_save"
-                style="@style/SearchButton"
+                style="@style/Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/save" />

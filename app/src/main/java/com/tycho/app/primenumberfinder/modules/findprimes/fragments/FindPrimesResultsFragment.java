@@ -136,7 +136,7 @@ public class FindPrimesResultsFragment extends ResultsFragment implements FindPr
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        final boolean success = FileManager.getInstance().savePrimes(getTask().getStartValue(), getTask().getCurrentNumber(), getTask().getPrimes());
+                        final boolean success = FileManager.getInstance().savePrimes(getTask().getStartValue(), getTask().getCurrentValue(), getTask().getPrimes());
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
@@ -211,7 +211,7 @@ public class FindPrimesResultsFragment extends ResultsFragment implements FindPr
                 }
 
                 //Update progress
-                if (getTask().getEndValue() != FindPrimesTask.END_VALUE_INFINITY && getTask().getState() != Task.State.STOPPED){
+                if (getTask().getEndValue() != FindPrimesTask.INFINITY && getTask().getState() != Task.State.STOPPED){
                     progress.setVisibility(View.VISIBLE);
                     progress.setText(getString(R.string.task_progress, decimalFormat.format(getTask().getProgress() * 100)));
                 }else{
@@ -219,19 +219,23 @@ public class FindPrimesResultsFragment extends ResultsFragment implements FindPr
                 }
 
                 //Update recyclerView
-                if (lastAdapterSize != primesAdapter.getItemCount()){
+                primesAdapter.setTask(getTask());
+                primesAdapter.notifyDataSetChanged();
+                recyclerView.scrollToPosition(primesAdapter.getItemCount() - 1);
+
+                /*if (lastAdapterSize != primesAdapter.getItemCount()){
                     try {
                         primesAdapter.notifyItemRangeInserted(lastAdapterSize, primesAdapter.getItemCount() - lastAdapterSize);
                     }catch (IllegalStateException e) {}
                     lastAdapterSize = primesAdapter.getItemCount();
                     recyclerView.scrollToPosition(primesAdapter.getItemCount() - 1);
-                }
+                }*/
 
                 //Format subtitle
                 final String count = NumberFormat.getInstance(Locale.getDefault()).format(getTask().getPrimes().size());
                 final String start = NumberFormat.getInstance(Locale.getDefault()).format(getTask().getStartValue());
                 String end = NumberFormat.getInstance(Locale.getDefault()).format(getTask().getEndValue());
-                if (getTask().getEndValue() == FindPrimesTask.END_VALUE_INFINITY){
+                if (getTask().getEndValue() == FindPrimesTask.INFINITY){
                     end = getString(R.string.infinity_text);
                 }
                 final String string = getString(R.string.find_primes_result);

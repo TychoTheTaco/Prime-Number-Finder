@@ -9,13 +9,11 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -102,10 +100,6 @@ public final class FileManager {
             if (!savedTreesDirectory.mkdirs()) {
                 Log.e(TAG, "Failed to create save directory at " + savedTreesDirectory);
             }
-        }
-
-        if (!getExportCacheDirectory().exists()){
-            getExportCacheDirectory().mkdirs();
         }
     }
 
@@ -283,6 +277,39 @@ public final class FileManager {
         }
     }
 
+    public File convert(final File file, final String fileName, final String itemSeparator){
+        final List<Long> items = readNumbers(file);
+
+        if (!getExportCacheDirectory().exists()){
+            getExportCacheDirectory().mkdir();
+        }
+
+        final File output = new File(getExportCacheDirectory() + File.separator + fileName);
+
+        try {
+
+            final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(output));
+
+            final long lastItem = items.get(items.size() - 1);
+
+            for (long number : items){
+                bufferedWriter.write(String.valueOf(number));
+
+                if (number != lastItem) {
+                    bufferedWriter.write(itemSeparator);
+                }
+            }
+
+            bufferedWriter.flush();
+            bufferedWriter.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return output;
+    }
+
     public File getSavedPrimesDirectory() {
         return savedPrimesDirectory;
     }
@@ -297,18 +324,5 @@ public final class FileManager {
 
     public File getExportCacheDirectory(){
         return new File(context.getFilesDir() + File.separator + "export" + File.separator);
-    }
-
-    public static void copy(File src, File dst) throws IOException {
-        try (InputStream in = new FileInputStream(src)) {
-            try (OutputStream out = new FileOutputStream(dst)) {
-                // Transfer bytes from in to out
-                byte[] buf = new byte[1024];
-                int len;
-                while ((len = in.read(buf)) > 0) {
-                    out.write(buf, 0, len);
-                }
-            }
-        }
     }
 }

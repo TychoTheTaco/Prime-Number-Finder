@@ -44,7 +44,7 @@
         <item name="android:textColor">@color/primary_text</item>
     </style>
 
-    <style name="SearchButton">
+    <style name="Button">
         <item name="android:textColor">@color/white</item>
         <item name="android:backgroundTint">@color/accent</item>
     </style>

@@ -39,7 +39,7 @@
 
             <Button
                 android:id="@+id/button_find_factors"
-                style="@style/SearchButton"
+                style="@style/Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/find_factors_button" />

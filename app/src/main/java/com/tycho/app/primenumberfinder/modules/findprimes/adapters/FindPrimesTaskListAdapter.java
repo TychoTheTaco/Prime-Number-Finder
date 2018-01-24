@@ -59,7 +59,7 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<AbstractT
         //Set title
         if (task instanceof FindPrimesTask) {
             final long endValue = ((FindPrimesTask) task).getEndValue();
-            holder.title.setText(context.getString(R.string.find_primes_task_list_item_title, NumberFormat.getInstance(Locale.getDefault()).format(((FindPrimesTask) task).getStartValue()), endValue == FindPrimesTask.END_VALUE_INFINITY ? context.getString(R.string.infinity_text) : NumberFormat.getInstance(Locale.getDefault()).format(endValue)));
+            holder.title.setText(context.getString(R.string.find_primes_task_list_item_title, NumberFormat.getInstance(Locale.getDefault()).format(((FindPrimesTask) task).getStartValue()), endValue == FindPrimesTask.INFINITY ? context.getString(R.string.infinity_text) : NumberFormat.getInstance(Locale.getDefault()).format(endValue)));
         } else if (task instanceof CheckPrimalityTask) {
             holder.title.setText(context.getString(R.string.check_primality_task_status, NumberFormat.getInstance(Locale.getDefault()).format(((CheckPrimalityTask) task).getNumber())));
         }
@@ -88,7 +88,7 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<AbstractT
         }
 
         //Set progress
-        if (task.getState() == Task.State.STOPPED || task instanceof FindPrimesTask && ((FindPrimesTask) task).getEndValue() == FindPrimesTask.END_VALUE_INFINITY){
+        if (task.getState() == Task.State.STOPPED || task instanceof FindPrimesTask && ((FindPrimesTask) task).getEndValue() == FindPrimesTask.INFINITY){
             holder.progress.setVisibility(View.GONE);
         }else if (task.getState() != Task.State.STOPPED){
             holder.progress.setVisibility(View.VISIBLE);
