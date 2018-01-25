@@ -331,7 +331,15 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     public void setTask(Task task) {
         super.setTask(task);
 
-        if (task != null){
+        try {
+            init();
+        }catch (NullPointerException e){}
+
+        updateUi();
+    }
+
+    private void init(){
+        if (getTask() != null){
 
             //Make sure view is visible
             resultsView.setVisibility(View.VISIBLE);
@@ -341,7 +349,5 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
             resultsView.setVisibility(View.GONE);
             noTaskView.setVisibility(View.VISIBLE);
         }
-
-        updateUi();
     }
 }

@@ -3,6 +3,8 @@ package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 import android.app.Fragment;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -18,12 +20,14 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.adapters.FragmentAdapter;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.math.BigInteger;
 import java.text.NumberFormat;
@@ -76,8 +80,8 @@ public class FindPrimesFragment extends Fragment {
 
     private final FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(0, FindPrimesTask.END_VALUE_INFINITY, FindPrimesTask.SearchOptions.Method.BRUTE_FORCE, FindPrimesTask.SearchOptions.MonitorType.SIMPLE);
 
-    /*private BottomSheetBehavior bottomSheetBehavior;
-    private RadioGroup radioGroupSearchMethod;*/
+    //private BottomSheetBehavior bottomSheetBehavior;
+    //private RadioGroup radioGroupSearchMethod;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
@@ -390,8 +394,8 @@ public class FindPrimesFragment extends Fragment {
                 if (screenDim.getAlpha() > 0) {
                     if (event.getAction() == MotionEvent.ACTION_UP) {
                         //editTextPrimalityInput.clearFocus();
-                        //bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                        MainActivity.hideKeyboard(getActivity());
+                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                        Utils.hideKeyboard(getActivity());
                     }
                     return true;
                 }
@@ -622,5 +626,9 @@ public class FindPrimesFragment extends Fragment {
         }
 
         return true;
+    }
+
+    public void addActionViewListener(final ActionViewListener actionViewListener){
+        taskListFragment.addActionViewListener(actionViewListener);
     }
 }

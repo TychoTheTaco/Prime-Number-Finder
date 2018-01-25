@@ -33,10 +33,10 @@ public class AboutPageFragment extends Fragment{
 
         ((TextView) rootView.findViewById(R.id.app_version)).setText(getString(R.string.app_version_name, PrimeNumberFinder.getVersionName(getActivity())));
 
-        /*TextView textViewCredits = rootView.findViewById(R.id.credits);
+        TextView textViewCredits = rootView.findViewById(R.id.credits);
         textViewCredits.setMovementMethod(LinkMovementMethod.getInstance());
 
-        ((TextView) rootView.findViewById(R.id.temporary)).setText(generateList());*/
+        /*((TextView) rootView.findViewById(R.id.temporary)).setText(generateList());*/
 
         //((CardView) rootView.findViewById(R.id.card)).setCardBackgroundColor(Color.GRAY);
 

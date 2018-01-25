@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -49,9 +50,7 @@ public class DisplayFactorsActivity extends AppCompatActivity{
 
     private RecyclerView recyclerView;
 
-    private FactorsListAdapter adapter = new FactorsListAdapter();
-
-    //private TextView subtitle;
+    private FactorsListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -76,6 +75,9 @@ public class DisplayFactorsActivity extends AppCompatActivity{
                 //Get the file path from the extras
                 final String filePath = extras.getString("filePath");
                 if (filePath != null){
+
+                    //Set up adapter
+                    adapter = new FactorsListAdapter(this);
 
                     //Set up RecyclerView
                     recyclerView = findViewById(R.id.recyclerView);
@@ -124,16 +126,14 @@ public class DisplayFactorsActivity extends AppCompatActivity{
 
         switch (item.getItemId()){
 
-            /*case R.id.export:
-                Uri uri = Uri.parse("content://" + "com.tycho.app.primenumberfinder/" + file.getName());
-
-                Log.d(TAG, "Uri: " + uri);
-
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-                startActivity(shareIntent);
-                break;*/
+            case R.id.export:
+                final Uri path = FileProvider.getUriForFile(this,"com.tycho.app.primenumberfinder", file);
+                final Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.putExtra(Intent.EXTRA_STREAM, path);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.setType("text/plain");
+                startActivity(intent);
+                break;
 
             case android.R.id.home:
                 onBackPressed();

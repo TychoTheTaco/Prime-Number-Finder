@@ -3,6 +3,7 @@ package com.tycho.app.primenumberfinder.modules.savedfiles.activities;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
@@ -12,6 +13,7 @@ import android.text.SpannableStringBuilder;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.SuperscriptSpan;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -198,6 +200,12 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity {
         setActionBarColor(actionBarColor);
     }
 
+    /*@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.display_content_activity_menu, menu);
+        return true;
+    }*/
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -205,6 +213,15 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity {
             case android.R.id.home:
                 onBackPressed();
                 break;
+
+            /*case R.id.export:
+                final Uri path = CustomFileProvider.getUriForFile(this,"com.tycho.app.primenumberfinder", file);
+                final Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.putExtra(Intent.EXTRA_STREAM, path);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.setType("text/plain");
+                startActivity(intent);
+                break;*/
         }
 
         return super.onOptionsItemSelected(item);

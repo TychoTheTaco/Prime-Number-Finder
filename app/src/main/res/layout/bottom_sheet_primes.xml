@@ -26,9 +26,10 @@
         android:textSize="16sp"/>
 
     <!-- Search method -->
-    <RelativeLayout
+    <!--<LinearLayout
         android:layout_width="match_parent"
         android:layout_marginBottom="4dp"
+        android:orientation="vertical"
         android:layout_height="wrap_content">
 
         <TextView
@@ -41,8 +42,7 @@
         <RadioGroup
             android:id="@+id/radio_group_search_method"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/search_method_title">
+            android:layout_height="wrap_content">
 
             <RadioButton
                 android:id="@+id/brute_force"
@@ -51,14 +51,71 @@
                 android:text="@string/find_primes_search_method_brute_force"
                 android:textSize="14sp"/>
 
-            <!--<RadioButton
+            <RadioButton
                 android:id="@+id/sieve_of_eratosthenes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/find_primes_search_method_sieve_of_eratosthenes"
-                android:textSize="14sp"/>-->
+                android:textSize="14sp"/>
 
         </RadioGroup>
 
-    </RelativeLayout>
+    </LinearLayout>-->
+
+    <!-- Thread count -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_marginBottom="4dp"
+        android:orientation="vertical"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/thread_count_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Threads"
+            android:textSize="14sp"/>
+
+        <EditText android:id="@+id/thread_count"
+            android:layout_width="wrap_content"
+            android:hint="4"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <!-- Notification -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_marginBottom="4dp"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content">
+
+        <Switch android:id="@+id/showNotification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:text="Show notification when finished."
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <!-- Auto save -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_marginBottom="4dp"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content">
+
+        <Switch android:id="@+id/autoSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:text="Save file when finished."
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
 </LinearLayout>

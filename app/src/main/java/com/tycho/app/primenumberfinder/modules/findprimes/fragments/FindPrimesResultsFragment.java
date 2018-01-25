@@ -1,5 +1,6 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimesActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -54,15 +56,21 @@ public class FindPrimesResultsFragment extends ResultsFragment implements FindPr
     private Button viewAllButton;
     private Button saveButton;
 
-    private final PrimesAdapter primesAdapter = new PrimesAdapter();
+    private PrimesAdapter primesAdapter;
 
     private int lastAdapterSize = 0;
 
     private boolean errorOccurred = false;
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        primesAdapter = new PrimesAdapter(activity);
+    }
+
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_primes_results_fragment, container, false);
 
         //Set up recycler view
@@ -114,6 +122,7 @@ public class FindPrimesResultsFragment extends ResultsFragment implements FindPr
 
                         final Intent intent = new Intent(getActivity(), DisplayPrimesActivity.class);
                         intent.putExtra("filePath", file.getAbsolutePath());
+                        intent.putExtra("title", false);
                         getActivity().startActivity(intent);
 
                     }
@@ -153,7 +162,6 @@ public class FindPrimesResultsFragment extends ResultsFragment implements FindPr
 
     @Override
     public void onPrimeFound(long prime) {
-        primesAdapter.getListNumbers().add(prime);
         requestUiUpdate();
     }
 
@@ -281,13 +289,9 @@ public class FindPrimesResultsFragment extends ResultsFragment implements FindPr
             resultsView.setVisibility(View.VISIBLE);
             noTaskView.setVisibility(View.GONE);
 
-            //Add primes to the adapter
-            if (!errorOccurred && getTask().getState() !=  Task.State.RUNNING){
-                primesAdapter.getListNumbers().clear();
-                primesAdapter.getListNumbers().addAll(getTask().getPrimes());
-                primesAdapter.notifyItemRangeInserted(0, getTask().getPrimes().size());
-                recyclerView.scrollToPosition(primesAdapter.getItemCount() - 1);
-            }
+            primesAdapter.setTask(getTask());
+            primesAdapter.notifyDataSetChanged();
+            recyclerView.scrollToPosition(primesAdapter.getItemCount() - 1);
 
         }else{
             resultsView.setVisibility(View.GONE);

@@ -1,5 +1,6 @@
 package com.tycho.app.primenumberfinder.modules.findfactors.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -54,9 +55,15 @@ public class FindFactorsResultsFragment extends ResultsFragment implements FindF
     private Button viewAllButton;
     private Button saveButton;
 
-    private final FactorsListAdapter adapter = new FactorsListAdapter();
+    private FactorsListAdapter adapter;
 
     private int lastAdapterSize = 0;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        adapter = new FactorsListAdapter(activity);
+    }
 
     @Nullable
     @Override
@@ -162,7 +169,6 @@ public class FindFactorsResultsFragment extends ResultsFragment implements FindF
 
     @Override
     public void onFactorFound(long prime) {
-        adapter.getFactors().add(prime);
         requestUiUpdate();
     }
 
@@ -252,28 +258,28 @@ public class FindFactorsResultsFragment extends ResultsFragment implements FindF
             getTask().addEventListener(this);
         }
 
-        if (task != null){
+        try {
+            init();
+        }catch (NullPointerException e){}
+
+        updateUi();
+    }
+
+    private void init(){
+        if (getTask() != null){
 
             //Make sure view is visible
             resultsView.setVisibility(View.VISIBLE);
             noTaskView.setVisibility(View.GONE);
 
             //Add factors to the adapter
-            final int count = adapter.getItemCount();
-            adapter.getFactors().clear();
-            adapter.notifyItemRangeRemoved(0, count);
-            adapter.getFactors().addAll(((FindFactorsTask) task).getFactors());
-            adapter.setNumber(((FindFactorsTask) task).getNumber());
-            final int newSize = ((FindFactorsTask) task).getFactors().size();
-            adapter.notifyItemRangeInserted(0, newSize);
-            lastAdapterSize = newSize;
-            recyclerView.scrollToPosition(newSize - 1);
+            adapter.setTask(getTask());
+            adapter.notifyDataSetChanged();
+            recyclerView.scrollToPosition(adapter.getItemCount() - 1);
 
         }else{
             resultsView.setVisibility(View.GONE);
             noTaskView.setVisibility(View.VISIBLE);
         }
-
-        updateUi();
     }
 }

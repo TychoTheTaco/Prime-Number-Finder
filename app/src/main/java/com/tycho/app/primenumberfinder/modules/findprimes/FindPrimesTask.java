@@ -291,7 +291,7 @@ public class FindPrimesTask extends Task {
          * it to 2 because that is the lowest prime number.
          */
         if (startValue < 3){
-            if (endValue >= 2){
+            if (endValue == END_VALUE_INFINITY || endValue >= 2){
                 dispatchPrimeFound(2);
             }
             currentNumber = 3;

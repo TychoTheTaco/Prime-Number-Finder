@@ -3,19 +3,21 @@ package com.tycho.app.primenumberfinder.modules.savedfiles.activities;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
@@ -40,19 +42,18 @@ public class DisplayPrimesActivity extends AppCompatActivity{
 
     private RecyclerView recyclerView;
 
-    private PrimesAdapter adapter = new PrimesAdapter();
+    private PrimesAdapter primesAdapter;
 
     //private TextView subtitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.display_factors_activity);
+        setContentView(R.layout.display_primes_activity);
 
         //Set up the toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Saved Files");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         applyThemeColor(ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));
@@ -69,16 +70,22 @@ public class DisplayPrimesActivity extends AppCompatActivity{
                 final String filePath = extras.getString("filePath");
                 if (filePath != null){
 
+                    //Set up adapter
+                    primesAdapter = new PrimesAdapter(this);
+
                     //Set up RecyclerView
                     recyclerView = findViewById(R.id.recyclerView);
                     recyclerView.setHasFixedSize(true);
                     recyclerView.setLayoutManager(new LinearLayoutManager(this));
-                    recyclerView.setAdapter(adapter);
+                    recyclerView.setAdapter(primesAdapter);
                     recyclerView.setItemAnimator(null);
 
                     file = new File(filePath);
                     loadFile(file);
-                    setTitle(formatTitle(file.getName().split("\\.")[0]));
+
+                    if (extras.getBoolean("title", true)){
+                        setTitle(formatTitle(file.getName().split("\\.")[0]));
+                    }
 
                 }else{
                     Log.e(TAG, "Invalid file path!");
@@ -106,12 +113,12 @@ public class DisplayPrimesActivity extends AppCompatActivity{
             public void run(){
 
                 final List<Long> numbers = FileManager.getInstance().readNumbers(file);
-                adapter.getListNumbers().addAll(numbers);
+                primesAdapter.getPrimes().addAll(numbers);
 
                 new Handler(getMainLooper()).post(new Runnable(){
                     @Override
                     public void run(){
-                        adapter.notifyItemRangeInserted(0, adapter.getItemCount());
+                        primesAdapter.notifyItemRangeInserted(0, primesAdapter.getItemCount());
                         progressDialog.dismiss();
                     }
                 });
@@ -163,11 +170,26 @@ public class DisplayPrimesActivity extends AppCompatActivity{
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.display_content_activity_menu, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()){
             case android.R.id.home:
                 onBackPressed();
+                break;
+
+            case R.id.export:
+                final Uri path = FileProvider.getUriForFile(this,"com.tycho.app.primenumberfinder", file);
+                final Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.putExtra(Intent.EXTRA_STREAM, path);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.setType("text/plain");
+                startActivity(intent);
                 break;
         }
 

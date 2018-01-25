@@ -1,4 +1,4 @@
-package com.tycho.app.primenumberfinder.Fragments_old;
+package com.tycho.app.primenumberfinder.settings;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,9 +15,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-
         getPreferenceManager().setSharedPreferencesName(PrimeNumberFinder.getPreferenceManager().getName());
-
         addPreferencesFromResource(R.xml.preferences);
     }
 

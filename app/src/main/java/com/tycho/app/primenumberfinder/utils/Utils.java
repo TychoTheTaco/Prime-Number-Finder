@@ -2,20 +2,26 @@ package com.tycho.app.primenumberfinder.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.inputmethod.InputMethodManager;
 
+import java.text.NumberFormat;
 import java.util.Locale;
 
 /**
  *
- * This class contains lots of random utility classes.
+ * This class contains lots of random utility methods.
  *
  * Created by tycho on 11/13/2017.
  *
  */
-
 public final class Utils {
+
+    /**
+     * Tag used for logging and debugging.
+     */
+    private static final String TAG = "Utils";
 
     /**
      * Convert a DP value to its pixel value.
@@ -40,6 +46,11 @@ public final class Utils {
         return (value - a) / (b - a) * (d - c) + c;
     }
 
+    /**
+     * Format the time like a stopwatch.
+     * @param millis The time in milliseconds.
+     * @return A string with the corresponding time formatted like a stopwatch.
+     */
     public static String formatTime(final long millis){
 
         if (millis == -1){
@@ -65,9 +76,37 @@ public final class Utils {
         return time;
     }
 
+    /**
+     * Append an ordinal indicator to the end of a number. This method will also format the number using {@linkplain NumberFormat#format(long)}.
+     * @param number The number to append to.
+     * @return A string containing the formatted number with an ordinal indicator appended.
+     */
+    public static String formatNumberOrdinal(final long number){
+        String output = NumberFormat.getInstance(Locale.getDefault()).format(number);
+
+        final long ones = number % 10;
+        final long tens = number % 100;
+
+        if (ones == 1 && tens != 11) {
+            output += "st";
+        }else if (ones == 2 && tens != 12) {
+            output += "nd";
+        }else if (ones == 3 && tens != 13) {
+            output += "rd";
+        }else{
+            output += "th";
+        }
+
+        return output;
+    }
+
+    /**
+     * Hide the Android virtual keyboard.
+     * @param context The activity context to use.
+     */
     public static void hideKeyboard(final Context context) {
         try {
-            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            final InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(((Activity) context).getCurrentFocus().getWindowToken(), 0);
         } catch (Exception e) {
             e.printStackTrace();

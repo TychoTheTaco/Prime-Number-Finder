@@ -2,7 +2,7 @@
 <resources>
 
     <dimen name="drawer_header_height">150dp</dimen>
-    <dimen name="navigation_drawer_width">210dp</dimen>
+    <dimen name="navigation_drawer_width">240dp</dimen>
 
 
     <dimen name="fab_margin">16dp</dimen>
@@ -11,16 +11,6 @@
     <dimen name="stat_title_height">40dp</dimen>
 
 
-    <!-- CardViews -->
-    <dimen name="card_view_list_saved_primes_height">200dp</dimen>
-    <dimen name="card_view_list_saved_primes_height_landscape">220dp</dimen>
-    <dimen name="card_view_list_saved_factors_height">200dp</dimen>
-    <dimen name="card_view_list_saved_factors_height_landscape">220dp</dimen>
-
-    <dimen name="card_view_list_saved_primes_width">340dp</dimen>
-    <dimen name="card_view_list_saved_primes_width_landscape">305dp</dimen>
-    <dimen name="card_view_list_saved_factors_width">340dp</dimen>
-    <dimen name="card_view_list_saved_factors_width_landscape">305dp</dimen>
 
     <dimen name="card_view_margin_top">8dp</dimen>
     <dimen name="card_view_margin_sides">8dp</dimen>
