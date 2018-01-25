@@ -58,7 +58,8 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     private Button saveButton;
     //private Button viewAllButton;
 
-    //private TreeView treeView;
+    private TreeView treeView;
+    private TreeView treeViewTest;
 
     @Nullable
     @Override
@@ -74,9 +75,10 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         noTaskView = rootView.findViewById(R.id.empty_message);
         progress = rootView.findViewById(R.id.textView_search_progress);
         saveButton = rootView.findViewById(R.id.button_save);
-        //treeView = rootView.findViewById(R.id.factor_tree);
+        treeView = rootView.findViewById(R.id.factor_tree);
+        treeViewTest = rootView.findViewById(R.id.factor_tree_test);
 
-        /*final Tree<Long> t = new Tree<>(810L);
+        final Tree<Long> t = new Tree<>(81L);
         t.addNodeWithChildren(27L)
                 .addNode(2L)
                 .addNodeWithChildren(9L)
@@ -89,7 +91,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                 .addNode(5L);
         treeView.setTree(t);
 
-        final Tree<String> tree = new Tree<>("This");
+        /*final Tree<String> tree = new Tree<>("This");
         tree.addNodeWithChildren("is")
                 .addNodeWithChildren("to")
                 .addNode("view")
@@ -107,9 +109,8 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                 .addNodeWithChildren("tree")
                 .addNode("really")
                 .addNode("hope")
-                .addNode("it");
-
-        Log.d(TAG, "Tree is: " + tree);*/
+                .addNode("it");*/
+        treeViewTest.setTree(t.formatNumbers());
 
         /*((TreeView) rootView.findViewById(R.id.factor_tree_test)).setTree(tree);
 
@@ -246,6 +247,8 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                 }
                 spannableStringBuilder.delete(spannableStringBuilder.length() - 3, spannableStringBuilder.length());
                 primeFactorization.setText(spannableStringBuilder);
+
+                treeView.setTree(getTask().getFactorTree());
 
                 //viewAllButton.setVisibility(View.VISIBLE);
             }

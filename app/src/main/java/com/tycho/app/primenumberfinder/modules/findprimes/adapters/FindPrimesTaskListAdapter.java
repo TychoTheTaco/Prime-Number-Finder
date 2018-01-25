@@ -1,6 +1,7 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,7 +14,9 @@ import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayFactorsActivity;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -96,6 +99,14 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<AbstractT
         }
 
         holder.root.setSelected(holder.getAdapterPosition() == getSelectedItemPosition());
+
+        holder.editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Intent intent = new Intent(context, FindPrimesConfigurationActivity.class);
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override

@@ -29,6 +29,11 @@
             android:label="Primes"/>
 
         <activity
+            android:theme="@style/PrimeNumbers"
+            android:name=".modules.findprimes.FindPrimesConfigurationActivity"
+            android:label="Configure Task"/>
+
+        <activity
             android:theme="@style/Factors"
             android:name=".modules.savedfiles.activities.DisplayFactorsActivity"
             android:label="Factors"/>

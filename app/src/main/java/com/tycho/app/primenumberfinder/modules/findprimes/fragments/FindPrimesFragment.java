@@ -3,14 +3,11 @@ package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 import android.app.Fragment;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,7 +24,6 @@ import com.tycho.app.primenumberfinder.adapters.FragmentAdapter;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
-import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.math.BigInteger;
 import java.text.NumberFormat;
@@ -161,7 +157,7 @@ public class FindPrimesFragment extends Fragment {
         tabLayout.setupWithViewPager(viewPager);
 
         //Set up number input
-        editTextPrimalityInput = rootView.findViewById(R.id.editText_primality_input);
+        editTextPrimalityInput = rootView.findViewById(R.id.primality_input);
         editTextPrimalityInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -202,7 +198,7 @@ public class FindPrimesFragment extends Fragment {
         });
 
         //Set up check primality button
-        buttonCheckPrimality = rootView.findViewById(R.id.button_check_primality);
+        buttonCheckPrimality = rootView.findViewById(R.id.check_primality_button);
         buttonCheckPrimality.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
