@@ -96,6 +96,7 @@
     <string name="stop">Stop</string>
     <string name="reset">Reset</string>
     <string name="content_description_reset_button">Reset</string>
+    <string name="content_description_edit_button">Edit</string>
     <string name="view_all">View all</string>
     <string name="save">Save</string>
 

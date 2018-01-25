@@ -17,7 +17,7 @@
             style="@style/SectionDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:labelFor="@+id/editText_primality_input"
+            android:labelFor="@+id/primality_input"
             android:paddingEnd="8dp"
             android:paddingStart="8dp"
             android:text="@string/input_number_description" />
@@ -31,7 +31,7 @@
             android:paddingStart="8dp">
 
             <EditText
-                android:id="@id/editText_primality_input"
+                android:id="@id/primality_input"
                 style="@style/NumberInput"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
                 android:hint="13,257" />
 
             <Button
-                android:id="@+id/button_check_primality"
+                android:id="@+id/check_primality_button"
                 style="@style/Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
