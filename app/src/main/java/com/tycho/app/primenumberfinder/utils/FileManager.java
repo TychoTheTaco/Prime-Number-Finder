@@ -9,11 +9,13 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,6 +54,8 @@ public final class FileManager {
     public static final String EXTENSION = ".txt";
     public static final String TREE_EXTENSION = ".tree";
 
+    private final Context context;
+
     /**
      * Initialize the file manager. This will create 1 instance that will be used throughout the
      * lifetime of the application.
@@ -76,6 +80,8 @@ public final class FileManager {
      */
     private FileManager(final Context context) {
 
+        this.context = context;
+
         //Initialize save directories
         savedPrimesDirectory = new File(context.getFilesDir().getAbsolutePath() + File.separator + "primes");
         if (!savedPrimesDirectory.exists()) {
@@ -96,6 +102,10 @@ public final class FileManager {
             if (!savedTreesDirectory.mkdirs()) {
                 Log.e(TAG, "Failed to create save directory at " + savedTreesDirectory);
             }
+        }
+
+        if (!getExportCacheDirectory().exists()){
+            getExportCacheDirectory().mkdirs();
         }
     }
 
@@ -283,5 +293,22 @@ public final class FileManager {
 
     public File getSavedTreesDirectory() {
         return savedTreesDirectory;
+    }
+
+    public File getExportCacheDirectory(){
+        return new File(context.getFilesDir() + File.separator + "export" + File.separator);
+    }
+
+    public static void copy(File src, File dst) throws IOException {
+        try (InputStream in = new FileInputStream(src)) {
+            try (OutputStream out = new FileOutputStream(dst)) {
+                // Transfer bytes from in to out
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+            }
+        }
     }
 }
