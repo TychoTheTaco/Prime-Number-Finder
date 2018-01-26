@@ -80,7 +80,7 @@ public class FindFactorsStatisticsFragment extends TaskFragment {
         if (task == null){
             statisticsView.setVisibility(View.GONE);
             noTaskView.setVisibility(View.VISIBLE);
-            uiUpdater.pause();
+            if (uiUpdater.getState() != Task.State.NOT_STARTED) uiUpdater.pause();
         }else{
             statisticsView.setVisibility(View.VISIBLE);
             noTaskView.setVisibility(View.GONE);
@@ -119,15 +119,12 @@ public class FindFactorsStatisticsFragment extends TaskFragment {
                 uiUpdater.startOnNewThread();
             }
 
-            switch (task.getState()){
+            switch (getTask().getState()){
                 case RUNNING:
                     uiUpdater.resume();
                     break;
 
                 case PAUSED:
-                    uiUpdater.pause();
-                    break;
-
                 case STOPPED:
                     uiUpdater.pause();
                     break;
@@ -151,7 +148,8 @@ public class FindFactorsStatisticsFragment extends TaskFragment {
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        uiUpdater.stop();
+        uiUpdater.pause();
+        //We need to wait here
         if (getTask() != null){
             try {
                 final StatisticData statisticData = new StatisticData();
@@ -196,7 +194,9 @@ public class FindFactorsStatisticsFragment extends TaskFragment {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            updateData(statisticData);
+                            if (getState() != State.PAUSED){
+                                updateData(statisticData);
+                            }
                         }
                     });
                 }

@@ -83,6 +83,7 @@ public class FactorsListAdapter extends RecyclerView.Adapter<FactorsListAdapter.
             factors = new ArrayList<>();
         }else{
             this.factors = task.getFactors();
+            setNumber(task.getNumber());
         }
     }
 

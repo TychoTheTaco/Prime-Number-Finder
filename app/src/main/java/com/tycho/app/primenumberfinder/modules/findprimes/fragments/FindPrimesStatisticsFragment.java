@@ -114,28 +114,11 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
         try {
             init();
         }catch (NullPointerException e){}
-    }
 
-    private void init(){
-        if (getTask() == null){
-            statisticsView.setVisibility(View.GONE);
-            noTaskView.setVisibility(View.VISIBLE);
-            uiUpdater.pause();
-        }else{
-            statisticsView.setVisibility(View.VISIBLE);
-            noTaskView.setVisibility(View.GONE);
+        Log.d(TAG, "UI STATE: " + uiUpdater.getState());
+        Log.d(TAG, "Task: " + task);
 
-            estimatedTimeRemainingLayout.setVisibility((getTask().getEndValue() == FindPrimesTask.END_VALUE_INFINITY) ? View.GONE : View.VISIBLE);
-
-            final StatisticData statisticData = new StatisticData();
-            try {
-                statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
-                statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getNumbersPerSecond());
-                statisticData.put(Statistic.PRIMES_PER_SECOND, getTask().getPrimesPerSecond());
-                statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
-            }catch (JSONException e){}
-            updateData(statisticData);
-
+        if (task != null){
             //Start UI updater
             if (uiUpdater.getState() == Task.State.NOT_STARTED) {
                 uiUpdater.addTaskListener(new TaskAdapter() {
@@ -160,8 +143,6 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
                     }
                 });
                 uiUpdater.startOnNewThread();
-            } else {
-                uiUpdater.resume();
             }
 
             switch (getTask().getState()){
@@ -170,14 +151,64 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
                     break;
 
                 case PAUSED:
-                    uiUpdater.pause();
-                    break;
-
                 case STOPPED:
                     uiUpdater.pause();
                     break;
             }
+        }
 
+    }
+
+    private void init(){
+        if (getTask() == null){
+            statisticsView.setVisibility(View.GONE);
+            noTaskView.setVisibility(View.VISIBLE);
+            if (uiUpdater.getState() != Task.State.NOT_STARTED) uiUpdater.pause();
+        }else{
+            statisticsView.setVisibility(View.VISIBLE);
+            noTaskView.setVisibility(View.GONE);
+
+            estimatedTimeRemainingLayout.setVisibility((getTask().getEndValue() == FindPrimesTask.END_VALUE_INFINITY) ? View.GONE : View.VISIBLE);
+
+            final StatisticData statisticData = new StatisticData();
+            try {
+                statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
+                statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getNumbersPerSecond());
+                statisticData.put(Statistic.PRIMES_PER_SECOND, getTask().getPrimesPerSecond());
+                statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
+            }catch (JSONException e){}
+            updateData(statisticData);
+        }
+    }
+
+    @Override
+    public void onTaskStarted() {
+        super.onTaskStarted();
+
+        //Start UI updater
+        if (uiUpdater.getState() == Task.State.NOT_STARTED) {
+            uiUpdater.addTaskListener(new TaskAdapter() {
+                @Override
+                public void onTaskStarted() {
+                    Log.d(TAG, "UI updater started");
+                }
+
+                @Override
+                public void onTaskPaused() {
+                    Log.d(TAG, "UI updater paused");
+                }
+
+                @Override
+                public void onTaskResumed() {
+                    Log.d(TAG, "UI updater resumed");
+                }
+
+                @Override
+                public void onTaskStopped() {
+                    Log.d(TAG, "UI updater stopped");
+                }
+            });
+            uiUpdater.startOnNewThread();
         }
     }
 
@@ -196,7 +227,7 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        uiUpdater.stop();
+        uiUpdater.pause();
         if (getTask() != null){
             try {
                 final StatisticData statisticData = new StatisticData();
@@ -243,7 +274,9 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            updateData(statisticData);
+                            if (getState() != State.PAUSED){
+                                updateData(statisticData);
+                            }
                         }
                     });
                 }
