@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import easytasks.Task;
+import easytasks.TaskAdapter;
 import easytasks.TaskListener;
 
 
@@ -60,7 +61,7 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
 
     protected abstract void doOnBindViewHolder(RecyclerView.ViewHolder holder, int position);
 
-    protected abstract class CustomTaskEventListener implements TaskListener{
+    protected abstract class CustomTaskEventListener extends TaskAdapter{
         protected T holder;
 
         private void setViewHolder(final T holder){
@@ -128,7 +129,7 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
                 }
             };
             task.addTaskListener(customTaskEventListener);
-            task.addTaskListener(new TaskListener() {
+            task.addTaskListener(new TaskAdapter() {
                 @Override
                 public void onTaskStarted() {
                     sendTaskStatesChanged();
@@ -147,11 +148,6 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
                 @Override
                 public void onTaskStopped() {
                     sendTaskStatesChanged();
-                }
-
-                @Override
-                public void onProgressChanged(float v) {
-
                 }
             });
             this.tasks.add(task);

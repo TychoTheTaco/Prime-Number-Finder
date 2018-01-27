@@ -21,6 +21,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import easytasks.Task;
+import easytasks.TaskAdapter;
 import easytasks.TaskListener;
 
 import static com.tycho.app.primenumberfinder.utils.Utils.formatTime;
@@ -79,7 +80,7 @@ public class FindFactorsStatisticsFragment extends TaskFragment {
         if (task == null){
             statisticsView.setVisibility(View.GONE);
             noTaskView.setVisibility(View.VISIBLE);
-            uiUpdater.pause();
+            if (uiUpdater.getState() != Task.State.NOT_STARTED) uiUpdater.pause();
         }else{
             statisticsView.setVisibility(View.VISIBLE);
             noTaskView.setVisibility(View.GONE);
@@ -94,7 +95,7 @@ public class FindFactorsStatisticsFragment extends TaskFragment {
 
             //Start UI updater
             if (uiUpdater.getState() == Task.State.NOT_STARTED) {
-                uiUpdater.addTaskListener(new TaskListener() {
+                uiUpdater.addTaskListener(new TaskAdapter() {
                     @Override
                     public void onTaskStarted() {
                         Log.d(TAG, "UI updater started");
@@ -114,24 +115,16 @@ public class FindFactorsStatisticsFragment extends TaskFragment {
                     public void onTaskStopped() {
                         Log.d(TAG, "UI updater stopped");
                     }
-
-                    @Override
-                    public void onProgressChanged(float v) {
-
-                    }
                 });
                 uiUpdater.startOnNewThread();
             }
 
-            switch (task.getState()){
+            switch (getTask().getState()){
                 case RUNNING:
                     uiUpdater.resume();
                     break;
 
                 case PAUSED:
-                    uiUpdater.pause();
-                    break;
-
                 case STOPPED:
                     uiUpdater.pause();
                     break;
@@ -155,7 +148,8 @@ public class FindFactorsStatisticsFragment extends TaskFragment {
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        uiUpdater.stop();
+        uiUpdater.pause();
+        //We need to wait here
         if (getTask() != null){
             try {
                 final StatisticData statisticData = new StatisticData();
@@ -200,7 +194,9 @@ public class FindFactorsStatisticsFragment extends TaskFragment {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            updateData(statisticData);
+                            if (getState() != State.PAUSED){
+                                updateData(statisticData);
+                            }
                         }
                     });
                 }

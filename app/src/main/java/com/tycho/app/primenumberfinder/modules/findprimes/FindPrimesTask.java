@@ -383,9 +383,9 @@ public class FindPrimesTask extends Task {
     }
 
     private void dispatchPrimeFound(final long number){
-        synchronized (LOCK){
+        //synchronized (LOCK){
             primes.add(number);
-        }
+        //}
         statistics[PRIMES_PER_SECOND][SINCE_LAST]++;
         sendOnPrimeFound(number);
     }

@@ -76,10 +76,6 @@ public class FindFactorsResultsFragment extends ResultsFragment implements FindF
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(null);
-        final FindFactorsTask task = getTask();
-        if (task != null){
-            adapter.setNumber(task.getNumber());
-        }
 
         title = rootView.findViewById(R.id.title);
         subtitle = rootView.findViewById(R.id.subtitle);
@@ -158,16 +154,6 @@ public class FindFactorsResultsFragment extends ResultsFragment implements FindF
     }
 
     @Override
-    public void onTaskStopped() {
-        super.onTaskStopped();
-
-        final FindFactorsTask task = getTask();
-        if (task != null){
-            adapter.setNumber(task.getNumber());
-        }
-    }
-
-    @Override
     public void onFactorFound(long prime) {
         requestUiUpdate();
     }
@@ -177,6 +163,7 @@ public class FindFactorsResultsFragment extends ResultsFragment implements FindF
         if (getTask() != null){
 
             //Update task state
+            Log.d(TAG, "Update UI with state: " + getTask().getState());
             switch (getTask().getState()){
                 case RUNNING:
                     title.setText(getString(R.string.status_searching));

@@ -40,12 +40,27 @@ public abstract class TaskFragment extends Fragment implements TaskListener {
     }
 
     @Override
+    public void onTaskPausing() {
+
+    }
+
+    @Override
     public void onTaskPaused() {
 
     }
 
     @Override
+    public void onTaskResuming() {
+
+    }
+
+    @Override
     public void onTaskResumed() {
+
+    }
+
+    @Override
+    public void onTaskStopping() {
 
     }
 
