@@ -26,10 +26,10 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
+import com.tycho.app.primenumberfinder.modules.savedfiles.ExportOptionsDialog;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -128,19 +128,8 @@ public class DisplayFactorsActivity extends AppCompatActivity{
         switch (item.getItemId()){
 
             case R.id.export:
-                try {
-                    final File output = new File(FileManager.getInstance().getExportCacheDirectory() + File.separator + file.getName());
-                    FileManager.copy(file, output);
-                    final Uri path = FileProvider.getUriForFile(this,"com.tycho.app.primenumberfinder", output);
-                    final Intent intent = new Intent(Intent.ACTION_SEND);
-                    intent.putExtra(Intent.EXTRA_STREAM, path);
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    intent.setType("text/plain");
-                    startActivity(intent);
-                }catch (IOException e){
-                    Log.e(TAG, "Error exporting file!");
-                    Toast.makeText(this, "Error exporting file!", Toast.LENGTH_SHORT).show();
-                }
+                final ExportOptionsDialog exportOptionsDialog = new ExportOptionsDialog(this, file);
+                exportOptionsDialog.show();
                 break;
 
             case android.R.id.home:

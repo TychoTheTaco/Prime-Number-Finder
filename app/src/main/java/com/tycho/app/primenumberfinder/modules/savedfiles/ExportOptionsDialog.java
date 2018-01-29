@@ -90,7 +90,7 @@ public class ExportOptionsDialog extends Dialog {
                     separator = itemSeparatorInput.getText().toString().trim();
                 }
 
-                final File output = FileManager.getInstance().convert(file, fileNameInput.getText().toString().trim(), separator);
+                final File output = FileManager.getInstance().convert(file, fileNameInput.getText().toString().trim() + ".txt", separator);
 
                 final Uri path = FileProvider.getUriForFile(context, "com.tycho.app.primenumberfinder", output);
                 final Intent intent = new Intent(Intent.ACTION_SEND);

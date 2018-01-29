@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import simpletrees.Tree;
 
@@ -52,9 +53,13 @@ public class TreeView extends View {
      */
     private float verticalSpacing;
 
+    private float[] horizontalSpacing;
+
     private float[] offsets;
 
     private List<List<Rect>> rectangles = new ArrayList<>();
+
+    private Tree<Rect> rectTree;
 
     public TreeView(Context context) {
         super(context);
@@ -90,7 +95,7 @@ public class TreeView extends View {
 
             boolean intersectionFound;
             do {
-                calculatePositions(tree, getWidth() / 2, getStringHeight(), 0);
+                //calculatePositions(tree, getWidth() / 2, getStringHeight(), 0);
 
                 intersectionFound = false;
                 for (int i = 0; i < rectangles.size(); i++) {
@@ -179,57 +184,45 @@ public class TreeView extends View {
             //if (!finished) new Thread(process).start();
 
             //drawTree(canvas, tree, getWidth() / 2, getStringHeight(), 0);
-            calculateBounds(canvas, tree, getWidth() / 2, getStringHeight(), 0);
-            generateGroups(canvas);
-        }
-    }
+            //calculateBounds(canvas, tree, getWidth() / 2, getStringHeight(), 0, rectTree);
 
-    final int[] DEBUG_COLORS = {
-            Color.argb(100, 255, 0, 0),
-            Color.argb(100, 0, 255, 0),
-            Color.argb(100, 0, 0, 255)
-    };
+            //debugRectangles(rectTree, canvas, Color.argb(50, 0, 100, 0));
+            Log.d(TAG, "Checking overlaps for " + tree.getValue());
+            fixOverlaps(rectTree, 1080 / 2, -1);
+            //debugRectangles(generateRectangleTree(1080 / 2, getStringHeight(), tree, 0), canvas, Color.argb(50, 100, 0, 0));
 
-    private void calculatePositions(final Tree<?> tree, final float centerX, final float centerY, int level) {
-        final float SPACING = offsets[level];
-        Log.d(TAG, "Level " + level + " calculate spacing: " + SPACING);
+            Log.d(TAG, "Checking overlaps for " + tree.getChildren().get(0).getValue());
+            fixOverlaps(rectTree.getChildren().get(0), rectTree.getChildren().get(0).getValue().exactCenterX(), 0);
+            //debugRectangles(generateRectangleTree(1080 / 2, getStringHeight(), tree, 0), canvas, Color.argb(50, 0, 0, 100));
 
-        //Calculate total row width
-        float totalWidth = 0;
-        final float totalSpacing = tree.getChildren().size() > 0 ? (tree.getChildren().size() - 1) * SPACING : 0;
-        float[] sizes = new float[tree.getChildren().size()];
-        for (int i = 0; i < tree.getChildren().size(); i++) {
-            if (tree.getChildren().get(i).getValue() instanceof String) {
-                sizes[i] = getStringWidth((String) tree.getChildren().get(i).getValue());
-            } else {
-                sizes[i] = getStringWidth(NumberFormat.getNumberInstance().format(tree.getChildren().get(i).getValue()));
+            Log.d(TAG, "Checking overlaps for " + tree.getValue());
+            fixOverlaps(rectTree, 1080 / 2, -1);
+            final Tree<Rect> modified = generateRectangleTree(1080 / 2, getStringHeight(), tree, 0);
+            debugRectangles(modified, canvas, Color.argb(50, 0, 0, 100));
+
+            drawContents(modified, tree, canvas);
+
+            for (float space : horizontalSpacing){
+                Log.d(TAG, "Space: " + space);
             }
-            totalWidth += sizes[i];
-        }
-
-        //Debug
-        paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        paint.setColor(Color.argb(100, 0, 200, 0));
-        paint.setStrokeWidth(1);
-        final Rect rect = new Rect(
-                (int) (centerX - (totalWidth / 2) - (totalSpacing / 2)),
-                (int) (centerY + 50 - (getStringHeight() / 2) + paint.descent()),
-                (int) (centerX - (totalWidth / 2) - (totalSpacing / 2) + totalWidth + totalSpacing),
-                (int) (centerY + 50 + 50 - (getStringHeight() / 2))
-        );
-        if (rect.width() > 0) rectangles.get(level).add(rect);
-
-
-        float previousOffset = 0;
-        for (int i = 0; i < tree.getChildren().size(); i++) {
-            float offset = previousOffset + (sizes[i] / 2);
-            calculatePositions(tree.getChildren().get(i), centerX - (totalWidth / 2) - (totalSpacing / 2) + offset, centerY + 50, level + 1);
-            previousOffset = offset + (sizes[i] / 2) + SPACING; //Add the remaining half of the item width to prepare for next iteration
         }
     }
 
-    private Rect calculateBounds(final Canvas canvas, final Tree<?> tree, final float centerX, final float centerY, int level){
+    private void debugRectangles(final Tree<Rect> rectTree, final Canvas canvas, final int color){
+        paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        paint.setColor(color);
+        canvas.drawRect(rectTree.getValue(), paint);
 
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(Color.BLACK);
+        canvas.drawRect(rectTree.getValue(), paint);
+
+        for (Tree<Rect> child : rectTree.getChildren()){
+            debugRectangles(child, canvas, color);
+        }
+    }
+
+    private Tree<Rect> generateRectangleTree(final float centerX, final float centerY, final Tree<?> tree, int level){
         //Draw text
         final String text = tree.getValue().toString();
         paint.setStyle(Paint.Style.FILL);
@@ -237,24 +230,8 @@ public class TreeView extends View {
         paint.setStrokeWidth(2);
         float textX = centerX - (getStringWidth(text) / 2);
         float textY = centerY + (getStringHeight() / 2) - paint.descent();
-        canvas.drawText(text, textX, textY, paint);
 
         final Rect bounds = new Rect((int) textX, (int) (centerY + (getStringHeight() / 2)), (int) (textX + getStringWidth(text)), (int) (centerY - (getStringHeight() / 2)));
-
-        //Debug
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.BLUE);
-        paint.setStrokeWidth(1);
-        canvas.drawLine(textX, centerY, textX + getStringWidth(text), centerY, paint); //Center Y
-        paint.setColor(Color.RED);
-        canvas.drawLine(textX, textY, textX + getStringWidth(text), textY, paint); //Baseline
-        paint.setColor(Color.BLUE);
-        canvas.drawLine(centerX, (centerY - (getStringHeight() / 2)), centerX, (centerY + (getStringHeight() / 2)), paint); //Center X
-
-        //Debug
-        paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        paint.setColor(Color.argb(100, 0, 200, 0));
-        canvas.drawRect(bounds, paint);
 
         float totalWidth = 0;
         float[] sizes = new float[tree.getChildren().size()];
@@ -262,16 +239,76 @@ public class TreeView extends View {
             sizes[i] = getStringWidth(tree.getChildren().get(i).getValue().toString());
             totalWidth += sizes[i];
         }
-        final float totalSpacing = tree.getChildren().size() > 0 ? (tree.getChildren().size() - 1) * 40 : 0;
+        final float totalSpacing = tree.getChildren().size() > 0 ? (tree.getChildren().size() - 1) * horizontalSpacing[level] : 0;
 
         float previousOffset = 0;
-        for (int i = 0; i <  tree.getChildren().size(); i++){
+        final Tree<Rect> rectangleTree = new Tree<>(bounds);
+        for (int i = 0; i < tree.getChildren().size(); i++){
             final float offset = previousOffset + (sizes[i] / 2);
-            rectangles.get(level + 1).add(calculateBounds(canvas, tree.getChildren().get(i), centerX - ((totalWidth + totalSpacing) / 2) + offset, centerY + verticalSpacing, level + 1));
-            previousOffset = offset + (sizes[i] / 2) + 40;
+            rectangleTree.addNode(generateRectangleTree(centerX - ((totalWidth + totalSpacing) / 2) + offset, centerY + verticalSpacing, tree.getChildren().get(i), level + 1));
+            previousOffset = offset + (sizes[i] / 2) + horizontalSpacing[level];
         }
 
-        return bounds;
+        return rectangleTree;
+    }
+
+    private void drawContents(final Tree<Rect> rectTree, final Tree<?> tree, final Canvas canvas){
+
+        //Draw text
+        final String text = tree.getValue().toString();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(tree.getChildren().size() == 0 ? Color.RED : Color.BLACK);
+        paint.setStrokeWidth(2);
+        float textX = rectTree.getValue().exactCenterX() - (getStringWidth(text) / 2);
+        float textY = rectTree.getValue().exactCenterY() + (getStringHeight() / 2) - paint.descent();
+        canvas.drawText(text, textX, textY, paint);
+
+        for (int i = 0; i < tree.getChildren().size(); i++){
+
+            //Draw lines
+            paint.setColor(Color.BLACK);
+            paint.setStrokeWidth(2);
+            canvas.drawLine(rectTree.getValue().exactCenterX(), rectTree.getValue().top, rectTree.getChildren().get(i).getValue().exactCenterX(), rectTree.getChildren().get(i).getValue().bottom, paint);
+
+            drawContents(rectTree.getChildren().get(i), tree.getChildren().get(i), canvas);
+        }
+
+    }
+
+    private void fixOverlaps(final Tree<Rect> rectTree, final float border, int level){
+        Log.d(TAG, "Fix overlaps with border: " + border);
+        for (int i = 0; i < rectTree.getChildren().size(); i++){
+            checkOverlaps(rectTree.getChildren().get(i), border, level, i);
+        }
+    }
+
+    private boolean checkOverlaps(final Tree<Rect> rectTree, final float border, final int level, int side){
+
+        final Rect rect = rectTree.getValue();
+
+        if (side == 0){
+            if (rect.right >= border){
+                Log.d(TAG, "Rectangle out of bounds (right collision): " + rect);
+                horizontalSpacing[level] += rect.right - border + 2;
+                Log.d(TAG, "Modified horizontal spacing on level " + level + ": " + horizontalSpacing[level]);
+                return true;
+            }
+        }else if (side == 1){
+            if (rect.left <= border){
+                Log.d(TAG, "Rectangle out of bounds (left collision): " + rect);
+                horizontalSpacing[level] += border - rect.left + 2;
+                Log.d(TAG, "Modified horizontal spacing on level " + level + ": " + horizontalSpacing[level]);
+                return true;
+            }
+        }
+
+        boolean overlap = false;
+        for (int i = 0; i < rectTree.getChildren().size(); i++){
+            overlap = checkOverlaps(rectTree.getChildren().get(i), border, level + 1, side);
+            if (overlap) break;
+        }
+
+        return overlap;
     }
 
     private void generateGroups(final Canvas canvas){
@@ -283,85 +320,22 @@ public class TreeView extends View {
                 if (group == null){
                     group = rect;
                 }else{
-                    group.union(rect);
+                    //group.union(rect);
+                    group.union(rect.left, rect.top);
+                    group.union(rect.right, rect.bottom);
                     Log.d(TAG, "Group: " + group);
                 }
             }
 
             if (group != null){
                 paint.setStyle(Paint.Style.FILL_AND_STROKE);
-                paint.setColor(Color.argb(100, 0, 0, 200));
+                paint.setColor(Color.argb(100, random.nextInt(255), random.nextInt(255), random.nextInt(255)));
                 canvas.drawRect(group, paint);
             }
         }
     }
 
-    private void drawTree(final Canvas canvas, final Tree<?> tree, final float centerX, final float centerY, int level) {
-
-        final float SPACING = offsets[level];
-        //Log.d(TAG, "Level " + level + " draw spacing: " + SPACING);
-
-        //Draw text
-        final String text = tree.getValue().toString();
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(tree.getChildren().size() == 0 ? Color.RED : Color.BLACK);
-        paint.setStrokeWidth(2);
-        float textX = centerX - (getStringWidth(text) / 2);
-        float textY = centerY + (getStringHeight() / 2) - paint.descent();
-        canvas.drawText(text, textX, textY, paint);
-
-        final Rect bounds = new Rect((int) textX, (int) (centerY + (getStringHeight() / 2)), (int) (textX + getStringWidth(text)), (int) (centerY - (getStringHeight() / 2)));
-
-        //Debug
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.BLUE);
-        paint.setStrokeWidth(1);
-        canvas.drawLine(textX, centerY, textX + getStringWidth(text), centerY, paint); //Center Y
-        paint.setColor(Color.RED);
-        canvas.drawLine(textX, textY, textX + getStringWidth(text), textY, paint); //Baseline
-        paint.setColor(Color.BLUE);
-        canvas.drawLine(centerX, (centerY - (getStringHeight() / 2)), centerX, (centerY + (getStringHeight() / 2)), paint); //Center X
-
-        //Debug
-        paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        paint.setColor(Color.argb(100, 0, 200, 0));
-        canvas.drawRect(bounds, paint);
-
-        //Calculate group
-        float groupWidth = 0;
-        final float totalSpacing = tree.getChildren().size() > 0 ? (tree.getChildren().size() - 1) * SPACING : 0;
-        for (Tree<?> child : tree.getChildren()){
-            groupWidth += getStringWidth(text);
-        }
-        final Rect group = new Rect((int) (centerX - (groupWidth + totalSpacing) / 2), (int) (centerY + verticalSpacing), (int) (centerX + (groupWidth + totalSpacing) / 2), (int) (centerY + verticalSpacing + getStringHeight()));
-
-        //Debug
-        paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        paint.setColor(Color.argb(100, 0, 0, 200));
-        canvas.drawRect(group, paint);
-
-        /*for (Tree<?> child : tree.getChildren()){
-            drawTree(canvas, child, group.left, group.bottom, level + 1);
-        }*/
-
-        //Calculate total row width
-        float totalWidth = 0;
-        //final float totalSpacing = tree.getChildren().size() > 0 ? (tree.getChildren().size() - 1) * SPACING : 0;
-        float[] sizes = new float[tree.getChildren().size()];
-        for (int i = 0; i < tree.getChildren().size(); i++) {
-            sizes[i] = getStringWidth(tree.getChildren().get(i).getValue().toString());
-            totalWidth += sizes[i];
-        }
-
-        float previousOffset = 0;
-        for (int i = 0; i < tree.getChildren().size(); i++) {
-            float offset = previousOffset + (sizes[i] / 2);
-            //Log.d(TAG, tree.getValue() + ": offset[" + i + "] = " + offset);
-            drawTree(canvas, tree.getChildren().get(i), centerX - (totalWidth / 2) - (totalSpacing / 2) + offset, centerY + verticalSpacing, level + 1);
-            previousOffset = offset + (sizes[i] / 2) + SPACING; //Add the remaining half of the item width to prepare for next iteration
-        }
-
-    }
+    final Random random = new Random();
 
     public void setTree(Tree<?> tree) {
         this.tree = tree;
@@ -370,10 +344,17 @@ public class TreeView extends View {
             rectangles.add(new ArrayList<Rect>());
         }
         offsets = new float[tree.getLevels()];
+        horizontalSpacing = new float[tree.getLevels()];
+        Arrays.fill(horizontalSpacing, 40);
         Arrays.fill(offsets, 40);
         finished = false;
         invalidate();
         Log.d(TAG, "Set tree: " + tree.getValue());
+        Log.d(TAG, "Filled: " + tree.getLevels() + " levels.");
+
+        //Cacalate
+        rectTree = generateRectangleTree(1080 / 2, getStringHeight(), tree, 0);
+        Log.d(TAG, "Rect Tree:\n" + rectTree.format());
     }
 
     private float getStringWidth(final String text) {

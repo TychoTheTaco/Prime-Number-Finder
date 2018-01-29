@@ -1,6 +1,7 @@
 package com.tycho.app.primenumberfinder.modules.primefactorization.fragments;
 
 import android.content.Intent;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -78,7 +79,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         treeView = rootView.findViewById(R.id.factor_tree);
         treeViewTest = rootView.findViewById(R.id.factor_tree_test);
 
-        final Tree<Long> t = new Tree<>(81L);
+        final Tree<Long> t = new Tree<>(810L);
         t.addNodeWithChildren(27L)
                 .addNode(2L)
                 .addNodeWithChildren(9L)
@@ -112,27 +113,17 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                 .addNode("it");*/
         treeViewTest.setTree(t.formatNumbers());
 
-        /*((TreeView) rootView.findViewById(R.id.factor_tree_test)).setTree(tree);
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try{
-                    Thread.sleep(5000);
-                }catch (InterruptedException e){
-
-                }
-
-                Log.w(TAG, "Setting delayed tree");
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((TreeView) rootView.findViewById(R.id.factor_tree_test)).setTree(t);
-                    }
-                });
-
-            }
-        }).start();*/
+        //Test
+        final Rect a = new Rect(0, 10, 10, 0);
+        Log.d(TAG, "A: " + a);
+        final Rect b = new Rect(10, 10, 20, 0);
+        Log.d(TAG, "B: " + b);
+        a.union(b);
+        Log.d(TAG, "Union A: " + a);
+        Log.d(TAG, "Union B: " + b);
+        a.union(10, 10);
+        a.union(20, 0);
+        Log.d(TAG, "Union A: " + a);
 
         /*viewAllButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -248,7 +239,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                 spannableStringBuilder.delete(spannableStringBuilder.length() - 3, spannableStringBuilder.length());
                 primeFactorization.setText(spannableStringBuilder);
 
-                treeView.setTree(getTask().getFactorTree());
+                //treeView.setTree(getTask().getFactorTree());
 
                 //viewAllButton.setVisibility(View.VISIBLE);
             }

@@ -115,9 +115,6 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
             init();
         }catch (NullPointerException e){}
 
-        Log.d(TAG, "UI STATE: " + uiUpdater.getState());
-        Log.d(TAG, "Task: " + task);
-
         if (task != null){
             //Start UI updater
             if (uiUpdater.getState() == Task.State.NOT_STARTED) {
@@ -168,7 +165,7 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
             statisticsView.setVisibility(View.VISIBLE);
             noTaskView.setVisibility(View.GONE);
 
-            estimatedTimeRemainingLayout.setVisibility((getTask().getEndValue() == FindPrimesTask.END_VALUE_INFINITY) ? View.GONE : View.VISIBLE);
+            estimatedTimeRemainingLayout.setVisibility((getTask().getEndValue() == FindPrimesTask.INFINITY) ? View.GONE : View.VISIBLE);
 
             final StatisticData statisticData = new StatisticData();
             try {

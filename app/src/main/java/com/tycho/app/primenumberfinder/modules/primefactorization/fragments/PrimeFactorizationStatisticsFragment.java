@@ -61,6 +61,8 @@ public class PrimeFactorizationStatisticsFragment extends TaskFragment {
         textViewElapsedTime = rootView.findViewById(R.id.textView_elapsed_time);
         estimatedTimeRemainingTextView = rootView.findViewById(R.id.textView_eta);
 
+        init();
+
         return rootView;
     }
 
@@ -96,10 +98,16 @@ public class PrimeFactorizationStatisticsFragment extends TaskFragment {
     public void setTask(Task task) {
         super.setTask(task);
 
-        if (task == null){
+        try {
+            init();
+        }catch (NullPointerException e){}
+    }
+
+    private void init(){
+        if (getTask() == null){
             statisticsView.setVisibility(View.GONE);
             noTaskView.setVisibility(View.VISIBLE);
-            uiUpdater.pause();
+            if (uiUpdater.getState() != Task.State.NOT_STARTED) uiUpdater.pause();
         }else{
             statisticsView.setVisibility(View.VISIBLE);
             noTaskView.setVisibility(View.GONE);
@@ -107,8 +115,6 @@ public class PrimeFactorizationStatisticsFragment extends TaskFragment {
             final StatisticData statisticData = new StatisticData();
             try {
                 statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
-               // statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getNumbersPerSecond());
-               // statisticData.put(Statistic.FACTORS_PER_SECOND, getTask().getFactorsPerSecond());
                 statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
             }catch (JSONException e){}
             updateData(statisticData);
@@ -141,20 +147,16 @@ public class PrimeFactorizationStatisticsFragment extends TaskFragment {
                 uiUpdater.resume();
             }
 
-            switch (task.getState()){
+            switch (getTask().getState()){
                 case RUNNING:
                     uiUpdater.resume();
                     break;
 
                 case PAUSED:
-                    uiUpdater.pause();
-                    break;
-
                 case STOPPED:
                     uiUpdater.pause();
                     break;
             }
-
         }
     }
 
@@ -173,7 +175,7 @@ public class PrimeFactorizationStatisticsFragment extends TaskFragment {
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        uiUpdater.stop();
+        uiUpdater.pause();
         if (getTask() != null){
             try {
                 final StatisticData statisticData = new StatisticData();
