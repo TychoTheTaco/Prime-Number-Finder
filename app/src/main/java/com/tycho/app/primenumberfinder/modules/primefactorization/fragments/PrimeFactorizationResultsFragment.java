@@ -90,7 +90,23 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                 .addNodeWithChildren(15L)
                 .addNode(3L)
                 .addNode(5L);
-        treeView.setTree(t);
+
+        final Tree<Long> a = new Tree<>(1200L);
+        a.addNodeWithChildren(30L)
+                .addNode(3L)
+                .addNodeWithChildren(10L)
+                .addNode(5L)
+                .addNode(2L);
+        a.addNodeWithChildren(40L)
+                .addNode(2L)
+                .addNodeWithChildren(20L)
+                .addNode(5L)
+                .addNodeWithChildren(4L)
+                    .addNode(2L)
+                    .addNode(2L);
+
+        treeViewTest.setTree(a.formatNumbers());
+        //treeView.setTree(a);
 
         /*final Tree<String> tree = new Tree<>("This");
         tree.addNodeWithChildren("is")
@@ -111,19 +127,6 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                 .addNode("really")
                 .addNode("hope")
                 .addNode("it");*/
-        treeViewTest.setTree(t.formatNumbers());
-
-        //Test
-        final Rect a = new Rect(0, 10, 10, 0);
-        Log.d(TAG, "A: " + a);
-        final Rect b = new Rect(10, 10, 20, 0);
-        Log.d(TAG, "B: " + b);
-        a.union(b);
-        Log.d(TAG, "Union A: " + a);
-        Log.d(TAG, "Union B: " + b);
-        a.union(10, 10);
-        a.union(20, 0);
-        Log.d(TAG, "Union A: " + a);
 
         /*viewAllButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -239,7 +242,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                 spannableStringBuilder.delete(spannableStringBuilder.length() - 3, spannableStringBuilder.length());
                 primeFactorization.setText(spannableStringBuilder);
 
-                //treeView.setTree(getTask().getFactorTree());
+                treeViewTest.setTree(getTask().getFactorTree().formatNumbers());
 
                 //viewAllButton.setVisibility(View.VISIBLE);
             }
