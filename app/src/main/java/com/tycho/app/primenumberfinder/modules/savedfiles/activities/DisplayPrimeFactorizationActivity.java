@@ -2,11 +2,13 @@ package com.tycho.app.primenumberfinder.modules.savedfiles.activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
@@ -18,11 +20,13 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.tycho.app.primenumberfinder.TreeView;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.TreeView;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,16 +53,16 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity {
 
     private TextView primeFactorization;
     private TextView title;
-    //private TreeView treeView;
+    private TreeView treeView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_display_prime_factorization);
+        setContentView(R.layout.display_prime_factorization_activity);
 
         primeFactorization = findViewById(R.id.prime_factorization);
         title = findViewById(R.id.title);
-        //treeView = findViewById(R.id.factor_tree);
+        treeView = findViewById(R.id.factor_tree);
 
         //Set up the toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);
@@ -119,7 +123,7 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity {
                 new Handler(getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        //treeView.setTree(factorTree);
+                        treeView.setTree(factorTree);
                         title.setText("Prime factorization of " + NumberFormat.getInstance(Locale.getDefault()).format(factorTree.getValue()));
 
                         final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
@@ -200,11 +204,11 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity {
         setActionBarColor(actionBarColor);
     }
 
-    /*@Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.display_content_activity_menu, menu);
         return true;
-    }*/
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -214,14 +218,24 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity {
                 onBackPressed();
                 break;
 
-            /*case R.id.export:
-                final Uri path = CustomFileProvider.getUriForFile(this,"com.tycho.app.primenumberfinder", file);
+            case R.id.export:
+
+                final File image = new File(FileManager.getInstance().getExportCacheDirectory() + File.separator + file.getName().substring(0, file.getName().indexOf(".")) + ".png");
+                try{
+                    OutputStream stream = new FileOutputStream(image);
+                    treeView.drawToBitmap().compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    stream.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+                final Uri path = FileProvider.getUriForFile(this,"com.tycho.app.primenumberfinder", image);
                 final Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.putExtra(Intent.EXTRA_STREAM, path);
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent.setType("text/plain");
+                intent.setType("image/*");
                 startActivity(intent);
-                break;*/
+                break;
         }
 
         return super.onOptionsItemSelected(item);

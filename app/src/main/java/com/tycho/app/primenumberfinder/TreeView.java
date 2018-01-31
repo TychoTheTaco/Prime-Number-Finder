@@ -1,6 +1,7 @@
 package com.tycho.app.primenumberfinder;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -87,6 +88,14 @@ public class TreeView extends View {
 
     boolean generated = false;
 
+    public Bitmap drawToBitmap(){
+        final Bitmap bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+        final Canvas canvas = new Canvas(bitmap);
+        canvas.drawColor(Color.WHITE);
+        this.draw(new Canvas(bitmap));
+        return bitmap;
+    }
+
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
@@ -172,6 +181,51 @@ public class TreeView extends View {
                 rectTree = generateRectangleTree(getWidth() / 2, getStringHeight(), tree, 0);
                 fixOverlaps(rectTree.getChildren().get(1).getChildren().get(0), 2); //No overlap*/
 
+                while(true){
+
+                    rectTree = generateRectangleTree(getWidth() / 2, getStringHeight(), tree, 0);
+
+                    if (!checkChildren(rectTree, 0)) break;
+
+                }
+
+                /*TODO:
+                check all child nodes
+                    if intersection found, start over at root tree
+                    regenerate root tree
+
+                Tree<Rect> root;
+
+                while(true){
+
+                    root = regenerateRects();
+
+                    if (checkChildren(root)){
+                        continue;
+                    }else{
+                        break;
+                    }
+
+                }
+
+                boolean checkChildren(Tree<Rect> tree){
+
+                    if (fixOverlaps())) return true;
+
+                    for ech child{
+                        if fixOverlaps() then return true;
+                    }
+
+                    intersect = false;
+                    for each child{
+                        intersect = checkChildren(child);
+                        if (intersect) return true;
+                    }
+
+                    return false;
+                }
+
+                */
 
                 //doFixes(rectTree, rectTree, 0);
 
@@ -219,6 +273,23 @@ public class TreeView extends View {
             final Tree<Rect> modified = generateRectangleTree(1080 / 2, getStringHeight(), tree, 0);
             debugRectangles(modified, canvas, Color.argb(50, 0, 0, 100));*/
         }
+    }
+
+    private boolean checkChildren(Tree<Rect> rectTree, int level){
+
+        if (fixOverlaps(rectTree, level)) return true;
+
+        for (Tree<Rect> child : rectTree.getChildren()){
+            if (fixOverlaps(child, level + 1)) return true;
+        }
+
+        boolean intersect = false;
+        for (Tree<Rect> child : rectTree.getChildren()){
+            intersect = checkChildren(child, level + 1);
+            if (intersect) return true;
+        }
+
+        return false;
     }
 
     private Tree<Rect> fixed;
