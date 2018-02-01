@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import easytasks.Task;
 import simpletrees.Tree;
@@ -28,7 +29,7 @@ public class PrimeFactorizationTask extends Task {
 
     private Tree<Long> factorTree;
 
-    private Map<Long, Long> primeFactors = new HashMap<>();
+    private Map<Long, Long> primeFactors = new TreeMap<>();
 
     private int total;
 

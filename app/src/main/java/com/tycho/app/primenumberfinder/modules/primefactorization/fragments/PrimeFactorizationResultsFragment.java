@@ -31,8 +31,12 @@ import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import easytasks.Task;
 import simpletrees.Tree;
@@ -76,55 +80,6 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         progress = rootView.findViewById(R.id.textView_search_progress);
         saveButton = rootView.findViewById(R.id.button_save);
         treeView = rootView.findViewById(R.id.factor_tree);
-
-        final Tree<Long> t = new Tree<>(810L);
-        t.addNodeWithChildren(27L)
-                .addNode(2L)
-                .addNodeWithChildren(9L)
-                .addNode(3L)
-                .addNode(3L);
-        t.addNodeWithChildren(30L)
-                .addNode(2L)
-                .addNodeWithChildren(15L)
-                .addNode(3L)
-                .addNode(5L);
-
-        final Tree<Long> a = new Tree<>(1200L);
-        a.addNodeWithChildren(30L)
-                .addNode(3L)
-                .addNodeWithChildren(10L)
-                .addNode(5L)
-                .addNode(2L);
-        a.addNodeWithChildren(40L)
-                .addNode(2L)
-                .addNodeWithChildren(20L)
-                .addNode(5L)
-                .addNodeWithChildren(4L)
-                    .addNode(2L)
-                    .addNode(2L);
-
-        //treeViewTest.setTree(a.formatNumbers());
-        //treeView.setTree(a);
-
-        /*final Tree<String> tree = new Tree<>("This");
-        tree.addNodeWithChildren("is")
-                .addNodeWithChildren("to")
-                .addNode("view")
-                .addNode("works")
-                .addNodeWithChildren("as")
-                .addNode("does")
-                .addNode(":)");
-        tree.addNodeWithChildren("a")
-                .addNode("see")
-                .addNodeWithChildren("if")
-                .addNode("intended.")
-                .addNode("I");
-        tree.addNodeWithChildren("test")
-                .addNode("the")
-                .addNodeWithChildren("tree")
-                .addNode("really")
-                .addNode("hope")
-                .addNode("it");*/
 
         /*viewAllButton.setOnClickListener(new View.OnClickListener() {
             @Override
