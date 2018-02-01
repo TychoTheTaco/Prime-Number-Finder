@@ -24,7 +24,7 @@
 
     <com.tycho.app.primenumberfinder.TreeView
         android:id="@+id/factor_tree"
-        android:layout_width="200dp"
-        android:layout_height="200dp" />
+        android:layout_width="300dp"
+        android:layout_height="300dp" />
 
 </LinearLayout>

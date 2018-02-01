@@ -60,7 +60,6 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     //private Button viewAllButton;
 
     private TreeView treeView;
-    private TreeView treeViewTest;
 
     @Nullable
     @Override
@@ -77,7 +76,6 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         progress = rootView.findViewById(R.id.textView_search_progress);
         saveButton = rootView.findViewById(R.id.button_save);
         treeView = rootView.findViewById(R.id.factor_tree);
-        treeViewTest = rootView.findViewById(R.id.factor_tree_test);
 
         final Tree<Long> t = new Tree<>(810L);
         t.addNodeWithChildren(27L)
@@ -105,7 +103,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                     .addNode(2L)
                     .addNode(2L);
 
-        treeViewTest.setTree(a.formatNumbers());
+        //treeViewTest.setTree(a.formatNumbers());
         //treeView.setTree(a);
 
         /*final Tree<String> tree = new Tree<>("This");
@@ -242,7 +240,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                 spannableStringBuilder.delete(spannableStringBuilder.length() - 3, spannableStringBuilder.length());
                 primeFactorization.setText(spannableStringBuilder);
 
-                treeViewTest.setTree(getTask().getFactorTree().formatNumbers());
+                treeView.setTree(getTask().getFactorTree().formatNumbers());
 
                 //viewAllButton.setVisibility(View.VISIBLE);
             }

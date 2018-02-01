@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.MotionEvent;
 import android.view.View;
 
 import java.text.NumberFormat;
@@ -81,7 +82,7 @@ public class TreeView extends View {
     private void init() {
         paint.setAntiAlias(true);
         paint.setTextSize(48);
-        verticalSpacing = getStringHeight() + 20;
+        verticalSpacing = getStringHeight() + 40;
     }
 
     int count = 0;
@@ -89,14 +90,23 @@ public class TreeView extends View {
     boolean generated = false;
 
     public Bitmap drawToBitmap(){
+        final float borderPadding = 10;
         final Rect bounds = calculateBounds(rectTree);
         Log.d(TAG,"Export width: " + bounds.width());
         Log.d(TAG,"Export height: " + bounds.height());
-        final Bitmap bitmap = Bitmap.createBitmap(bounds.width(), bounds.height(), Bitmap.Config.ARGB_8888);
+        final Bitmap bitmap = Bitmap.createBitmap((int) ((Math.max(Math.abs(bounds.left), Math.abs(bounds.right)) * 2) + (borderPadding * 2)), (int) (bounds.height()+ (borderPadding * 2)), Bitmap.Config.ARGB_8888);
         final Canvas canvas = new Canvas(bitmap);
         canvas.drawColor(Color.WHITE);
-        this.draw(new Canvas(bitmap));
+        canvas.translate((canvas.getWidth() / 2), -rectTree.getValue().bottom + borderPadding);
+        debugRectangles(rectTree, canvas, Color.argb(100, 0, 50, 0));
+        drawContents(rectTree, tree, canvas);
         return bitmap;
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        setClipBounds(new Rect(0, 0, getWidth(), getHeight()));
     }
 
     @Override
@@ -133,12 +143,13 @@ public class TreeView extends View {
         } else {
             //if (!finished) new Thread(process).start();
 
+            //Draw view border
             paint.setStyle(Paint.Style.STROKE);
             paint.setColor(Color.BLACK);
             paint.setStrokeWidth(1);
             canvas.drawRect(0, 0, getWidth(), getHeight(), paint);
 
-            if (!generated){
+            if (!generated && tree != null){
                 while(true){
                     rectTree = generateRectangleTree(0, getStringHeight() / 2 + 10, tree, 0);
                     if (!checkChildren(rectTree, 0)) break;
@@ -148,10 +159,57 @@ public class TreeView extends View {
                 generated = true;
             }
 
-            canvas.translate(getWidth() / 2, 0);
-            debugRectangles(rectTree, canvas, Color.argb(50, 0, 0, 100));
-            drawContents(rectTree, tree, canvas);
+            if (tree != null){
+                canvas.translate(getWidth() / 2, 0);
+                canvas.translate(translationX, translationY);
+                debugRectangles(rectTree, canvas, Color.argb(50, 0, 0, 100));
+                drawContents(rectTree, tree, canvas);
+            }
         }
+    }
+
+    private float translationX;
+    private float translationY;
+    private float lastTouchX;
+    private float lastTouchY;
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        final int action = event.getAction();
+        switch (action) {
+            case MotionEvent.ACTION_DOWN: {
+                final float x = event.getX();
+                final float y = event.getY();
+
+                // Remember where we started
+                lastTouchX = x;
+                lastTouchY = y;
+                break;
+            }
+
+            case MotionEvent.ACTION_MOVE: {
+                final float x = event.getX();
+                final float y = event.getY();
+
+                // Calculate the distance moved
+                final float dx = x - lastTouchX;
+                final float dy = y - lastTouchY;
+
+                // Move the object
+                translationX += dx;
+                translationY += dy;
+
+                // Remember this touch position for the next move event
+                lastTouchX = x;
+                lastTouchY = y;
+
+                // Invalidate to request a redraw
+                invalidate();
+                break;
+            }
+        }
+
+        return true;
     }
 
     private boolean checkChildren(Tree<Rect> rectTree, int level){
@@ -191,7 +249,6 @@ public class TreeView extends View {
         paint.setColor(tree.getChildren().size() == 0 ? Color.RED : Color.BLACK);
         paint.setStrokeWidth(2);
         float textX = centerX - (getStringWidth(text) / 2);
-        //float textY = centerY + (getStringHeight() / 2) - paint.descent();
 
         final Rect bounds = new Rect((int) textX, (int) (centerY + (getStringHeight() / 2)), (int) (textX + getStringWidth(text)), (int) (centerY - (getStringHeight() / 2)));
 
@@ -205,7 +262,6 @@ public class TreeView extends View {
                 totalWidth += sizes[i];
             }
             final float totalSpacing = tree.getChildren().size() > 0 ? (tree.getChildren().size() - 1) * horizontalSpacing[level + 1] : 0;
-            //Log.d(TAG, "Generating level " + level + " with " + horizontalSpacing[level + 1] + " child spacing");
 
             float previousOffset = 0;
             for (int i = 0; i < tree.getChildren().size(); i++){
@@ -252,14 +308,15 @@ public class TreeView extends View {
     }
 
     private Rect calculateBounds(final Tree<Rect> rectTree){
-        final float left = findLeft(rectTree, getWidth() / 2);
-        final float right = findRight(rectTree, getWidth() / 2);
+        final float left = findLeft(rectTree, 0);
+        final float right = findRight(rectTree, 0);
         final float bottom = findBottom(rectTree, 0);
+        final float top = findTop(rectTree, 0);
         Log.d(TAG, "Left bound is " + left);
         Log.d(TAG, "Right bound is " + right);
         Log.d(TAG, "Bottom bound is " + bottom);
-        //return new Rect(0, (int) bottom, (int) (right - left), 0);
-        return new Rect((int) left, 0, (int) right, (int) bottom);
+        Log.d(TAG, "Top bound is " + top);
+        return new Rect((int) left, 0, (int) right, (int) top - Math.abs(rectTree.getValue().bottom));
     }
 
     private float findLeft(final Tree<Rect> rectTree, float value){
@@ -319,6 +376,25 @@ public class TreeView extends View {
         return largest;
     }
 
+    private float findTop(final Tree<Rect> rectTree, float value){
+
+        float largest = value;
+
+        if (rectTree.getValue().top > largest){
+            largest = rectTree.getValue().top;
+        }
+
+        float largestChild;
+        for (Tree<Rect> child : rectTree.getChildren()){
+            largestChild = findTop(child, largest);
+            if (largestChild > largest){
+                largest = largestChild;
+            }
+        }
+
+        return largest;
+    }
+
     private boolean checkOverlaps(final Tree<Rect> rectTree, final float border, final int level, int side){
 
         final Rect rect = rectTree.getValue();
@@ -327,18 +403,15 @@ public class TreeView extends View {
         if (side == 0){
             if (rect.right >= border){
                 off = rect.right - border;
-                Log.d(TAG, "Rectangle out of bounds (right collision): " + rect + "\noff by " + off);
             }
         }else if (side == 1){
             if (rect.left <= border){
                 off = border - rect.left;
-                Log.d(TAG, "Rectangle out of bounds (left collision): " + rect + "\noff by " + off);
             }
         }
 
         if (off > 0){
             horizontalSpacing[level + 1] += (off * 2) + 20;
-            Log.d(TAG, "Modified horizontal spacing on level " + (level + 1) + ": " + horizontalSpacing[level + 1]);
             return true;
         }
 

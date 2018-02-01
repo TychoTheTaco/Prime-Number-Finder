@@ -77,19 +77,7 @@
 
         <com.tycho.app.primenumberfinder.TreeView
             android:id="@+id/factor_tree"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="8dp"
-            android:layout_weight="1"
-            android:minHeight="200dp"
-            android:visibility="gone"
-            android:paddingEnd="8dp"
-            android:paddingStart="8dp"
-            android:paddingTop="@dimen/content_padding_top" />
-
-        <com.tycho.app.primenumberfinder.TreeView
-            android:id="@+id/factor_tree_test"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_marginTop="8dp"
             android:layout_weight="1"
