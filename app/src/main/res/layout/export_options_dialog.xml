@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="250dp"
+    android:orientation="vertical" android:layout_width="300dp"
     android:padding="8dp"
     android:clipToPadding="false"
     android:layout_height="match_parent">
@@ -10,17 +10,18 @@
         android:layout_height="wrap_content"
         android:textSize="18sp"
         android:textColor="@color/primary_text"
-        android:text="Export options"/>
+        android:text="@string/export_options_title"/>
 
     <TextView
+        android:textColor="@color/primary_text"
         android:paddingTop="16dp"
+        android:textSize="14sp"
         android:layout_width="wrap_content"
-        android:text="File name"
+        android:text="@string/file_name"
         android:layout_height="wrap_content" />
 
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_marginTop="4dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -29,13 +30,14 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:textSize="16sp"
+            android:inputType="textNoSuggestions|textVisiblePassword"
             android:includeFontPadding="false"
             android:singleLine="true"
             android:layout_height="wrap_content" />
 
         <TextView
             android:layout_width="wrap_content"
-            android:text=".txt"
+            android:text="@string/txt_extension"
             android:includeFontPadding="false"
             android:lines="1"
             android:textSize="16sp"
@@ -44,6 +46,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:layout_marginTop="4dp"
         android:layout_width="match_parent"
         android:orientation="vertical"
         android:layout_height="wrap_content">
@@ -51,8 +54,16 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Item separator"
+            android:text="@string/item_separator"
+            android:textColor="@color/primary_text"
             android:textSize="14sp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/item_separator_description"
+            android:textColor="@color/secondary_text"
+            android:textSize="12sp"/>
 
         <com.tycho.app.primenumberfinder.CustomRadioGroup
             android:id="@+id/item_separator_radio_group"
@@ -63,7 +74,7 @@
                 android:id="@+id/new_line"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="New line"
+                android:text="@string/new_line_separator"
                 android:textSize="14sp"/>
 
             <LinearLayout
@@ -75,15 +86,14 @@
                     android:id="@+id/other"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Other:"
+                    android:text="@string/custom_separator"
                     android:textSize="14sp"/>
 
                 <EditText
                     android:id="@+id/item_separator"
-                    android:paddingStart="4dp"
+                    android:layout_marginStart="2dp"
                     android:inputType="textNoSuggestions|textVisiblePassword"
-                    android:layout_width="match_parent"
-                    android:hint=","
+                    android:layout_width="50dp"
                     android:includeFontPadding="false"
                     android:layout_height="wrap_content" />
 
@@ -95,7 +105,7 @@
         style="@style/Button"
         android:id="@+id/export_button"
         android:layout_width="match_parent"
-        android:text="Export"
+        android:text="@string/export_button"
         android:layout_height="wrap_content" />
 
 </LinearLayout>
