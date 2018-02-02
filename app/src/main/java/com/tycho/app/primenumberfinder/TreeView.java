@@ -51,7 +51,7 @@ public class TreeView extends View {
     private volatile boolean finished = false;
 
     /**
-     * The minimum vertical spacing (in pixels) between layers of the tree.
+     * The vertical spacing (in pixels) between layers of the tree.
      */
     private float verticalSpacing;
 

@@ -87,7 +87,7 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity {
                     loadFile(file);
 
                     if (extras.getBoolean("title")){
-                        //setTitle(formatTitle(file.getName().split("\\.")[0]));
+                        //setTitleTextView(formatTitle(file.getName().split("\\.")[0]));
                         setTitle("Prime factorization");
                     }
 

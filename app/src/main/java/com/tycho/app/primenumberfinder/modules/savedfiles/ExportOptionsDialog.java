@@ -16,6 +16,7 @@ import android.widget.RadioButton;
 
 import com.tycho.app.primenumberfinder.CustomRadioGroup;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
+import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
@@ -87,10 +88,18 @@ public class ExportOptionsDialog extends Dialog {
                 if (newLineButton.isChecked()){
                     separator = System.lineSeparator();
                 }else{
-                    separator = itemSeparatorInput.getText().toString().trim();
+                    separator = itemSeparatorInput.getText().toString().replace("\\n", System.lineSeparator());
                 }
 
+                final ProgressDialog progressDialog = new ProgressDialog(context);
+                progressDialog.setTitle("Exporting...");
+                progressDialog.show();
+                dismiss();
+
+                //Convert the file to the requested format
                 final File output = FileManager.getInstance().convert(file, fileNameInput.getText().toString().trim() + ".txt", separator);
+
+                progressDialog.dismiss();
 
                 final Uri path = FileProvider.getUriForFile(context, "com.tycho.app.primenumberfinder", output);
                 final Intent intent = new Intent(Intent.ACTION_SEND);

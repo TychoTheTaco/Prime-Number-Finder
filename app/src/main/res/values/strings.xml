@@ -107,6 +107,17 @@
     <string name="status_stopped">Stopped</string>
     <string name="status_finished">Finished</string>
 
+    <!-- Export Options -->
+    <string name="export_options_title">Export Options</string>
+    <string name="file_name">File name</string>
+    <string name="txt_extension">.txt</string>
+    <string name="item_separator">Item Separator</string>
+    <string name="item_separator_description">You can use \'\\n\' to insert a new line for custom item separators.</string>
+    <string name="new_line_separator">New line</string>
+    <string name="custom_separator">Other: </string>
+    <string name="export_button">Export</string>
+    <string name="progress_dialog_title">Progressing&#8230;</string>
+
     <!-- Error messages -->
     <string name="error_invalid_number">Invalid number!</string>
     <string name="error_invalid_range">Invalid range!</string>
