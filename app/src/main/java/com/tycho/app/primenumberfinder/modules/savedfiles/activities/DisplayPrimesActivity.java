@@ -187,12 +187,6 @@ public class DisplayPrimesActivity extends AppCompatActivity{
             case R.id.export:
                 final ExportOptionsDialog exportOptionsDialog = new ExportOptionsDialog(this, file);
                 exportOptionsDialog.show();
-                /*final Uri path = FileProvider.getUriForFile(this,"com.tycho.app.primenumberfinder", file);
-                final Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.putExtra(Intent.EXTRA_STREAM, path);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent.setType("text/plain");
-                startActivity(intent);*/
                 break;
         }
 
