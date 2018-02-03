@@ -71,12 +71,14 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
 
         estimatedTimeRemainingLayout = rootView.findViewById(R.id.estimated_time_remaining_layout);
 
-        init();
+        try {
+            init();
+        }catch (NullPointerException e){}
 
         return rootView;
     }
 
-    public void updateData(StatisticData statisticData){
+    public void updateData(final StatisticData statisticData){
         if (getView() != null){
             setTimeElapsed(statisticData.optLong(Statistic.TIME_ELAPSED));
             textViewNumbersPerSecond.setText(NumberFormat.getInstance().format(statisticData.optInt(Statistic.NUMBERS_PER_SECOND)));
@@ -173,8 +175,10 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
                 statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getNumbersPerSecond());
                 statisticData.put(Statistic.PRIMES_PER_SECOND, getTask().getPrimesPerSecond());
                 statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
-            }catch (JSONException e){}
-            updateData(statisticData);
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
+            setStatisticData(statisticData);
         }
     }
 
@@ -266,7 +270,9 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
                             statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
                             lastUpdate = System.currentTimeMillis();
                         }
-                    }catch (JSONException e){}
+                    }catch (JSONException e){
+                        e.printStackTrace();
+                    }
 
                     handler.post(new Runnable() {
                         @Override
