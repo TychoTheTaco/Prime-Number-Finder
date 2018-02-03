@@ -55,7 +55,15 @@ public class TreeView extends View {
      */
     private float verticalSpacing;
 
+    /**
+     * The horizontal spacing between items in each level
+     */
     private float[] horizontalSpacing;
+
+    private float paddingLeft = 2;
+    private float paddingRight = 2;
+    private float paddingTop = 2;
+    private float paddingBottom = 2;
 
     private Tree<Rect> rectTree;
 
@@ -250,7 +258,7 @@ public class TreeView extends View {
         paint.setStrokeWidth(2);
         float textX = centerX - (getStringWidth(text) / 2);
 
-        final Rect bounds = new Rect((int) textX, (int) (centerY + (getStringHeight() / 2)), (int) (textX + getStringWidth(text)), (int) (centerY - (getStringHeight() / 2)));
+        final Rect bounds = new Rect((int) (textX - paddingLeft), (int) (centerY + (getStringHeight() / 2) + paddingTop), (int) (textX + getStringWidth(text) + paddingRight), (int) (centerY - (getStringHeight() / 2) - paddingBottom));
 
         final Tree<Rect> rectangleTree = new Tree<>(bounds);
 
