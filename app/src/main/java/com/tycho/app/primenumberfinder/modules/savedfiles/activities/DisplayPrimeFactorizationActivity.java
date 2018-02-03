@@ -22,6 +22,8 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.TreeView;
+import com.tycho.app.primenumberfinder.modules.savedfiles.ExportOptionsDialog;
+import com.tycho.app.primenumberfinder.modules.savedfiles.PrimeFactorizationExportOptionsDialog;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;
@@ -219,22 +221,8 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity {
                 break;
 
             case R.id.export:
-
-                final File image = new File(FileManager.getInstance().getExportCacheDirectory() + File.separator + file.getName().substring(0, file.getName().indexOf(".")) + ".png");
-                try{
-                    OutputStream stream = new FileOutputStream(image);
-                    treeView.drawToBitmap().compress(Bitmap.CompressFormat.PNG, 100, stream);
-                    stream.close();
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-
-                final Uri path = FileProvider.getUriForFile(this,"com.tycho.app.primenumberfinder", image);
-                final Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.putExtra(Intent.EXTRA_STREAM, path);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent.setType("image/*");
-                startActivity(intent);
+                final PrimeFactorizationExportOptionsDialog exportOptionsDialog = new PrimeFactorizationExportOptionsDialog(this, file, treeView);
+                exportOptionsDialog.show();
                 break;
         }
 
