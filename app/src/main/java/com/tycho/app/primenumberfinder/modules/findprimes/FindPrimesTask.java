@@ -287,7 +287,7 @@ public class FindPrimesTask extends MultithreadedTask {
     }
 
     public long getNumbersPerSecond() {
-        return System.currentTimeMillis();
+        return 0;
     }
 
     public void addEventListener(final EventListener eventListener) {

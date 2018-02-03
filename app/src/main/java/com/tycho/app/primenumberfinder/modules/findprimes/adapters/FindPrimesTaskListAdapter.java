@@ -100,13 +100,13 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<AbstractT
 
         holder.root.setSelected(holder.getAdapterPosition() == getSelectedItemPosition());
 
-        holder.editButton.setOnClickListener(new View.OnClickListener() {
+        /*holder.editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final Intent intent = new Intent(context, FindPrimesConfigurationActivity.class);
                 context.startActivity(intent);
             }
-        });
+        });*/
     }
 
     @Override

@@ -17,7 +17,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/titleTextView"
+            android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -62,7 +62,7 @@
             android:tint="@android:color/black"
             android:visibility="visible" />
 
-        <ImageButton
+        <!--<ImageButton
             android:id="@+id/edit_button"
             android:layout_width="44dp"
             android:layout_height="48dp"
@@ -70,7 +70,7 @@
             android:contentDescription="@string/content_description_edit_button"
             android:src="@drawable/ic_mode_edit_white_24dp"
             android:tint="@color/delete_button_tint_color_state_list"
-            android:visibility="visible" />
+            android:visibility="visible" />-->
 
         <ImageButton
             android:id="@+id/delete_button"

@@ -163,7 +163,6 @@ public class FindFactorsResultsFragment extends ResultsFragment implements FindF
         if (getTask() != null){
 
             //Update task state
-            Log.d(TAG, "Update UI with state: " + getTask().getState());
             switch (getTask().getState()){
                 case RUNNING:
                     title.setText(getString(R.string.status_searching));
