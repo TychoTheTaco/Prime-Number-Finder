@@ -159,7 +159,7 @@ public class TreeView extends View {
 
             if (!generated && tree != null){
                 while(true){
-                    rectTree = generateRectangleTree(0, getStringHeight() / 2 + 10, tree, 0);
+                    rectTree = generateRectangleTree(0, getStringHeight() / 2, tree, 0);
                     if (!checkChildren(rectTree, 0)) break;
                 }
                 Log.d(TAG, "Canvas width: " + canvas.getWidth());
@@ -172,6 +172,12 @@ public class TreeView extends View {
                 canvas.translate(translationX, translationY);
                 debugRectangles(rectTree, canvas, Color.argb(50, 0, 0, 100));
                 drawContents(rectTree, tree, canvas);
+
+                //Draw bounds
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setColor(Color.BLUE);
+                paint.setStrokeWidth(1);
+                canvas.drawRect(getBoundingRect(rectTree), paint);
             }
         }
     }
@@ -181,38 +187,109 @@ public class TreeView extends View {
     private float lastTouchX;
     private float lastTouchY;
 
+    private float scrollPaddingLeft = 20;
+    private float scrollPaddingRight = 20;
+    private float scrollPaddingTop = 20;
+    private float scrollPaddingBottom = 20;
+
+    private static final int INVALID_POINTER_ID = -1;
+
+    // The ‘active pointer’ is the one currently moving our object.
+    private int mActivePointerId = INVALID_POINTER_ID;
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         final int action = event.getAction();
-        switch (action) {
+        switch (action & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN: {
                 final float x = event.getX();
                 final float y = event.getY();
 
-                // Remember where we started
                 lastTouchX = x;
                 lastTouchY = y;
+
+                // Save the ID of this pointer
+                mActivePointerId = event.getPointerId(0);
                 break;
             }
 
             case MotionEvent.ACTION_MOVE: {
-                final float x = event.getX();
-                final float y = event.getY();
+                // Find the index of the active pointer and fetch its position
+                final int pointerIndex = event.findPointerIndex(mActivePointerId);
+                final float x = event.getX(pointerIndex);
+                final float y = event.getY(pointerIndex);
 
-                // Calculate the distance moved
                 final float dx = x - lastTouchX;
                 final float dy = y - lastTouchY;
 
-                // Move the object
+                final Rect bounds = getBoundingRect(rectTree);
+
+                final float maxTranslationX = -(bounds.right - (getWidth() / 2)) - scrollPaddingRight;
+                final float minTranslationX = -(bounds.left + (getWidth() / 2)) + scrollPaddingLeft;
+                final float minTranslationY = 0 + scrollPaddingTop;
+                final float maxTranslationY = getHeight() - Math.abs(bounds.height()) - scrollPaddingBottom;
+
                 translationX += dx;
                 translationY += dy;
 
-                // Remember this touch position for the next move event
+                if (bounds.width() < getWidth()){
+                    if (translationX > maxTranslationX){
+                        translationX = maxTranslationX;
+                    }else if (translationX < minTranslationX){
+                        translationX = minTranslationX;
+                    }
+                }else{
+                    if (translationX < maxTranslationX){
+                        translationX = maxTranslationX;
+                    }else if (translationX > minTranslationX){
+                        translationX = minTranslationX;
+                    }
+                }
+
+                if (Math.abs(bounds.height()) < getHeight()){
+                    if (translationY > maxTranslationY){
+                        translationY = maxTranslationY;
+                    }else if (translationY < minTranslationY){
+                        translationY = minTranslationY;
+                    }
+                }else{
+                    if (translationY < maxTranslationY){
+                        translationY = maxTranslationY;
+                    }else if (translationY > minTranslationY){
+                        translationY = minTranslationY;
+                    }
+                }
+
                 lastTouchX = x;
                 lastTouchY = y;
 
-                // Invalidate to request a redraw
                 invalidate();
+                break;
+            }
+
+            case MotionEvent.ACTION_UP: {
+                mActivePointerId = INVALID_POINTER_ID;
+                break;
+            }
+
+            case MotionEvent.ACTION_CANCEL: {
+                mActivePointerId = INVALID_POINTER_ID;
+                break;
+            }
+
+            case MotionEvent.ACTION_POINTER_UP: {
+                // Extract the index of the pointer that left the touch sensor
+                final int pointerIndex = (action & MotionEvent.ACTION_POINTER_INDEX_MASK)
+                        >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+                final int pointerId = event.getPointerId(pointerIndex);
+                if (pointerId == mActivePointerId) {
+                    // This was our active pointer going up. Choose a new
+                    // active pointer and adjust accordingly.
+                    final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
+                    lastTouchX = event.getX(newPointerIndex);
+                    lastTouchY = event.getY(newPointerIndex);
+                    mActivePointerId = event.getPointerId(newPointerIndex);
+                }
                 break;
             }
         }
@@ -320,11 +397,15 @@ public class TreeView extends View {
         final float right = findRight(rectTree, 0);
         final float bottom = findBottom(rectTree, 0);
         final float top = findTop(rectTree, 0);
-        Log.d(TAG, "Left bound is " + left);
-        Log.d(TAG, "Right bound is " + right);
-        Log.d(TAG, "Bottom bound is " + bottom);
-        Log.d(TAG, "Top bound is " + top);
         return new Rect((int) left, 0, (int) right, (int) top - Math.abs(rectTree.getValue().bottom));
+    }
+
+    private Rect getBoundingRect(final Tree<Rect> rectTree){
+        final float left = findLeft(rectTree, 0);
+        final float right = findRight(rectTree, 0);
+        final float bottom = findBottom(rectTree, rectTree.getValue().bottom);
+        final float top = findTop(rectTree, 0);
+        return new Rect((int) left, (int) top, (int) right, (int) bottom);
     }
 
     private float findLeft(final Tree<Rect> rectTree, float value){
@@ -367,21 +448,21 @@ public class TreeView extends View {
 
     private float findBottom(final Tree<Rect> rectTree, float value){
 
-        float largest = value;
+        float smallest = value;
 
-        if (rectTree.getValue().bottom > largest){
-            largest = rectTree.getValue().bottom;
+        if (rectTree.getValue().bottom < smallest){
+            smallest = rectTree.getValue().bottom;
         }
 
-        float largestChild;
+        float smallestChild;
         for (Tree<Rect> child : rectTree.getChildren()){
-            largestChild = findBottom(child, largest);
-            if (largestChild > largest){
-                largest = largestChild;
+            smallestChild = findBottom(child, smallest);
+            if (smallestChild < smallest){
+                smallest = smallestChild;
             }
         }
 
-        return largest;
+        return smallest;
     }
 
     private float findTop(final Tree<Rect> rectTree, float value){
