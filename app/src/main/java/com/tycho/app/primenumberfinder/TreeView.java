@@ -192,98 +192,101 @@ public class TreeView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        final int action = event.getAction();
-        switch (action & MotionEvent.ACTION_MASK) {
-            case MotionEvent.ACTION_DOWN: {
-                final float x = event.getX();
-                final float y = event.getY();
 
-                lastTouchX = x;
-                lastTouchY = y;
+        if (tree != null){
+            final int action = event.getAction();
+            switch (action & MotionEvent.ACTION_MASK) {
+                case MotionEvent.ACTION_DOWN: {
+                    final float x = event.getX();
+                    final float y = event.getY();
 
-                // Save the ID of this pointer
-                mActivePointerId = event.getPointerId(0);
-                break;
-            }
+                    lastTouchX = x;
+                    lastTouchY = y;
 
-            case MotionEvent.ACTION_MOVE: {
-                // Find the index of the active pointer and fetch its position
-                final int pointerIndex = event.findPointerIndex(mActivePointerId);
-                final float x = event.getX(pointerIndex);
-                final float y = event.getY(pointerIndex);
-
-                final float dx = x - lastTouchX;
-                final float dy = y - lastTouchY;
-
-                final Rect bounds = getBoundingRect(rectTree);
-
-                final float maxTranslationX = -(bounds.right - (getWidth() / 2)) - scrollPaddingRight;
-                final float minTranslationX = -(bounds.left + (getWidth() / 2)) + scrollPaddingLeft;
-                final float minTranslationY = 0 + scrollPaddingTop;
-                final float maxTranslationY = getHeight() - Math.abs(bounds.height()) - scrollPaddingBottom;
-
-                translationX += dx;
-                translationY += dy;
-
-                if (bounds.width() < getWidth()){
-                    if (translationX > maxTranslationX){
-                        translationX = maxTranslationX;
-                    }else if (translationX < minTranslationX){
-                        translationX = minTranslationX;
-                    }
-                }else{
-                    if (translationX < maxTranslationX){
-                        translationX = maxTranslationX;
-                    }else if (translationX > minTranslationX){
-                        translationX = minTranslationX;
-                    }
+                    // Save the ID of this pointer
+                    mActivePointerId = event.getPointerId(0);
+                    break;
                 }
 
-                if (Math.abs(bounds.height()) < getHeight()){
-                    if (translationY > maxTranslationY){
-                        translationY = maxTranslationY;
-                    }else if (translationY < minTranslationY){
-                        translationY = minTranslationY;
+                case MotionEvent.ACTION_MOVE: {
+                    // Find the index of the active pointer and fetch its position
+                    final int pointerIndex = event.findPointerIndex(mActivePointerId);
+                    final float x = event.getX(pointerIndex);
+                    final float y = event.getY(pointerIndex);
+
+                    final float dx = x - lastTouchX;
+                    final float dy = y - lastTouchY;
+
+                    final Rect bounds = getBoundingRect(rectTree);
+
+                    final float maxTranslationX = -(bounds.right - (getWidth() / 2)) - scrollPaddingRight;
+                    final float minTranslationX = -(bounds.left + (getWidth() / 2)) + scrollPaddingLeft;
+                    final float minTranslationY = 0 + scrollPaddingTop;
+                    final float maxTranslationY = getHeight() - Math.abs(bounds.height()) - scrollPaddingBottom;
+
+                    translationX += dx;
+                    translationY += dy;
+
+                    if (bounds.width() < getWidth()){
+                        if (translationX > maxTranslationX){
+                            translationX = maxTranslationX;
+                        }else if (translationX < minTranslationX){
+                            translationX = minTranslationX;
+                        }
+                    }else{
+                        if (translationX < maxTranslationX){
+                            translationX = maxTranslationX;
+                        }else if (translationX > minTranslationX){
+                            translationX = minTranslationX;
+                        }
                     }
-                }else{
-                    if (translationY < maxTranslationY){
-                        translationY = maxTranslationY;
-                    }else if (translationY > minTranslationY){
-                        translationY = minTranslationY;
+
+                    if (Math.abs(bounds.height()) < getHeight()){
+                        if (translationY > maxTranslationY){
+                            translationY = maxTranslationY;
+                        }else if (translationY < minTranslationY){
+                            translationY = minTranslationY;
+                        }
+                    }else{
+                        if (translationY < maxTranslationY){
+                            translationY = maxTranslationY;
+                        }else if (translationY > minTranslationY){
+                            translationY = minTranslationY;
+                        }
                     }
+
+                    lastTouchX = x;
+                    lastTouchY = y;
+
+                    invalidate();
+                    break;
                 }
 
-                lastTouchX = x;
-                lastTouchY = y;
-
-                invalidate();
-                break;
-            }
-
-            case MotionEvent.ACTION_UP: {
-                mActivePointerId = INVALID_POINTER_ID;
-                break;
-            }
-
-            case MotionEvent.ACTION_CANCEL: {
-                mActivePointerId = INVALID_POINTER_ID;
-                break;
-            }
-
-            case MotionEvent.ACTION_POINTER_UP: {
-                // Extract the index of the pointer that left the touch sensor
-                final int pointerIndex = (action & MotionEvent.ACTION_POINTER_INDEX_MASK)
-                        >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-                final int pointerId = event.getPointerId(pointerIndex);
-                if (pointerId == mActivePointerId) {
-                    // This was our active pointer going up. Choose a new
-                    // active pointer and adjust accordingly.
-                    final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
-                    lastTouchX = event.getX(newPointerIndex);
-                    lastTouchY = event.getY(newPointerIndex);
-                    mActivePointerId = event.getPointerId(newPointerIndex);
+                case MotionEvent.ACTION_UP: {
+                    mActivePointerId = INVALID_POINTER_ID;
+                    break;
                 }
-                break;
+
+                case MotionEvent.ACTION_CANCEL: {
+                    mActivePointerId = INVALID_POINTER_ID;
+                    break;
+                }
+
+                case MotionEvent.ACTION_POINTER_UP: {
+                    // Extract the index of the pointer that left the touch sensor
+                    final int pointerIndex = (action & MotionEvent.ACTION_POINTER_INDEX_MASK)
+                            >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+                    final int pointerId = event.getPointerId(pointerIndex);
+                    if (pointerId == mActivePointerId) {
+                        // This was our active pointer going up. Choose a new
+                        // active pointer and adjust accordingly.
+                        final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
+                        lastTouchX = event.getX(newPointerIndex);
+                        lastTouchY = event.getY(newPointerIndex);
+                        mActivePointerId = event.getPointerId(newPointerIndex);
+                    }
+                    break;
+                }
             }
         }
 

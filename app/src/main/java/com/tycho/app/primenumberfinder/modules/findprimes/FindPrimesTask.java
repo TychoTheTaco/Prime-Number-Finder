@@ -36,6 +36,13 @@ public class FindPrimesTask extends MultithreadedTask {
 
     private SearchMethod searchMethod;
 
+    private long[][] statistics = new long[2][3];
+    private static final int NUMBERS_PER_SECOND = 0;
+    private static final int PRIMES_PER_SECOND = 1;
+    private static final int CURRENT_VALUE = 0;
+    private static final int SINCE_LAST = 1;
+    private static final int LAST_UPDATE_TIME = 2;
+
     /**
      * Create a new {@linkplain FindPrimesTask}.
      *

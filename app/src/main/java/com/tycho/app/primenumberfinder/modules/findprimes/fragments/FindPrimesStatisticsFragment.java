@@ -7,6 +7,7 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.renderscript.ScriptIntrinsicYuvToRGB;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -234,8 +235,8 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
                 final StatisticData statisticData = new StatisticData();
                 statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
                 statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
-                statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getNumbersPerSecond());
-                statisticData.put(Statistic.PRIMES_PER_SECOND, getTask().getPrimesPerSecond());
+                //statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getNumbersPerSecond());
+                //statisticData.put(Statistic.PRIMES_PER_SECOND, getTask().getPrimesPerSecond());
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -257,6 +258,10 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
 
         private long lastUpdate;
 
+        private long lastCurrentNumber = 0;
+        private int lastPrimeCount = 0;
+        private long lastUpdateTime = 0;
+
         @Override
         protected void run() {
             while (true) {
@@ -264,8 +269,16 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
                 if (getTask() != null){
                     try {
                         statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
-                        statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getNumbersPerSecond());
-                        statisticData.put(Statistic.PRIMES_PER_SECOND, getTask().getPrimesPerSecond());
+
+                        //Update statistics
+                        if (System.currentTimeMillis() - lastUpdateTime >= 1000){
+                            statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getCurrentValue() - lastCurrentNumber);
+                            statisticData.put(Statistic.PRIMES_PER_SECOND, getTask().getPrimes().size() - lastPrimeCount);
+                            lastCurrentNumber = getTask().getCurrentValue();
+                            lastPrimeCount = getTask().getPrimes().size();
+                            lastUpdateTime = System.currentTimeMillis();
+                        }
+
                         if (System.currentTimeMillis() - lastUpdate >= 1000){
                             statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
                             lastUpdate = System.currentTimeMillis();

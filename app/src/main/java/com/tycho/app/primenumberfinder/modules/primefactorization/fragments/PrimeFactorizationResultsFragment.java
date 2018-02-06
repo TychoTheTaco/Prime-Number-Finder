@@ -127,6 +127,10 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
             }
         });
 
+        init();
+
+        updateUi();
+
         return rootView;
     }
 
@@ -294,6 +298,8 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
             //Make sure view is visible
             resultsView.setVisibility(View.VISIBLE);
             noTaskView.setVisibility(View.GONE);
+
+            treeView.setTree(getTask().getFactorTree().formatNumbers());
 
         }else{
             resultsView.setVisibility(View.GONE);
