@@ -119,6 +119,10 @@ public class DisplayFactorsActivity extends AppCompatActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.display_content_activity_menu, menu);
+
+        //Hide the export option if this is a temp file
+        menu.findItem(R.id.export).setVisible(!file.getName().equals("temp"));
+
         return true;
     }
 

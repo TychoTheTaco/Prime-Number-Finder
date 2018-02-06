@@ -60,10 +60,10 @@ public class TreeView extends View {
      */
     private float[] horizontalSpacing;
 
-    private float paddingLeft = 2;
-    private float paddingRight = 2;
-    private float paddingTop = 2;
-    private float paddingBottom = 2;
+    private float paddingLeft = 5;
+    private float paddingRight = 5;
+    private float paddingTop = 3;
+    private float paddingBottom = 3;
 
     private Tree<Rect> rectTree;
 
@@ -99,15 +99,16 @@ public class TreeView extends View {
 
     public Bitmap drawToBitmap(){
         final float borderPadding = 10;
-        final Rect bounds = calculateBounds(rectTree);
-        Log.d(TAG,"Export width: " + bounds.width());
-        Log.d(TAG,"Export height: " + bounds.height());
-        final Bitmap bitmap = Bitmap.createBitmap((int) ((Math.max(Math.abs(bounds.left), Math.abs(bounds.right)) * 2) + (borderPadding * 2)), (int) (bounds.height()+ (borderPadding * 2)), Bitmap.Config.ARGB_8888);
+        final Rect bounds = getBoundingRect(rectTree);
+        final Bitmap bitmap = Bitmap.createBitmap((int) (Math.abs(bounds.width()) + (borderPadding * 2)), (int) (Math.abs(bounds.height()) + (borderPadding * 2)), Bitmap.Config.ARGB_8888);
         final Canvas canvas = new Canvas(bitmap);
+
+        //Draw tree
         canvas.drawColor(Color.WHITE);
-        canvas.translate((canvas.getWidth() / 2), -rectTree.getValue().bottom + borderPadding);
-        debugRectangles(rectTree, canvas, Color.argb(100, 0, 50, 0));
+        canvas.translate(-bounds.left + borderPadding, -rectTree.getValue().bottom + borderPadding);
+        debugRectangles(rectTree, canvas, Color.argb(50, 0, 100, 0));
         drawContents(rectTree, tree, canvas);
+
         return bitmap;
     }
 
@@ -149,35 +150,27 @@ public class TreeView extends View {
             }).start();
 
         } else {
-            //if (!finished) new Thread(process).start();
 
             //Draw view border
             paint.setStyle(Paint.Style.STROKE);
             paint.setColor(Color.BLACK);
-            paint.setStrokeWidth(1);
-            canvas.drawRect(0, 0, getWidth(), getHeight(), paint);
+            paint.setStrokeWidth(3);
+            canvas.drawRect(0, 0, getWidth() - 1, getHeight() - 1, paint);
 
             if (!generated && tree != null){
                 while(true){
                     rectTree = generateRectangleTree(0, getStringHeight() / 2, tree, 0);
                     if (!checkChildren(rectTree, 0)) break;
                 }
-                Log.d(TAG, "Canvas width: " + canvas.getWidth());
-                Log.d(TAG, "Generated:\n" + rectTree.format());
                 generated = true;
             }
 
             if (tree != null){
+                //Draw tree contents
                 canvas.translate(getWidth() / 2, 0);
                 canvas.translate(translationX, translationY);
-                debugRectangles(rectTree, canvas, Color.argb(50, 0, 0, 100));
+                debugRectangles(rectTree, canvas, Color.argb(50, 0, 100, 0));
                 drawContents(rectTree, tree, canvas);
-
-                //Draw bounds
-                paint.setStyle(Paint.Style.STROKE);
-                paint.setColor(Color.BLUE);
-                paint.setStrokeWidth(1);
-                canvas.drawRect(getBoundingRect(rectTree), paint);
             }
         }
     }
@@ -392,14 +385,6 @@ public class TreeView extends View {
         return overlap;
     }
 
-    private Rect calculateBounds(final Tree<Rect> rectTree){
-        final float left = findLeft(rectTree, 0);
-        final float right = findRight(rectTree, 0);
-        final float bottom = findBottom(rectTree, 0);
-        final float top = findTop(rectTree, 0);
-        return new Rect((int) left, 0, (int) right, (int) top - Math.abs(rectTree.getValue().bottom));
-    }
-
     private Rect getBoundingRect(final Tree<Rect> rectTree){
         final float left = findLeft(rectTree, 0);
         final float right = findRight(rectTree, 0);
@@ -520,7 +505,6 @@ public class TreeView extends View {
         finished = false;
         generated = false;
         invalidate();
-        Log.d(TAG, "Set tree:\n" + tree.format());
     }
 
     private float getStringWidth(final String text) {

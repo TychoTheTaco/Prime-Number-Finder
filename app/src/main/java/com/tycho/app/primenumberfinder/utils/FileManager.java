@@ -107,6 +107,11 @@ public final class FileManager {
         if (!getExportCacheDirectory().exists()){
             getExportCacheDirectory().mkdirs();
         }
+
+        //Clear export cache
+        for (File file : getExportCacheDirectory().listFiles()){
+            file.delete();
+        }
     }
 
     public boolean savePrimes(final long startValue, final long endValue, final List<Long> primes) {

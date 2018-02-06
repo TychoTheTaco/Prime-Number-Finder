@@ -12,6 +12,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.SuperscriptSpan;
 import android.util.Log;
@@ -35,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 
 import simpletrees.Tree;
 
@@ -125,11 +127,11 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity {
                 new Handler(getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        treeView.setTree(factorTree);
+                        treeView.setTree(factorTree.formatNumbers());
                         title.setText("Prime factorization of " + NumberFormat.getInstance(Locale.getDefault()).format(factorTree.getValue()));
 
                         final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-                        final Map<Long, Integer> map = new HashMap<>();
+                        final Map<Long, Integer> map = new TreeMap<>();
                         getPrimeFactors(map, factorTree);
                         for (Object factor : map.keySet()){
                             spannableStringBuilder.append(NumberFormat.getInstance(Locale.getDefault()).format(factor));
@@ -137,6 +139,7 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity {
                             spannableStringBuilder.append(NumberFormat.getInstance(Locale.getDefault()).format(map.get(factor)), new SuperscriptSpan(), 0);
                             final int endIndex = spannableStringBuilder.length();
                             spannableStringBuilder.setSpan(new RelativeSizeSpan(0.8f), startIndex, endIndex, 0);
+                            spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getApplicationContext(), R.color.green_dark)), startIndex, endIndex, 0);
                             spannableStringBuilder.append(" x ");
                         }
                         spannableStringBuilder.delete(spannableStringBuilder.length() - 3, spannableStringBuilder.length());
