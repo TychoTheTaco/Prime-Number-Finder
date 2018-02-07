@@ -262,6 +262,8 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
         private int lastPrimeCount = 0;
         private long lastUpdateTime = 0;
 
+        private Task task;
+
         @Override
         protected void run() {
             while (true) {
@@ -269,6 +271,13 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
                 if (getTask() != null){
                     try {
                         statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
+
+                        if (task != getTask()){
+                            task = getTask();
+                            lastCurrentNumber = 0;
+                            lastPrimeCount = 0;
+                            lastUpdateTime = 0;
+                        }
 
                         //Update statistics
                         if (System.currentTimeMillis() - lastUpdateTime >= 1000){
