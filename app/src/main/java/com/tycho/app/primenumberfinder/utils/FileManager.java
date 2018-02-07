@@ -195,15 +195,15 @@ public final class FileManager {
 
             String line;
 
-            String output = "";
+            final StringBuilder stringBuilder = new StringBuilder("");
 
             while ((line = bufferedReader.readLine()) != null) {
-                output += line;
+                stringBuilder.append(line);
             }
 
             bufferedReader.close();
 
-            final List<String> stringNumbers = Arrays.asList(output.split(","));
+            final List<String> stringNumbers = Arrays.asList(stringBuilder.toString().split(","));
 
             for (String string : stringNumbers) {
                 numbers.add(Long.valueOf(string));
