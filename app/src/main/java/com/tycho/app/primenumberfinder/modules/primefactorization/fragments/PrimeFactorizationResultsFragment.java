@@ -1,6 +1,7 @@
 package com.tycho.app.primenumberfinder.modules.primefactorization.fragments;
 
 import android.content.Intent;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -30,8 +31,12 @@ import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import easytasks.Task;
 import simpletrees.Tree;
@@ -58,7 +63,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     private Button saveButton;
     //private Button viewAllButton;
 
-    //private TreeView treeView;
+    private TreeView treeView;
 
     @Nullable
     @Override
@@ -74,64 +79,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         noTaskView = rootView.findViewById(R.id.empty_message);
         progress = rootView.findViewById(R.id.textView_search_progress);
         saveButton = rootView.findViewById(R.id.button_save);
-        //treeView = rootView.findViewById(R.id.factor_tree);
-
-        /*final Tree<Long> t = new Tree<>(810L);
-        t.addNodeWithChildren(27L)
-                .addNode(2L)
-                .addNodeWithChildren(9L)
-                .addNode(3L)
-                .addNode(3L);
-        t.addNodeWithChildren(30L)
-                .addNode(2L)
-                .addNodeWithChildren(15L)
-                .addNode(3L)
-                .addNode(5L);
-        treeView.setTree(t);
-
-        final Tree<String> tree = new Tree<>("This");
-        tree.addNodeWithChildren("is")
-                .addNodeWithChildren("to")
-                .addNode("view")
-                .addNode("works")
-                .addNodeWithChildren("as")
-                .addNode("does")
-                .addNode(":)");
-        tree.addNodeWithChildren("a")
-                .addNode("see")
-                .addNodeWithChildren("if")
-                .addNode("intended.")
-                .addNode("I");
-        tree.addNodeWithChildren("test")
-                .addNode("the")
-                .addNodeWithChildren("tree")
-                .addNode("really")
-                .addNode("hope")
-                .addNode("it");
-
-        Log.d(TAG, "Tree is: " + tree);*/
-
-        /*((TreeView) rootView.findViewById(R.id.factor_tree_test)).setTree(tree);
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try{
-                    Thread.sleep(5000);
-                }catch (InterruptedException e){
-
-                }
-
-                Log.w(TAG, "Setting delayed tree");
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((TreeView) rootView.findViewById(R.id.factor_tree_test)).setTree(t);
-                    }
-                });
-
-            }
-        }).start();*/
+        treeView = rootView.findViewById(R.id.factor_tree);
 
         /*viewAllButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -178,6 +126,10 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                 }).start();
             }
         });
+
+        init();
+
+        updateUi();
 
         return rootView;
     }
@@ -246,6 +198,8 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                 }
                 spannableStringBuilder.delete(spannableStringBuilder.length() - 3, spannableStringBuilder.length());
                 primeFactorization.setText(spannableStringBuilder);
+
+                treeView.setTree(getTask().getFactorTree().formatNumbers());
 
                 //viewAllButton.setVisibility(View.VISIBLE);
             }
@@ -344,6 +298,8 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
             //Make sure view is visible
             resultsView.setVisibility(View.VISIBLE);
             noTaskView.setVisibility(View.GONE);
+
+            treeView.setTree(getTask().getFactorTree().formatNumbers());
 
         }else{
             resultsView.setVisibility(View.GONE);

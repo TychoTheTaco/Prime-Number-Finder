@@ -2,14 +2,17 @@ package com.tycho.app.primenumberfinder.modules.savedfiles.activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.SuperscriptSpan;
 import android.util.Log;
@@ -18,17 +21,22 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.tycho.app.primenumberfinder.TreeView;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.TreeView;
+import com.tycho.app.primenumberfinder.modules.savedfiles.ExportOptionsDialog;
+import com.tycho.app.primenumberfinder.modules.savedfiles.PrimeFactorizationExportOptionsDialog;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 
 import simpletrees.Tree;
 
@@ -49,16 +57,16 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity {
 
     private TextView primeFactorization;
     private TextView title;
-    //private TreeView treeView;
+    private TreeView treeView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_display_prime_factorization);
+        setContentView(R.layout.display_prime_factorization_activity);
 
         primeFactorization = findViewById(R.id.prime_factorization);
         title = findViewById(R.id.title);
-        //treeView = findViewById(R.id.factor_tree);
+        treeView = findViewById(R.id.factor_tree);
 
         //Set up the toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);
@@ -83,7 +91,7 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity {
                     loadFile(file);
 
                     if (extras.getBoolean("title")){
-                        //setTitle(formatTitle(file.getName().split("\\.")[0]));
+                        //setTitleTextView(formatTitle(file.getName().split("\\.")[0]));
                         setTitle("Prime factorization");
                     }
 
@@ -119,11 +127,11 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity {
                 new Handler(getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        //treeView.setTree(factorTree);
+                        treeView.setTree(factorTree.formatNumbers());
                         title.setText("Prime factorization of " + NumberFormat.getInstance(Locale.getDefault()).format(factorTree.getValue()));
 
                         final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-                        final Map<Long, Integer> map = new HashMap<>();
+                        final Map<Long, Integer> map = new TreeMap<>();
                         getPrimeFactors(map, factorTree);
                         for (Object factor : map.keySet()){
                             spannableStringBuilder.append(NumberFormat.getInstance(Locale.getDefault()).format(factor));
@@ -131,6 +139,7 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity {
                             spannableStringBuilder.append(NumberFormat.getInstance(Locale.getDefault()).format(map.get(factor)), new SuperscriptSpan(), 0);
                             final int endIndex = spannableStringBuilder.length();
                             spannableStringBuilder.setSpan(new RelativeSizeSpan(0.8f), startIndex, endIndex, 0);
+                            spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getApplicationContext(), R.color.green_dark)), startIndex, endIndex, 0);
                             spannableStringBuilder.append(" x ");
                         }
                         spannableStringBuilder.delete(spannableStringBuilder.length() - 3, spannableStringBuilder.length());
@@ -200,11 +209,11 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity {
         setActionBarColor(actionBarColor);
     }
 
-    /*@Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.display_content_activity_menu, menu);
         return true;
-    }*/
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -214,14 +223,10 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity {
                 onBackPressed();
                 break;
 
-            /*case R.id.export:
-                final Uri path = CustomFileProvider.getUriForFile(this,"com.tycho.app.primenumberfinder", file);
-                final Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.putExtra(Intent.EXTRA_STREAM, path);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent.setType("text/plain");
-                startActivity(intent);
-                break;*/
+            case R.id.export:
+                final PrimeFactorizationExportOptionsDialog exportOptionsDialog = new PrimeFactorizationExportOptionsDialog(this, file, treeView);
+                exportOptionsDialog.show();
+                break;
         }
 
         return super.onOptionsItemSelected(item);

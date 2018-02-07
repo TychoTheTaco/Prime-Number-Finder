@@ -218,6 +218,7 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
         public final TextView state;
         public final TextView progress;
         public final ImageButton pauseButton;
+        //public final ImageButton editButton;
         public final ImageButton deleteButton;
 
         public AbstractTaskListItemViewHolder(View itemView){
@@ -228,6 +229,7 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
             state = itemView.findViewById(R.id.state);
             progress = itemView.findViewById(R.id.textView_search_progress);
             pauseButton = itemView.findViewById(R.id.pause_button);
+            //editButton = itemView.findViewById(R.id.edit_button);
             deleteButton = itemView.findViewById(R.id.delete_button);
 
             root.setOnClickListener(new View.OnClickListener(){

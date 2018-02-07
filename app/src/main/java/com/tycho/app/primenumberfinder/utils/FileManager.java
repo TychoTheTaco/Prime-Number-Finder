@@ -107,6 +107,11 @@ public final class FileManager {
         if (!getExportCacheDirectory().exists()){
             getExportCacheDirectory().mkdirs();
         }
+
+        //Clear export cache
+        for (File file : getExportCacheDirectory().listFiles()){
+            file.delete();
+        }
     }
 
     public boolean savePrimes(final long startValue, final long endValue, final List<Long> primes) {
@@ -190,15 +195,15 @@ public final class FileManager {
 
             String line;
 
-            String output = "";
+            final StringBuilder stringBuilder = new StringBuilder("");
 
             while ((line = bufferedReader.readLine()) != null) {
-                output += line;
+                stringBuilder.append(line);
             }
 
             bufferedReader.close();
 
-            final List<String> stringNumbers = Arrays.asList(output.split(","));
+            final List<String> stringNumbers = Arrays.asList(stringBuilder.toString().split(","));
 
             for (String string : stringNumbers) {
                 numbers.add(Long.valueOf(string));
@@ -281,6 +286,35 @@ public final class FileManager {
             }
             factorsDirectory.delete();
         }
+    }
+
+    public File convert(final File file, final String fileName, final String itemSeparator){
+        final List<Long> items = readNumbers(file);
+
+        final File output = new File(getExportCacheDirectory() + File.separator + fileName);
+
+        try {
+
+            final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(output));
+
+            final long lastItem = items.get(items.size() - 1);
+
+            for (long number : items){
+                bufferedWriter.write(String.valueOf(number));
+
+                if (number != lastItem) {
+                    bufferedWriter.write(itemSeparator);
+                }
+            }
+
+            bufferedWriter.flush();
+            bufferedWriter.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return output;
     }
 
     public File getSavedPrimesDirectory() {

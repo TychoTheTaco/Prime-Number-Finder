@@ -8,8 +8,8 @@ android {
         applicationId "com.tycho.app.primenumberfinder"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 9
-        versionName "1.2.4"
+        versionCode 10
+        versionName "1.2.5"
     }
     buildTypes {
         release {
@@ -27,6 +27,6 @@ dependencies {
     compile 'com.android.support:design:26.1.0'
     compile 'com.android.support:support-v13:26.1.0'
     compile project(':simplegraphs')
-    implementation files('libs/Simple Trees 1.1.0.DEV.jar')
-    implementation files('libs/Easy Tasks 1.1.16.DEV.jar')
+    implementation files('libs/Simple Trees 1.1.1.DEV.jar')
+    implementation files('libs/Easy Tasks 1.1.18.DEV.jar')
 }

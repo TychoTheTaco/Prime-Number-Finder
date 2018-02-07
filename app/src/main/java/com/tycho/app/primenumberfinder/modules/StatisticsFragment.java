@@ -61,7 +61,7 @@ public abstract class StatisticsFragment extends TaskFragment{
      * Update the fragment with new data.
      * @param data The new statistic data.
      */
-    protected abstract void updateData(StatisticData data);
+    protected abstract void updateData(final StatisticData data);
 
     //Getters and setters
 
@@ -69,7 +69,7 @@ public abstract class StatisticsFragment extends TaskFragment{
         return statisticData;
     }
 
-    public void setStatisticData(StatisticData statisticData){
+    public void setStatisticData(final StatisticData statisticData){
         this.statisticData = statisticData;
         if (this.statisticData != null){
             updateData(statisticData);
