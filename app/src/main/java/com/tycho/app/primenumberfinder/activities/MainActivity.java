@@ -21,7 +21,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
-import com.tycho.app.primenumberfinder.Fragments_old.AboutPageFragment;
+import com.tycho.app.primenumberfinder.modules.about.AboutPageFragment;
 import com.tycho.app.primenumberfinder.settings.SettingsFragment;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;

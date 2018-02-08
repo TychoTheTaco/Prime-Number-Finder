@@ -43,6 +43,11 @@
             android:name=".modules.savedfiles.activities.DisplayPrimeFactorizationActivity"
             android:label="Prime Factorization"/>
 
+        <activity
+            android:theme="@style/Default.NoActionBar"
+            android:name=".modules.about.ChangelogActivity"
+            android:label="Changelog"/>
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.tycho.app.primenumberfinder"
