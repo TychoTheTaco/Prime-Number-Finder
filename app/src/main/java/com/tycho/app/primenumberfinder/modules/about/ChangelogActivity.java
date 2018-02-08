@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 
 import com.tycho.app.primenumberfinder.R;
 
@@ -58,6 +59,19 @@ public class ChangelogActivity extends AppCompatActivity {
         for (ChangelogListAdapter.ChangelogItem item : changelogItems){
             changelogListAdapter.addItem(item);
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()){
+
+            case android.R.id.home:
+                onBackPressed();
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private List<ChangelogListAdapter.ChangelogItem> readChangelog(){
