@@ -45,7 +45,7 @@ public class AboutPageFragment extends Fragment{
         ((Button) rootView.findViewById(R.id.contact_developer_button)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto","tycho.bellers@sbcglobal.net", null));
+                Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto","tycho.developer@gmail.com", null));
                 intent.putExtra(Intent.EXTRA_SUBJECT, "Prime Number Finder Feedback (Version " + PrimeNumberFinder.getVersionName(getActivity()) + ")");
                 startActivity(Intent.createChooser(intent, "Send email..."));
             }
