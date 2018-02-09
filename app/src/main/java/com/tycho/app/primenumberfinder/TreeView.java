@@ -67,6 +67,8 @@ public class TreeView extends View {
 
     private Tree<Rect> rectTree;
 
+    private ExportOptions exportOptions;
+
     public TreeView(Context context) {
         super(context);
         init();
@@ -91,23 +93,33 @@ public class TreeView extends View {
         paint.setAntiAlias(true);
         paint.setTextSize(48);
         verticalSpacing = getStringHeight() + 40;
+        exportOptions = new ExportOptions();
+        exportOptions.imageBackgroundColor = Color.WHITE;
+        exportOptions.itemTextSize = 48;
+        exportOptions.itemTextColor = Color.BLACK;
+        exportOptions.itemBackgrounds = true;
+        exportOptions.itemBackgroundColor = Color.argb(50, 0, 100, 0);
+        exportOptions.verticalSpacing = getStringHeight() + 40;
+        exportOptions.primeFactorTextColor = Color.RED;
+        exportOptions.itemBorderColor = Color.BLACK;
+        exportOptions.branchColor = Color.BLACK;
     }
 
     int count = 0;
 
     boolean generated = false;
 
-    public Bitmap drawToBitmap(){
+    public Bitmap drawToBitmap(final ExportOptions options){
         final float borderPadding = 10;
         final Rect bounds = getBoundingRect(rectTree);
         final Bitmap bitmap = Bitmap.createBitmap((int) (Math.abs(bounds.width()) + (borderPadding * 2)), (int) (Math.abs(bounds.height()) + (borderPadding * 2)), Bitmap.Config.ARGB_8888);
         final Canvas canvas = new Canvas(bitmap);
 
         //Draw tree
-        canvas.drawColor(Color.WHITE);
+        canvas.drawColor(options.imageBackgroundColor);
         canvas.translate(-bounds.left + borderPadding, -rectTree.getValue().bottom + borderPadding);
-        debugRectangles(rectTree, canvas, Color.argb(50, 0, 100, 0));
-        drawContents(rectTree, tree, canvas);
+        debugRectangles(rectTree, canvas, options);
+        drawContents(rectTree, tree, canvas, options);
 
         return bitmap;
     }
@@ -116,6 +128,10 @@ public class TreeView extends View {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
         setClipBounds(new Rect(0, 0, getWidth(), getHeight()));
+    }
+
+    public ExportOptions getDefaultExportOptions(){
+        return this.exportOptions;
     }
 
     @Override
@@ -169,8 +185,8 @@ public class TreeView extends View {
                 //Draw tree contents
                 canvas.translate(getWidth() / 2, 0);
                 canvas.translate(translationX, translationY);
-                debugRectangles(rectTree, canvas, Color.argb(50, 0, 100, 0));
-                drawContents(rectTree, tree, canvas);
+                debugRectangles(rectTree, canvas, exportOptions);
+                drawContents(rectTree, tree, canvas, exportOptions);
             }
         }
     }
@@ -308,18 +324,21 @@ public class TreeView extends View {
         return false;
     }
 
-    private void debugRectangles(final Tree<Rect> rectTree, final Canvas canvas, final int color){
+    private void debugRectangles(final Tree<Rect> rectTree, final Canvas canvas, final ExportOptions options){
+
+        //Draw item background
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        paint.setColor(color);
+        paint.setColor(options.itemBackgroundColor);
         canvas.drawRect(rectTree.getValue(), paint);
 
+        //Draw item borders
         paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(Color.BLACK);
+        paint.setColor(options.itemBorderColor);
         paint.setStrokeWidth(1);
         canvas.drawRect(rectTree.getValue(), paint);
 
         for (Tree<Rect> child : rectTree.getChildren()){
-            debugRectangles(child, canvas, color);
+            debugRectangles(child, canvas, options);
         }
     }
 
@@ -355,12 +374,12 @@ public class TreeView extends View {
         return rectangleTree;
     }
 
-    private void drawContents(final Tree<Rect> rectTree, final Tree<?> tree, final Canvas canvas){
+    private void drawContents(final Tree<Rect> rectTree, final Tree<?> tree, final Canvas canvas, final ExportOptions options){
 
         //Draw text
         final String text = tree.getValue().toString();
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(tree.getChildren().size() == 0 ? Color.RED : Color.BLACK);
+        paint.setColor(tree.getChildren().size() == 0 ? options.primeFactorTextColor : options.itemTextColor);
         paint.setStrokeWidth(2);
         float textX = rectTree.getValue().exactCenterX() - (getStringWidth(text) / 2);
         float textY = rectTree.getValue().exactCenterY() + (getStringHeight() / 2) - paint.descent();
@@ -368,12 +387,12 @@ public class TreeView extends View {
 
         for (int i = 0; i < tree.getChildren().size(); i++){
 
-            //Draw lines
-            paint.setColor(Color.BLACK);
+            //Draw branches connecting nodes to parent
+            paint.setColor(options.branchColor);
             paint.setStrokeWidth(2);
             canvas.drawLine(rectTree.getValue().exactCenterX(), rectTree.getValue().top, rectTree.getChildren().get(i).getValue().exactCenterX(), rectTree.getChildren().get(i).getValue().bottom, paint);
 
-            drawContents(rectTree.getChildren().get(i), tree.getChildren().get(i), canvas);
+            drawContents(rectTree.getChildren().get(i), tree.getChildren().get(i), canvas, options);
         }
 
     }
@@ -518,5 +537,27 @@ public class TreeView extends View {
 
     private float getStringHeight() {
         return -paint.ascent() + paint.descent();
+    }
+
+    public static class ExportOptions implements Cloneable{
+
+        public int imageBackgroundColor;
+
+        public int itemTextSize;
+        public int itemTextColor;
+        public boolean itemBackgrounds;
+        public int itemBackgroundColor;
+        public int itemBorderColor;
+
+        public int primeFactorTextColor;
+
+        public int branchColor;
+
+        public float verticalSpacing;
+
+        @Override
+        public ExportOptions clone() throws CloneNotSupportedException {
+            return (ExportOptions) super.clone();
+        }
     }
 }

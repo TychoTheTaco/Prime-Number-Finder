@@ -21,6 +21,8 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jaredrummler.android.colorpicker.ColorPickerDialogListener;
+import com.jaredrummler.android.colorpicker.ColorPickerView;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.TreeView;
 import com.tycho.app.primenumberfinder.modules.savedfiles.ExportOptionsDialog;
@@ -44,7 +46,7 @@ import simpletrees.Tree;
  * Created by tycho on 11/12/2017.
  */
 
-public class DisplayPrimeFactorizationActivity extends AppCompatActivity {
+public class DisplayPrimeFactorizationActivity extends AppCompatActivity implements ColorPickerDialogListener{
 
     /**
      * Tag used for logging and debugging.
@@ -215,6 +217,8 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity {
         return true;
     }
 
+    private PrimeFactorizationExportOptionsDialog exportOptionsDialog;
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -224,11 +228,23 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity {
                 break;
 
             case R.id.export:
-                final PrimeFactorizationExportOptionsDialog exportOptionsDialog = new PrimeFactorizationExportOptionsDialog(this, file, treeView);
+                exportOptionsDialog = new PrimeFactorizationExportOptionsDialog(this, file, treeView);
                 exportOptionsDialog.show();
                 break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onDialogDismissed(int dialogId) {
+        Log.d(TAG, "Dialog dismissed");
+        exportOptionsDialog.onDialogDismissed(dialogId);
+    }
+
+    @Override
+    public void onColorSelected(int dialogId, int color) {
+        Log.d(TAG, "onColorSelected: " + dialogId + " ::: " + color);
+        exportOptionsDialog.onColorSelected(dialogId, color);
     }
 }

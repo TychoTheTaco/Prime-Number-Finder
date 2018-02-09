@@ -26,6 +26,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:26.1.0'
     compile 'com.android.support:design:26.1.0'
     compile 'com.android.support:support-v13:26.1.0'
+    compile 'com.jaredrummler:colorpicker:1.0.2'
     compile project(':simplegraphs')
     implementation files('libs/Simple Trees 1.1.1.DEV.jar')
     implementation files('libs/Easy Tasks 1.1.20.DEV.jar')
