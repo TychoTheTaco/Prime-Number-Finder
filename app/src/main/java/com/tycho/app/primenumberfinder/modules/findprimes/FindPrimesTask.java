@@ -65,7 +65,7 @@ public class FindPrimesTask extends MultithreadedTask {
     protected void run() {
 
         //Start worker threads
-        System.out.println("Starting " + threadCount + " threads...");
+        //System.out.println("Starting " + threadCount + " threads...");
 
         for (int i = 0; i < threadCount; i++) {
             long s = startValue + (2 * i + 1);
@@ -103,7 +103,7 @@ public class FindPrimesTask extends MultithreadedTask {
 
         executeTasks();
 
-        System.out.println("All threads stopped.");
+        /*System.out.println("All threads stopped.");
         long time = 0;
         for (Task task : getTasks()) {
             time += task.getElapsedTime();
@@ -111,7 +111,7 @@ public class FindPrimesTask extends MultithreadedTask {
                     + task.getElapsedTime() + " milliseconds\n    " + ((BruteForceTask) task).totalDistance + " distance");
         }
         System.out.println("Average time: " + (time / getTasks().size()) + " milliseconds.");
-        System.out.println("Elapsed time: " + getElapsedTime() + " milliseconds.");
+        System.out.println("Elapsed time: " + getElapsedTime() + " milliseconds.");*/
     }
 
     /**

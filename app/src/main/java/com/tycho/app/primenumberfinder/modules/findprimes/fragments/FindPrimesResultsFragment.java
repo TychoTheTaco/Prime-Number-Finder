@@ -223,14 +223,6 @@ public class FindPrimesResultsFragment extends ResultsFragment implements FindPr
                 primesAdapter.notifyDataSetChanged();
                 recyclerView.scrollToPosition(primesAdapter.getItemCount() - 1);
 
-                /*if (lastAdapterSize != primesAdapter.getItemCount()){
-                    try {
-                        primesAdapter.notifyItemRangeInserted(lastAdapterSize, primesAdapter.getItemCount() - lastAdapterSize);
-                    }catch (IllegalStateException e) {}
-                    lastAdapterSize = primesAdapter.getItemCount();
-                    recyclerView.scrollToPosition(primesAdapter.getItemCount() - 1);
-                }*/
-
                 //Format subtitle
                 final String count = NumberFormat.getInstance(Locale.getDefault()).format(getTask().getPrimes().size());
                 final String start = NumberFormat.getInstance(Locale.getDefault()).format(getTask().getStartValue());
