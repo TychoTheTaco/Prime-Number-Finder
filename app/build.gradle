@@ -28,5 +28,5 @@ dependencies {
     compile 'com.android.support:support-v13:26.1.0'
     compile project(':simplegraphs')
     implementation files('libs/Simple Trees 1.1.1.DEV.jar')
-    implementation files('libs/Easy Tasks 1.1.18.DEV.jar')
+    implementation files('libs/Easy Tasks 1.1.19.DEV.jar')
 }
