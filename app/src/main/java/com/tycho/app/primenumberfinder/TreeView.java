@@ -85,7 +85,7 @@ public class TreeView extends View {
         exportOptions.verticalSpacing = 40;
         exportOptions.primeFactorTextColor = Color.RED;
         exportOptions.itemBorderColor = Color.argb(255, 0, 130, 0);
-        exportOptions.itemBorderWidth = 2;
+        exportOptions.itemBorderWidth = 1;
         exportOptions.branchColor = Color.BLACK;
         exportOptions.branchWidth = 2;
 
@@ -106,7 +106,14 @@ public class TreeView extends View {
     public Bitmap drawToBitmap(final ExportOptions options) {
         final Rect bounds = getBoundingRect(itemTree);
         final Paint creditsPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        creditsPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, options.itemTextSize > 24 ? (options.itemTextSize / 3) : 8, getResources().getDisplayMetrics()));
+
+        float size = options.itemTextSize >= 30 ? (options.itemTextSize / 2.5f) : 12;
+        final String text = "Created with Prime Number Finder on Android";
+        while(getStringWidth(text, paint) > (Math.abs(bounds.width()) + (borderPadding * 2))){
+            size -= 0.25f;
+            paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, size, getResources().getDisplayMetrics()));
+        }
+
         final Bitmap bitmap = Bitmap.createBitmap((int) (Math.abs(bounds.width()) + (borderPadding * 2)), (int) (Math.abs(bounds.height()) + (borderPadding * 2) + getStringHeight(creditsPaint) + borderPadding), Bitmap.Config.ARGB_8888);
         final Canvas canvas = new Canvas(bitmap);
 
@@ -571,11 +578,15 @@ public class TreeView extends View {
         this.tree = tree;
         horizontalSpacing = new float[tree.getLevels()];
         generated = false;
+        translationX = 0;
+        translationY = scrollPaddingTop;
         dirty = true;
         invalidate();
     }
 
     public void recalculate(){
+        translationX = 0;
+        translationY = scrollPaddingTop;
         horizontalSpacing = new float[tree.getLevels()];
         generated = false;
         dirty = true;

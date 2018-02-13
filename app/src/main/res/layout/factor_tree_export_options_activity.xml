@@ -380,40 +380,44 @@
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <!-- Preview -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Preview"
-                        android:textColor="@color/primary_text"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/image_size"
-                        android:layout_width="wrap_content"
-                        android:textSize="12sp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp" />
-
-                </LinearLayout>
-
-                <com.tycho.app.primenumberfinder.TreeView
-                    android:id="@+id/factor_tree_preview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="200dp"
-                    app:touchEnabled="false" />
-
             </LinearLayout>
         </ScrollView>
 
     </LinearLayout>
+
+    <!-- Preview -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Preview"
+            android:textColor="@color/primary_text"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/image_size"
+            android:layout_width="wrap_content"
+            android:textSize="12sp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp" />
+
+    </LinearLayout>
+
+    <com.tycho.app.primenumberfinder.TreeView
+        android:id="@+id/factor_tree_preview"
+        android:layout_width="wrap_content"
+        android:layout_height="200dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:touchEnabled="true" />
 
     <Button
         android:id="@+id/export_button"
