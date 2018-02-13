@@ -1,27 +1,19 @@
 package com.tycho.app.primenumberfinder;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.Rect;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.util.SparseArray;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
-
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 import simpletrees.Tree;
 
@@ -47,14 +39,6 @@ public class TreeView extends View {
      */
     private final Paint paint = new Paint();
 
-    private volatile boolean processing = false;
-    private volatile boolean finished = false;
-
-    /**
-     * The vertical spacing (in pixels) between layers of the tree.
-     */
-    private float verticalSpacing;
-
     /**
      * The horizontal spacing between items in each level
      */
@@ -62,144 +46,175 @@ public class TreeView extends View {
 
     private float paddingLeft = 5;
     private float paddingRight = 5;
-    private float paddingTop = 3;
-    private float paddingBottom = 3;
-
-    private Tree<Rect> rectTree;
+    private float paddingTop = -2;
+    private float paddingBottom = -2;
 
     private ExportOptions exportOptions;
 
+    private boolean touchEnabled;
+
     public TreeView(Context context) {
         super(context);
-        init();
+        init(context, null);
     }
 
     public TreeView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context, attrs);
     }
 
     public TreeView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context, attrs);
     }
 
     public TreeView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init();
+        init(context, attrs);
     }
 
-    private void init() {
+    private void init(final Context context, final AttributeSet attributeSet) {
         paint.setAntiAlias(true);
-        paint.setTextSize(48);
-        verticalSpacing = getStringHeight() + 40;
+        paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
         exportOptions = new ExportOptions();
         exportOptions.imageBackgroundColor = Color.WHITE;
-        exportOptions.itemTextSize = 48;
+        exportOptions.itemTextSize = 14;
         exportOptions.itemTextColor = Color.BLACK;
         exportOptions.itemBackgrounds = true;
         exportOptions.itemBackgroundColor = Color.argb(50, 0, 100, 0);
-        exportOptions.verticalSpacing = getStringHeight() + 40;
+        exportOptions.verticalSpacing = 40;
         exportOptions.primeFactorTextColor = Color.RED;
-        exportOptions.itemBorderColor = Color.BLACK;
+        exportOptions.itemBorderColor = Color.argb(255, 0, 130, 0);
+        exportOptions.itemBorderWidth = 2;
         exportOptions.branchColor = Color.BLACK;
-    }
+        exportOptions.branchWidth = 2;
 
-    int count = 0;
+        //Set custom attributes
+        final TypedArray typedArray = context.getTheme().obtainStyledAttributes(attributeSet, R.styleable.TreeView, 0, 0);
+        try {
+            touchEnabled = typedArray.getBoolean(R.styleable.TreeView_touchEnabled, true);
+        }finally {
+            typedArray.recycle();
+        }
+    }
 
     boolean generated = false;
 
-    public Bitmap drawToBitmap(final ExportOptions options){
-        final float borderPadding = 10;
-        final Rect bounds = getBoundingRect(rectTree);
-        final Bitmap bitmap = Bitmap.createBitmap((int) (Math.abs(bounds.width()) + (borderPadding * 2)), (int) (Math.abs(bounds.height()) + (borderPadding * 2)), Bitmap.Config.ARGB_8888);
+    //TODO: maybe make border padding = text size?
+    private final float borderPadding = 10;
+
+    public Bitmap drawToBitmap(final ExportOptions options) {
+        final Rect bounds = getBoundingRect(itemTree);
+        final Paint creditsPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        creditsPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, options.itemTextSize > 24 ? (options.itemTextSize / 3) : 8, getResources().getDisplayMetrics()));
+        final Bitmap bitmap = Bitmap.createBitmap((int) (Math.abs(bounds.width()) + (borderPadding * 2)), (int) (Math.abs(bounds.height()) + (borderPadding * 2) + getStringHeight(creditsPaint) + borderPadding), Bitmap.Config.ARGB_8888);
         final Canvas canvas = new Canvas(bitmap);
 
         //Draw tree
         canvas.drawColor(options.imageBackgroundColor);
-        canvas.translate(-bounds.left + borderPadding, -rectTree.getValue().bottom + borderPadding);
-        debugRectangles(rectTree, canvas, options);
-        drawContents(rectTree, tree, canvas, options);
+        canvas.save();
+        canvas.translate(-bounds.left + borderPadding, borderPadding);
+        drawItemBackgrounds(itemTree, canvas, options);
+        drawContents(itemTree, canvas, options);
+        canvas.restore();
+        drawCredits(canvas, creditsPaint, options);
 
         return bitmap;
     }
 
+    private void drawCredits(final Canvas canvas, final Paint paint, final ExportOptions options){
+        final String text = "Created with Prime Number Finder on Android";
+
+        //Draw text
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.BLACK);
+        float textX = canvas.getWidth() - getStringWidth(text, paint) - borderPadding;
+        float textY = canvas.getHeight() - borderPadding;
+        canvas.drawText(text, textX, textY, paint);
+    }
+
+    private Rect clipBounds = new Rect();
+
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        setClipBounds(new Rect(0, 0, getWidth(), getHeight()));
+        clipBounds.set(0, 0, getWidth(), getHeight());
+        setClipBounds(clipBounds);
     }
 
-    public ExportOptions getDefaultExportOptions(){
+    public ExportOptions getDefaultExportOptions() {
         return this.exportOptions;
     }
+
+    private boolean threadStarted = false;
+
+    private Tree<Item> itemTree;
 
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
 
-        if (processing) {
+        //Draw background
+        canvas.drawColor(exportOptions.imageBackgroundColor);
+
+        canvas.save();
+
+        //Generate the tree if it hasn't been created yet
+        if (!generated && tree != null) {
+
+            //Draw text
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.BLACK);
-            paint.setStrokeWidth(2);
-            String text = "Generating tree";
-            for (int i = 0; i < count; i++) {
-                text += '.';
-            }
-            canvas.drawText(text, getWidth() / 2 - getStringWidth(text) / 2, getHeight() / 2, paint);
+            paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
+            final String text = "Generating...";
+            canvas.drawText(text, ((canvas.getWidth() - getStringWidth(text, paint)) / 2), ((canvas.getHeight() - getStringHeight(paint)) / 2), paint);
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(250);
-                    } catch (InterruptedException e) {}
-
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (++count > 5) count = 0;
-                            invalidate();
-                        }
-                    });
-                }
-            }).start();
-
-        } else {
-
-            //Draw view border
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setColor(Color.BLACK);
-            paint.setStrokeWidth(3);
-            canvas.drawRect(0, 0, getWidth() - 1, getHeight() - 1, paint);
-
-            if (!generated && tree != null){
-                while(true){
-                    rectTree = generateRectangleTree(0, getStringHeight() / 2, tree, 0);
-                    if (!checkChildren(rectTree, 0)) break;
-                }
-                generated = true;
-            }
-
-            if (tree != null){
-                //Draw tree contents
-                canvas.translate(getWidth() / 2, 0);
-                canvas.translate(translationX, translationY);
-                debugRectangles(rectTree, canvas, exportOptions);
-                drawContents(rectTree, tree, canvas, exportOptions);
+            if (!threadStarted){
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        do{
+                            dirty = false;
+                            while (true) {
+                                itemTree = generateRectangleTree(tree, exportOptions);
+                                if (!checkChildren(itemTree, 0)) break;
+                            }
+                            generated = true;
+                        }while(dirty);
+                        postInvalidate();
+                        threadStarted = false;
+                    }
+                }).start();
+                threadStarted = true;
             }
         }
-    }
 
-    private float translationX;
-    private float translationY;
-    private float lastTouchX;
-    private float lastTouchY;
+        if (!dirty && tree != null && itemTree != null) {
+            //Draw tree contents
+            canvas.translate(getWidth() / 2, 0);
+            canvas.translate(translationX, translationY);
+            drawItemBackgrounds(itemTree, canvas, exportOptions);
+            drawContents(itemTree, canvas, exportOptions);
+        }
+
+        canvas.restore();
+
+        //Draw view border
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(Color.BLACK);
+        paint.setStrokeWidth(0);
+        canvas.drawRect(0, 0, getWidth(), getHeight(), paint);
+    }
 
     private float scrollPaddingLeft = 20;
     private float scrollPaddingRight = 20;
     private float scrollPaddingTop = 20;
     private float scrollPaddingBottom = 20;
+
+    private float translationX;
+    private float translationY = scrollPaddingTop;
+    private float lastTouchX;
+    private float lastTouchY;
 
     private static final int INVALID_POINTER_ID = -1;
 
@@ -209,7 +224,7 @@ public class TreeView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        if (tree != null){
+        if (touchEnabled && tree != null) {
             final int action = event.getAction();
             switch (action & MotionEvent.ACTION_MASK) {
                 case MotionEvent.ACTION_DOWN: {
@@ -233,7 +248,7 @@ public class TreeView extends View {
                     final float dx = x - lastTouchX;
                     final float dy = y - lastTouchY;
 
-                    final Rect bounds = getBoundingRect(rectTree);
+                    final Rect bounds = getBoundingRect(itemTree);
 
                     final float maxTranslationX = -(bounds.right - (getWidth() / 2)) - scrollPaddingRight;
                     final float minTranslationX = -(bounds.left + (getWidth() / 2)) + scrollPaddingLeft;
@@ -243,30 +258,30 @@ public class TreeView extends View {
                     translationX += dx;
                     translationY += dy;
 
-                    if (bounds.width() < getWidth()){
-                        if (translationX > maxTranslationX){
+                    if (bounds.width() < getWidth()) {
+                        if (translationX > maxTranslationX) {
                             translationX = maxTranslationX;
-                        }else if (translationX < minTranslationX){
+                        } else if (translationX < minTranslationX) {
                             translationX = minTranslationX;
                         }
-                    }else{
-                        if (translationX < maxTranslationX){
+                    } else {
+                        if (translationX < maxTranslationX) {
                             translationX = maxTranslationX;
-                        }else if (translationX > minTranslationX){
+                        } else if (translationX > minTranslationX) {
                             translationX = minTranslationX;
                         }
                     }
 
-                    if (Math.abs(bounds.height()) < getHeight()){
-                        if (translationY > maxTranslationY){
+                    if (Math.abs(bounds.height()) < getHeight()) {
+                        if (translationY > maxTranslationY) {
                             translationY = maxTranslationY;
-                        }else if (translationY < minTranslationY){
+                        } else if (translationY < minTranslationY) {
                             translationY = minTranslationY;
                         }
-                    }else{
-                        if (translationY < maxTranslationY){
+                    } else {
+                        if (translationY < maxTranslationY) {
                             translationY = maxTranslationY;
-                        }else if (translationY > minTranslationY){
+                        } else if (translationY > minTranslationY) {
                             translationY = minTranslationY;
                         }
                     }
@@ -309,124 +324,154 @@ public class TreeView extends View {
         return true;
     }
 
-    private boolean checkChildren(Tree<Rect> rectTree, int level){
+    private boolean checkChildren(Tree<Item> itemTree, int level) {
 
-        if (fixOverlaps(rectTree, level)) return true;
+        if (fixOverlaps(itemTree, level)) return true;
 
-        for (Tree<Rect> child : rectTree.getChildren()){
+        for (Tree<Item> child : itemTree.getChildren()) {
             if (fixOverlaps(child, level + 1)) return true;
         }
 
-        for (Tree<Rect> child : rectTree.getChildren()){
+        for (Tree<Item> child : itemTree.getChildren()) {
             if (checkChildren(child, level + 1)) return true;
         }
 
         return false;
     }
 
-    private void debugRectangles(final Tree<Rect> rectTree, final Canvas canvas, final ExportOptions options){
+    private void drawItemBackgrounds(final Tree<Item> itemTree, final Canvas canvas, final ExportOptions options) {
 
-        //Draw item background
-        paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        paint.setColor(options.itemBackgroundColor);
-        canvas.drawRect(rectTree.getValue(), paint);
+        if (options.itemBackgrounds){
 
-        //Draw item borders
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(options.itemBorderColor);
-        paint.setStrokeWidth(1);
-        canvas.drawRect(rectTree.getValue(), paint);
+            //Draw item background
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(options.itemBackgroundColor);
+            canvas.drawRect(itemTree.getValue().bounds, paint);
 
-        for (Tree<Rect> child : rectTree.getChildren()){
-            debugRectangles(child, canvas, options);
+            //Draw item borders
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(options.itemBorderColor);
+            paint.setStrokeWidth(options.itemBorderWidth);
+            canvas.drawRect(itemTree.getValue().bounds, paint);
+
+            for (Tree<Item> child : itemTree.getChildren()) {
+                drawItemBackgrounds(child, canvas, options);
+            }
+
         }
     }
 
-    private Tree<Rect> generateRectangleTree(final float centerX, final float centerY, final Tree<?> tree, int level){
-        //Draw text
+    private Tree<Item> generateRectangleTree(final Tree<?> tree, final ExportOptions options){
+        final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, options.itemTextSize, getResources().getDisplayMetrics()));
+        return generateRectangleTree(0, 0, tree, 0, paint, options);
+    }
+
+    //TODO: item heights can be slightly different, use getStringHeight instead to calculate height and just center the text vertically
+
+    private Tree<Item> generateRectangleTree(final float centerX, final float topY, final Tree<?> tree, int level, final Paint paint, final ExportOptions options) {
+
+        //Calculate text bounds
         final String text = tree.getValue().toString();
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(tree.getChildren().size() == 0 ? Color.RED : Color.BLACK);
-        paint.setStrokeWidth(2);
-        float textX = centerX - (getStringWidth(text) / 2);
+        paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, options.itemTextSize, getResources().getDisplayMetrics()));
+        final Rect bounds = getStringBounds(text, paint);
 
-        final Rect bounds = new Rect((int) (textX - paddingLeft), (int) (centerY + (getStringHeight() / 2) + paddingTop), (int) (textX + getStringWidth(text) + paddingRight), (int) (centerY - (getStringHeight() / 2) - paddingBottom));
+        final float left = bounds.left;
+        final float bottom = bounds.bottom;
 
-        final Tree<Rect> rectangleTree = new Tree<>(bounds);
+        bounds.offset(((int) centerX - (bounds.width() / 2)), ((int) (topY - bounds.top + 1 + paddingTop)));
 
-        if (tree.getChildren().size() > 0){
+        final int height = bounds.height();
+        final float stringHeight = getStringHeight(paint);
+
+        final float textX = bounds.left - left;
+        final float textY = bounds.bottom - bottom + 1 + ((stringHeight - height) / 2);
+
+        final Tree<Item> itemTree = new Tree<>(new Item(text, bounds, textX, textY));
+
+        //Apply padding
+        bounds.left -= paddingLeft;
+        bounds.top -= paddingTop;
+        bounds.right += paddingRight;
+        bounds.bottom += paddingBottom + (stringHeight - height);
+
+        if (tree.getChildren().size() > 0) {
             float totalWidth = 0;
             float[] sizes = new float[tree.getChildren().size()];
-            for (int i = 0; i <  tree.getChildren().size(); i++){
-                sizes[i] = getStringWidth(tree.getChildren().get(i).getValue().toString());
+            for (int i = 0; i < tree.getChildren().size(); i++) {
+                sizes[i] = getStringWidth(tree.getChildren().get(i).getValue().toString(), paint);
                 totalWidth += sizes[i];
             }
             final float totalSpacing = tree.getChildren().size() > 0 ? (tree.getChildren().size() - 1) * horizontalSpacing[level + 1] : 0;
 
             float previousOffset = 0;
-            for (int i = 0; i < tree.getChildren().size(); i++){
+            for (int i = 0; i < tree.getChildren().size(); i++) {
                 final float offset = previousOffset + (sizes[i] / 2);
-                rectangleTree.addNode(generateRectangleTree(centerX - ((totalWidth + totalSpacing) / 2) + offset, centerY + verticalSpacing, tree.getChildren().get(i), level + 1));
+                itemTree.addNode(generateRectangleTree(centerX - ((totalWidth + totalSpacing) / 2) + offset, topY + bounds.height()/*+ getStringHeight(paint)*/ /*+ paddingTop + paddingBottom*/ + options.verticalSpacing, tree.getChildren().get(i), level + 1, paint, options));
                 previousOffset = offset + (sizes[i] / 2) + horizontalSpacing[level + 1];
             }
         }
 
-        return rectangleTree;
+        return itemTree;
     }
 
-    private void drawContents(final Tree<Rect> rectTree, final Tree<?> tree, final Canvas canvas, final ExportOptions options){
+
+    private void drawContents(final Tree<Item> itemTree, final Canvas canvas, final ExportOptions options) {
 
         //Draw text
-        final String text = tree.getValue().toString();
+        final String text = itemTree.getValue().text;
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(tree.getChildren().size() == 0 ? options.primeFactorTextColor : options.itemTextColor);
-        paint.setStrokeWidth(2);
-        float textX = rectTree.getValue().exactCenterX() - (getStringWidth(text) / 2);
-        float textY = rectTree.getValue().exactCenterY() + (getStringHeight() / 2) - paint.descent();
-        canvas.drawText(text, textX, textY, paint);
+        paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, options.itemTextSize, getResources().getDisplayMetrics()));
+        paint.setColor(itemTree.getChildren().size() == 0 ? options.primeFactorTextColor : options.itemTextColor);
+        canvas.drawText(text, itemTree.getValue().textX, itemTree.getValue().textY, paint);
 
-        for (int i = 0; i < tree.getChildren().size(); i++){
+        for (int i = 0; i < itemTree.getChildren().size(); i++) {
 
             //Draw branches connecting nodes to parent
             paint.setColor(options.branchColor);
-            paint.setStrokeWidth(2);
-            canvas.drawLine(rectTree.getValue().exactCenterX(), rectTree.getValue().top, rectTree.getChildren().get(i).getValue().exactCenterX(), rectTree.getChildren().get(i).getValue().bottom, paint);
+            paint.setStrokeWidth(options.branchWidth);
+            canvas.drawLine(itemTree.getValue().bounds.exactCenterX(), itemTree.getValue().bounds.bottom, itemTree.getChildren().get(i).getValue().bounds.exactCenterX(), itemTree.getChildren().get(i).getValue().bounds.top, paint);
 
-            drawContents(rectTree.getChildren().get(i), tree.getChildren().get(i), canvas, options);
+            drawContents(itemTree.getChildren().get(i), canvas, options);
         }
 
     }
 
-    private boolean fixOverlaps(final Tree<Rect> rectTree, int level){
-        final float border = rectTree.getValue().exactCenterX();
+    private boolean fixOverlaps(final Tree<Item> itemTree, int level) {
+        final float border = itemTree.getValue().bounds.exactCenterX();
         boolean overlap = false;
-        for (int i = 0; i < rectTree.getChildren().size(); i++){
-            overlap = checkOverlaps(rectTree.getChildren().get(i), border, level, i);
+        for (int i = 0; i < itemTree.getChildren().size(); i++) {
+            overlap = checkOverlaps(itemTree.getChildren().get(i), border, level, i);
             if (overlap) break;
         }
         return overlap;
     }
 
-    private Rect getBoundingRect(final Tree<Rect> rectTree){
-        final float left = findLeft(rectTree, 0);
-        final float right = findRight(rectTree, 0);
-        final float bottom = findBottom(rectTree, rectTree.getValue().bottom);
-        final float top = findTop(rectTree, 0);
+    public Rect getBoundingRect(){
+        return getBoundingRect(itemTree);
+    }
+
+    private Rect getBoundingRect(final Tree<Item> itemTree) {
+        final float left = findLeft(itemTree, 0);
+        final float right = findRight(itemTree, 0);
+        final float bottom = findBottom(itemTree, 0);
+        final float top = findTop(itemTree, itemTree.getValue().bounds.top);
         return new Rect((int) left, (int) top, (int) right, (int) bottom);
     }
 
-    private float findLeft(final Tree<Rect> rectTree, float value){
+    private float findLeft(final Tree<Item> itemTree, float value) {
 
         float smallest = value;
 
-        if (rectTree.getValue().left < smallest){
-            smallest = rectTree.getValue().left;
+        if (itemTree.getValue().bounds.left < smallest) {
+            smallest = itemTree.getValue().bounds.left;
         }
 
         float smallerChild;
-        for (Tree<Rect> child : rectTree.getChildren()){
+        for (Tree<Item> child : itemTree.getChildren()) {
             smallerChild = findLeft(child, smallest);
-            if (smallerChild < smallest){
+            if (smallerChild < smallest) {
                 smallest = smallerChild;
             }
         }
@@ -434,18 +479,18 @@ public class TreeView extends View {
         return smallest;
     }
 
-    private float findRight(final Tree<Rect> rectTree, float value){
+    private float findRight(final Tree<Item> itemTree, float value) {
 
         float largest = value;
 
-        if (rectTree.getValue().right > largest){
-            largest = rectTree.getValue().right;
+        if (itemTree.getValue().bounds.right > largest) {
+            largest = itemTree.getValue().bounds.right;
         }
 
         float largestChild;
-        for (Tree<Rect> child : rectTree.getChildren()){
+        for (Tree<Item> child : itemTree.getChildren()) {
             largestChild = findRight(child, largest);
-            if (largestChild > largest){
+            if (largestChild > largest) {
                 largest = largestChild;
             }
         }
@@ -453,18 +498,18 @@ public class TreeView extends View {
         return largest;
     }
 
-    private float findBottom(final Tree<Rect> rectTree, float value){
+    private float findBottom(final Tree<Item> itemTree, float value) {
 
         float smallest = value;
 
-        if (rectTree.getValue().bottom < smallest){
-            smallest = rectTree.getValue().bottom;
+        if (itemTree.getValue().bounds.bottom > smallest) {
+            smallest = itemTree.getValue().bounds.bottom;
         }
 
         float smallestChild;
-        for (Tree<Rect> child : rectTree.getChildren()){
+        for (Tree<Item> child : itemTree.getChildren()) {
             smallestChild = findBottom(child, smallest);
-            if (smallestChild < smallest){
+            if (smallestChild > smallest) {
                 smallest = smallestChild;
             }
         }
@@ -472,18 +517,18 @@ public class TreeView extends View {
         return smallest;
     }
 
-    private float findTop(final Tree<Rect> rectTree, float value){
+    private float findTop(final Tree<Item> itemTree, float value) {
 
         float largest = value;
 
-        if (rectTree.getValue().top > largest){
-            largest = rectTree.getValue().top;
+        if (itemTree.getValue().bounds.top < largest) {
+            largest = itemTree.getValue().bounds.top;
         }
 
         float largestChild;
-        for (Tree<Rect> child : rectTree.getChildren()){
+        for (Tree<Item> child : itemTree.getChildren()) {
             largestChild = findTop(child, largest);
-            if (largestChild > largest){
+            if (largestChild < largest) {
                 largest = largestChild;
             }
         }
@@ -491,55 +536,73 @@ public class TreeView extends View {
         return largest;
     }
 
-    private boolean checkOverlaps(final Tree<Rect> rectTree, final float border, final int level, int side){
+    private boolean checkOverlaps(final Tree<Item> itemTree, final float border, final int level, int side) {
 
-        final Rect rect = rectTree.getValue();
+        final Rect rect = itemTree.getValue().bounds;
 
         float off = 0;
-        if (side == 0){
-            if (rect.right >= border){
-                off = rect.right - border;
+        if (side == 0) {
+            if (rect.right >= border - 10) {
+                off = rect.right - border + 10;
             }
-        }else if (side == 1){
-            if (rect.left <= border){
-                off = border - rect.left;
+        } else if (side == 1) {
+            if (rect.left <= border + 10) {
+                off = border - rect.left + 10;
             }
         }
 
-        if (off > 0){
-            horizontalSpacing[level + 1] += (off * 2) + 20;
+        if (off > 0) {
+            horizontalSpacing[level + 1] += (off * 2);
             return true;
         }
 
         boolean overlap = false;
-        for (int i = 0; i < rectTree.getChildren().size(); i++){
-            overlap = checkOverlaps(rectTree.getChildren().get(i), border, level, side);
+        for (int i = 0; i < itemTree.getChildren().size(); i++) {
+            overlap = checkOverlaps(itemTree.getChildren().get(i), border, level, side);
             if (overlap) break;
         }
 
         return overlap;
     }
 
+    private volatile boolean dirty = true;
+
     public void setTree(Tree<?> tree) {
         this.tree = tree;
         horizontalSpacing = new float[tree.getLevels()];
-        Arrays.fill(horizontalSpacing, 40);
-        finished = false;
         generated = false;
+        dirty = true;
         invalidate();
     }
 
-    private float getStringWidth(final String text) {
-        final Rect bounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), bounds);
-        return bounds.right + bounds.left;
+    public void recalculate(){
+        horizontalSpacing = new float[tree.getLevels()];
+        generated = false;
+        dirty = true;
+        postInvalidate();
     }
 
-    private float getStringHeight() {
+    public void redraw(){
+        invalidate();
+    }
+
+    private float getStringWidth(final String text, final Paint paint) {
+        final Rect bounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), bounds);
+        return Math.abs(bounds.width());
+    }
+
+    private Rect getStringBounds(final String text, final Paint paint){
+        final Rect bounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), bounds);
+        return bounds;
+    }
+
+    private float getStringHeight(final Paint paint) {
         return -paint.ascent() + paint.descent();
     }
 
-    public static class ExportOptions implements Cloneable{
+    public static class ExportOptions implements Cloneable {
 
         public int imageBackgroundColor;
 
@@ -548,16 +611,35 @@ public class TreeView extends View {
         public boolean itemBackgrounds;
         public int itemBackgroundColor;
         public int itemBorderColor;
+        public int itemBorderWidth;
 
         public int primeFactorTextColor;
 
         public int branchColor;
+        public int branchWidth;
 
         public float verticalSpacing;
 
         @Override
         public ExportOptions clone() throws CloneNotSupportedException {
             return (ExportOptions) super.clone();
+        }
+    }
+
+    private static class Item{
+
+        private String text;
+
+        private Rect bounds;
+
+        private float textX;
+        private float textY;
+
+        public Item(final String text, final Rect bounds, final float textX, final float textY){
+            this.text = text;
+            this.bounds = bounds;
+            this.textX = textX;
+            this.textY =  textY;
         }
     }
 }

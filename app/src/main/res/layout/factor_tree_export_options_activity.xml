@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <include layout="@layout/app_bar" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:layout_height="0dp">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:orientation="vertical">
+
+                <!-- File name -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/file_name"
+                    android:textColor="@color/primary_text"
+                    android:textSize="16sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/file_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="16dp"
+                        android:includeFontPadding="false"
+                        android:inputType="textNoSuggestions|textVisiblePassword"
+                        android:singleLine="true"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:lines="1"
+                        android:text="@string/png_extension"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
+
+                <!-- Image style -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Image Style"
+                    android:textColor="@color/primary_text"
+                    android:textSize="16sp" />
+
+                <!-- Image background color-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/Label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Image background color:" />
+
+                    <TextView
+                        android:id="@+id/image_background_color"
+                        style="@style/ColorPicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp" />
+
+                </LinearLayout>
+
+                <!-- Vertical item spacing-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/Label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Vertical item spacing:" />
+
+                    <EditText
+                        android:id="@+id/vertical_item_spacing"
+                        android:layout_width="32dp"
+                        android:gravity="center_horizontal"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:inputType="number"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:text="px."
+                        android:textColor="@color/secondary_text"
+                        android:textSize="14sp" />
+
+                    <SeekBar
+                        android:id="@+id/vertical_item_spacing_seekbar"
+                        android:layout_width="match_parent"
+                        android:layout_marginEnd="8dp"
+                        android:layout_height="match_parent" />
+
+                </LinearLayout>
+
+                <!-- Branch color -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/Label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Branch color:" />
+
+                    <TextView
+                        android:id="@+id/branch_color"
+                        style="@style/ColorPicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp" />
+
+                </LinearLayout>
+
+                <!-- Branch width -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/Label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Branch width:" />
+
+                    <EditText
+                        android:id="@+id/branch_widtth"
+                        android:layout_width="32dp"
+                        android:gravity="center_horizontal"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:inputType="number"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:text="px."
+                        android:textColor="@color/secondary_text"
+                        android:textSize="14sp" />
+
+                    <SeekBar
+                        android:id="@+id/branch_width_seekbar"
+                        android:layout_width="match_parent"
+                        android:layout_marginEnd="8dp"
+                        android:layout_height="match_parent" />
+
+                </LinearLayout>
+
+                <!-- Item Style -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Item Style"
+                    android:textColor="@color/primary_text"
+                    android:textSize="16sp" />
+
+                <!-- Item text color-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/Label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Item text color:" />
+
+                    <TextView
+                        android:id="@+id/item_text_color"
+                        style="@style/ColorPicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp" />
+
+                </LinearLayout>
+
+                <!-- Item text size-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/Label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Item text size:" />
+
+                    <EditText
+                        android:id="@+id/item_text_size"
+                        android:layout_width="32dp"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:gravity="center_horizontal"
+                        android:inputType="number"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:text="pt."
+                        android:textColor="@color/secondary_text"
+                        android:textSize="14sp" />
+
+                    <SeekBar
+                        android:id="@+id/item_text_size_seekbar"
+                        android:layout_width="match_parent"
+                        android:layout_marginEnd="8dp"
+                        android:layout_height="match_parent" />
+
+                </LinearLayout>
+
+                <CheckBox
+                    android:id="@+id/item_background_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="Item backgrounds" />
+
+                <!-- Item background color -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/item_background_color_label"
+                        style="@style/Label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Item background color:" />
+
+                    <TextView
+                        android:id="@+id/item_background_color"
+                        style="@style/ColorPicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp" />
+
+                </LinearLayout>
+
+                <!-- Item border color -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/item_border_color_label"
+                        style="@style/Label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Item border color:" />
+
+                    <TextView
+                        android:id="@+id/item_border_color"
+                        style="@style/ColorPicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp" />
+
+                </LinearLayout>
+
+                <!-- Item text size-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/Label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Item border width:" />
+
+                    <EditText
+                        android:id="@+id/item_border_width"
+                        android:layout_width="32dp"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:gravity="center_horizontal"
+                        android:inputType="number"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:text="pt."
+                        android:textColor="@color/secondary_text"
+                        android:textSize="14sp" />
+
+                    <SeekBar
+                        android:id="@+id/item_border_width_seekbar"
+                        android:layout_width="match_parent"
+                        android:layout_marginEnd="8dp"
+                        android:layout_height="match_parent" />
+
+                </LinearLayout>
+
+                <!-- Prime factor text color-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/Label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Prime factor text color:" />
+
+                    <TextView
+                        android:id="@+id/prime_factor_text_color"
+                        style="@style/ColorPicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <!-- Preview -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Preview"
+                        android:textColor="@color/primary_text"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/image_size"
+                        android:layout_width="wrap_content"
+                        android:textSize="12sp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp" />
+
+                </LinearLayout>
+
+                <com.tycho.app.primenumberfinder.TreeView
+                    android:id="@+id/factor_tree_preview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="200dp"
+                    app:touchEnabled="false" />
+
+            </LinearLayout>
+        </ScrollView>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/export_button"
+        style="@style/Button"
+        android:padding="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/export_button" />
+
+</LinearLayout>

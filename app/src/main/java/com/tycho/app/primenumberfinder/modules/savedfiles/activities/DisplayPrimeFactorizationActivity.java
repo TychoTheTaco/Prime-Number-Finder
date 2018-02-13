@@ -2,13 +2,10 @@ package com.tycho.app.primenumberfinder.modules.savedfiles.activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
@@ -22,19 +19,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener;
-import com.jaredrummler.android.colorpicker.ColorPickerView;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.TreeView;
-import com.tycho.app.primenumberfinder.modules.savedfiles.ExportOptionsDialog;
-import com.tycho.app.primenumberfinder.modules.savedfiles.PrimeFactorizationExportOptionsDialog;
+import com.tycho.app.primenumberfinder.modules.savedfiles.FactorTreeExportOptionsActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -46,7 +38,7 @@ import simpletrees.Tree;
  * Created by tycho on 11/12/2017.
  */
 
-public class DisplayPrimeFactorizationActivity extends AppCompatActivity implements ColorPickerDialogListener{
+public class DisplayPrimeFactorizationActivity extends AppCompatActivity{
 
     /**
      * Tag used for logging and debugging.
@@ -217,8 +209,6 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity impleme
         return true;
     }
 
-    private PrimeFactorizationExportOptionsDialog exportOptionsDialog;
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -228,23 +218,12 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity impleme
                 break;
 
             case R.id.export:
-                exportOptionsDialog = new PrimeFactorizationExportOptionsDialog(this, file, treeView);
-                exportOptionsDialog.show();
+                final Intent intent = new Intent(this, FactorTreeExportOptionsActivity.class);
+                intent.putExtra("filePath", file.getAbsolutePath());
+                startActivity(intent);
                 break;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onDialogDismissed(int dialogId) {
-        Log.d(TAG, "Dialog dismissed");
-        exportOptionsDialog.onDialogDismissed(dialogId);
-    }
-
-    @Override
-    public void onColorSelected(int dialogId, int color) {
-        Log.d(TAG, "onColorSelected: " + dialogId + " ::: " + color);
-        exportOptionsDialog.onColorSelected(dialogId, color);
     }
 }
