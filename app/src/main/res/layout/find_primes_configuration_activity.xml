@@ -7,61 +7,25 @@
 
     <include layout="@layout/app_bar" />
 
-    <!-- Number input -->
-    <!--<TextView
-        style="@style/SectionDescription"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:labelFor="@+id/primality_input"
-        android:paddingEnd="8dp"
-        android:paddingStart="8dp"
-        android:paddingTop="8dp"
-        android:text="@string/input_number_description" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:clipToPadding="false"
-        android:paddingEnd="8dp"
-        android:paddingStart="8dp">
-
-        <EditText
-            android:id="@id/primality_input"
-            style="@style/NumberInput"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-        <Button
-            android:id="@+id/check_primality_button"
-            style="@style/Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/check_primality_button" />
-
-    </LinearLayout>-->
-
     <!-- Range input -->
     <TextView
         style="@style/SectionDescription"
         android:layout_width="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
         android:layout_height="wrap_content"
-        android:paddingEnd="8dp"
-        android:paddingTop="8dp"
-        android:paddingStart="8dp"
-        android:text="Enter a range to search for prime numbers (inclusive)." />
+        android:text="Search Range (inclusive)" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingEnd="8dp"
-        android:paddingStart="8dp">
+        android:orientation="horizontal">
 
-        <EditText
+        <com.tycho.app.primenumberfinder.ValidEditText
             android:id="@+id/search_range_start"
             style="@style/NumberInput"
             android:layout_width="wrap_content"
@@ -74,7 +38,7 @@
             android:layout_height="wrap_content"
             android:text="@string/to" />
 
-        <EditText
+        <com.tycho.app.primenumberfinder.ValidEditText
             android:id="@+id/search_range_end"
             style="@style/NumberInput"
             android:layout_width="wrap_content"
@@ -88,33 +52,27 @@
             android:background="?android:selectableItemBackground"
             android:contentDescription="@string/content_description_infinity_button"
             android:src="@drawable/ic_infinity_white_24dp"
-            android:tint="@android:color/black" />
-
-        <!--<Button
-            android:id="@+id/button_find_primes"
-            style="@style/Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/find_primes_button" />-->
+            android:tint="@color/infinity_button_tint" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_marginBottom="4dp"
-        android:paddingEnd="8dp"
-        android:paddingStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:orientation="vertical"
         android:layout_height="wrap_content">
 
         <TextView
+            style="@style/SectionDescription"
             android:id="@+id/search_method_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/find_primes_search_method_label"
             android:textSize="14sp"/>
 
-        <RadioGroup
+        <com.tycho.app.primenumberfinder.CustomRadioGroup
             android:id="@+id/radio_group_search_method"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -133,15 +91,16 @@
                 android:text="@string/find_primes_search_method_sieve_of_eratosthenes"
                 android:textSize="14sp"/>
 
-        </RadioGroup>
+        </com.tycho.app.primenumberfinder.CustomRadioGroup>
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:orientation="horizontal"
-        android:paddingEnd="8dp"
-        android:paddingStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_height="wrap_content">
 
         <TextView
@@ -150,25 +109,28 @@
             android:layout_height="wrap_content"
             android:text="Threads"/>
 
-        <EditText
-            style="@style/NumberInput"
+        <Spinner
+            android:id="@+id/thread_count_spinner"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 
     <CheckBox
+        android:id="@+id/notify_when_finished"
         android:layout_width="wrap_content"
-        android:paddingEnd="8dp"
-        android:paddingStart="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
         android:text="Notify when finished"
         android:layout_height="wrap_content" />
 
     <CheckBox
+        android:id="@+id/auto_save"
         android:layout_width="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:text="Auto-save when finished"
-        android:paddingEnd="8dp"
-        android:paddingStart="8dp"
         android:layout_height="wrap_content" />
 
 </LinearLayout>

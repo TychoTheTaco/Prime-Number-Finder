@@ -1,13 +1,21 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.app.Fragment;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,18 +26,27 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
+import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.ValidEditText;
+import com.tycho.app.primenumberfinder.activities.MainActivity;
 import com.tycho.app.primenumberfinder.adapters.FragmentAdapter;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
+import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimeFactorizationActivity;
+import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.UUID;
 
 import easytasks.Task;
+import easytasks.TaskAdapter;
+import easytasks.TaskListener;
 
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
@@ -37,7 +54,7 @@ import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
  * @author Tycho Bellers
  *         Date Created: 11/12/2016
  */
-public class FindPrimesFragment extends Fragment {
+public class FindPrimesFragment extends Fragment implements FloatingActionButtonListener {
 
     /**
      * Tag used for logging and debugging.
@@ -48,11 +65,8 @@ public class FindPrimesFragment extends Fragment {
      * Views.
      */
     private EditText editTextPrimalityInput;
-    private EditText editTextSearchRangeStart;
-    private EditText editTextSearchRangeEnd;
-    private Button buttonCheckPrimality;
-    private Button buttonFindPrimes;
-    private ImageButton infinityButton;
+    private ValidEditText editTextSearchRangeStart;
+    private ValidEditText editTextSearchRangeEnd;
 
     /*
     Fragments in the main adapter.
@@ -73,11 +87,10 @@ public class FindPrimesFragment extends Fragment {
     private final CheckPrimalityResultsFragment checkPrimalityResultsFragment = new CheckPrimalityResultsFragment();
     private final CheckPrimalityStatisticsFragment checkPrimalityStatisticsFragment = new CheckPrimalityStatisticsFragment();
 
+    private final NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
 
-    private final FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(0, FindPrimesTask.INFINITY, FindPrimesTask.SearchMethod.BRUTE_FORCE, FindPrimesTask.SearchOptions.MonitorType.SIMPLE);
 
-    //private BottomSheetBehavior bottomSheetBehavior;
-    //private RadioGroup radioGroupSearchMethod;
+    private final FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(0, FindPrimesTask.INFINITY, FindPrimesTask.SearchMethod.BRUTE_FORCE, 1);
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
@@ -142,6 +155,42 @@ public class FindPrimesFragment extends Fragment {
         generalStatisticsFragment.setContent(findPrimesStatisticsFragment);
         viewPager.setAdapter(fragmentAdapter);
         viewPager.setOffscreenPageLimit(2);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+
+            private final FloatingActionButton fab = ((MainActivity) getActivity()).getFab();
+            private int diameter;
+            private double circumference;
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+                diameter = fab.getWidth();
+                circumference = (2f * Math.PI * ((float) diameter / 2));
+                switch (position) {
+                    case 0:
+                        fab.setVisibility(View.VISIBLE);
+                        fab.setTranslationX(-positionOffsetPixels);
+                        if (circumference > 0) {
+                            fab.setRotation(-360 * positionOffset * ((float) (rootView.getWidth() / circumference)));
+                        }
+                        break;
+
+                    default:
+                        fab.setVisibility(View.GONE);
+                        break;
+                }
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         final TabLayout tabLayout = rootView.findViewById(R.id.tab_layout);
         tabLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -198,7 +247,7 @@ public class FindPrimesFragment extends Fragment {
         });
 
         //Set up check primality button
-        buttonCheckPrimality = rootView.findViewById(R.id.check_primality_button);
+        final Button buttonCheckPrimality = rootView.findViewById(R.id.check_primality_button);
         buttonCheckPrimality.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -208,38 +257,6 @@ public class FindPrimesFragment extends Fragment {
 
                     //Create a new task
                     final Task task = new CheckPrimalityTask(getPrimalityInput());
-                    /*task.addTaskListener(new TaskListener() {
-                        @Override
-                        public void onTaskStarted() {
-                            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    //Update bottom sheet
-                                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onTaskPaused() {
-
-                        }
-
-                        @Override
-                        public void onTaskResumed() {
-
-                        }
-
-                        @Override
-                        public void onTaskStopped() {
-
-                        }
-
-                        @Override
-                        public void onProgressChanged(float v) {
-
-                        }
-                    });*/
                     taskListFragment.addTask(task);
                     PrimeNumberFinder.getTaskManager().registerTask(task);
 
@@ -247,7 +264,6 @@ public class FindPrimesFragment extends Fragment {
                     task.startOnNewThread();
                     taskListFragment.setSelected(task);
 
-                    //bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                     hideKeyboard(getActivity());
 
                 } else {
@@ -258,7 +274,11 @@ public class FindPrimesFragment extends Fragment {
 
         //Set up range start input
         editTextSearchRangeStart = rootView.findViewById(R.id.search_range_start);
+        editTextSearchRangeStart.setText(numberFormat.format(searchOptions.getStartValue()));
         editTextSearchRangeStart.addTextChangedListener(new TextWatcher() {
+
+            private boolean isDirty = true;
+
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -272,20 +292,28 @@ public class FindPrimesFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable editable) {
 
-                //Check if the number is valid
-                if (isRangeValid()) {
-                    editTextSearchRangeStart.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.accent)));
-                    editTextSearchRangeEnd.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.accent)));
+                if (isDirty) {
 
-                    final String formattedText = NumberFormat.getNumberInstance(Locale.getDefault()).format(getStartValue());
-                    if (!editable.toString().equals(formattedText)) {
-                        editTextSearchRangeStart.setText(formattedText);
+                    //Format text
+                    if (editable.length() > 0) {
+                        final String formattedText = NumberFormat.getNumberInstance(Locale.getDefault()).format(getStartValue());
+                        if (!editable.toString().equals(formattedText)) {
+                            isDirty = false;
+                            editTextSearchRangeStart.setText(formattedText);
+                        }
+                        editTextSearchRangeStart.setSelection(formattedText.length());
                     }
-                    editTextSearchRangeStart.setSelection(formattedText.length());
 
-                } else {
-                    editTextSearchRangeStart.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.red)));
+                    //Check if the number is valid
+                    if (isRangeValid()){
+                        editTextSearchRangeStart.setValid(true);
+                        editTextSearchRangeEnd.setValid(true);
+                    }else if (editTextSearchRangeStart.hasFocus()){
+                        editTextSearchRangeStart.setValid(editTextSearchRangeEnd.getText().length() == 0);
+                    }
+
                 }
+                isDirty = true;
             }
         });
         editTextSearchRangeStart.setOnTouchListener(new View.OnTouchListener() {
@@ -299,7 +327,11 @@ public class FindPrimesFragment extends Fragment {
 
         //Set up range end input
         editTextSearchRangeEnd = rootView.findViewById(R.id.search_range_end);
+        //editTextSearchRangeEnd.requestFocus();
         editTextSearchRangeEnd.addTextChangedListener(new TextWatcher() {
+
+            private boolean isDirty = true;
+
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -313,26 +345,35 @@ public class FindPrimesFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable editable) {
 
-                //Check if the number is valid
-                if (isRangeValid()) {
-                    editTextSearchRangeStart.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.accent)));
-                    editTextSearchRangeEnd.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.accent)));
+                if (isDirty) {
 
-                    if (getEndValue() == FindPrimesTask.INFINITY) {
-                        if (!editable.toString().equals(getString(R.string.infinity_text))) {
-                            editTextSearchRangeEnd.setText(getString(R.string.infinity_text));
+                    //Format text
+                    if (editable.length() > 0) {
+                        if (getEndValue().compareTo(BigInteger.valueOf(FindPrimesTask.INFINITY)) == 0) {
+                            if (!editable.toString().equals(getString(R.string.infinity_text))) {
+                                editTextSearchRangeEnd.setText(getString(R.string.infinity_text));
+                            }
+                            editTextSearchRangeEnd.setSelection(editTextSearchRangeEnd.getText().length());
+                        } else {
+                            final String formattedText = NumberFormat.getNumberInstance(Locale.getDefault()).format(getEndValue());
+                            if (!editable.toString().equals(formattedText)) {
+                                isDirty = false;
+                                editTextSearchRangeEnd.setText(formattedText);
+                            }
+                            editTextSearchRangeEnd.setSelection(formattedText.length());
                         }
-                        editTextSearchRangeEnd.setSelection(editTextSearchRangeEnd.getText().length());
-                    } else {
-                        final String formattedText = NumberFormat.getNumberInstance(Locale.getDefault()).format(getEndValue());
-                        if (!editable.toString().equals(formattedText)) {
-                            editTextSearchRangeEnd.setText(formattedText);
-                        }
-                        editTextSearchRangeEnd.setSelection(formattedText.length());
                     }
-                } else {
-                    editTextSearchRangeEnd.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.red)));
+
+                    //Check if the number is valid
+                    if (isRangeValid()){
+                        editTextSearchRangeStart.setValid(true);
+                        editTextSearchRangeEnd.setValid(true);
+                    }else if (editTextSearchRangeEnd.hasFocus()){
+                        editTextSearchRangeEnd.setValid(editTextSearchRangeStart.getText().length() == 0);
+                    }
+
                 }
+                isDirty = true;
             }
         });
         editTextSearchRangeEnd.setOnTouchListener(new View.OnTouchListener() {
@@ -344,7 +385,7 @@ public class FindPrimesFragment extends Fragment {
         });
 
         //Set up infinity button
-        infinityButton = rootView.findViewById(R.id.infinity_button);
+        final ImageButton infinityButton = rootView.findViewById(R.id.infinity_button);
         infinityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -353,7 +394,7 @@ public class FindPrimesFragment extends Fragment {
         });
 
         //Set up find primes button
-        buttonFindPrimes = rootView.findViewById(R.id.button_find_primes);
+        final Button buttonFindPrimes = rootView.findViewById(R.id.button_find_primes);
         buttonFindPrimes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -362,18 +403,11 @@ public class FindPrimesFragment extends Fragment {
                 if (isRangeValid()) {
 
                     //Create a new task
-                    searchOptions.setStartValue(getStartValue());
-                    searchOptions.setEndValue(getEndValue());
+                    searchOptions.setStartValue(getStartValue().longValue());
+                    searchOptions.setEndValue(getEndValue().longValue());
                     searchOptions.setThreadCount(1);
-                    final Task task = new FindPrimesTask(searchOptions);
-                    taskListFragment.addTask(task);
-                    PrimeNumberFinder.getTaskManager().registerTask(task);
+                    startTask(searchOptions);
 
-                    //Start the task
-                    task.startOnNewThread();
-                    taskListFragment.setSelected(task);
-
-                    //bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                     hideKeyboard(getActivity());
 
                 } else {
@@ -382,152 +416,38 @@ public class FindPrimesFragment extends Fragment {
             }
         });
 
-        //Set up screen-dim view
-        /*final View screenDim = rootView.findViewById(R.id.screenDim);
-        screenDim.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (screenDim.getAlpha() > 0) {
-                    if (event.getAction() == MotionEvent.ACTION_UP) {
-                        //editTextPrimalityInput.clearFocus();
-                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                        Utils.hideKeyboard(getActivity());
-                    }
-                    return true;
-                }
-                return false;
-            }
-        });*/
-
-        //Set up bottom sheet
-        /*final View bottomSheet = rootView.findViewById(R.id.bottom_sheet);
-        bottomSheet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
-                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                }
-            }
-        });
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-        bottomSheetBehavior.setPeekHeight((int) getResources().getDimension(R.dimen.bottom_sheet_peek_height));
-        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-
-            }
-
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                screenDim.setAlpha(Utils.map(slideOffset, 0, 1, 0, 0.7f));
-            }
-        });*/
-
-        //Set up search method
-        /*radioGroupSearchMethod = rootView.findViewById(R.id.radio_group_search_method);
-        radioGroupSearchMethod.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
-                switch (checkedId) {
-
-                    case R.id.brute_force:
-                        searchOptions.setSearchMethod(FindPrimesTask.SearchOptions.Method.BRUTE_FORCE);
-                        editTextSearchRangeStart.setEnabled(true);
-                        infinityButton.setEnabled(true);
-                        infinityButton.setAlpha(1f);
-                        break;
-
-                    case R.id.sieve_of_eratosthenes:
-                        searchOptions.setSearchMethod(FindPrimesTask.SearchOptions.Method.SIEVE_OF_ERATOSTHENES);
-                        editTextSearchRangeStart.setText("0");
-                        editTextSearchRangeStart.setEnabled(false);
-                        if (getEndValue() < 0) {
-                            editTextSearchRangeEnd.setText(NumberFormat.getInstance().format(1000000));
-                        }
-                        infinityButton.setEnabled(false);
-                        infinityButton.setAlpha(0.3f);
-                        break;
-
-                }
-
-                editTextSearchRangeStart.setText(editTextSearchRangeStart.getText());
-                editTextSearchRangeEnd.setText(editTextSearchRangeEnd.getText());
-            }
-        });*/
-
-        //Apply defaults
-        applyDefaults();
-
         return rootView;
     }
-
-    //Utility methods
-
-    private void applyDefaults() {
-
-        //Reset search options
-        searchOptions.setStartValue(0);
-        searchOptions.setEndValue(1000000);
-        searchOptions.setSearchMethod(FindPrimesTask.SearchMethod.BRUTE_FORCE);
-        searchOptions.setMonitorType(FindPrimesTask.SearchOptions.MonitorType.SIMPLE);
-
-        //Reset view states
-        buttonCheckPrimality.setEnabled(true);
-        buttonFindPrimes.setEnabled(true);
-        editTextPrimalityInput.setText("");
-        editTextPrimalityInput.setEnabled(true);
-        editTextSearchRangeStart.setText(NumberFormat.getInstance().format(searchOptions.getStartValue()));
-        editTextSearchRangeEnd.setEnabled(true);
-
-        switch (searchOptions.getSearchMethod()) {
-
-            case BRUTE_FORCE:
-                //radioGroupSearchMethod.check(R.id.brute_force);
-                editTextSearchRangeEnd.setText(getText(R.string.infinity_text));
-                editTextSearchRangeStart.setEnabled(true);
-                break;
-
-            /*case SIEVE_OF_ERATOSTHENES:
-                radioGroupSearchMethod.check(R.id.sieve_of_eratosthenes);
-                editTextSearchRangeEnd.setText(NumberFormat.getInstance().format(searchOptions.getEndValue()));
-                break;*/
-        }
-    }
-
-    //Get inputs
 
     private long getPrimalityInput() {
         final String input = editTextPrimalityInput.getText().toString().trim();
         if (input.length() > 0) {
-            final BigInteger number = new BigInteger(editTextPrimalityInput.getText().toString().replace(",", ""));
+            final BigInteger number = new BigInteger(input.replace(",", ""));
             return number.longValue();
         } else {
             return 0;
         }
     }
 
-    private long getStartValue() {
+    private BigInteger getStartValue() {
         final String input = editTextSearchRangeStart.getText().toString().trim();
         if (input.length() > 0) {
-            final BigInteger number = new BigInteger(editTextSearchRangeStart.getText().toString().replace(",", ""));
-            return number.longValue();
+            return new BigInteger(input.replace(",", ""));
         } else {
-            return 0;
+            return BigInteger.ZERO;
         }
     }
 
-    private long getEndValue() {
+    private BigInteger getEndValue() {
         final String input = editTextSearchRangeEnd.getText().toString().trim();
 
         if (input.length() > 0) {
             if (input.equals("infinity")) {
-                return FindPrimesTask.INFINITY;
+                return BigInteger.valueOf(FindPrimesTask.INFINITY);
             }
-
-            final BigInteger endValue = new BigInteger(editTextSearchRangeEnd.getText().toString().replace(",", ""));
-            return endValue.longValue();
+            return new BigInteger(input.replace(",", ""));
         } else {
-            return 0;
+            return BigInteger.ZERO;
         }
     }
 
@@ -624,7 +544,79 @@ public class FindPrimesFragment extends Fragment {
         return true;
     }
 
-    public void addActionViewListener(final ActionViewListener actionViewListener){
+    public void addActionViewListener(final ActionViewListener actionViewListener) {
         taskListFragment.addActionViewListener(actionViewListener);
+    }
+
+    private static final int REQUEST_CODE_NEW_TASK = 0;
+
+    @Override
+    public void onClick(View view) {
+        final Intent intent = new Intent(getActivity(), FindPrimesConfigurationActivity.class);
+        startActivityForResult(intent, REQUEST_CODE_NEW_TASK);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        switch (requestCode) {
+
+            case REQUEST_CODE_NEW_TASK:
+                if (data != null && data.getExtras() != null) {
+                    final FindPrimesTask.SearchOptions searchOptions = data.getExtras().getParcelable("searchOptions");
+                    final FindPrimesTask task = (FindPrimesTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) data.getExtras().get("taskId"));
+                    Log.d(TAG, "Task: " + task);
+                    if (task == null) {
+                        startTask(searchOptions);
+                    } else {
+                        task.setOptions(searchOptions);
+                    }
+                }
+                break;
+        }
+    }
+
+    private void startTask(final FindPrimesTask.SearchOptions searchOptions) {
+        final FindPrimesTask task = new FindPrimesTask(searchOptions);
+        task.addTaskListener(new TaskAdapter() {
+            @Override
+            public void onTaskStopped() {
+                if (task.getSearchOptions().autoSave) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            final boolean success = FileManager.getInstance().savePrimes(task.getStartValue(), task.getEndValue(), task.getPrimes());
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }).start();
+                }
+
+                if (task.getSearchOptions().notifyWhenFinished) {
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity())
+                            .setSmallIcon(R.drawable.circle_white)
+                            .setContentTitle("Task Finished")
+                            .setContentText("Task \"Primes from " + task.getStartValue() + " to " + task.getEndValue() + "\" finished.");
+                    final NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.notify(0, builder.build());
+                }
+            }
+        });
+        taskListFragment.addTask(task);
+        PrimeNumberFinder.getTaskManager().registerTask(task);
+
+        //Start the task
+        task.startOnNewThread();
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                taskListFragment.setSelected(task);
+            }
+        });
+
     }
 }

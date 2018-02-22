@@ -57,12 +57,6 @@ public abstract class ResultsFragment extends TaskFragment {
         updateUi();
     }
 
-    @Override
-    public void onProgressChanged(float progress) {
-        super.onProgressChanged(progress);
-        requestUiUpdate();
-    }
-
     protected void updateUi(){
         if (isAdded() && !isDetached()){
             handler.post(new Runnable() {

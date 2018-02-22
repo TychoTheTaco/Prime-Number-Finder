@@ -3,6 +3,7 @@ package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,8 +17,10 @@ import android.widget.TextView;
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.TaskListAdapterCallbacks;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
 
@@ -53,7 +56,7 @@ public class FindPrimesTaskListFragment extends Fragment {
      * @param activity
      */
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(final Activity activity) {
         super.onAttach(activity);
         taskListAdapter = new FindPrimesTaskListAdapter(activity);
         while (!eventListenerQueue.isEmpty()) {
@@ -62,6 +65,15 @@ public class FindPrimesTaskListFragment extends Fragment {
         while (!actionViewListenerQueue.isEmpty()) {
             taskListAdapter.addActionViewListener(actionViewListenerQueue.poll());
         }
+        taskListAdapter.addTaskListAdapterCallbacks(new TaskListAdapterCallbacks() {
+            @Override
+            public void onEditClicked(Task task) {
+                final Intent intent = new Intent(activity, FindPrimesConfigurationActivity.class);
+                intent.putExtra("searchOptions", ((FindPrimesTask) task).getSearchOptions());
+                intent.putExtra("taskId", task.getId());
+                getParentFragment().startActivityForResult(intent, 0);
+            }
+        });
     }
 
     @Nullable

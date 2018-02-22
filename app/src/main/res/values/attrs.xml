@@ -5,4 +5,8 @@
         <attr name="minValue" format="float" />
         <attr name="maxValue" format="float" />
     </declare-styleable>
+
+    <declare-styleable name="ValidState">
+        <attr name="valid" format="boolean"/>
+    </declare-styleable>
 </resources>

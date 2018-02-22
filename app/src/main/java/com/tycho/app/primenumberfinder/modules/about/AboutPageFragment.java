@@ -101,6 +101,10 @@ public class AboutPageFragment extends Fragment{
             stringBuilder.append(System.lineSeparator());
         }
 
-        return stringBuilder.substring(0, stringBuilder.length() - 1);
+        if (stringBuilder.length() > 0){
+            return stringBuilder.substring(0, stringBuilder.length() - 1);
+        }else{
+            return "";
+        }
     }
 }

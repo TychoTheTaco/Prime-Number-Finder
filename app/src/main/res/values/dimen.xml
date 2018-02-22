@@ -6,6 +6,7 @@
 
 
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="fab_elevation">6dp</dimen>
 
     <dimen name="stat_view_height">130dp</dimen>
     <dimen name="stat_title_height">40dp</dimen>

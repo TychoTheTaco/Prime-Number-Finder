@@ -8,6 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipChildren="false"
         android:orientation="vertical"
         android:paddingTop="8dp">
 
@@ -26,6 +27,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:orientation="horizontal"
             android:paddingEnd="8dp"
             android:paddingStart="8dp">
@@ -35,8 +38,7 @@
                 style="@style/NumberInput"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="13,257" />
+                android:layout_weight="1" />
 
             <Button
                 android:id="@+id/check_primality_button"
@@ -63,6 +65,8 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
+            android:clipToPadding="false"
+            android:clipChildren="false"
             android:paddingEnd="8dp"
             android:paddingStart="8dp">
 
@@ -70,11 +74,13 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:clipChildren="false"
+                android:clipToPadding="false"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:weightSum="2">
 
-                <EditText
+                <com.tycho.app.primenumberfinder.ValidEditText
                     android:id="@+id/search_range_start"
                     style="@style/NumberInput"
                     android:layout_width="wrap_content"
@@ -87,7 +93,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/to" />
 
-                <EditText
+                <com.tycho.app.primenumberfinder.ValidEditText
                     android:id="@+id/search_range_end"
                     style="@style/NumberInput"
                     android:layout_width="wrap_content"
@@ -101,7 +107,7 @@
                     android:background="@drawable/ripple_clear"
                     android:contentDescription="@string/content_description_infinity_button"
                     android:src="@drawable/ic_infinity_white_24dp"
-                    android:tint="@android:color/black" />
+                    android:tint="@color/infinity_button_tint" />
 
             </LinearLayout>
 
@@ -131,18 +137,5 @@
         </android.support.v4.view.ViewPager>
 
     </LinearLayout>
-
-    <!-- Screen dim -->
-    <!--<View
-        android:id="@+id/screenDim"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:alpha="0"
-        android:background="#000000" />-->
-
-    <!-- Bottom sheet -->
-    <!--<include
-        android:id="@+id/bottom_sheet"
-        layout="@layout/bottom_sheet_primes" />-->
 
 </android.support.design.widget.CoordinatorLayout>

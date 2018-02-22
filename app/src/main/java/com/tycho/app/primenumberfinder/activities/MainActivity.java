@@ -2,12 +2,14 @@ package com.tycho.app.primenumberfinder.activities;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -15,12 +17,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewDebug;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
+import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.modules.about.AboutPageFragment;
 import com.tycho.app.primenumberfinder.settings.SettingsFragment;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
@@ -30,7 +35,9 @@ import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesFr
 import com.tycho.app.primenumberfinder.modules.primefactorization.fragments.PrimeFactorizationFragment;
 import com.tycho.app.primenumberfinder.modules.savedfiles.SavedFilesFragment;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
@@ -68,6 +75,8 @@ public class MainActivity extends AppCompatActivity{
     private Fragment currentFragment;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
+
+    private FloatingActionButton floatingActionButton;
 
     /**
      * Maps drawer item ids to the corresponding fragment tag. The ids and tags are used to find
@@ -110,8 +119,23 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
+        //Set up floating action button
+        floatingActionButton = findViewById(R.id.fab);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentFragment instanceof FloatingActionButtonListener){
+                    ((FloatingActionButtonListener) currentFragment).onClick(v);
+                }
+            }
+        });
+
         //Select the first drawer item
         selectDrawerItem(0);
+    }
+
+    public FloatingActionButton getFab(){
+        return this.floatingActionButton;
     }
 
     @Override
@@ -127,13 +151,8 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
-        //Inflate the menu
         getMenuInflater().inflate(R.menu.main, menu);
-
-        //Assign menu
         this.menu = menu;
-
         return true;
     }
 
@@ -231,6 +250,9 @@ public class MainActivity extends AppCompatActivity{
 
         //Get the new fragment
         currentFragment = getFragment(menuItem.getItemId());
+
+        //Change floating action button visibility
+        floatingActionButton.setVisibility(currentFragment instanceof FloatingActionButtonListener ? View.VISIBLE : View.GONE);
 
         //Add the new fragment if it doesn't exist yet
         if (getFragmentManager().findFragmentByTag(fragmentIds.get(menuItem.getItemId())) == null) {

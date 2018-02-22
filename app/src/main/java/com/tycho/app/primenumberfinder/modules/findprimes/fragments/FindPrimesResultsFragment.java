@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter;
@@ -38,7 +39,7 @@ import easytasks.Task;
  * Created by tycho on 11/16/2017.
  */
 
-public class FindPrimesResultsFragment extends ResultsFragment implements FindPrimesTask.EventListener{
+public class FindPrimesResultsFragment extends ResultsFragment {
 
     /**
      * Tag used for logging and debugging.
@@ -61,6 +62,8 @@ public class FindPrimesResultsFragment extends ResultsFragment implements FindPr
     private int lastAdapterSize = 0;
 
     private boolean errorOccurred = false;
+
+    private final UiUpdater uiUpdater = new UiUpdater();
 
     @Override
     public void onAttach(Activity activity) {
@@ -108,7 +111,7 @@ public class FindPrimesResultsFragment extends ResultsFragment implements FindPr
                         getTask().pause();
                         final File file = new File(getActivity().getFilesDir() + File.separator + "temp");
                         final boolean success = FileManager.getInstance().savePrimes(getTask().getPrimes(), file);
-                        if (!success){
+                        if (!success) {
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -116,7 +119,7 @@ public class FindPrimesResultsFragment extends ResultsFragment implements FindPr
                                 }
                             });
                         }
-                        if (state == Task.State.RUNNING){
+                        if (state == Task.State.RUNNING) {
                             getTask().resume();
                         }
 
@@ -136,7 +139,7 @@ public class FindPrimesResultsFragment extends ResultsFragment implements FindPr
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        final boolean success = FileManager.getInstance().savePrimes(getTask().getStartValue(), getTask().getCurrentValue(), getTask().getPrimes());
+                        final boolean success = FileManager.getInstance().savePrimes(getTask().getStartValue(), getTask().getCurrentValue(), getTask().getSortedPrimes());
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
@@ -155,42 +158,45 @@ public class FindPrimesResultsFragment extends ResultsFragment implements FindPr
         return rootView;
     }
 
-    @Override
-    public void onProgressChanged(float progress) {
-        requestUiUpdate();
-    }
+    private class UiUpdater extends Task {
 
-    @Override
-    public void onPrimeFound(long prime) {
-        requestUiUpdate();
-    }
+        @Override
+        protected void run() {
 
-    @Override
-    public void onErrorOccurred(Object exception) {
-        if (exception instanceof OutOfMemoryError){
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    errorOccurred = true;
-                    Toast.makeText(getActivity(), "Error finding primes!", Toast.LENGTH_LONG).show();
-                    subtitle.setText("Could not allocate enough memory to search for primes up to " + getTask().getEndValue() + ". Please try a smaller number.");
-                    title.setText("Error");
-                    progressBarInfinite.setVisibility(View.GONE);
-                    viewAllButton.setVisibility(View.GONE);
-                    saveButton.setVisibility(View.GONE);
+            while (true) {
+
+                if (getTask() == null || getTask().getState() == State.STOPPED || getTask().getState() == State.PAUSED) pause();
+
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateUi();
+                    }
+                });
+
+                try {
+                    Thread.sleep(1000 / 2);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    break;
                 }
-            });
+
+                tryPause();
+            }
+
+            Log.d(TAG, "Stopped updater");
+
         }
     }
 
     @Override
     protected void onUiUpdate() {
-        if (getTask() != null){
+        if (getTask() != null) {
 
-            if (!errorOccurred && isAdded() && !isDetached()){
+            if (!errorOccurred && isAdded() && !isDetached()) {
 
                 //Update task state
-                switch (getTask().getState()){
+                switch (getTask().getState()) {
                     case RUNNING:
                         title.setText(getString(R.string.status_searching));
                         progressBarInfinite.setVisibility(View.VISIBLE);
@@ -211,15 +217,15 @@ public class FindPrimesResultsFragment extends ResultsFragment implements FindPr
                 }
 
                 //Update progress
-                if (getTask().getEndValue() != FindPrimesTask.INFINITY && getTask().getState() != Task.State.STOPPED){
+                if (getTask().getEndValue() != FindPrimesTask.INFINITY && getTask().getState() != Task.State.STOPPED) {
                     progress.setVisibility(View.VISIBLE);
                     progress.setText(getString(R.string.task_progress, decimalFormat.format(getTask().getProgress() * 100)));
-                }else{
+                } else {
                     progress.setVisibility(View.GONE);
                 }
 
                 //Update recyclerView
-                primesAdapter.setTask(getTask());
+                //primesAdapter.setTask(getTask());
                 primesAdapter.notifyDataSetChanged();
                 recyclerView.scrollToPosition(primesAdapter.getItemCount() - 1);
 
@@ -227,23 +233,23 @@ public class FindPrimesResultsFragment extends ResultsFragment implements FindPr
                 final String count = NumberFormat.getInstance(Locale.getDefault()).format(getTask().getPrimes().size());
                 final String start = NumberFormat.getInstance(Locale.getDefault()).format(getTask().getStartValue());
                 String end = NumberFormat.getInstance(Locale.getDefault()).format(getTask().getEndValue());
-                if (getTask().getEndValue() == FindPrimesTask.INFINITY){
+                if (getTask().getEndValue() == FindPrimesTask.INFINITY) {
                     end = getString(R.string.infinity_text);
                 }
                 final String string = getString(R.string.find_primes_result);
                 final String[] split = string.split("%\\d\\$.");
                 final String[] items = {split[0], count, split[1], start, split[2], end, split[3]};
                 final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-                for (int i = 0; i < items.length; i++){
-                    if (i % 2 != 0){
+                for (int i = 0; i < items.length; i++) {
+                    if (i % 2 != 0) {
                         spannableStringBuilder.append(items[i], new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.purple_dark)), 0);
                         spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), spannableStringBuilder.length() - items[i].length(), spannableStringBuilder.length(), 0);
-                    }else{
+                    } else {
                         spannableStringBuilder.append(items[i]);
                     }
                 }
                 subtitle.setText(spannableStringBuilder);
-            }else{
+            } else {
                 subtitle.setText("Could not allocate enough memory to search for primes up to " + getTask().getEndValue() + ". Please try a smaller number.");
             }
         }
@@ -256,30 +262,24 @@ public class FindPrimesResultsFragment extends ResultsFragment implements FindPr
 
     @Override
     public void setTask(final Task task) {
-
-        //Remove task listener from previous task
-        if (getTask() != null){
-            if (!getTask().removeEventListener(this)){
-                Log.d(TAG, "Failed to remove event listener!");
-            }
-        }
-
         super.setTask(task);
-
-        //Add task listener to new task
-        if (getTask() != null){
-            getTask().addEventListener(this);
-        }
 
         try {
             init();
-        }catch (NullPointerException e){}
+        } catch (NullPointerException e) {
+        }
 
         updateUi();
     }
 
-    private void init(){
-        if (getTask() != null){
+    private void init() {
+        if (getTask() != null) {
+
+            if (uiUpdater.getState() == Task.State.NOT_STARTED){
+                uiUpdater.startOnNewThread();
+            }else{
+                uiUpdater.resume();
+            }
 
             //Make sure view is visible
             resultsView.setVisibility(View.VISIBLE);
@@ -289,7 +289,8 @@ public class FindPrimesResultsFragment extends ResultsFragment implements FindPr
             primesAdapter.notifyDataSetChanged();
             recyclerView.scrollToPosition(primesAdapter.getItemCount() - 1);
 
-        }else{
+        } else {
+            uiUpdater.pause();
             resultsView.setVisibility(View.GONE);
             noTaskView.setVisibility(View.VISIBLE);
         }

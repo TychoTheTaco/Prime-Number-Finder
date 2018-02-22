@@ -1,14 +1,20 @@
 package com.tycho.app.primenumberfinder.modules.findprimes;
 
+import android.content.res.TypedArray;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
+import android.widget.EditText;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import easytasks.MultithreadedTask;
 import easytasks.Task;
 import easytasks.TaskAdapter;
+import simpletrees.Tree;
 
 public class FindPrimesTask extends MultithreadedTask {
 
@@ -43,6 +49,10 @@ public class FindPrimesTask extends MultithreadedTask {
     private static final int SINCE_LAST = 1;
     private static final int LAST_UPDATE_TIME = 2;
 
+    private final List<Long> primes = new ArrayList<>();
+
+    private SearchOptions searchOptions;
+
     /**
      * Create a new {@linkplain FindPrimesTask}.
      *
@@ -59,14 +69,17 @@ public class FindPrimesTask extends MultithreadedTask {
 
     public FindPrimesTask(final SearchOptions searchOptions) {
         this(searchOptions.getStartValue(), searchOptions.getEndValue(), searchOptions.getThreadCount(), searchOptions.getSearchMethod());
+        this.searchOptions = searchOptions;
+    }
+
+    public SearchOptions getSearchOptions(){
+        return this.searchOptions;
     }
 
     @Override
     protected void run() {
 
-        //Start worker threads
-        //System.out.println("Starting " + threadCount + " threads...");
-
+        //Create worker tasks
         for (int i = 0; i < threadCount; i++) {
             long s = startValue + (2 * i + 1);
             if (s % 2 == 0)
@@ -92,26 +105,21 @@ public class FindPrimesTask extends MultithreadedTask {
                 public void onTaskStopped() {
                     System.out.println("Thread " + task.startValue + " finished.");
                 }
-
-                @Override
-                public void onProgressChanged(float v) {
-
-                }
             });
             addTask(task);
         }
 
         executeTasks();
 
-        /*System.out.println("All threads stopped.");
+        System.out.println("All threads stopped.");
         long time = 0;
         for (Task task : getTasks()) {
             time += task.getElapsedTime();
-            System.out.println("Task " + ((BruteForceTask) task).startValue + "\n    " + ((BruteForceTask) task).primes.size() + " primes\n    "
+            System.out.println("Task " + ((BruteForceTask) task).startValue + "\n    " /*+ ((BruteForceTask) task).primes.size() + " primes\n    "*/
                     + task.getElapsedTime() + " milliseconds\n    " + ((BruteForceTask) task).totalDistance + " distance");
         }
         System.out.println("Average time: " + (time / getTasks().size()) + " milliseconds.");
-        System.out.println("Elapsed time: " + getElapsedTime() + " milliseconds.");*/
+        System.out.println("Elapsed time: " + getElapsedTime() + " milliseconds.");
     }
 
     /**
@@ -135,16 +143,47 @@ public class FindPrimesTask extends MultithreadedTask {
         return startValue;
     }
 
-    //final List<Long> primes = new ArrayList<>();
+    private int lastSortIndex = 0;
 
-    public List<Long> getPrimes() {
-        final List<Long> primes = new ArrayList<>();
-        for (Task task : getTasks()) {
-            primes.addAll(((BruteForceTask) task).getPrimes());
+    private final Object SORT_LOCK = new Object();
+
+    public List<Long> getSortedPrimes(){
+        Log.d("FPT", "Beginning sort at index " + lastSortIndex);
+
+        final int size = primes.size();
+        for (int i = lastSortIndex; i < size; i++) {
+            int swapIndex = -1;
+            long smallest = primes.get(i);
+            for (int k = i + 1; k < size; k++) {
+                final long item = primes.get(k);
+                if (item < smallest) {
+                    smallest = item;
+                    swapIndex = k;
+                }
+            }
+
+            if (swapIndex != -1) {
+                final long temp = primes.get(i);
+                primes.set(i, smallest);
+                primes.set(swapIndex, temp);
+            }
         }
+        lastSortIndex = size;
+
+        Log.d("FPT", "Finished sort until index " + size);
+
         return primes;
     }
 
+    public List<Long> getPrimes() {
+        return this.primes;
+    }
+
+    /**
+     * Finds and returns the lowest number that is currently being checked or has already been checked for primality. If there is more than one thread, this will return the lowest {@linkplain BruteForceTask#currentNumber} out of all threads.
+     *
+     * @return The lowest {@linkplain BruteForceTask#currentNumber}.
+     */
     public long getCurrentValue() {
         if (getTasks().size() == 0) return 0;
         long lowest = ((BruteForceTask) getTasks().get(0)).getCurrentValue();
@@ -154,6 +193,10 @@ public class FindPrimesTask extends MultithreadedTask {
             }
         }
         return lowest;
+    }
+
+    public void setOptions(final SearchOptions searchOptions){
+        this.searchOptions = searchOptions;
     }
 
     private class BruteForceTask extends MultithreadedTask.SubTask {
@@ -172,7 +215,7 @@ public class FindPrimesTask extends MultithreadedTask {
 
         private final int increment;
 
-        public final List<Long> primes = new ArrayList<>();
+        //public final List<Long> primes = new ArrayList<>();
 
         private int totalDistance = 0;
 
@@ -217,7 +260,7 @@ public class FindPrimesTask extends MultithreadedTask {
                         isPrime = true;
 
 						/*
-						 * Check if the number is divisible by every odd number below it's square root.
+                         * Check if the number is divisible by every odd number below it's square root.
 						 */
                         for (int i = 3; i <= sqrtMax; i += 2) {
 
@@ -263,31 +306,19 @@ public class FindPrimesTask extends MultithreadedTask {
         }
 
         private void dispatchPrimeFound(final long number) {
-            primes.add(number);
-            sendOnPrimeFound(number);
+            synchronized (SORT_LOCK) {
+                primes.add(number);
+            }
         }
 
-        public List<Long> getPrimes() {
+       /* public List<Long> getPrimes() {
             return this.primes;
-        }
+        }*/
 
     }
 
     // Android
 
-    private final List<EventListener> eventListeners = new CopyOnWriteArrayList<>();
-
-    public interface EventListener {
-        void onPrimeFound(final long prime);
-
-        void onErrorOccurred(final Object error);
-    }
-
-    private void sendOnPrimeFound(final long prime) {
-        for (int i = 0; i < eventListeners.size(); i++) {
-            eventListeners.get(i).onPrimeFound(prime);
-        }
-    }
 
     public long getPrimesPerSecond() {
         return 0;
@@ -297,15 +328,7 @@ public class FindPrimesTask extends MultithreadedTask {
         return 0;
     }
 
-    public void addEventListener(final EventListener eventListener) {
-        if (!eventListeners.contains(eventListener)) eventListeners.add(eventListener);
-    }
-
-    public boolean removeEventListener(final EventListener eventListener) {
-        return eventListeners.remove(eventListener);
-    }
-
-    public static class SearchOptions {
+    public static class SearchOptions implements Parcelable {
 
         /**
          * The value to start the search from. Inclusive.
@@ -317,31 +340,78 @@ public class FindPrimesTask extends MultithreadedTask {
          */
         private long endValue;
 
-        public enum MonitorType {
-            NONE,
-            SIMPLE,
-            ADVANCED
-        }
-
         /**
          * The search method to use.
          */
         private SearchMethod searchMethod;
 
-        private MonitorType monitorType;
-
+        /**
+         * The number of threads to use. This is ignored if the search method is {@linkplain SearchMethod#SIEVE_OF_ERATOSTHENES}.
+         */
         private int threadCount;
 
-        public SearchOptions(final long startValue, final long endValue, final SearchMethod searchMethod, final MonitorType monitorType) {
+        /**
+         * Show a notification when the task is finished.
+         */
+        public boolean notifyWhenFinished;
+
+        /**
+         * Automatically save the results of this task.
+         */
+        public boolean autoSave;
+
+        public SearchOptions(final long startValue, final long endValue, final SearchMethod searchMethod, final int threadCount, final boolean notifyWhenFinished, final boolean autoSave) {
             this.startValue = startValue;
             this.endValue = endValue;
             this.searchMethod = searchMethod;
-            this.monitorType = monitorType;
+            this.threadCount = threadCount;
+            this.notifyWhenFinished = notifyWhenFinished;
+            this.autoSave = autoSave;
         }
 
-        public SearchOptions(final long startValue, final long endValue, final SearchMethod searchMethod, final MonitorType monitorType, final int threadCount) {
-            this(startValue, endValue, searchMethod, monitorType);
-            this.threadCount = threadCount;
+        public SearchOptions(final long startValue, final long endValue, final SearchMethod searchMethod, final int threadCount) {
+            this(startValue, endValue, searchMethod, threadCount, false, false);
+        }
+
+        public SearchOptions(final long startValue, final long endValue){
+            this(startValue, endValue, SearchMethod.BRUTE_FORCE, 1, false, false);
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeLong(this.startValue);
+            dest.writeLong(this.endValue);
+            dest.writeSerializable(this.searchMethod);
+            dest.writeInt(this.threadCount);
+            dest.writeInt(this.notifyWhenFinished ? 1 : 0);
+            dest.writeInt(this.autoSave ? 1 : 0);
+        }
+
+        public static final Parcelable.Creator<SearchOptions> CREATOR  = new Parcelable.Creator<SearchOptions>() {
+
+            @Override
+            public SearchOptions createFromParcel(Parcel in) {
+                return new SearchOptions(in);
+            }
+
+            @Override
+            public SearchOptions[] newArray(int size) {
+                return new SearchOptions[size];
+            }
+        };
+
+        private SearchOptions(final Parcel parcel) {
+            this.startValue = parcel.readLong();
+            this.endValue = parcel.readLong();
+            this.searchMethod = (SearchMethod) parcel.readSerializable();
+            this.threadCount = parcel.readInt();
+            this.notifyWhenFinished = parcel.readInt() == 1;
+            this.autoSave = parcel.readInt() == 1;
         }
 
         public long getStartValue() {
@@ -366,14 +436,6 @@ public class FindPrimesTask extends MultithreadedTask {
 
         public void setSearchMethod(SearchMethod searchMethod) {
             this.searchMethod = searchMethod;
-        }
-
-        public MonitorType getMonitorType() {
-            return monitorType;
-        }
-
-        public void setMonitorType(MonitorType monitorType) {
-            this.monitorType = monitorType;
         }
 
         public int getThreadCount() {

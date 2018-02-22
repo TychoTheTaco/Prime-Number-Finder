@@ -163,13 +163,15 @@ public final class FileManager {
 
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
 
-            final long lastNumber = numbers.get(numbers.size() - 1);
+            if (numbers.size() > 0){
+                final long lastNumber = numbers.get(numbers.size() - 1);
 
-            for (long number : numbers){
-                bufferedWriter.write(String.valueOf(number));
+                for (long number : numbers){
+                    bufferedWriter.write(String.valueOf(number));
 
-                if (number != lastNumber) {
-                    bufferedWriter.write(LIST_ITEM_SEPARATOR);
+                    if (number != lastNumber) {
+                        bufferedWriter.write(LIST_ITEM_SEPARATOR);
+                    }
                 }
             }
 

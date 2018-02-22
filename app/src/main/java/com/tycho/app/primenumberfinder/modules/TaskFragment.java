@@ -69,11 +69,6 @@ public abstract class TaskFragment extends Fragment implements TaskListener {
 
     }
 
-    @Override
-    public void onProgressChanged(float progress) {
-
-    }
-
     //Getters and setters
 
     public Task getTask(){

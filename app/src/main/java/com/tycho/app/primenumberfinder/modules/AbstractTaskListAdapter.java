@@ -10,18 +10,17 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
-import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import easytasks.Task;
 import easytasks.TaskAdapter;
-import easytasks.TaskListener;
 
 
 /**
@@ -111,21 +110,6 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
                             }
                         }
                     });
-                }
-
-                @Override
-                public void onProgressChanged(float v){
-                    if (System.currentTimeMillis() - lastUiUpdateTime >= PrimeNumberFinder.UPDATE_LIMIT_MS * 2){
-                        handler.post(new Runnable(){
-                            @Override
-                            public void run(){
-                                if (holder != null){
-                                    notifyItemChanged(holder.getAdapterPosition());
-                                }
-                            }
-                        });
-                        lastUiUpdateTime = System.currentTimeMillis();
-                    }
                 }
             };
             task.addTaskListener(customTaskEventListener);
@@ -286,6 +270,51 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
                     sendOnDeletePressed(task);
                 }
             });
+
+            new UiUpdater(this).startOnNewThread();
+        }
+    }
+
+    protected void onUpdate(final AbstractTaskListItemViewHolder viewHolder){
+        notifyItemChanged(viewHolder.getAdapterPosition());
+    }
+
+    private class UiUpdater extends Task{
+
+        private final AbstractTaskListItemViewHolder viewHolder;
+
+        public UiUpdater(final AbstractTaskListItemViewHolder viewHolder){
+            this.viewHolder = viewHolder;
+        }
+
+        @Override
+        protected void run() {
+
+            while(true){
+
+                if (viewHolder.getAdapterPosition() != -1){
+
+                    final Task task = tasks.get(viewHolder.getAdapterPosition());
+                    if (task.getState() ==  State.STOPPED) break;
+
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            onUpdate(viewHolder);
+                        }
+                    });
+                }
+
+                try {
+                    Thread.sleep(1000 / 2);
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                    break;
+                }
+            }
+
+            Log.d(TAG, "Stopped updater");
+
         }
     }
 
@@ -307,8 +336,16 @@ public abstract class AbstractTaskListAdapter<T extends RecyclerView.ViewHolder>
         }
 
         for (ActionViewListener actionViewListener : this.actionViewListeners){
-            Log.d(TAG, "Sending active: " + active);
             actionViewListener.onTaskStatesChanged(active);
         }
+    }
+
+    public Task getTaskById(final UUID id){
+        for (Task task : tasks){
+            if (task.getId().equals(id)){
+                return task;
+            }
+        }
+        return null;
     }
 }
