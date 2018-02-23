@@ -34,6 +34,8 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import easytasks.Task;
+import easytasks.TaskAdapter;
+import easytasks.TaskListener;
 
 /**
  * Created by tycho on 11/16/2017.
@@ -165,7 +167,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
             while (true) {
 
-                if (getTask() == null || getTask().getState() == State.STOPPED || getTask().getState() == State.PAUSED) pause();
+                if (getTask() == null) pause();
 
                 handler.post(new Runnable() {
                     @Override
@@ -260,13 +262,40 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         return (FindPrimesTask) super.getTask();
     }
 
+    private final TaskListener taskListener = new TaskAdapter(){
+        @Override
+        public void onTaskPaused() {
+            uiUpdater.pause();
+        }
+
+        @Override
+        public void onTaskResumed() {
+            uiUpdater.resume();
+        }
+
+        @Override
+        public void onTaskStopped() {
+            uiUpdater.pause();
+        }
+    };
+
     @Override
     public void setTask(final Task task) {
+
+        if (getTask() != null){
+            getTask().removeTaskListener(taskListener);
+        }
+
         super.setTask(task);
+
+        if (getTask() != null){
+            getTask().addTaskListener(taskListener);
+        }
 
         try {
             init();
         } catch (NullPointerException e) {
+            e.printStackTrace();
         }
 
         updateUi();

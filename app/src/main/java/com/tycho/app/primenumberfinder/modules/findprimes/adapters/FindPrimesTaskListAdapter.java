@@ -1,32 +1,20 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.adapters;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.TextView;
 
-import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.TaskListAdapterCallbacks;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesFragment;
-import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayFactorsActivity;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -81,6 +69,7 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
                 holder.state.setText(context.getString(R.string.status_searching));
                 holder.pauseButton.setVisibility(View.VISIBLE);
                 holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                holder.editButton.setVisibility(View.VISIBLE);
                 holder.editButton.setEnabled(false);
                 holder.deleteButton.setEnabled(false);
                 break;
@@ -113,14 +102,16 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
     }
 
     @Override
-    protected void onUpdate(AbstractTaskListItemViewHolder viewHolder) {
+    protected void onUpdate(AbstractTaskListAdapter.ViewHolder viewHolder) {
         //Set progress
-        final Task task = tasks.get(viewHolder.getAdapterPosition());
-        if (task.getState() == Task.State.STOPPED || task instanceof FindPrimesTask && ((FindPrimesTask) task).getEndValue() == FindPrimesTask.INFINITY){
-            viewHolder.progress.setVisibility(View.GONE);
-        }else if (task.getState() != Task.State.STOPPED){
-            viewHolder.progress.setVisibility(View.VISIBLE);
-            viewHolder.progress.setText(context.getString(R.string.task_progress, decimalFormat.format(task.getProgress() * 100)));
+        if (viewHolder.getAdapterPosition() != -1){
+            final Task task = tasks.get(viewHolder.getAdapterPosition());
+            if (task.getState() == Task.State.STOPPED || task instanceof FindPrimesTask && ((FindPrimesTask) task).getEndValue() == FindPrimesTask.INFINITY){
+                viewHolder.progress.setVisibility(View.GONE);
+            }else if (task.getState() != Task.State.STOPPED){
+                viewHolder.progress.setVisibility(View.VISIBLE);
+                viewHolder.progress.setText(context.getString(R.string.task_progress, decimalFormat.format(task.getProgress() * 100)));
+            }
         }
     }
 
@@ -129,7 +120,7 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
         return tasks.size();
     }
 
-    class ViewHolder extends AbstractTaskListAdapter.AbstractTaskListItemViewHolder{
+    class ViewHolder extends AbstractTaskListAdapter.ViewHolder {
 
         private final ImageButton editButton;
 

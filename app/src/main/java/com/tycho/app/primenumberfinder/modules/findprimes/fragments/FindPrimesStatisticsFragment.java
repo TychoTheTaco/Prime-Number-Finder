@@ -256,8 +256,6 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
 
         private StatisticData statisticData = new StatisticData();
 
-        private long lastUpdate;
-
         private long lastCurrentNumber = 0;
         private int lastPrimeCount = 0;
         private long lastUpdateTime = 0;
@@ -281,6 +279,7 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
 
                         //Update statistics
                         if (System.currentTimeMillis() - lastUpdateTime >= 1000){
+                            statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
                             statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getCurrentValue() - lastCurrentNumber);
                             statisticData.put(Statistic.PRIMES_PER_SECOND, getTask().getPrimes().size() - lastPrimeCount);
                             lastCurrentNumber = getTask().getCurrentValue();
@@ -288,10 +287,6 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
                             lastUpdateTime = System.currentTimeMillis();
                         }
 
-                        if (System.currentTimeMillis() - lastUpdate >= 1000){
-                            statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
-                            lastUpdate = System.currentTimeMillis();
-                        }
                     }catch (JSONException e){
                         e.printStackTrace();
                     }
