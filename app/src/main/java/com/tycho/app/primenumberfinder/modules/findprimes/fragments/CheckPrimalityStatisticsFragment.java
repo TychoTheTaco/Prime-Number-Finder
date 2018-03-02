@@ -149,10 +149,12 @@ public class CheckPrimalityStatisticsFragment extends StatisticsFragment{
                         Log.d(TAG, "UI updater stopped");
                     }
                 });
-                uiUpdater.startOnNewThread();
+                uiUpdater.startOnNewThread(); //TODO: This is not guaranteed to start the thread immediately, maybe we need another "starting" state or block until started
             } else {
                 uiUpdater.resume();
             }
+
+            Log.d(TAG, "Init state: " + getTask().getState());
 
             switch (getTask().getState()){
                 case RUNNING:
@@ -160,9 +162,6 @@ public class CheckPrimalityStatisticsFragment extends StatisticsFragment{
                     break;
 
                 case PAUSED:
-                    uiUpdater.pause();
-                    break;
-
                 case STOPPED:
                     uiUpdater.pause();
                     break;
@@ -186,7 +185,7 @@ public class CheckPrimalityStatisticsFragment extends StatisticsFragment{
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        uiUpdater.stop();
+        uiUpdater.pause();
         if (getTask() != null){
             try {
                 final StatisticData statisticData = new StatisticData();

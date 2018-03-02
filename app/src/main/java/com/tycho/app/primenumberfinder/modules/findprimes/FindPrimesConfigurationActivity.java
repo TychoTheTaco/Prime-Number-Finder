@@ -1,11 +1,13 @@
 package com.tycho.app.primenumberfinder.modules.findprimes;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -14,10 +16,12 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -26,12 +30,14 @@ import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.CustomRadioGroup;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.ValidEditText;
+import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 
 import java.math.BigInteger;
 import java.text.NumberFormat;
@@ -212,6 +218,7 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
                         editTextSearchRangeStart.setEnabled(true);
                         infinityButton.setEnabled(true);
                         infinityButton.setAlpha(1f);
+                        threadCountSpinner.setEnabled(true);
                         break;
 
                     case R.id.sieve_of_eratosthenes:
@@ -223,6 +230,7 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
                         }
                         infinityButton.setEnabled(false);
                         infinityButton.setAlpha(0.3f);
+                        threadCountSpinner.setEnabled(false);
                         break;
 
                 }
@@ -235,7 +243,7 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
         for (int i = 0; i < items.length; i++) {
             items[i] = String.valueOf(i + 1);
         }
-        threadCountSpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items));
+        threadCountSpinner.setAdapter(new ThreadCountAdapter(this, items));
 
         notifyWhenFinishedCheckbox = findViewById(R.id.notify_when_finished);
         autoSaveCheckbox = findViewById(R.id.auto_save);
@@ -266,6 +274,28 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
             }
         }catch (NullPointerException e){
             e.printStackTrace();
+        }
+    }
+
+    class ThreadCountAdapter extends ArrayAdapter<String>{
+
+        private final LayoutInflater layoutInflater;
+
+        private final String[] items;
+
+        public ThreadCountAdapter(final Context context, final String[] items){
+            super(context, R.layout.thread_count_list_item, R.id.text, items);
+            layoutInflater = getLayoutInflater();
+            this.items = items;
+        }
+
+        @Override
+        public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            if (convertView == null){
+                convertView = layoutInflater.inflate(R.layout.thread_count_list_item, parent, false);
+            }
+            ((TextView) convertView.findViewById(R.id.text)).setText(items[position]);
+            return convertView;
         }
     }
 
@@ -373,6 +403,11 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
 
                     //The end value cannot be infinity
                     if (endValue.compareTo(BigInteger.valueOf(FindPrimesTask.INFINITY)) == 0) {
+                        return false;
+                    }
+
+                    //The end value cannot larger than an int
+                    if (endValue.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) == 1) {
                         return false;
                     }
 

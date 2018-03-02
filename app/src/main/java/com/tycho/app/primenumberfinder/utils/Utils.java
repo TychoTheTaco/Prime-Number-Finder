@@ -7,6 +7,8 @@ import android.util.TypedValue;
 import android.view.inputmethod.InputMethodManager;
 
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 /**

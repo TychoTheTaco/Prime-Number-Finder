@@ -12,6 +12,7 @@ import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
+import java.security.PublicKey;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ public class PrimesAdapter extends RecyclerView.Adapter<PrimesAdapter.ViewHolder
     /**
      * List of prime numbers in this adapter.
      */
-    private List<Long> primes = new ArrayList<>();
+    private final List<Long> primes = new ArrayList<>();
 
     /**
      * {@linkplain NumberFormat} used for formatting numbers.
@@ -51,7 +52,9 @@ public class PrimesAdapter extends RecyclerView.Adapter<PrimesAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.number.setText(numberFormat.format(primes.get(position)));
+        try {
+            holder.number.setText(numberFormat.format(primes.get(position)));
+        }catch (IndexOutOfBoundsException e){}
     }
 
     @Override
@@ -59,17 +62,8 @@ public class PrimesAdapter extends RecyclerView.Adapter<PrimesAdapter.ViewHolder
         return primes.size();
     }
 
-    /**
-     * Set the task that the adapter should get its prime numbers from. The task keeps the original list, and this adapter will keep a reference to it.
-     *
-     * @param task
-     */
-    public void setTask(FindPrimesTask task) {
-        if (task == null) {
-            primes = new ArrayList<>();
-        }else{
-            this.primes = task.getPrimes();
-        }
+    public void add(final long number){
+        this.primes.add(number);
     }
 
     public List<Long> getPrimes() {

@@ -42,6 +42,7 @@ import com.tycho.app.primenumberfinder.utils.FileManager;
 import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Random;
 import java.util.UUID;
 
 import easytasks.Task;
@@ -207,6 +208,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
         //Set up number input
         editTextPrimalityInput = rootView.findViewById(R.id.primality_input);
+        editTextPrimalityInput.setHint(numberFormat.format(new Random().nextInt(1000000)));
         editTextPrimalityInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -275,6 +277,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         //Set up range start input
         editTextSearchRangeStart = rootView.findViewById(R.id.search_range_start);
         editTextSearchRangeStart.setText(numberFormat.format(searchOptions.getStartValue()));
+        editTextSearchRangeStart.setHint(numberFormat.format(0));
         editTextSearchRangeStart.addTextChangedListener(new TextWatcher() {
 
             private boolean isDirty = true;
@@ -327,7 +330,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
         //Set up range end input
         editTextSearchRangeEnd = rootView.findViewById(R.id.search_range_end);
-        //editTextSearchRangeEnd.requestFocus();
+        editTextSearchRangeEnd.setHint(numberFormat.format(Integer.valueOf(editTextSearchRangeStart.getHint().toString().replace(",", "")) + new Random().nextInt(1000000)));
         editTextSearchRangeEnd.addTextChangedListener(new TextWatcher() {
 
             private boolean isDirty = true;
@@ -577,7 +580,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
     }
 
     private void startTask(final FindPrimesTask.SearchOptions searchOptions) {
-        final FindPrimesTask task = new FindPrimesTask(searchOptions);
+        final FindPrimesTask task = new FindPrimesTask(searchOptions, getActivity());
         task.addTaskListener(new TaskAdapter() {
             @Override
             public void onTaskStopped() {
@@ -585,7 +588,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            final boolean success = FileManager.getInstance().savePrimes(task.getStartValue(), task.getEndValue(), task.getPrimes());
+                            final boolean success = FileManager.getInstance().savePrimes(task.getStartValue(), task.getEndValue(), task.getSortedPrimes());
                             new Handler(Looper.getMainLooper()).post(new Runnable() {
                                 @Override
                                 public void run() {

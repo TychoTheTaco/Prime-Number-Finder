@@ -62,6 +62,7 @@ public class FindFactorsStatisticsFragment extends TaskFragment {
     }
 
     public void updateData(StatisticData statisticData){
+        Log.d(TAG, "updateData " + getView());
         if (getView() != null){
             setTimeElapsed(statisticData.optLong(Statistic.TIME_ELAPSED));
             textViewNumbersPerSecond.setText(NumberFormat.getInstance().format(statisticData.optInt(Statistic.NUMBERS_PER_SECOND)));

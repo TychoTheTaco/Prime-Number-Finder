@@ -1,5 +1,7 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -55,6 +57,8 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
     private TextView textViewNumbersPerSecond;
     private TextView textViewPrimesPerSecond;
 
+    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
+
     private final UiUpdater uiUpdater = new UiUpdater();
 
     @Nullable
@@ -81,9 +85,10 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
 
     public void updateData(final StatisticData statisticData){
         if (getView() != null){
+            Log.d(TAG, "updateData " + getView());
             setTimeElapsed(statisticData.optLong(Statistic.TIME_ELAPSED));
-            textViewNumbersPerSecond.setText(NumberFormat.getInstance().format(statisticData.optInt(Statistic.NUMBERS_PER_SECOND)));
-            textViewPrimesPerSecond.setText(NumberFormat.getInstance().format(statisticData.optInt(Statistic.PRIMES_PER_SECOND)));
+            textViewNumbersPerSecond.setText(NUMBER_FORMAT.format(statisticData.optInt(Statistic.NUMBERS_PER_SECOND)));
+            textViewPrimesPerSecond.setText(NUMBER_FORMAT.format(statisticData.optInt(Statistic.PRIMES_PER_SECOND)));
 
             //Display estimated time remaining
             final String string = formatTime(statisticData.optLong(Statistic.ESTIMATED_TIME_REMAINING));
@@ -173,8 +178,6 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
             final StatisticData statisticData = new StatisticData();
             try {
                 statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
-                statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getNumbersPerSecond());
-                statisticData.put(Statistic.PRIMES_PER_SECOND, getTask().getPrimesPerSecond());
                 statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
             }catch (JSONException e){
                 e.printStackTrace();
@@ -281,9 +284,9 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
                         if (System.currentTimeMillis() - lastUpdateTime >= 1000){
                             statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
                             statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getCurrentValue() - lastCurrentNumber);
-                            statisticData.put(Statistic.PRIMES_PER_SECOND, getTask().getPrimes().size() - lastPrimeCount);
+                            statisticData.put(Statistic.PRIMES_PER_SECOND, getTask().getPrimeCount() - lastPrimeCount);
                             lastCurrentNumber = getTask().getCurrentValue();
-                            lastPrimeCount = getTask().getPrimes().size();
+                            lastPrimeCount = getTask().getPrimeCount();
                             lastUpdateTime = System.currentTimeMillis();
                         }
 

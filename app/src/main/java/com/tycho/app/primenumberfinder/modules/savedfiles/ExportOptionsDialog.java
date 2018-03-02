@@ -97,16 +97,20 @@ public class ExportOptionsDialog extends Dialog {
                 dismiss();
 
                 //Convert the file to the requested format
-                final File output = FileManager.getInstance().convert(file, fileNameInput.getText().toString().trim() + ".txt", separator);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final File output = FileManager.getInstance().convert(file, fileNameInput.getText().toString().trim() + ".txt", separator);
+                        progressDialog.dismiss();
 
-                progressDialog.dismiss();
-
-                final Uri path = FileProvider.getUriForFile(context, "com.tycho.app.primenumberfinder", output);
-                final Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.putExtra(Intent.EXTRA_STREAM, path);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent.setType("text/plain");
-                context.startActivity(intent);
+                        final Uri path = FileProvider.getUriForFile(context, "com.tycho.app.primenumberfinder", output);
+                        final Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.putExtra(Intent.EXTRA_STREAM, path);
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        intent.setType("text/plain");
+                        context.startActivity(intent);
+                    }
+                }).start();
             }
         });
     }

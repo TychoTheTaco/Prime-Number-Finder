@@ -5,6 +5,7 @@
     <application
         android:name=".PrimeNumberFinder"
         android:allowBackup="false"
+        android:largeHeap="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Default.NoActionBar">

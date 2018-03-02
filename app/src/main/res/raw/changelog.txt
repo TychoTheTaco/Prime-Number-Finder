@@ -58,3 +58,17 @@
 - Improved 'About' page
 - Fixed a bug that sometimes caused the 'Find Primes' statistics page to show incorrect data
 - Fixed a bug that sometimes caused the application to freeze when deleting a task
+
+??/??/2018 > Prime Number Finder version 1.3.0
+- Factor tree performance improvements
++ Many export options added for factor trees
+	- Image background color
+	- Vertical item spacing
+	- Branch color
+	- Branch width
+	- Item text color
+	- Item text size
+	- Item background color
+	- Item border color
+	- Item border width
+	- Prime factor text color

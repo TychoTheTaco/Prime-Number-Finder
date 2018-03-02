@@ -22,7 +22,7 @@ public abstract class ResultsFragment extends TaskFragment {
      */
     private static final String TAG = "ResultsFragment";
 
-    protected final DecimalFormat decimalFormat = new DecimalFormat("##0.00");
+    protected static final DecimalFormat decimalFormat = new DecimalFormat("##0.00");
 
     /**
      * The last time in milliseconds that the UI was updated.

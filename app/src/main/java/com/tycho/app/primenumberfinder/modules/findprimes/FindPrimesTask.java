@@ -1,32 +1,58 @@
 package com.tycho.app.primenumberfinder.modules.findprimes;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.TextView;
 
+import com.tycho.app.primenumberfinder.utils.FileManager;
+
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import easytasks.MultithreadedTask;
 import easytasks.Task;
 import easytasks.TaskAdapter;
+import easytasks.TaskListener;
 import simpletrees.Tree;
 
+import static com.tycho.app.primenumberfinder.utils.FileManager.EXTENSION;
+
 public class FindPrimesTask extends MultithreadedTask {
+
+    /**
+     * Tag used for logging and debugging.
+     */
+    private static final String TAG = "FindPrimesTask";
 
     public static final int INFINITY = -1;
 
     /**
-     * The starting value of the search. (inclusive).
+     * The starting value of the search range. (inclusive).
      */
     private final long startValue;
 
     /**
-     * The ending value of the search. (inclusive).
+     * The ending value of the search range. (inclusive).
      */
     private long endValue;
 
@@ -42,16 +68,13 @@ public class FindPrimesTask extends MultithreadedTask {
 
     private SearchMethod searchMethod;
 
-    private long[][] statistics = new long[2][3];
-    private static final int NUMBERS_PER_SECOND = 0;
-    private static final int PRIMES_PER_SECOND = 1;
-    private static final int CURRENT_VALUE = 0;
-    private static final int SINCE_LAST = 1;
-    private static final int LAST_UPDATE_TIME = 2;
+    //private List<Long> primes = new ArrayList<>();
 
-    private final List<Long> primes = new ArrayList<>();
+    private int primeCount = 0;
 
     private SearchOptions searchOptions;
+
+    private Context context;
 
     /**
      * Create a new {@linkplain FindPrimesTask}.
@@ -65,20 +88,34 @@ public class FindPrimesTask extends MultithreadedTask {
         this.endValue = endValue;
         this.threadCount = threadCount;
         this.searchMethod = searchMethod;
+        this.context = null;
     }
 
-    public FindPrimesTask(final SearchOptions searchOptions) {
+    public FindPrimesTask(final SearchOptions searchOptions, final Context context) {
         this(searchOptions.getStartValue(), searchOptions.getEndValue(), searchOptions.getThreadCount(), searchOptions.getSearchMethod());
         this.searchOptions = searchOptions;
+        this.context = context;
     }
 
-    public SearchOptions getSearchOptions(){
+    public SearchOptions getSearchOptions() {
         return this.searchOptions;
     }
 
     @Override
     protected void run() {
 
+        switch (searchMethod){
+            case BRUTE_FORCE:
+                searchBruteForce();
+                break;
+
+            case SIEVE_OF_ERATOSTHENES:
+                searchSieve();
+                break;
+        }
+    }
+
+    private void searchBruteForce(){
         //Create worker tasks
         for (int i = 0; i < threadCount; i++) {
             long s = startValue + (2 * i + 1);
@@ -106,10 +143,98 @@ public class FindPrimesTask extends MultithreadedTask {
                     System.out.println("Thread " + task.startValue + " finished.");
                 }
             });
+            task.bufferSize = searchOptions.bufferSize / threadCount;
             addTask(task);
         }
 
         executeTasks();
+
+        //Execute all tasks
+/*        final List<Thread> threads = new ArrayList<>();
+        for (Task task : getTasks()) {
+            threads.add(task.startOnNewThread());
+        }
+
+        final List<Long> sorted = new ArrayList<>();
+
+        if (threadCount > 1){
+            final List<Long> heads = new ArrayList<>();
+            for (int i = 0; i < getTasks().size(); i++) {
+                if (!(getTasks().get(i).getState() == State.STOPPED && ((BruteForceTask) getTasks().get(i)).queue.isEmpty())) {
+                    try {
+                        heads.add(((BruteForceTask) getTasks().get(i)).queue.take());
+                    } catch (InterruptedException e) {
+                        Log.wtf(TAG, "Sorting was interrupted!");
+                    }
+                }
+            }
+
+            //Log.d(TAG, "Initial heads: " + heads);
+
+            while (!areSubTasksDone()){
+                takeFlag = false;
+                int lowestIndex = 0;
+                for (int i = 1; i < heads.size(); i++) {
+                    if (heads.get(i) != -1 && heads.get(i) < heads.get(lowestIndex)) {
+                        lowestIndex = i;
+                    }
+                }
+
+                if (lowestIndex == -1){
+                    Log.wtf(TAG, "lowestIndex was -1!");
+                }
+
+                *//*for (long number : heads){
+                    Log.w(TAG, "Head: " + number);
+                }
+                Log.d(TAG, "Lowest index was " + lowestIndex);
+                for (Task task : getTasks()){
+                    Log.w(TAG, "Queue: " + ((BruteForceTask) task).queue);
+                }*//*
+
+                sorted.add(heads.get(lowestIndex));
+                if (!(getTasks().get(lowestIndex).getState() == State.STOPPED && ((BruteForceTask) getTasks().get(lowestIndex)).queue.isEmpty())) {
+                    try {
+                        if (((BruteForceTask) getTasks().get(lowestIndex)).queue.isEmpty()){
+                            //Wait until item added or task finished
+                            synchronized (((BruteForceTask) getTasks().get(lowestIndex)).QUEUE_LOCK){
+                                while (((BruteForceTask) getTasks().get(lowestIndex)).queue.isEmpty() && getTasks().get(lowestIndex).getState() != State.STOPPED){
+                                    //Log.d(TAG, "Waiting...");
+                                    ((BruteForceTask) getTasks().get(lowestIndex)).QUEUE_LOCK.wait();
+                                    //Log.d(TAG, "Notified: " + ((BruteForceTask) getTasks().get(lowestIndex)).queue.size());
+                                }
+                            }
+                        }
+                        if (((BruteForceTask) getTasks().get(lowestIndex)).queue.isEmpty()){
+                            //Log.d(TAG, "Index " + lowestIndex + " still empty. state: " + getTasks().get(lowestIndex).getState());
+                            heads.set(lowestIndex, -1L);
+                        }else{
+                            //Log.d(TAG, "Taking from " + ((BruteForceTask) getTasks().get(lowestIndex)).queue);
+                            heads.set(lowestIndex, ((BruteForceTask) getTasks().get(lowestIndex)).queue.poll());
+                            //Log.d(TAG, "Took " + heads.get(lowestIndex));
+                            takeFlag = true;
+                        }
+                    } catch (InterruptedException e) {
+                        Log.wtf(TAG, "Sorting was interrupted!");
+                    }
+                }else{
+                    //Log.d(TAG, "Index " + lowestIndex + " is done");
+                    heads.set(lowestIndex, -1L);
+                }
+            }
+        }else{
+            sorted.addAll(((BruteForceTask) getTasks().get(0)).queue);
+        }
+
+        Log.d(TAG, "Sorted: " + sorted);
+
+        for (Thread thread : threads){
+            try {
+                thread.join();
+            }catch (InterruptedException e){
+                e.printStackTrace();
+            }
+        }*/
 
         System.out.println("All threads stopped.");
         long time = 0;
@@ -120,6 +245,70 @@ public class FindPrimesTask extends MultithreadedTask {
         }
         System.out.println("Average time: " + (time / getTasks().size()) + " milliseconds.");
         System.out.println("Elapsed time: " + getElapsedTime() + " milliseconds.");
+
+        final long sortStart = System.currentTimeMillis();
+        System.out.println("Merging cache...");
+
+        try {
+
+            final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(FileManager.getInstance().getContext().getFilesDir() + File.separator + "cache" + File.separator + getId() + File.separator + "primes")));
+
+            //Read each cache file
+            for (File file : FileManager.getInstance().getTaskCacheDirectory(this).listFiles()) {
+                Log.d(TAG, "Reading from: " + file.getAbsolutePath());
+                if (file.getAbsolutePath().contains("primes")) break;
+                final DataInputStream dataInputStream = new DataInputStream(new FileInputStream(file));
+                try {
+                    while (true) {
+                        bufferedWriter.write(String.valueOf(dataInputStream.readLong()));
+                        bufferedWriter.write(',');
+                    }
+                } catch (EOFException e) {
+                    dataInputStream.close();
+                }
+            }
+
+            final List<Long> primes = getSortedPrimes();
+            Log.d(TAG, "Writing remaining: " + primes.size());
+            if (primes.size() > 0) {
+                final long last = primes.get(primes.size() - 1);
+                for (long number : primes) {
+                    bufferedWriter.write(String.valueOf(number));
+                    if (number != last) {
+                        bufferedWriter.write(',');
+                    }
+                }
+            }
+
+            //Delete old cache
+            for (File file : FileManager.getInstance().getTaskCacheDirectory(this).listFiles()) {
+                if (!file.getAbsolutePath().contains("primes")) {
+                    file.delete();
+                }
+            }
+
+            //Clear memory
+            for (Task task : getTasks()) {
+                ((BruteForceTask) task).primes.clear();
+            }
+
+            bufferedWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Finished merge in " + (System.currentTimeMillis() - sortStart) + " ms.");
+    }
+
+    private volatile boolean takeFlag = false;
+
+    private boolean areSubTasksDone() {
+        if (takeFlag) return false;
+        for (Task task : getTasks()) {
+            if (!(task.getState() == State.STOPPED && ((BruteForceTask) task).queue.isEmpty()))
+                return false;
+        }
+        return true;
     }
 
     /**
@@ -143,40 +332,48 @@ public class FindPrimesTask extends MultithreadedTask {
         return startValue;
     }
 
-    private int lastSortIndex = 0;
-
-    private final Object SORT_LOCK = new Object();
-
-    public List<Long> getSortedPrimes(){
-        Log.d("FPT", "Beginning sort at index " + lastSortIndex);
-
-        final int size = primes.size();
-        for (int i = lastSortIndex; i < size; i++) {
-            int swapIndex = -1;
-            long smallest = primes.get(i);
-            for (int k = i + 1; k < size; k++) {
-                final long item = primes.get(k);
-                if (item < smallest) {
-                    smallest = item;
-                    swapIndex = k;
-                }
-            }
-
-            if (swapIndex != -1) {
-                final long temp = primes.get(i);
-                primes.set(i, smallest);
-                primes.set(swapIndex, temp);
-            }
-        }
-        lastSortIndex = size;
-
-        Log.d("FPT", "Finished sort until index " + size);
-
-        return primes;
+    public int getPrimeCount() {
+        return this.primeCount;
     }
 
-    public List<Long> getPrimes() {
-        return this.primes;
+    public List<Long> getSortedPrimes() {
+
+        final List<Long> primes = new ArrayList<>(primeCount);
+
+        switch (searchMethod){
+            case BRUTE_FORCE:
+                final int[] index = new int[getTasks().size()];
+                for (int i = 0; i < index.length; i++) {
+                    index[i] = 0;
+                }
+
+                int li = 0;
+                long lowest = 0;
+                do {
+                    lowest = 0;
+                    for (int i = 0; i < getTasks().size(); i++) {
+                        if (index[i] < ((BruteForceTask) getTasks().get(i)).primes.size()) {
+                            if (((BruteForceTask) getTasks().get(i)).primes.get(index[i]) < lowest || lowest == 0) {
+                                lowest = ((BruteForceTask) getTasks().get(i)).primes.get(index[i]);
+                                li = i;
+                            }
+                        }
+                    }
+                    index[li]++;
+                    primes.add(lowest);
+                } while (lowest != 0);
+                primes.remove(primes.size() - 1);
+
+                break;
+
+            case SIEVE_OF_ERATOSTHENES:
+                for (int i = 0; i < primeCount - 1; i++){
+                    primes.add(Long.valueOf(((SieveTask) getTasks().get(0)).primes.get(i)));
+                }
+                break;
+        }
+
+        return primes;
     }
 
     /**
@@ -186,6 +383,13 @@ public class FindPrimesTask extends MultithreadedTask {
      */
     public long getCurrentValue() {
         if (getTasks().size() == 0) return 0;
+        if (searchMethod == SearchMethod.SIEVE_OF_ERATOSTHENES){
+            if (getState() == State.STOPPED){
+                return endValue;
+            }else{
+                return 0;
+            }
+        }
         long lowest = ((BruteForceTask) getTasks().get(0)).getCurrentValue();
         for (Task task : getTasks()) {
             if (((BruteForceTask) task).getCurrentValue() < lowest) {
@@ -195,11 +399,15 @@ public class FindPrimesTask extends MultithreadedTask {
         return lowest;
     }
 
-    public void setOptions(final SearchOptions searchOptions){
+    public void setOptions(final SearchOptions searchOptions) {
         this.searchOptions = searchOptions;
     }
 
-    private class BruteForceTask extends MultithreadedTask.SubTask {
+    private final File taskDirectory = FileManager.getInstance().getTaskCacheDirectory(this);
+
+    public boolean isCached = false;
+
+    private class BruteForceTask extends MultithreadedTask.SubTask{
 
         /**
          * The starting value of the search. (inclusive).
@@ -215,14 +423,28 @@ public class FindPrimesTask extends MultithreadedTask {
 
         private final int increment;
 
-        //public final List<Long> primes = new ArrayList<>();
+        private final List<Long> primes = new ArrayList<>();
+        private final BlockingQueue<Long> queue = new LinkedBlockingQueue<>();
 
         private int totalDistance = 0;
 
-        public BruteForceTask(final long startValue, final long endValue, final int increment) {
+        private final Object QUEUE_LOCK = new Object();
+
+        private int bufferSize;
+
+        private BruteForceTask(final long startValue, final long endValue, final int increment) {
             this.startValue = startValue;
             this.endValue = endValue;
             this.increment = increment;
+            /*addTaskListener(new TaskAdapter(){
+                @Override
+                public void onTaskStopped() {
+                    synchronized (QUEUE_LOCK){
+                        QUEUE_LOCK.notify();
+                    }
+                    Log.d(TAG, "Thread took " + getElapsedTime() + " ms.");
+                }
+            });*/
         }
 
         @Override
@@ -306,8 +528,26 @@ public class FindPrimesTask extends MultithreadedTask {
         }
 
         private void dispatchPrimeFound(final long number) {
-            synchronized (SORT_LOCK) {
-                primes.add(number);
+            primes.add(number);
+            /*queue.add(number);
+            synchronized (QUEUE_LOCK){
+                //Log.d(TAG, "Added " + number + " to " + queue);
+                QUEUE_LOCK.notify();
+            }*/
+            primeCount++;
+
+            if (primes.size() >= bufferSize) {
+                isCached = true;
+                Log.d(TAG, "Swapping to disk! Size: " + primes.size());
+
+                //Swap memory to disk
+                if (!taskDirectory.exists()) {
+                    taskDirectory.mkdirs();
+                }
+
+                //Write to 1 file with no commas use byte offset for quick reads
+                FileManager.getInstance().writeToCache(primes, new File(FileManager.getInstance().getContext().getFilesDir() + File.separator + "cache" + File.separator + FindPrimesTask.this.getId() + File.separator + getId() + ".cache"), true);
+                primes.clear();
             }
         }
 
@@ -317,16 +557,52 @@ public class FindPrimesTask extends MultithreadedTask {
 
     }
 
+    private class SieveTask extends MultithreadedTask.SubTask{
+
+        private final List<Integer> primes = new ArrayList<>();
+
+        @Override
+        protected void run() {
+            //Assume all numbers are prime
+            final BitSet bitSet = new BitSet((int) (endValue + 1));
+            bitSet.set(0, bitSet.size() - 1, true);
+
+            final int sqrtMax = (int) Math.sqrt(endValue);
+
+            // mark non-primes <= n using Sieve of Eratosthenes
+            for (int factor = 2; factor <= sqrtMax; factor++) {
+
+                //currentNumber = factor;
+                // if factor is prime, then mark multiples of factor as nonprime
+                // suffices to consider mutiples factor, factor+1, ...,  n/factor
+                if (bitSet.get(factor)) {
+                    for (int j = factor; factor*j <= endValue; j++) {
+                        bitSet.set(factor * j, false);
+                    }
+                }
+
+                setProgress(((float) factor / sqrtMax) / 2);
+                tryPause();
+            }
+
+            for (int i = 2; i < endValue; i++){
+                if (bitSet.get(i)){
+                    primes.add(i);
+                    primeCount++;
+                }
+                //setProgress(0.5f + (((float) i / endValue) / 2));
+            }
+            Log.d(TAG, "Largest: " + primes.get(primeCount - 1));
+            setProgress(1);
+        }
+    }
+
+    private void searchSieve(){
+        addTask(new SieveTask());
+        executeTasks();
+    }
+
     // Android
-
-
-    public long getPrimesPerSecond() {
-        return 0;
-    }
-
-    public long getNumbersPerSecond() {
-        return 0;
-    }
 
     public static class SearchOptions implements Parcelable {
 
@@ -351,6 +627,11 @@ public class FindPrimesTask extends MultithreadedTask {
         private int threadCount;
 
         /**
+         * The maximum size of prime numbers in memory. If more numbers are found, the entire list will be saved onto the disk first.
+         */
+        private int bufferSize = 100_000;
+
+        /**
          * Show a notification when the task is finished.
          */
         public boolean notifyWhenFinished;
@@ -373,7 +654,7 @@ public class FindPrimesTask extends MultithreadedTask {
             this(startValue, endValue, searchMethod, threadCount, false, false);
         }
 
-        public SearchOptions(final long startValue, final long endValue){
+        public SearchOptions(final long startValue, final long endValue) {
             this(startValue, endValue, SearchMethod.BRUTE_FORCE, 1, false, false);
         }
 
@@ -392,7 +673,7 @@ public class FindPrimesTask extends MultithreadedTask {
             dest.writeInt(this.autoSave ? 1 : 0);
         }
 
-        public static final Parcelable.Creator<SearchOptions> CREATOR  = new Parcelable.Creator<SearchOptions>() {
+        public static final Parcelable.Creator<SearchOptions> CREATOR = new Parcelable.Creator<SearchOptions>() {
 
             @Override
             public SearchOptions createFromParcel(Parcel in) {

@@ -53,7 +53,6 @@ public class TaskManager{
 
     public Task findTaskById(final UUID id){
         for (Task task : tasks.keySet()){
-            Log.d("TAG", "Compare: " + task.getId() + " vs " + id);
             if (task.getId().equals(id)){
                 return task;
             }

@@ -31,7 +31,7 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
      */
     private static final String TAG = "FindPrimesTaskListAdptr";
 
-    private final DecimalFormat decimalFormat = new DecimalFormat("##0.00");
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("##0.00");
 
     private final Context context;
 
@@ -84,6 +84,9 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
 
             case STOPPED:
                 holder.state.setText(context.getString(R.string.status_finished));
+                if (task instanceof CheckPrimalityTask){
+                    holder.state.setText(context.getString(R.string.status_finished) + ": " + context.getString(R.string.check_primality_result, NumberFormat.getInstance(Locale.getDefault()).format(((CheckPrimalityTask) task).getNumber()), ((CheckPrimalityTask) task).isPrime() ? "prime" : "not prime"));
+                }
                 holder.pauseButton.setVisibility(View.GONE);
                 holder.editButton.setVisibility(View.GONE);
                 holder.deleteButton.setEnabled(true);
@@ -95,7 +98,7 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
             holder.progress.setVisibility(View.GONE);
         }else if (task.getState() != Task.State.STOPPED){
             holder.progress.setVisibility(View.VISIBLE);
-            holder.progress.setText(context.getString(R.string.task_progress, decimalFormat.format(task.getProgress() * 100)));
+            holder.progress.setText(context.getString(R.string.task_progress, DECIMAL_FORMAT.format(task.getProgress() * 100)));
         }
 
         holder.root.setSelected(holder.getAdapterPosition() == getSelectedItemPosition());
@@ -110,7 +113,7 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
                 viewHolder.progress.setVisibility(View.GONE);
             }else if (task.getState() != Task.State.STOPPED){
                 viewHolder.progress.setVisibility(View.VISIBLE);
-                viewHolder.progress.setText(context.getString(R.string.task_progress, decimalFormat.format(task.getProgress() * 100)));
+                viewHolder.progress.setText(context.getString(R.string.task_progress, DECIMAL_FORMAT.format(task.getProgress() * 100)));
             }
         }
     }
