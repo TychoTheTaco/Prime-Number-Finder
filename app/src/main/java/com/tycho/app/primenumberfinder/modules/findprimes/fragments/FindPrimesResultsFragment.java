@@ -1,8 +1,6 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -29,18 +27,9 @@ import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimesActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.NumberFormat;
-import java.util.List;
 import java.util.Locale;
 
 import easytasks.Task;
@@ -75,8 +64,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
-    private final UiUpdater uiUpdater = new UiUpdater();
-
     private final String[] subtitleItems = new String[7];
     private final SpannableStringBuilder subtitleStringBuilder = new SpannableStringBuilder();
 
@@ -85,8 +72,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         super.onAttach(activity);
         primesAdapter = new PrimesAdapter(activity);
 
-        final String rawSubtitle = getString(R.string.find_primes_result);
-        final String[] splitSubtitle = rawSubtitle.split("%\\d\\$.");
+        final String[] splitSubtitle = getString(R.string.find_primes_result).split("%\\d\\$.");
         subtitleItems[0] = splitSubtitle[0];
         subtitleItems[2] = splitSubtitle[1];
         subtitleItems[4] = splitSubtitle[2];
@@ -165,57 +151,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
                             //Read cache file
                             try {
-
-                                //final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getTask().getStartValue() + " to " + getTask().getEndValue() + EXTENSION)));
-
-                                //Read each cache file
-                                /*for (File file : FileManager.getInstance().getTaskCacheDirectory(getTask()).listFiles()) {
-                                    final DataInputStream dataInputStream = new DataInputStream(new FileInputStream(file));
-                                    try {
-                                        while (true) {
-                                            bufferedWriter.write(String.valueOf(dataInputStream.readLong()));
-                                            bufferedWriter.write(',');
-                                        }
-                                    } catch (EOFException e) {
-                                        dataInputStream.close();
-                                    }
-                                }
-
-                                final List<Long> primes = getTask().getSortedPrimes();
-                                if (primes.size() > 0){
-                                    final long last = primes.get(primes.size() - 1);
-                                    for (long number : primes) {
-                                        bufferedWriter.write(String.valueOf(number));
-                                        if (number != last){
-                                            bufferedWriter.write(',');
-                                        }
-                                    }
-                                }*/
-
                                 FileManager.copy(new File(FileManager.getInstance().getTaskCacheDirectory(getTask()) + File.separator + "primes"), new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getTask().getStartValue() + " to " + getTask().getEndValue() + EXTENSION));
-
-                                //bufferedWriter.close();
-
-                                /*final DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getTask().getStartValue() + " to " + getTask().getEndValue() + EXTENSION)));
-
-                                //Read each cache file
-                                for (File file : FileManager.getInstance().getTaskCacheDirectory(getTask()).listFiles()) {
-                                    final DataInputStream dataInputStream = new DataInputStream(new FileInputStream(file));
-                                    try {
-                                        while (true) {
-                                            dataOutputStream.writeLong(dataInputStream.readLong());
-                                        }
-                                    } catch (EOFException e) {
-                                        dataInputStream.close();
-                                    }
-                                }
-
-                                for (long number : getTask().getPrimesSort2()) {
-                                    dataOutputStream.writeLong(number);
-                                }
-
-                                dataOutputStream.close();*/
-
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -243,38 +179,80 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
         init();
 
-        updateUi();
-
         return rootView;
     }
 
-    private class UiUpdater extends Task {
+    @Override
+    public void onTaskStarted() {
+        super.onTaskStarted();
+        if (isAdded() && !isDetached()){
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    title.setText(getString(R.string.status_searching));
+                    progressBarInfinite.setVisibility(View.VISIBLE);
 
-        @Override
-        protected void run() {
+                    //Subtitle
+                    subtitleTextView.setText(formatSubtitle());
 
-            while (true) {
+                    saveButton.setVisibility(View.GONE);
 
-                if (getTask() == null) pause();
-
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateUi();
+                    //Update progress
+                    if (getTask().getEndValue() != FindPrimesTask.INFINITY) {
+                        progress.setText(getString(R.string.task_progress, DECIMAL_FORMAT.format(getTask().getProgress() * 100)));
                     }
-                });
-
-                //Log.d(TAG, "Memory: (" + (Runtime.getRuntime().totalMemory() / 1024 / 1024) + " / " + getRemainingMemory() + ") MB.");
-
-                try {
-                    Thread.sleep(1000 / 2);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    break;
                 }
+            });
+        }
+    }
 
-                tryPause();
-            }
+    @Override
+    public void onTaskPaused() {
+        super.onTaskPaused();
+        if (isAdded() && !isDetached()){
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    title.setText(getString(R.string.status_paused));
+                    progressBarInfinite.setVisibility(View.GONE);
+
+                    //Subtitle
+                    subtitleTextView.setText(formatSubtitle());
+
+                    saveButton.setVisibility(View.VISIBLE);
+
+                    //Update progress
+                    if (getTask().getEndValue() != FindPrimesTask.INFINITY) {
+                        progress.setText(getString(R.string.task_progress, DECIMAL_FORMAT.format(getTask().getProgress() * 100)));
+                    }
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onTaskResumed() {
+        super.onTaskResumed();
+        onTaskStarted();
+    }
+
+    @Override
+    public void onTaskStopped() {
+        super.onTaskStopped();
+        if (isAdded() && !isDetached()){
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    title.setText(getString(R.string.status_finished));
+                    progressBarInfinite.setVisibility(View.GONE);
+                    progress.setVisibility(View.GONE);
+
+                    //Subtitle
+                    subtitleTextView.setText(formatSubtitle());
+
+                    saveButton.setVisibility(View.VISIBLE);
+                }
+            });
         }
     }
 
@@ -282,64 +260,40 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     protected void onUiUpdate() {
         if (getTask() != null) {
 
-            if (isAdded() && !isDetached()) {
+            //Update progress
+            if (getTask().getEndValue() != FindPrimesTask.INFINITY) {
+                progress.setText(getString(R.string.task_progress, DECIMAL_FORMAT.format(getTask().getProgress() * 100)));
+            }
 
-                //Update task state
-                switch (getTask().getState()) {
-                    case RUNNING:
-                        title.setText(getString(R.string.status_searching));
-                        progressBarInfinite.setVisibility(View.VISIBLE);
-                        saveButton.setVisibility(View.GONE);
-                        break;
+            //Update recyclerView
+            //primesAdapter.notifyDataSetChanged();
+            //recyclerView.scrollToPosition(primesAdapter.getItemCount() - 1);
 
-                    case PAUSED:
-                        title.setText(getString(R.string.status_paused));
-                        progressBarInfinite.setVisibility(View.GONE);
-                        saveButton.setVisibility(View.VISIBLE);
-                        break;
+            subtitleTextView.setText(formatSubtitle());
+        }
+    }
 
-                    case STOPPED:
-                        progressBarInfinite.setVisibility(View.GONE);
-                        title.setText(getString(R.string.status_finished));
-                        saveButton.setVisibility(View.VISIBLE);
-                        break;
-                }
+    private SpannableStringBuilder formatSubtitle() {
+        final String count = NUMBER_FORMAT.format(getTask().getPrimeCount());
+        final String start = NUMBER_FORMAT.format(getTask().getStartValue());
+        String end = NUMBER_FORMAT.format(getTask().getEndValue());
+        if (getTask().getEndValue() == FindPrimesTask.INFINITY) {
+            end = getString(R.string.infinity_text);
+        }
 
-                //Update progress
-                if (getTask().getEndValue() != FindPrimesTask.INFINITY && getTask().getState() != Task.State.STOPPED) {
-                    progress.setVisibility(View.VISIBLE);
-                    progress.setText(getString(R.string.task_progress, decimalFormat.format(getTask().getProgress() * 100)));
-                } else {
-                    progress.setVisibility(View.GONE);
-                }
-
-                //Update recyclerView
-                primesAdapter.notifyDataSetChanged();
-                recyclerView.scrollToPosition(primesAdapter.getItemCount() - 1);
-
-                //Format subtitleTextView
-                final String count = NUMBER_FORMAT.format(getTask().getPrimeCount());
-                final String start = NUMBER_FORMAT.format(getTask().getStartValue());
-                String end = NUMBER_FORMAT.format(getTask().getEndValue());
-                if (getTask().getEndValue() == FindPrimesTask.INFINITY) {
-                    end = getString(R.string.infinity_text);
-                }
-
-                subtitleItems[1] = count;
-                subtitleItems[3] = start;
-                subtitleItems[5] = end;
-                subtitleStringBuilder.clear();
-                for (int i = 0; i < subtitleItems.length; i++) {
-                    if (i % 2 != 0) {
-                        subtitleStringBuilder.append(subtitleItems[i], new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.purple_dark)), 0);
-                        subtitleStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), subtitleStringBuilder.length() - subtitleItems[i].length(), subtitleStringBuilder.length(), 0);
-                    } else {
-                        subtitleStringBuilder.append(subtitleItems[i]);
-                    }
-                }
-                subtitleTextView.setText(subtitleStringBuilder);
+        subtitleItems[1] = count;
+        subtitleItems[3] = start;
+        subtitleItems[5] = end;
+        subtitleStringBuilder.clear();
+        for (int i = 0; i < subtitleItems.length; i++) {
+            if (i % 2 != 0) {
+                subtitleStringBuilder.append(subtitleItems[i], new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.purple_dark)), 0);
+                subtitleStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), subtitleStringBuilder.length() - subtitleItems[i].length(), subtitleStringBuilder.length(), 0);
+            } else {
+                subtitleStringBuilder.append(subtitleItems[i]);
             }
         }
+        return subtitleStringBuilder;
     }
 
     @Override
@@ -347,64 +301,46 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         return (FindPrimesTask) super.getTask();
     }
 
-    private final TaskListener taskListener = new TaskAdapter() {
-        @Override
-        public void onTaskPaused() {
-            uiUpdater.pause();
-        }
-
-        @Override
-        public void onTaskResumed() {
-            uiUpdater.resume();
-        }
-
-        @Override
-        public void onTaskStopped() {
-            uiUpdater.pause();
-        }
-    };
-
     @Override
     public void setTask(final Task task) {
-
-        if (getTask() != null) {
-            getTask().removeTaskListener(taskListener);
-        }
-
         super.setTask(task);
-
-        if (getTask() != null) {
-            getTask().addTaskListener(taskListener);
-        }
-
-        try {
+        if (getView() != null){
             init();
-        } catch (NullPointerException e) {
-            e.printStackTrace();
         }
-
-        updateUi();
     }
 
     private void init() {
         if (getTask() != null) {
 
-            if (uiUpdater.getState() == Task.State.NOT_STARTED) {
-                uiUpdater.startOnNewThread();
-            } else {
-                uiUpdater.resume();
-            }
-
             //Make sure view is visible
             resultsView.setVisibility(View.VISIBLE);
             noTaskView.setVisibility(View.GONE);
 
-            //primesAdapter.setTask(getTask());
-            primesAdapter.notifyDataSetChanged();
-            recyclerView.scrollToPosition(primesAdapter.getItemCount() - 1);
+            final FindPrimesTask.SearchOptions searchOptions = getTask().getSearchOptions();
+            if (searchOptions.getSearchMethod() == FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES || searchOptions.getThreadCount() > 1) {
+                recyclerView.setVisibility(View.GONE);
+            } else {
+                primesAdapter.notifyDataSetChanged();
+                recyclerView.scrollToPosition(primesAdapter.getItemCount() - 1);
+            }
+
+            progress.setVisibility(getTask().getEndValue() == FindPrimesTask.INFINITY ? View.GONE : View.VISIBLE);
+
+            switch (getTask().getState()) {
+                case RUNNING:
+                    onTaskStarted();
+                    break;
+
+                case PAUSED:
+                    onTaskPaused();
+                    break;
+
+                case STOPPED:
+                    onTaskStopped();
+                    break;
+            }
 
         } else {
-            uiUpdater.pause();
             resultsView.setVisibility(View.GONE);
             noTaskView.setVisibility(View.VISIBLE);
         }

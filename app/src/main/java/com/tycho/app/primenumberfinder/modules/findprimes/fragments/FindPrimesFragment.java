@@ -91,7 +91,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
     private final NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
 
 
-    private final FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(0, FindPrimesTask.INFINITY, FindPrimesTask.SearchMethod.BRUTE_FORCE, 1);
+    private final FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(0, FindPrimesTask.INFINITY, FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES, 1);
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
@@ -401,6 +401,10 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         buttonFindPrimes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if (getEndValue().longValue() == FindPrimesTask.INFINITY){
+                    searchOptions.setSearchMethod(FindPrimesTask.SearchMethod.BRUTE_FORCE);
+                }
 
                 //Check if the range is valid
                 if (isRangeValid()) {

@@ -63,8 +63,7 @@
             android:layout_height="wrap_content"
             android:paddingBottom="2dp"
             android:paddingTop="2dp"
-            android:textColor="@color/secondary_text"
-            android:textSize="14sp" />
+            style="@style/TaskFragmentSubtitle" />
 
         <!-- Main content -->
         <TextView

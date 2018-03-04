@@ -7,6 +7,7 @@ import android.support.v4.content.ContextCompat;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -32,7 +34,7 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "CheckPrimalityResultsFgmnt";
+    private static final String TAG = "ChkPrimalityRsltsFgmnt";
 
     //Views
     private ViewGroup resultsView;
@@ -42,10 +44,6 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     private ProgressBar progressBarInfinite;
     private TextView progress;
     private TextView result;
-
-    final DecimalFormat decimalFormat = new DecimalFormat("##0.00");
-
-    private long lastUiUpdateTime = 0;
 
     @Nullable
     @Override
@@ -60,59 +58,96 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
         progress = rootView.findViewById(R.id.textView_search_progress);
         result = rootView.findViewById(R.id.content);
 
-        updateUi();
-
         init();
 
         return rootView;
     }
 
-    //TODO: Maybe dont have a ui update method. Instead create methods like uiStoped(), uiRunning(), uiStarted() and just call those in the listeners.
     @Override
-    protected void onUiUpdate() {
-        if (getTask() != null) {
+    public void onTaskStarted() {
+        super.onTaskStarted();
+        if (isAdded() && !isDetached()) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
 
-            //Update task state
-            switch (getTask().getState()) {
-                case RUNNING:
                     title.setText(getString(R.string.status_searching));
                     progressBarInfinite.setVisibility(View.VISIBLE);
 
-                    //Set progress
-                    progress.setVisibility(View.VISIBLE);
-                    progress.setText(getString(R.string.task_progress, decimalFormat.format(getTask().getProgress() * 100)));
-                    break;
-
-                case PAUSED:
-                    title.setText(getString(R.string.status_paused));
-                    progressBarInfinite.setVisibility(View.GONE);
-
-                    //Set progress
-                    progress.setVisibility(View.VISIBLE);
-                    progress.setText(getString(R.string.task_progress, decimalFormat.format(getTask().getProgress() * 100)));
-                    break;
-
-                case STOPPED:
-                    progressBarInfinite.setVisibility(View.GONE);
-                    title.setText(getString(R.string.status_finished));
-
-                    //Set progress
-                    progress.setVisibility(View.GONE);
-                    break;
-            }
+                    //Format subtitle
+                    final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(getString(R.string.check_primality_task_status, NumberFormat.getInstance(Locale.getDefault()).format(getTask().getNumber())));
+                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.purple_dark)), 0, spannableStringBuilder.length(), 0);
+                    spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, spannableStringBuilder.length(), 0);
+                    subtitle.setText(spannableStringBuilder);
+                }
+            });
         }
     }
 
     @Override
-    public void onTaskStarted() {
-        super.onTaskStarted();
-        uiStarted();
+    public void onTaskPaused() {
+        super.onTaskPaused();
+        if (isAdded() && !isDetached()) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    title.setText(getString(R.string.status_paused));
+                    progressBarInfinite.setVisibility(View.GONE);
+
+                    //Set progress
+                    progress.setText(getString(R.string.task_progress, DECIMAL_FORMAT.format(getTask().getProgress() * 100)));
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onTaskResumed() {
+        super.onTaskResumed();
+        onTaskStarted();
     }
 
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        uiStopped();
+        if (isAdded() && !isDetached()) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+
+                    title.setText(getString(R.string.status_finished));
+                    progressBarInfinite.setVisibility(View.GONE);
+
+                    //Set progress
+                    progress.setVisibility(View.GONE);
+
+                    //Format subtitle
+                    final String[] splitSubtitle = getString(R.string.check_primality_result).split("%\\d\\$.");
+                    final String[] subtitleItems = new String[4 + 1];
+                    subtitleItems[0] = splitSubtitle[0];
+                    subtitleItems[1] = NumberFormat.getInstance(Locale.getDefault()).format(getTask().getNumber());
+                    subtitleItems[2] = splitSubtitle[1];
+                    subtitleItems[3] = getTask().isPrime() ? "prime" : "not prime";
+                    subtitleItems[4] = splitSubtitle[2];
+                    final SpannableStringBuilder subtitleStringBuilder = new SpannableStringBuilder();
+                    for (int i = 0; i < subtitleItems.length; i++) {
+                        if (i % 2 != 0) {
+                            subtitleStringBuilder.append(subtitleItems[i], new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.purple_dark)), 0);
+                            subtitleStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), subtitleStringBuilder.length() - subtitleItems[i].length(), subtitleStringBuilder.length(), 0);
+                        } else {
+                            subtitleStringBuilder.append(subtitleItems[i]);
+                        }
+                    }
+                    subtitle.setText(subtitleStringBuilder);
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onUiUpdate() {
+        //Update progress
+        progress.setText(getString(R.string.task_progress, DECIMAL_FORMAT.format(getTask().getProgress() * 100)));
     }
 
     @Override
@@ -123,12 +158,8 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     @Override
     public void setTask(final Task task) {
         super.setTask(task);
-
-        updateUi();
-
-        try {
+        if (getView() != null) {
             init();
-        } catch (NullPointerException e) {
         }
     }
 
@@ -141,51 +172,21 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
 
             switch (getTask().getState()) {
                 case RUNNING:
-                    uiStarted();
+                    onTaskStarted();
                     break;
 
                 case PAUSED:
-                    uiStarted();
+                    onTaskPaused();
                     break;
 
                 case STOPPED:
-                    uiStopped();
+                    onTaskStopped();
                     break;
             }
 
         } else {
             resultsView.setVisibility(View.GONE);
             noTaskView.setVisibility(View.VISIBLE);
-        }
-    }
-
-    private void uiStarted() {
-        if (isAdded() && !isDetached()) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    //Format subtitle
-                    final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(getString(R.string.check_primality_task_status, NumberFormat.getInstance(Locale.getDefault()).format(getTask().getNumber())));
-                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.purple_dark)), 0, spannableStringBuilder.length(), 0);
-                    spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, spannableStringBuilder.length(), 0);
-                    subtitle.setText(spannableStringBuilder);
-                }
-            });
-        }
-    }
-
-    private void uiStopped() {
-        if (isAdded() && !isDetached()) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    //Format subtitle
-                    final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(getString(R.string.check_primality_result, NumberFormat.getInstance(Locale.getDefault()).format(getTask().getNumber()), getTask().isPrime() ? "prime" : "not prime"));
-                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.purple_dark)), 0, spannableStringBuilder.length(), 0);
-                    spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, spannableStringBuilder.length(), 0);
-                    subtitle.setText(spannableStringBuilder);
-                }
-            });
         }
     }
 }

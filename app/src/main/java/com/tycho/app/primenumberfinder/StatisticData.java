@@ -20,24 +20,34 @@ public class StatisticData extends JSONObject{
         super(json);
     }
 
-    public void put(Statistic statistic, boolean value) throws JSONException{
-        super.put(statistic.getKey(), value);
+    public void put(Statistic statistic, boolean value){
+        try {
+            super.put(statistic.getKey(), value);
+        }catch (JSONException e){}
     }
 
-    public void put(Statistic statistic, double value) throws JSONException{
-        super.put(statistic.getKey(), value);
+    public void put(Statistic statistic, double value){
+        try {
+            super.put(statistic.getKey(), value);
+        }catch (JSONException e){}
     }
 
-    public void put(Statistic statistic, int value) throws JSONException{
-        super.put(statistic.getKey(), value);
+    public void put(Statistic statistic, int value){
+        try {
+            super.put(statistic.getKey(), value);
+        }catch (JSONException e){}
     }
 
-    public void put(Statistic statistic, long value) throws JSONException{
-        super.put(statistic.getKey(), value);
+    public void put(Statistic statistic, long value){
+        try {
+            super.put(statistic.getKey(), value);
+        }catch (JSONException e){}
     }
 
-    public void put(Statistic statistic, Object value) throws JSONException{
-        super.put(statistic.getKey(), value);
+    public void put(Statistic statistic, Object value){
+        try {
+            super.put(statistic.getKey(), value);
+        }catch (JSONException e){}
     }
 
     public boolean optBoolean(Statistic statistic){

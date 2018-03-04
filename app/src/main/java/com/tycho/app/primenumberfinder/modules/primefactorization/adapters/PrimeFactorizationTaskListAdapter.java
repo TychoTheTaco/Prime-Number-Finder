@@ -76,7 +76,7 @@ public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<A
         //Set progress
         /*if (task.getState() != Task.State.STOPPED){
             holder.progress.setVisibility(View.VISIBLE);
-            holder.progress.setText(context.getString(R.string.task_progress, decimalFormat.format(task.getProgress() * 100)));
+            holder.progress.setText(context.getString(R.string.task_progress, DECIMAL_FORMAT.format(task.getProgress() * 100)));
         }else{
             holder.progress.setVisibility(View.GONE);
         }*/

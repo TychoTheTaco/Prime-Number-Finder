@@ -47,6 +47,8 @@ public class FindPrimesTaskListFragment extends Fragment {
 
     private TextView textViewNoTasks;
 
+    private RecyclerView recyclerView;
+
     private final Queue<AbstractTaskListAdapter.EventListener> eventListenerQueue = new LinkedBlockingQueue<>(5);
     private final Queue<ActionViewListener> actionViewListenerQueue = new LinkedBlockingQueue<>(5);
 
@@ -82,7 +84,7 @@ public class FindPrimesTaskListFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.find_primes_task_list_fragment, container, false);
 
         //Set up the task list
-        final RecyclerView recyclerView = rootView.findViewById(R.id.task_list);
+        recyclerView = rootView.findViewById(R.id.task_list);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(taskListAdapter);
@@ -108,6 +110,7 @@ public class FindPrimesTaskListFragment extends Fragment {
 
     public void addTask(final Task task) {
         taskListAdapter.addTask(task);
+        recyclerView.scrollToPosition(taskListAdapter.getItemCount() - 1);
         update();
     }
 

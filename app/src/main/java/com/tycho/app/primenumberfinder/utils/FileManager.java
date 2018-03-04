@@ -114,13 +114,24 @@ public final class FileManager {
         }
 
         //Clear export cache
-        for (File file : getExportCacheDirectory().listFiles()) {
-            file.delete();
-        }
+        deleteDirectory(getExportCacheDirectory(), false);
 
-        //Clear cache directory
-        for (File file : new File(context.getFilesDir() + File.separator + "cache" + File.separator).listFiles()){
-            file.delete();
+        //Clear cache directory //TODO: Dont do this if there are running tasks
+        deleteDirectory(new File(context.getFilesDir() + File.separator + "cache" + File.separator), false);
+    }
+
+    private static void deleteDirectory(final File directory, final boolean deleteRoot){
+        if (directory != null && directory.exists()){
+            for (File file : directory.listFiles()){
+                if (file.isDirectory()){
+                    deleteDirectory(file, true);
+                }else{
+                    file.delete();
+                }
+            }
+            if (deleteRoot){
+                directory.delete();
+            }
         }
     }
 

@@ -46,6 +46,7 @@
 
         <!-- ETA-->
         <LinearLayout
+            android:id="@+id/estimated_time_remaining_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">

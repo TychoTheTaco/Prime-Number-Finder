@@ -9,7 +9,7 @@
             android:id="@+id/drawer_item_find_primes"
             android:icon="@drawable/circle_white"
             app:actionLayout="@layout/navigation_drawer_item"
-            android:title="@string/title_scan_for_primes"/>
+            android:title="@string/title_find_primes"/>
 
         <item
             android:id="@+id/drawer_item_find_factors"

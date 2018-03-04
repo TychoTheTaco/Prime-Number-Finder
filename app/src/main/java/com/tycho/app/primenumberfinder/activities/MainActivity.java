@@ -2,7 +2,6 @@ package com.tycho.app.primenumberfinder.activities;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -17,11 +16,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewDebug;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
@@ -35,9 +32,7 @@ import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesFr
 import com.tycho.app.primenumberfinder.modules.primefactorization.fragments.PrimeFactorizationFragment;
 import com.tycho.app.primenumberfinder.modules.savedfiles.SavedFilesFragment;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
@@ -277,7 +272,7 @@ public class MainActivity extends AppCompatActivity{
                 break;
 
             case R.id.drawer_item_find_primes:
-                setTitle(getString(R.string.title_scan_for_primes));
+                setTitle(getString(R.string.title_find_primes));
                 navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.purple)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.purple_dark)));
                 applyThemeColor(ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));

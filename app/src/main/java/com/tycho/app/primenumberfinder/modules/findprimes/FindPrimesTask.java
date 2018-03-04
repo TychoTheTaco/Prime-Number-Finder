@@ -249,22 +249,33 @@ public class FindPrimesTask extends MultithreadedTask {
         final long sortStart = System.currentTimeMillis();
         System.out.println("Merging cache...");
 
-        try {
+        mergeCache();
 
-            final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File(FileManager.getInstance().getContext().getFilesDir() + File.separator + "cache" + File.separator + getId() + File.separator + "primes")));
+        System.out.println("Finished merge in " + (System.currentTimeMillis() - sortStart) + " ms.");
+    }
+
+    private void mergeCache(){
+        try {
+            final File largeCache = new File(FileManager.getInstance().getContext().getFilesDir() + File.separator + "cache" + File.separator + getId() + File.separator + "primes");
+            if (!new File(FileManager.getInstance().getContext().getFilesDir() + File.separator + "cache" + File.separator + getId() + File.separator).exists()){
+                new File(FileManager.getInstance().getContext().getFilesDir() + File.separator + "cache" + File.separator + getId() + File.separator).mkdirs();
+            }
+            final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(largeCache));
 
             //Read each cache file
-            for (File file : FileManager.getInstance().getTaskCacheDirectory(this).listFiles()) {
-                Log.d(TAG, "Reading from: " + file.getAbsolutePath());
-                if (file.getAbsolutePath().contains("primes")) break;
-                final DataInputStream dataInputStream = new DataInputStream(new FileInputStream(file));
-                try {
-                    while (true) {
-                        bufferedWriter.write(String.valueOf(dataInputStream.readLong()));
-                        bufferedWriter.write(',');
+            if (isCached){
+                for (File file : FileManager.getInstance().getTaskCacheDirectory(this).listFiles()) {
+                    Log.d(TAG, "Reading from: " + file.getAbsolutePath());
+                    if (file.getAbsolutePath().contains("primes")) break;
+                    final DataInputStream dataInputStream = new DataInputStream(new FileInputStream(file));
+                    try {
+                        while (true) {
+                            bufferedWriter.write(String.valueOf(dataInputStream.readLong()));
+                            bufferedWriter.write(',');
+                        }
+                    } catch (EOFException e) {
+                        dataInputStream.close();
                     }
-                } catch (EOFException e) {
-                    dataInputStream.close();
                 }
             }
 
@@ -296,8 +307,6 @@ public class FindPrimesTask extends MultithreadedTask {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        System.out.println("Finished merge in " + (System.currentTimeMillis() - sortStart) + " ms.");
     }
 
     private volatile boolean takeFlag = false;
