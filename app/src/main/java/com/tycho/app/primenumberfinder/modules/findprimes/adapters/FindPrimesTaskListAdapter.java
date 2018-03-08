@@ -67,6 +67,7 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
         switch (task.getState()) {
             case RUNNING:
                 holder.state.setText(context.getString(R.string.status_searching));
+                holder.pauseButton.setEnabled(true);
                 holder.pauseButton.setVisibility(View.VISIBLE);
                 holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
                 holder.editButton.setVisibility(View.VISIBLE);
@@ -74,12 +75,31 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
                 holder.deleteButton.setEnabled(false);
                 break;
 
+            case PAUSING:
+                holder.state.setText(context.getString(R.string.state_pausing));
+                holder.pauseButton.setEnabled(false);
+                holder.pauseButton.setVisibility(View.VISIBLE);
+                holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                holder.editButton.setEnabled(false);
+                holder.deleteButton.setEnabled(false);
+                break;
+
             case PAUSED:
                 holder.state.setText(context.getString(R.string.status_paused));
+                holder.pauseButton.setEnabled(true);
                 holder.pauseButton.setVisibility(View.VISIBLE);
                 holder.pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
                 holder.editButton.setEnabled(true);
                 holder.deleteButton.setEnabled(true);
+                break;
+
+            case RESUMING:
+                holder.state.setText(context.getString(R.string.state_resuming));
+                holder.pauseButton.setEnabled(false);
+                holder.pauseButton.setVisibility(View.VISIBLE);
+                holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                holder.editButton.setEnabled(false);
+                holder.deleteButton.setEnabled(false);
                 break;
 
             case STOPPED:

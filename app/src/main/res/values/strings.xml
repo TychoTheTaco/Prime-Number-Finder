@@ -103,7 +103,9 @@
     <!-- Task status -->
     <string name="status_ready">Ready</string>
     <string name="status_searching">Searching&#8230;</string>
+    <string name="state_pausing">Pausing&#8230;</string>
     <string name="status_paused">Paused</string>
+    <string name="state_resuming">Resuming&#8230;</string>
     <string name="status_stopped">Stopped</string>
     <string name="status_finished">Finished</string>
 

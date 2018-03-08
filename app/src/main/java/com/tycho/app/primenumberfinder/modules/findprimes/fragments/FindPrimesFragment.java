@@ -402,8 +402,10 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             @Override
             public void onClick(View v) {
 
-                if (getEndValue().longValue() == FindPrimesTask.INFINITY){
+                if (getEndValue().longValue() == FindPrimesTask.INFINITY || getEndValue().compareTo(BigInteger.valueOf(Integer.MAX_VALUE - 1)) == 1){
                     searchOptions.setSearchMethod(FindPrimesTask.SearchMethod.BRUTE_FORCE);
+                }else{
+                    searchOptions.setSearchMethod(FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES);
                 }
 
                 //Check if the range is valid

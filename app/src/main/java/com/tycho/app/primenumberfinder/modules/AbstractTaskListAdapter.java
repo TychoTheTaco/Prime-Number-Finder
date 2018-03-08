@@ -119,6 +119,20 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                 }
 
                 @Override
+                public void onTaskPausing() {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (holder != null) {
+                                //holder.uiUpdater.pause();
+                                notifyItemChanged(holder.getAdapterPosition());
+                            }
+
+                        }
+                    });
+                }
+
+                @Override
                 public void onTaskPaused() {
                     handler.post(new Runnable() {
                         @Override
@@ -132,14 +146,43 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                 }
 
                 @Override
+                public void onTaskResuming() {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (holder != null) {
+                                //holder.uiUpdater.resume();
+                                Log.d(TAG, "notify resuming: " + task);
+                                notifyItemChanged(holder.getAdapterPosition());
+                            }
+
+                        }
+                    });
+                }
+
+                @Override
                 public void onTaskResumed() {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
                             if (holder != null) {
+                                Log.d(TAG, "notify resumed: " + task);
                                 holder.uiUpdater.resume();
                                 notifyItemChanged(holder.getAdapterPosition());
                             }
+                        }
+                    });
+                }
+
+                @Override
+                public void onTaskStopping() {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (holder != null) {
+                                notifyItemChanged(holder.getAdapterPosition());
+                            }
+
                         }
                     });
                 }
@@ -254,7 +297,6 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
             root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
                     if (selectedItemPosition == getAdapterPosition()) {
                         setSelected(null);
                     } else {

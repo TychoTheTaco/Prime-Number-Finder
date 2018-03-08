@@ -498,7 +498,6 @@ public class FindPrimesTask extends MultithreadedTask {
                             // Check if the number divides perfectly
                             if (currentNumber % i == 0) {
                                 isPrime = false;
-                                totalDistance += i;
                                 break;
                             }
 
@@ -512,7 +511,6 @@ public class FindPrimesTask extends MultithreadedTask {
 
                         // Check if the number was prime
                         if (isPrime) {
-                            totalDistance += sqrtMax;
                             dispatchPrimeFound(currentNumber);
                         }
                     }
@@ -587,6 +585,7 @@ public class FindPrimesTask extends MultithreadedTask {
                 if (bitSet.get(factor)) {
                     for (int j = factor; factor*j <= endValue; j++) {
                         bitSet.set(factor * j, false);
+                        //tryPause();
                     }
                 }
 

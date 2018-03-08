@@ -260,6 +260,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     protected void onUiUpdate() {
         if (getTask() != null) {
 
+            //Log.d(TAG, "onUiUpdate()");
+
             //Update progress
             if (getTask().getEndValue() != FindPrimesTask.INFINITY) {
                 progress.setText(getString(R.string.task_progress, DECIMAL_FORMAT.format(getTask().getProgress() * 100)));
@@ -304,6 +306,10 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     public void setTask(final Task task) {
         super.setTask(task);
+        Log.d(TAG, "setTask: " + task);
+        if (task != null){
+            Log.d(TAG, "end: " + ((FindPrimesTask) task).getEndValue());
+        }
         if (getView() != null){
             init();
         }

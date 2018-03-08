@@ -477,4 +477,18 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
         }
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        PrimeNumberFinder.getTaskManager().resumeAllTasks();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (!PrimeNumberFinder.getPreferenceManager().isAllowBackgroundTasks()) {
+            PrimeNumberFinder.getTaskManager().pauseAllTasks();
+        }
+    }
 }
