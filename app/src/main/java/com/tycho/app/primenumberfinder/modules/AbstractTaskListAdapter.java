@@ -124,7 +124,6 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                         @Override
                         public void run() {
                             if (holder != null) {
-                                //holder.uiUpdater.pause();
                                 notifyItemChanged(holder.getAdapterPosition());
                             }
 
@@ -151,8 +150,6 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                         @Override
                         public void run() {
                             if (holder != null) {
-                                //holder.uiUpdater.resume();
-                                Log.d(TAG, "notify resuming: " + task);
                                 notifyItemChanged(holder.getAdapterPosition());
                             }
 
@@ -166,7 +163,6 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                         @Override
                         public void run() {
                             if (holder != null) {
-                                Log.d(TAG, "notify resumed: " + task);
                                 holder.uiUpdater.resume();
                                 notifyItemChanged(holder.getAdapterPosition());
                             }

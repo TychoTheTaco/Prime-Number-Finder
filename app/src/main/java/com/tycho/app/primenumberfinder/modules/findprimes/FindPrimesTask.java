@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -69,6 +70,8 @@ public class FindPrimesTask extends MultithreadedTask {
     private SearchMethod searchMethod;
 
     //private List<Long> primes = new ArrayList<>();
+
+    private static final Object COUNTER_SYNC = new Object();
 
     private int primeCount = 0;
 
@@ -342,7 +345,7 @@ public class FindPrimesTask extends MultithreadedTask {
     }
 
     public int getPrimeCount() {
-        return this.primeCount;
+        return primeCount;
     }
 
     public List<Long> getSortedPrimes() {
@@ -541,7 +544,9 @@ public class FindPrimesTask extends MultithreadedTask {
                 //Log.d(TAG, "Added " + number + " to " + queue);
                 QUEUE_LOCK.notify();
             }*/
-            primeCount++;
+            synchronized (COUNTER_SYNC){
+                primeCount++;
+            }
 
             if (primes.size() >= bufferSize) {
                 isCached = true;
@@ -579,7 +584,6 @@ public class FindPrimesTask extends MultithreadedTask {
             // mark non-primes <= n using Sieve of Eratosthenes
             for (int factor = 2; factor <= sqrtMax; factor++) {
 
-                //currentNumber = factor;
                 // if factor is prime, then mark multiples of factor as nonprime
                 // suffices to consider mutiples factor, factor+1, ...,  n/factor
                 if (bitSet.get(factor)) {

@@ -60,7 +60,6 @@ public class FindPrimesTaskListFragment extends Fragment {
     @Override
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
-        Log.d(TAG, "onAttach()");
         taskListAdapter = new FindPrimesTaskListAdapter(activity);
         while (!eventListenerQueue.isEmpty()) {
             taskListAdapter.addEventListener(eventListenerQueue.poll());
@@ -71,7 +70,6 @@ public class FindPrimesTaskListFragment extends Fragment {
         taskListAdapter.addTaskListAdapterCallbacks(new TaskListAdapterCallbacks() {
             @Override
             public void onEditClicked(Task task) {
-                Log.d(TAG, "edit: " + task.getId());
                 final Intent intent = new Intent(activity, FindPrimesConfigurationActivity.class);
                 intent.putExtra("searchOptions", ((FindPrimesTask) task).getSearchOptions());
                 intent.putExtra("taskId", task.getId());

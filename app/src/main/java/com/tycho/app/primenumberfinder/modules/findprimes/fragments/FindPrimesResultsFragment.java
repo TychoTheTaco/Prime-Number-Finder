@@ -70,6 +70,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        Log.d(TAG, "onAttach()");
         primesAdapter = new PrimesAdapter(activity);
 
         final String[] splitSubtitle = getString(R.string.find_primes_result).split("%\\d\\$.");
@@ -83,6 +84,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_primes_results_fragment, container, false);
+
+        Log.d(TAG, "onCreateView()");
 
         //Set up recycler view
         recyclerView = rootView.findViewById(R.id.recyclerView);
@@ -185,10 +188,11 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     public void onTaskStarted() {
         super.onTaskStarted();
-        if (isAdded() && !isDetached()){
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (isAdded() && !isDetached() && getTask() != null) {
                     title.setText(getString(R.string.status_searching));
                     progressBarInfinite.setVisibility(View.VISIBLE);
 
@@ -202,17 +206,34 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                         progress.setText(getString(R.string.task_progress, DECIMAL_FORMAT.format(getTask().getProgress() * 100)));
                     }
                 }
-            });
-        }
+            }
+        });
+    }
+
+    @Override
+    public void onTaskPausing() {
+        super.onTaskPausing();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (isAdded() && !isDetached() && getTask() != null) {
+                    title.setText(getString(R.string.state_pausing));
+
+                    //Subtitle
+                    subtitleTextView.setText(formatSubtitle());
+                }
+
+            }
+        });
     }
 
     @Override
     public void onTaskPaused() {
         super.onTaskPaused();
-        if (isAdded() && !isDetached()){
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (isAdded() && !isDetached() && getTask() != null) {
                     title.setText(getString(R.string.status_paused));
                     progressBarInfinite.setVisibility(View.GONE);
 
@@ -226,8 +247,24 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                         progress.setText(getString(R.string.task_progress, DECIMAL_FORMAT.format(getTask().getProgress() * 100)));
                     }
                 }
-            });
-        }
+            }
+        });
+    }
+
+    @Override
+    public void onTaskResuming() {
+        super.onTaskResuming();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (isAdded() && !isDetached() && getTask() != null) {
+                    title.setText(getString(R.string.state_resuming));
+
+                    //Subtitle
+                    subtitleTextView.setText(formatSubtitle());
+                }
+            }
+        });
     }
 
     @Override
@@ -239,7 +276,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        if (isAdded() && !isDetached()){
+        if (isAdded() && !isDetached() && getTask() != null) {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -260,8 +297,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     protected void onUiUpdate() {
         if (getTask() != null) {
 
-            //Log.d(TAG, "onUiUpdate()");
-
             //Update progress
             if (getTask().getEndValue() != FindPrimesTask.INFINITY) {
                 progress.setText(getString(R.string.task_progress, DECIMAL_FORMAT.format(getTask().getProgress() * 100)));
@@ -271,7 +306,11 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             //primesAdapter.notifyDataSetChanged();
             //recyclerView.scrollToPosition(primesAdapter.getItemCount() - 1);
 
-            subtitleTextView.setText(formatSubtitle());
+            final String count = NUMBER_FORMAT.format(getTask().getPrimeCount());
+            subtitleStringBuilder.replace(subtitleItems[0].length(), subtitleItems[0].length() + subtitleItems[1].length(), count);
+            subtitleItems[1] = count;
+
+            subtitleTextView.setText(subtitleStringBuilder);
         }
     }
 
@@ -307,10 +346,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     public void setTask(final Task task) {
         super.setTask(task);
         Log.d(TAG, "setTask: " + task);
-        if (task != null){
-            Log.d(TAG, "end: " + ((FindPrimesTask) task).getEndValue());
-        }
-        if (getView() != null){
+        if (task != null) formatSubtitle();
+        if (getView() != null) {
             init();
         }
     }
@@ -325,6 +362,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             final FindPrimesTask.SearchOptions searchOptions = getTask().getSearchOptions();
             if (searchOptions.getSearchMethod() == FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES || searchOptions.getThreadCount() > 1) {
                 recyclerView.setVisibility(View.GONE);
+                Log.d(TAG, "set visibility gone");
             } else {
                 primesAdapter.notifyDataSetChanged();
                 recyclerView.scrollToPosition(primesAdapter.getItemCount() - 1);
