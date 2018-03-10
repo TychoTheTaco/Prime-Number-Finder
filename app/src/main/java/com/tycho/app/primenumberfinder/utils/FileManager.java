@@ -275,7 +275,7 @@ public final class FileManager {
                 numbers.add(Long.valueOf(string));
             }
 
-        } catch (IOException e) {
+        } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
         }
 

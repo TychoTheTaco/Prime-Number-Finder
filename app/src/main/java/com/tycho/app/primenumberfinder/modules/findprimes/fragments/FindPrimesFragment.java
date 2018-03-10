@@ -91,7 +91,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
     private final NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
 
 
-    private final FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(0, FindPrimesTask.INFINITY, FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES, 1);
+    private final FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(0, FindPrimesTask.INFINITY, FindPrimesTask.SearchMethod.BRUTE_FORCE, 1);
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
@@ -197,7 +197,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 //TODO: We might not want to do this because the last fragment doesn't get even spacing. Either center it or allow scrolling.
-                /**
+                /*
                  * This empty touch listener is to prevent the scrolling behaviour of this
                  * TabLayout's parent HorizontalScrollView.
                  */
@@ -402,7 +402,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             @Override
             public void onClick(View v) {
 
-                if (getEndValue().longValue() == FindPrimesTask.INFINITY || getEndValue().compareTo(BigInteger.valueOf(Integer.MAX_VALUE - 1)) == 1){
+                if (getStartValue().compareTo(BigInteger.ZERO) == 1 ||getEndValue().longValue() == FindPrimesTask.INFINITY || getEndValue().compareTo(BigInteger.valueOf(Integer.MAX_VALUE - 1)) == 1){
                     searchOptions.setSearchMethod(FindPrimesTask.SearchMethod.BRUTE_FORCE);
                 }else{
                     searchOptions.setSearchMethod(FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES);
@@ -416,6 +416,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                     searchOptions.setEndValue(getEndValue().longValue());
                     searchOptions.setThreadCount(1);
                     startTask(searchOptions);
+                    searchOptions.setSearchMethod(FindPrimesTask.SearchMethod.BRUTE_FORCE);
 
                     hideKeyboard(getActivity());
 

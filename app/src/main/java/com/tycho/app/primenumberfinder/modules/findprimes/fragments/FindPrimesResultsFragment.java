@@ -362,7 +362,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             final FindPrimesTask.SearchOptions searchOptions = getTask().getSearchOptions();
             if (searchOptions.getSearchMethod() == FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES || searchOptions.getThreadCount() > 1) {
                 recyclerView.setVisibility(View.GONE);
-                Log.d(TAG, "set visibility gone");
             } else {
                 primesAdapter.notifyDataSetChanged();
                 recyclerView.scrollToPosition(primesAdapter.getItemCount() - 1);
@@ -375,8 +374,20 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                     onTaskStarted();
                     break;
 
+                case PAUSING:
+                    onTaskPausing();
+                    break;
+
                 case PAUSED:
                     onTaskPaused();
+                    break;
+
+                case RESUMING:
+                    onTaskResuming();
+                    break;
+
+                case STOPPING:
+                    onTaskStopping();
                     break;
 
                 case STOPPED:

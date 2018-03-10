@@ -1,5 +1,7 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.adapters;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,6 +19,8 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import static android.content.Context.CLIPBOARD_SERVICE;
 
 /**
  * @author Tycho Bellers
@@ -88,6 +92,17 @@ public class PrimesAdapter extends RecyclerView.Adapter<PrimesAdapter.ViewHolder
                             numberFormat.format(primes.get(getAdapterPosition())),
                             Utils.formatNumberOrdinal(getAdapterPosition() + 1)),
                             Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    final ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                    final ClipData clip = ClipData.newPlainText(numberFormat.format(primes.get(getAdapterPosition())), String.valueOf(primes.get(getAdapterPosition())));
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(context, "Number Copied!", Toast.LENGTH_SHORT).show();
+                    return true;
                 }
             });
         }
