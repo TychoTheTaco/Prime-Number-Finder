@@ -31,11 +31,9 @@ import java.util.List;
  *         Date Created: 11/3/2016
  */
 
-public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesSmallListAdapter.ViewHolderSavedFiles>{
+public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesSmallListAdapter.ViewHolder>{
 
     private final List<File> files = new ArrayList<>();
-    private final SparseBooleanArray selectedPositions = new SparseBooleanArray();
-    private boolean isSelecting = false;
 
     private final FileType fileType;
 
@@ -60,13 +58,13 @@ public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesS
     }
 
     @Override
-    public ViewHolderSavedFiles onCreateViewHolder(ViewGroup parent, int viewType){
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
         final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_saved_file, parent, false);
-        return new SavedFilesSmallListAdapter.ViewHolderSavedFiles(view);
+        return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolderSavedFiles holder, int position){
+    public void onBindViewHolder(ViewHolder holder, int position){
 
         final File file = files.get(position);
 
@@ -189,17 +187,17 @@ public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesS
         return fileType;
     }
 
-    protected class ViewHolderSavedFiles extends RecyclerView.ViewHolder{
+    class ViewHolder extends RecyclerView.ViewHolder{
 
-        protected final TextView fileName;
-        protected final TextView dateCreated;
-        protected final TextView icon;
+        private final TextView fileName;
+        private final TextView dateCreated;
+        private final TextView icon;
 
-        public ViewHolderSavedFiles(final View itemView){
+        ViewHolder(final View itemView){
             super(itemView);
-            icon = (TextView) itemView.findViewById(R.id.icon);
-            fileName = (TextView) itemView.findViewById(R.id.file_name);
-            dateCreated = (TextView) itemView.findViewById(R.id.textView_dateCreated);
+            icon = itemView.findViewById(R.id.icon);
+            fileName = itemView.findViewById(R.id.file_name);
+            dateCreated =  itemView.findViewById(R.id.textView_dateCreated);
         }
     }
 }

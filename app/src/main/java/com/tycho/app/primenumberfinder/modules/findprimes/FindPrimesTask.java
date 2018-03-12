@@ -107,7 +107,7 @@ public class FindPrimesTask extends MultithreadedTask {
     @Override
     protected void run() {
 
-        switch (searchMethod){
+        switch (searchMethod) {
             case BRUTE_FORCE:
                 searchBruteForce();
                 break;
@@ -118,7 +118,7 @@ public class FindPrimesTask extends MultithreadedTask {
         }
     }
 
-    private void searchBruteForce(){
+    private void searchBruteForce() {
         //Create worker tasks
         for (int i = 0; i < threadCount; i++) {
             long s = startValue + (2 * i + 1);
@@ -257,16 +257,16 @@ public class FindPrimesTask extends MultithreadedTask {
         System.out.println("Finished merge in " + (System.currentTimeMillis() - sortStart) + " ms.");
     }
 
-    private void mergeCache(){
+    private void mergeCache() {
         try {
             final File largeCache = new File(FileManager.getInstance().getContext().getFilesDir() + File.separator + "cache" + File.separator + getId() + File.separator + "primes");
-            if (!new File(FileManager.getInstance().getContext().getFilesDir() + File.separator + "cache" + File.separator + getId() + File.separator).exists()){
+            if (!new File(FileManager.getInstance().getContext().getFilesDir() + File.separator + "cache" + File.separator + getId() + File.separator).exists()) {
                 new File(FileManager.getInstance().getContext().getFilesDir() + File.separator + "cache" + File.separator + getId() + File.separator).mkdirs();
             }
             final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(largeCache));
 
             //Read each cache file
-            if (isCached){
+            if (isCached) {
                 for (File file : FileManager.getInstance().getTaskCacheDirectory(this).listFiles()) {
                     Log.d(TAG, "Reading from: " + file.getAbsolutePath());
                     if (file.getAbsolutePath().contains("primes")) break;
@@ -352,7 +352,7 @@ public class FindPrimesTask extends MultithreadedTask {
 
         final List<Long> primes = new ArrayList<>(primeCount);
 
-        switch (searchMethod){
+        switch (searchMethod) {
             case BRUTE_FORCE:
                 final int[] index = new int[getTasks().size()];
                 for (int i = 0; i < index.length; i++) {
@@ -379,7 +379,7 @@ public class FindPrimesTask extends MultithreadedTask {
                 break;
 
             case SIEVE_OF_ERATOSTHENES:
-                for (int i = 0; i < primeCount - 1; i++){
+                for (int i = 0; i < primeCount - 1; i++) {
                     primes.add(Long.valueOf(((SieveTask) getTasks().get(0)).primes.get(i)));
                 }
                 break;
@@ -395,10 +395,10 @@ public class FindPrimesTask extends MultithreadedTask {
      */
     public long getCurrentValue() {
         if (getTasks().size() == 0) return 0;
-        if (searchMethod == SearchMethod.SIEVE_OF_ERATOSTHENES){
-            if (getState() == State.STOPPED){
+        if (searchMethod == SearchMethod.SIEVE_OF_ERATOSTHENES) {
+            if (getState() == State.STOPPED) {
                 return endValue;
-            }else{
+            } else {
                 return 0;
             }
         }
@@ -419,7 +419,7 @@ public class FindPrimesTask extends MultithreadedTask {
 
     public boolean isCached = false;
 
-    private class BruteForceTask extends MultithreadedTask.SubTask{
+    private class BruteForceTask extends MultithreadedTask.SubTask {
 
         /**
          * The starting value of the search. (inclusive).
@@ -480,42 +480,38 @@ public class FindPrimesTask extends MultithreadedTask {
                 // Check if the end value has been reached
                 if (currentNumber <= endValue || endValue == -1) {
 
-                    // Check if the number is divisible by 2
-                    if (currentNumber % 2 != 0) {
+                    /*
+                     * Get the square root of the number. We only need to calculate up to the square
+                     * root to determine if the number is prime. The square root of a long will
+                     * always fit inside the value range of an int.
+                     */
+                    sqrtMax = (int) Math.sqrt(currentNumber);
 
-						/*
-                         * Get the square root of the number. We only need to calculate up to the square
-						 * root to determine if the number is prime. The square root of a long will
-						 * always fit inside the value range of an int.
-						 */
-                        sqrtMax = (int) Math.sqrt(currentNumber);
+                    // Assume the number is prime
+                    isPrime = true;
 
-                        // Assume the number is prime
-                        isPrime = true;
+                    /*
+                     * Check if the number is divisible by every odd number below it's square root.
+                     */
+                    for (int i = 3; i <= sqrtMax; i += 2) {
 
-						/*
-                         * Check if the number is divisible by every odd number below it's square root.
-						 */
-                        for (int i = 3; i <= sqrtMax; i += 2) {
-
-                            // Check if the number divides perfectly
-                            if (currentNumber % i == 0) {
-                                isPrime = false;
-                                break;
-                            }
-
-                            // Check if we should pause
-                            tryPause();
-                            if (shouldStop()) {
-                                running = false;
-                                break;
-                            }
+                        // Check if the number divides perfectly
+                        if (currentNumber % i == 0) {
+                            isPrime = false;
+                            break;
                         }
 
-                        // Check if the number was prime
-                        if (isPrime) {
-                            dispatchPrimeFound(currentNumber);
+                        // Check if we should pause
+                        tryPause();
+                        if (shouldStop()) {
+                            running = false;
+                            break;
                         }
+                    }
+
+                    // Check if the number was prime
+                    if (isPrime) {
+                        dispatchPrimeFound(currentNumber);
                     }
 
                     currentNumber += increment;
@@ -544,7 +540,7 @@ public class FindPrimesTask extends MultithreadedTask {
                 //Log.d(TAG, "Added " + number + " to " + queue);
                 QUEUE_LOCK.notify();
             }*/
-            synchronized (COUNTER_SYNC){
+            synchronized (COUNTER_SYNC) {
                 primeCount++;
             }
 
@@ -569,7 +565,7 @@ public class FindPrimesTask extends MultithreadedTask {
 
     }
 
-    private class SieveTask extends MultithreadedTask.SubTask{
+    private class SieveTask extends MultithreadedTask.SubTask {
 
         private final List<Integer> primes = new ArrayList<>();
 
@@ -587,7 +583,7 @@ public class FindPrimesTask extends MultithreadedTask {
                 // if factor is prime, then mark multiples of factor as nonprime
                 // suffices to consider mutiples factor, factor+1, ...,  n/factor
                 if (bitSet.get(factor)) {
-                    for (int j = factor; factor*j <= endValue; j++) {
+                    for (int j = factor; factor * j <= endValue; j++) {
                         bitSet.set(factor * j, false);
                         //tryPause();
                     }
@@ -597,8 +593,8 @@ public class FindPrimesTask extends MultithreadedTask {
                 tryPause();
             }
 
-            for (int i = 2; i < endValue; i++){
-                if (bitSet.get(i)){
+            for (int i = 2; i < endValue; i++) {
+                if (bitSet.get(i)) {
                     primes.add(i);
                     primeCount++;
                 }
@@ -609,7 +605,7 @@ public class FindPrimesTask extends MultithreadedTask {
         }
     }
 
-    private void searchSieve(){
+    private void searchSieve() {
         addTask(new SieveTask());
         executeTasks();
     }

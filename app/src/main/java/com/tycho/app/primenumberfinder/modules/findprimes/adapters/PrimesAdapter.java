@@ -11,10 +11,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
-import java.security.PublicKey;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +35,7 @@ public class PrimesAdapter extends RecyclerView.Adapter<PrimesAdapter.ViewHolder
     /**
      * {@linkplain NumberFormat} used for formatting numbers.
      */
-    private final NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
+    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
     /**
      * The context used to display toast messages.
@@ -56,9 +54,7 @@ public class PrimesAdapter extends RecyclerView.Adapter<PrimesAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        try {
-            holder.number.setText(numberFormat.format(primes.get(position)));
-        }catch (IndexOutOfBoundsException e){}
+        holder.number.setText(NUMBER_FORMAT.format(primes.get(position)));
     }
 
     @Override
@@ -89,7 +85,7 @@ public class PrimesAdapter extends RecyclerView.Adapter<PrimesAdapter.ViewHolder
                 @Override
                 public void onClick(View v) {
                     Toast.makeText(context, context.getString(R.string.primes_list_toast_message,
-                            numberFormat.format(primes.get(getAdapterPosition())),
+                            NUMBER_FORMAT.format(primes.get(getAdapterPosition())),
                             Utils.formatNumberOrdinal(getAdapterPosition() + 1)),
                             Toast.LENGTH_SHORT).show();
                 }
@@ -99,7 +95,7 @@ public class PrimesAdapter extends RecyclerView.Adapter<PrimesAdapter.ViewHolder
                 @Override
                 public boolean onLongClick(View v) {
                     final ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
-                    final ClipData clip = ClipData.newPlainText(numberFormat.format(primes.get(getAdapterPosition())), String.valueOf(primes.get(getAdapterPosition())));
+                    final ClipData clip = ClipData.newPlainText(NUMBER_FORMAT.format(primes.get(getAdapterPosition())), String.valueOf(primes.get(getAdapterPosition())));
                     clipboard.setPrimaryClip(clip);
                     Toast.makeText(context, "Number Copied!", Toast.LENGTH_SHORT).show();
                     return true;

@@ -416,6 +416,8 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                     searchOptions.setEndValue(getEndValue().longValue());
                     searchOptions.setThreadCount(1);
                     startTask(searchOptions);
+
+                    //Reset search options
                     searchOptions.setSearchMethod(FindPrimesTask.SearchMethod.BRUTE_FORCE);
 
                     hideKeyboard(getActivity());

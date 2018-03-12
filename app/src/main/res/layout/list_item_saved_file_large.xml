@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/selected_item_background"
-                android:orientation="horizontal"
-                android:padding="8dp">
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:background="@drawable/selected_item_background"
+    android:elevation="1dp"
+    android:orientation="horizontal"
+    android:padding="8dp">
 
     <TextView
         android:id="@+id/icon"
@@ -15,7 +16,7 @@
         android:background="@drawable/circle_white"
         android:gravity="center"
         android:textColor="@color/white"
-        android:textSize="12sp"/>
+        android:textSize="12sp" />
 
     <TextView
         android:id="@+id/file_name"
@@ -26,7 +27,7 @@
         android:gravity="top"
         android:singleLine="true"
         android:textColor="@color/primary_text"
-        android:textSize="14sp"/>
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/textView_dateCreated"
@@ -37,7 +38,7 @@
         android:gravity="bottom"
         android:maxLines="1"
         android:textColor="@color/secondary_text"
-        android:textSize="12sp"/>
+        android:textSize="12sp" />
 
     <TextView
         android:id="@+id/file_size"
@@ -48,6 +49,6 @@
         android:gravity="bottom"
         android:maxLines="1"
         android:textColor="#bebebe"
-        android:textSize="12sp"/>
+        android:textSize="12sp" />
 
 </RelativeLayout>
