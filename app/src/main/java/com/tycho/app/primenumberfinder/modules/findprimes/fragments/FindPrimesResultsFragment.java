@@ -1,6 +1,7 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
@@ -27,9 +29,14 @@ import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimesActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import easytasks.Task;
@@ -56,11 +63,11 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     private TextView subtitleTextView;
     private ProgressBar progressBarInfinite;
     private TextView progress;
-    private RecyclerView recyclerView;
+    //private RecyclerView recyclerView;
     private Button viewAllButton;
     private Button saveButton;
 
-    private PrimesAdapter primesAdapter;
+    //private PrimesAdapter primesAdapter;
 
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
@@ -71,7 +78,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         Log.d(TAG, "onAttach()");
-        primesAdapter = new PrimesAdapter(activity);
+        //primesAdapter = new PrimesAdapter(activity);
 
         final String[] splitSubtitle = getString(R.string.find_primes_result).split("%\\d\\$.");
         subtitleItems[0] = splitSubtitle[0];
@@ -88,11 +95,11 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         Log.d(TAG, "onCreateView()");
 
         //Set up recycler view
-        recyclerView = rootView.findViewById(R.id.recyclerView);
+        /*recyclerView = rootView.findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(primesAdapter);
-        recyclerView.setItemAnimator(null);
+        recyclerView.setItemAnimator(null);*/
 
         title = rootView.findViewById(R.id.title);
         subtitleTextView = rootView.findViewById(R.id.subtitle);
@@ -147,33 +154,35 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+                progressDialog.setTitle("Saving...");
+                progressDialog.show();
+
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        if (getTask().isCached) {
 
-                            //Read cache file
-                            try {
-                                FileManager.copy(new File(FileManager.getInstance().getTaskCacheDirectory(getTask()) + File.separator + "primes"), new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getTask().getStartValue() + " to " + getTask().getEndValue() + EXTENSION));
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-
+                        try {
+                            FileManager.copy(getTask().saveToFile(), new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getTask().getStartValue() + " to " + getTask().getEndValue() + EXTENSION));
+                        }catch (IOException e){
+                            e.printStackTrace();
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(getActivity(), "Saved from cache!", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        } else {
-                            final boolean success = FileManager.getInstance().savePrimes(getTask().getStartValue(), getTask().getCurrentValue(), getTask().getSortedPrimes());
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getActivity(), "Error saving file!", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
+
+                        progressDialog.dismiss();
+
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getActivity(), getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
+                            }
+                        });
 
                     }
                 }).start();
@@ -291,6 +300,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                 }
             });
         }
+
+        //FileManager.saveDebugFile(new File(FileManager.getInstance().getSavedPrimesDirectory() +  File.separator + "debug"));
     }
 
     @Override
@@ -345,8 +356,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     public void setTask(final Task task) {
         super.setTask(task);
-        Log.d(TAG, "setTask: " + task);
-        if (task != null) formatSubtitle();
         if (getView() != null) {
             init();
         }
@@ -359,13 +368,15 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             resultsView.setVisibility(View.VISIBLE);
             noTaskView.setVisibility(View.GONE);
 
-            final FindPrimesTask.SearchOptions searchOptions = getTask().getSearchOptions();
+           /* final FindPrimesTask.SearchOptions searchOptions = getTask().getSearchOptions();
             if (searchOptions.getSearchMethod() == FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES || searchOptions.getThreadCount() > 1) {
                 recyclerView.setVisibility(View.GONE);
             } else {
                 primesAdapter.notifyDataSetChanged();
                 recyclerView.scrollToPosition(primesAdapter.getItemCount() - 1);
-            }
+            }*/
+
+            formatSubtitle();
 
             progress.setVisibility(getTask().getEndValue() == FindPrimesTask.INFINITY ? View.GONE : View.VISIBLE);
 

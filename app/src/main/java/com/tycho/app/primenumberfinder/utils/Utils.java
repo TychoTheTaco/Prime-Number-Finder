@@ -20,6 +20,12 @@ import java.util.Locale;
  */
 public final class Utils {
 
+    /*static {
+        System.loadLibrary("native-utils");
+    }
+
+    public native static void compact();*/
+
     /**
      * Tag used for logging and debugging.
      */
