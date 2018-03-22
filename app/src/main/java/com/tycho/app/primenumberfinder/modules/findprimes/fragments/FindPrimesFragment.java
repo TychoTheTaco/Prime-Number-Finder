@@ -415,7 +415,11 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                     searchOptions.setStartValue(getStartValue().longValue());
                     searchOptions.setEndValue(getEndValue().longValue());
                     searchOptions.setThreadCount(1);
-                    startTask(searchOptions);
+                    try {
+                        startTask((FindPrimesTask.SearchOptions) searchOptions.clone());
+                    }catch (CloneNotSupportedException e){
+                        e.printStackTrace();
+                    }
 
                     //Reset search options
                     searchOptions.setSearchMethod(FindPrimesTask.SearchMethod.BRUTE_FORCE);
@@ -589,46 +593,66 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
     }
 
     private void startTask(final FindPrimesTask.SearchOptions searchOptions) {
-        final FindPrimesTask task = new FindPrimesTask(searchOptions, getActivity());
-        task.addTaskListener(new TaskAdapter() {
-            @Override
-            public void onTaskStopped() {
-                if (task.getSearchOptions().autoSave) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            final boolean success = FileManager.getInstance().savePrimes(task.getStartValue(), task.getEndValue(), task.getSortedPrimes());
-                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+
+        //Make sure there is enough memory
+        if (searchOptions.getSearchMethod() == FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES){
+
+            final Runtime runtime = Runtime.getRuntime();
+            final long usedMemInMB=(runtime.totalMemory() - runtime.freeMemory()) / 1048576L;
+            final long maxHeapSizeInMB=runtime.maxMemory() / 1048576L;
+            final long availHeapSizeInMB = maxHeapSizeInMB - usedMemInMB;
+
+            final long requiredMB = ((searchOptions.getEndValue() / 8) + (searchOptions.getEndValue() * 2)) / (1024 * 1024);
+
+            Log.d(TAG, "RAM: " + usedMemInMB + " / " + maxHeapSizeInMB);
+            Log.d(TAG, "Avail: " + availHeapSizeInMB);
+            Log.d(TAG, "Req: " + requiredMB);
+
+            if (requiredMB <= availHeapSizeInMB * 0.9f){
+                final FindPrimesTask task = new FindPrimesTask(searchOptions, getActivity());
+                task.addTaskListener(new TaskAdapter() {
+                    @Override
+                    public void onTaskStopped() {
+                        if (task.getSearchOptions().autoSave) {
+                            new Thread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
+                                    final boolean success = FileManager.getInstance().savePrimes(task.getStartValue(), task.getEndValue(), task.getSortedPrimes());
+                                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                                 }
-                            });
+                            }).start();
                         }
-                    }).start();
-                }
 
-                if (task.getSearchOptions().notifyWhenFinished) {
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity())
-                            .setSmallIcon(R.drawable.circle_white)
-                            .setContentTitle("Task Finished")
-                            .setContentText("Task \"Primes from " + task.getStartValue() + " to " + task.getEndValue() + "\" finished.");
-                    final NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-                    notificationManager.notify(0, builder.build());
-                }
+                        if (task.getSearchOptions().notifyWhenFinished) {
+                            NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity())
+                                    .setSmallIcon(R.drawable.circle_white)
+                                    .setContentTitle("Task Finished")
+                                    .setContentText("Task \"Primes from " + task.getStartValue() + " to " + task.getEndValue() + "\" finished.");
+                            final NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+                            notificationManager.notify(0, builder.build());
+                        }
+                        task.removeTaskListener(this);
+                    }
+                });
+                taskListFragment.addTask(task);
+                PrimeNumberFinder.getTaskManager().registerTask(task);
+
+                //Start the task
+                task.startOnNewThread();
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        taskListFragment.setSelected(task);
+                    }
+                });
+            }else{
+                Toast.makeText(getActivity(), "Not enough memory to start task!", Toast.LENGTH_SHORT).show();
             }
-        });
-        taskListFragment.addTask(task);
-        PrimeNumberFinder.getTaskManager().registerTask(task);
-
-        //Start the task
-        task.startOnNewThread();
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                taskListFragment.setSelected(task);
-            }
-        });
-
+        }
     }
 }

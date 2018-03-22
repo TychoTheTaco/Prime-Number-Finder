@@ -63,11 +63,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     private TextView subtitleTextView;
     private ProgressBar progressBarInfinite;
     private TextView progress;
-    //private RecyclerView recyclerView;
     private Button viewAllButton;
     private Button saveButton;
-
-    //private PrimesAdapter primesAdapter;
 
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
@@ -78,7 +75,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         Log.d(TAG, "onAttach()");
-        //primesAdapter = new PrimesAdapter(activity);
 
         final String[] splitSubtitle = getString(R.string.find_primes_result).split("%\\d\\$.");
         subtitleItems[0] = splitSubtitle[0];
@@ -93,13 +89,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         final View rootView = inflater.inflate(R.layout.find_primes_results_fragment, container, false);
 
         Log.d(TAG, "onCreateView()");
-
-        //Set up recycler view
-        /*recyclerView = rootView.findViewById(R.id.recyclerView);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.setAdapter(primesAdapter);
-        recyclerView.setItemAnimator(null);*/
 
         title = rootView.findViewById(R.id.title);
         subtitleTextView = rootView.findViewById(R.id.subtitle);
@@ -204,10 +193,15 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                 if (isAdded() && !isDetached() && getTask() != null) {
                     title.setText(getString(R.string.status_searching));
                     progressBarInfinite.setVisibility(View.VISIBLE);
-
-                    //Subtitle
                     subtitleTextView.setText(formatSubtitle());
+                    switch (getTask().getSearchOptions().getSearchMethod()){
+                        case BRUTE_FORCE:
+                            break;
 
+                        case SIEVE_OF_ERATOSTHENES:
+                            viewAllButton.setVisibility(View.GONE);
+                            break;
+                    }
                     saveButton.setVisibility(View.GONE);
 
                     //Update progress
@@ -227,8 +221,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             public void run() {
                 if (isAdded() && !isDetached() && getTask() != null) {
                     title.setText(getString(R.string.state_pausing));
-
-                    //Subtitle
                     subtitleTextView.setText(formatSubtitle());
                 }
 
@@ -245,10 +237,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                 if (isAdded() && !isDetached() && getTask() != null) {
                     title.setText(getString(R.string.status_paused));
                     progressBarInfinite.setVisibility(View.GONE);
-
-                    //Subtitle
                     subtitleTextView.setText(formatSubtitle());
-
                     saveButton.setVisibility(View.VISIBLE);
 
                     //Update progress
@@ -268,8 +257,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             public void run() {
                 if (isAdded() && !isDetached() && getTask() != null) {
                     title.setText(getString(R.string.state_resuming));
-
-                    //Subtitle
                     subtitleTextView.setText(formatSubtitle());
                 }
             }
@@ -292,10 +279,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                     title.setText(getString(R.string.status_finished));
                     progressBarInfinite.setVisibility(View.GONE);
                     progress.setVisibility(View.GONE);
-
-                    //Subtitle
                     subtitleTextView.setText(formatSubtitle());
-
+                    viewAllButton.setVisibility(View.VISIBLE);
                     saveButton.setVisibility(View.VISIBLE);
                 }
             });
@@ -312,10 +297,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             if (getTask().getEndValue() != FindPrimesTask.INFINITY) {
                 progress.setText(getString(R.string.task_progress, DECIMAL_FORMAT.format(getTask().getProgress() * 100)));
             }
-
-            //Update recyclerView
-            //primesAdapter.notifyDataSetChanged();
-            //recyclerView.scrollToPosition(primesAdapter.getItemCount() - 1);
 
             final String count = NUMBER_FORMAT.format(getTask().getPrimeCount());
             subtitleStringBuilder.replace(subtitleItems[0].length(), subtitleItems[0].length() + subtitleItems[1].length(), count);

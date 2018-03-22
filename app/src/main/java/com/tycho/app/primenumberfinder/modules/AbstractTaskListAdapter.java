@@ -10,6 +10,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
+import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 
 import java.util.ArrayList;
@@ -338,6 +339,8 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                     customEventListeners.remove(task);
                     tasks.remove(task);
                     notifyItemRemoved(getAdapterPosition());
+
+                    PrimeNumberFinder.getTaskManager().unregisterTask(task);
 
                     //Notify listeners
                     sendOnDeletePressed(task);

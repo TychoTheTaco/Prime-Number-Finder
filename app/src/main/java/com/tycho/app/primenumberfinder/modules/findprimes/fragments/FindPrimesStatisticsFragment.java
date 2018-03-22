@@ -125,6 +125,8 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
     @Override
     public void setTask(Task task) {
         super.setTask(task);
+        this.task = task;
+        Log.d(TAG, "Set task: " + task);
         if (getView() != null) {
             init();
         }

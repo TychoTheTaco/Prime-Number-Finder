@@ -401,8 +401,9 @@ public final class FileManager {
                 bufferedReader.readLine();
             }
 
-            for (int i = 0; i < (endIndex - startIndex); i++) {
-                numbers.add(Long.valueOf(bufferedReader.readLine()));
+            String line;
+            for (int i = 0; i < (endIndex - startIndex) && (line = bufferedReader.readLine()) != null; i++) {
+                numbers.add(Long.valueOf(line));
             }
 
             bufferedReader.close();

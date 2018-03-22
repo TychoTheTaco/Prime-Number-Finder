@@ -79,8 +79,6 @@ public class FindPrimesTask extends MultithreadedTask {
 
     private SearchOptions searchOptions;
 
-    private Context context;
-
     /**
      * Create a new {@linkplain FindPrimesTask}.
      *
@@ -93,13 +91,11 @@ public class FindPrimesTask extends MultithreadedTask {
         this.endValue = endValue;
         this.threadCount = threadCount;
         this.searchMethod = searchMethod;
-        this.context = null;
     }
 
     public FindPrimesTask(final SearchOptions searchOptions, final Context context) {
         this(searchOptions.getStartValue(), searchOptions.getEndValue(), searchOptions.getThreadCount(), searchOptions.getSearchMethod());
         this.searchOptions = searchOptions;
-        this.context = context;
     }
 
     public SearchOptions getSearchOptions() {
@@ -259,17 +255,17 @@ public class FindPrimesTask extends MultithreadedTask {
         //System.out.println("Finished merge in " + (System.currentTimeMillis() - sortStart) + " ms.");
     }
 
-    public File saveToFile() throws IOException{
+    public File saveToFile() throws IOException {
 
         final File largeCache = new File(FileManager.getInstance().getTaskCacheDirectory(this) + File.separator + "primes");
-        if (searchMethod == SearchMethod.BRUTE_FORCE){
+        if (searchMethod == SearchMethod.BRUTE_FORCE) {
             mergeCache();
-        }else{
+        } else {
             final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(largeCache));
             final int lastNumber = ((SieveTask) getTasks().get(0)).primes.get(((SieveTask) getTasks().get(0)).primes.size() - 1);
-            for (int number : ((SieveTask) getTasks().get(0)).primes){
+            for (int number : ((SieveTask) getTasks().get(0)).primes) {
                 bufferedWriter.write(String.valueOf(number));
-                if (number != lastNumber){
+                if (number != lastNumber) {
                     bufferedWriter.write('\n');
                 }
             }
@@ -288,30 +284,28 @@ public class FindPrimesTask extends MultithreadedTask {
             final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(largeCache));
 
             //Read each cache file
-            if (isCached) {
-                for (File file : FileManager.getInstance().getTaskCacheDirectory(this).listFiles()) {
-                    Log.d(TAG, "Reading from: " + file.getAbsolutePath());
-                    if (file.getAbsolutePath().contains("primes")) break;
-                    final DataInputStream dataInputStream = new DataInputStream(new FileInputStream(file));
-                    //final List<Long> numbers = new ArrayList<>();
-                    //final int BUFFER_SIZE = 100_000;
-                    try {
-                        while (true) {
+            for (File file : FileManager.getInstance().getTaskCacheDirectory(this).listFiles()) {
+                Log.d(TAG, "Reading from: " + file.getAbsolutePath());
+                if (file.getAbsolutePath().contains("primes")) break;
+                final DataInputStream dataInputStream = new DataInputStream(new FileInputStream(file));
+                //final List<Long> numbers = new ArrayList<>();
+                //final int BUFFER_SIZE = 100_000;
+                try {
+                    while (true) {
                             /*numbers.add(dataInputStream.readLong());
                             if (numbers.size() >= BUFFER_SIZE){
                                 FileManager.writeCompact(numbers, largeCache, true);
                                 numbers.clear();
                             }*/
-                            bufferedWriter.write(String.valueOf(dataInputStream.readLong()));
-                            bufferedWriter.write('\n');
-                        }
-                    } catch (EOFException e) {
-                        dataInputStream.close();
+                        bufferedWriter.write(String.valueOf(dataInputStream.readLong()));
+                        bufferedWriter.write('\n');
+                    }
+                } catch (EOFException e) {
+                    dataInputStream.close();
                         /*if (numbers.size() >= BUFFER_SIZE){
                             FileManager.writeCompact(numbers, largeCache, true);
                             numbers.clear();
                         }*/
-                    }
                 }
             }
 
@@ -455,8 +449,6 @@ public class FindPrimesTask extends MultithreadedTask {
 
     private final File taskDirectory = FileManager.getInstance().getTaskCacheDirectory(this);
 
-    public boolean isCached = false;
-
     private class BruteForceTask extends MultithreadedTask.SubTask {
 
         /**
@@ -583,7 +575,6 @@ public class FindPrimesTask extends MultithreadedTask {
             }
 
             if (primes.size() >= bufferSize) {
-                isCached = true;
                 Log.d(TAG, "Swapping to disk! Size: " + primes.size());
 
                 //Swap memory to disk
@@ -638,9 +629,6 @@ public class FindPrimesTask extends MultithreadedTask {
                 }
                 //setProgress(0.5f + (((float) i / endValue) / 2));
             }
-            if (primeCount >= 1){
-                Log.d(TAG, "Largest: " + primes.get(primeCount - 1));
-            }
             setProgress(1);
         }
     }
@@ -663,7 +651,7 @@ public class FindPrimesTask extends MultithreadedTask {
 
     // Android
 
-    public static class SearchOptions implements Parcelable {
+    public static class SearchOptions implements Parcelable, Cloneable {
 
         /**
          * The value to start the search from. Inclusive.
@@ -752,6 +740,10 @@ public class FindPrimesTask extends MultithreadedTask {
             this.threadCount = parcel.readInt();
             this.notifyWhenFinished = parcel.readInt() == 1;
             this.autoSave = parcel.readInt() == 1;
+        }
+
+        public Object clone() throws CloneNotSupportedException {
+            return super.clone();
         }
 
         public long getStartValue() {

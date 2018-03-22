@@ -88,10 +88,10 @@ public class DisplayPrimesActivity extends AppCompatActivity{
 
                         private final int totalNumbers = FileManager.countTotalNumbers(file);
 
-                        private int totalItemCount, lastVisibleItem, visibleThreshold = 3;
+                        private int totalItemCount, lastVisibleItem, visibleThreshold = 0;
                         private boolean loading = false;
 
-                        private final int MAX_NUMBERS = 100;
+                        private final int MAX_NUMBERS = 1000 - 1;
                         private final int[] range = new int[]{0, MAX_NUMBERS};
 
                         @Override
@@ -100,8 +100,9 @@ public class DisplayPrimesActivity extends AppCompatActivity{
 
                             totalItemCount = linearLayoutManager.getItemCount();
                             lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+
                             if (!loading) {
-                                if (totalItemCount <= (lastVisibleItem + visibleThreshold)){
+                                if (totalItemCount - 1 <= (lastVisibleItem + visibleThreshold)){
                                     loading = true;
                                     loadMore(true);
                                     loading = false;
@@ -121,9 +122,8 @@ public class DisplayPrimesActivity extends AppCompatActivity{
                                 return;
                             }
                             Log.d(TAG, "Loading more...");
-                            Log.d(TAG, totalItemCount + " / " + totalNumbers);
 
-                            final int half = MAX_NUMBERS / 2;
+                            final int half = (MAX_NUMBERS + 1) / 2;
                             //Log.d(TAG, "Before: " + primesAdapter.getPrimes());
                             if (end){
 
@@ -224,7 +224,7 @@ public class DisplayPrimesActivity extends AppCompatActivity{
             @Override
             public void run(){
 
-                primesAdapter.getPrimes().addAll(FileManager.getInstance().readNumbers(file, 0, 100));
+                primesAdapter.getPrimes().addAll(FileManager.getInstance().readNumbers(file, 0, 999));
 
                 new Handler(getMainLooper()).post(new Runnable(){
                     @Override
