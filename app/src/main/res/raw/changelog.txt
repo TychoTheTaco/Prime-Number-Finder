@@ -1,0 +1,60 @@
+01/10/2016 > FindPrime version 1.0
+- First Release
+
+02/17/2016 > FindPrime version 1.1.0
+- Added ability to find all factors of a number
+- Changed layout and color scheme
+- Added ability to share and export saved files
+- Bug fixes
+- Changed icon
+
+02/18/2016 > FindPrime version 1.1.1
+- Added ability to delete files when viewing them
+
+03/01/2016 > FindPrime version 1.1.2
+- Changed card views and layout in the "Saved Files" fragment
+
+01/01/2018 > Prime Number Finder version 1.2.0
+- Major UI update
+- Implemented task system to make it possible to start multiple tasks at once and selectively pause or stop them.
++ Major performance increase
+	- 57% faster at finding prime numbers
+	- 97% faster at finding factors
+- Added Prime factorization functionality
+- Added setting for allowing background tasks
+- Changed name to "Prime Number Finder"
+- Minor bug fixes
+
+01/14/2018 > Prime Number Finder version 1.2.1
+- Fixed a bug that would sometimes cause the application to crash when starting up or resuming
+
+01/15/2018 > Prime Number Finder version 1.2.2
+- Fixed a bug that would sometimes cause the application to crash when a task finished
+- Minor performance and battery life improvements
+
+01/19/2018 > Prime Number Finder version 1.2.3
+- Navigation drawer items now show a progress bar if there is a task running
+- Reduced memory usage for results fragment adapters
+- Lists will now show the number's position when tapped
+- Saved primes and factors can now be exported
+- Fixed a bug where the links in the 'About' page couldn't be opened
+- Fixed a bug where '2' was not included in the prime numbers when searching to infinity
+
+01/25/2018 > Prime Number Finder version 1.2.4
+- Fixed a bug that caused the application to crash the first time a file was exported
+- Fixed a bug that occasionally prevented the statistics tab to update
+- Fixed a bug that sometimes caused the factors list to display incorrect items
+- Fixed a bug that prevented the results tab from properly updating after resuming the application
+- Fixed a bug that prevented the statistics tab from updating after a task had finished
+- Fixed a bug that occasionally caused the statistics tab to show incorrect information after a task was finished
+
+02/06/2018 > Prime Number Finder version 1.2.5
+- Fixed a bug that occasionally prevented the statistics tab in the 'Find Primes' section from updating when a paused task was selected
+- Added export options for saved primes and factors
+- Added factor trees
+- Added ability to export factor trees as PNG
+
+02/07/2018 > Prime Number Finder version 1.2.6
+- Improved 'About' page
+- Fixed a bug that sometimes caused the 'Find Primes' statistics page to show incorrect data
+- Fixed a bug that sometimes caused the application to freeze when deleting a task
