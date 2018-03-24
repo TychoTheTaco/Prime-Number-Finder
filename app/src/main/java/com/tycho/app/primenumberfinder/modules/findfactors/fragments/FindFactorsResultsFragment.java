@@ -103,7 +103,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                         });
 
                         final Task.State state = getTask().getState();
-                        getTask().pause();
+                        getTask().pause(true);
                         final File file = new File(getActivity().getFilesDir() + File.separator + "temp");
                         final boolean success = FileManager.getInstance().saveFactors(getTask().getFactors(), file);
                         if (!success){

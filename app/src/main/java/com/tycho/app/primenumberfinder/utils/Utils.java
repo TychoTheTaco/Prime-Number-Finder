@@ -6,9 +6,13 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.inputmethod.InputMethodManager;
 
+import java.io.File;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -119,5 +123,18 @@ public final class Utils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void sortByDate(final List<File> files, final boolean ascending){
+        Collections.sort(files, new Comparator<File>() {
+            @Override
+            public int compare(File file0, File file1) {
+                if (ascending){
+                    return Long.valueOf(file0.lastModified()).compareTo(file1.lastModified());
+                }else{
+                    return Long.valueOf(file1.lastModified()).compareTo(file0.lastModified());
+                }
+            }
+        });
     }
 }

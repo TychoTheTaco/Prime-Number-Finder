@@ -52,8 +52,6 @@ public class SavedFilesCardAdapter extends RecyclerView.Adapter<SavedFilesCardAd
 
         holder.recyclerView.setAdapter(card.getSavedFilesAdapter());
         card.getSavedFilesAdapter().refresh();
-        card.getSavedFilesAdapter().sortByDate();
-        card.getSavedFilesAdapter().notifyDataSetChanged();
        // holder.listView.setAdapter(card.getAdapterSavedFilesTest());
 
         final ViewGroup.LayoutParams layoutParams = holder.recyclerView.getLayoutParams();

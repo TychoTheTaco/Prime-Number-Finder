@@ -20,6 +20,7 @@ import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrim
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimesActivity;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.SavedFilesListActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -72,6 +73,9 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 files.addAll(Arrays.asList(FileManager.getInstance().getSavedTreesDirectory().listFiles()));
                 break;
         }
+
+        Utils.sortByDate(files, false);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -194,6 +198,7 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                         case PRIMES:
                             intent = new Intent(context, DisplayPrimesActivity.class);
                             intent.putExtra("filePath", file.getAbsolutePath());
+                            intent.putExtra("allowExport", true);
                             intent.putExtra("title", true);
                             context.startActivity(intent);
                             break;
@@ -201,6 +206,7 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                         case FACTORS:
                             intent = new Intent(context, DisplayFactorsActivity.class);
                             intent.putExtra("filePath", file.getAbsolutePath());
+                            intent.putExtra("allowExport", true);
                             intent.putExtra("title", true);
                             context.startActivity(intent);
                             break;
@@ -208,6 +214,7 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                         case TREE:
                             intent = new Intent(context, DisplayPrimeFactorizationActivity.class);
                             intent.putExtra("filePath", file.getAbsolutePath());
+                            intent.putExtra("allowExport", true);
                             intent.putExtra("title", true);
                             context.startActivity(intent);
                             break;
@@ -230,15 +237,6 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     return true;
                 }
                 return false;
-            }
-        });
-    }
-
-    public void sortByDate() {
-        Collections.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(File file0, File file1) {
-                return (int) (file1.lastModified() - file0.lastModified());
             }
         });
     }

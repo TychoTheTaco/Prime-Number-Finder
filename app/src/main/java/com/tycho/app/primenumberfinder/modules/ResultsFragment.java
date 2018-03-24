@@ -54,7 +54,7 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public void onTaskPaused() {
         super.onTaskPaused();
-        uiUpdater.pause();
+        uiUpdater.pause(false);
     }
 
     @Override
@@ -66,7 +66,7 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        uiUpdater.pause();
+        uiUpdater.pause(false);
     }
 
     protected void updateUi(){
@@ -90,7 +90,7 @@ public abstract class ResultsFragment extends TaskFragment {
         protected void run() {
             while (true) {
 
-                if (getTask() == null) pause();
+                if (getTask() == null) pause(false);
 
                 handler.post(new Runnable() {
                     @Override

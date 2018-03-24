@@ -15,6 +15,7 @@ import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.utils.FileType;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesListAdapter;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
 /**
  * @author Tycho Bellers
@@ -43,8 +44,6 @@ public class SavedFilesListActivity extends AppCompatActivity {
         final FileType fileType = FileType.findById(savedFileTypeId);
 
         adapterSavedFilesList = new SavedFilesListAdapter(this, fileType);
-        adapterSavedFilesList.sortByDate();
-        adapterSavedFilesList.notifyDataSetChanged();
 
         //Set the actionbar to a custom toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);

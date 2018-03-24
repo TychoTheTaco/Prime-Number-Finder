@@ -16,6 +16,7 @@ import com.tycho.app.primenumberfinder.utils.FileType;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesCardAdapter;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.VerticalItemDecoration;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.util.Iterator;
 
@@ -61,7 +62,7 @@ public class SavedFilesFragment extends Fragment{
         recyclerViewCards = rootView.findViewById(R.id.recyclerView_savedFiles);
         recyclerViewCards.setHasFixedSize(true);
         recyclerViewCards.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerViewCards.addItemDecoration(new VerticalItemDecoration(24));
+        recyclerViewCards.addItemDecoration(new VerticalItemDecoration((int) Utils.dpToPx(getActivity(), 8)));
         recyclerViewCards.setAdapter(cardAdapter);
         recyclerViewCards.setItemAnimator(null);
 

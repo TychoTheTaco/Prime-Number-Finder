@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.EOFException;
@@ -71,8 +72,6 @@ public class FindPrimesTask extends MultithreadedTask {
 
     private SearchMethod searchMethod;
 
-    //private List<Long> primes = new ArrayList<>();
-
     private static final Object COUNTER_SYNC = new Object();
 
     private int primeCount = 0;
@@ -104,7 +103,6 @@ public class FindPrimesTask extends MultithreadedTask {
 
     @Override
     protected void run() {
-
         switch (searchMethod) {
             case BRUTE_FORCE:
                 searchBruteForce();
@@ -120,8 +118,9 @@ public class FindPrimesTask extends MultithreadedTask {
         //Create worker tasks
         for (int i = 0; i < threadCount; i++) {
             long s = startValue + (2 * i + 1);
-            if (s % 2 == 0)
+            if (s % 2 == 0) {
                 s -= 1;
+            }
             final BruteForceTask task = new BruteForceTask(s, endValue, threadCount * 2);
             task.addTaskListener(new TaskAdapter() {
                 @Override
@@ -259,8 +258,10 @@ public class FindPrimesTask extends MultithreadedTask {
 
         final File largeCache = new File(FileManager.getInstance().getTaskCacheDirectory(this) + File.separator + "primes");
         if (searchMethod == SearchMethod.BRUTE_FORCE) {
-            mergeCache();
+            //sortCache(getState() == State.STOPPED);
+            sortCache(false);
         } else {
+            if (getState() != State.STOPPED) return largeCache;
             final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(largeCache));
             final int lastNumber = ((SieveTask) getTasks().get(0)).primes.get(((SieveTask) getTasks().get(0)).primes.size() - 1);
             for (int number : ((SieveTask) getTasks().get(0)).primes) {
@@ -274,74 +275,153 @@ public class FindPrimesTask extends MultithreadedTask {
         return largeCache;
     }
 
-    private void mergeCache() {
-
-        final long sortStart = System.currentTimeMillis();
-        System.out.println("Merging cache...");
-
+    private void sortCache(final boolean delete) {
         try {
-            final File largeCache = new File(FileManager.getInstance().getTaskCacheDirectory(this) + File.separator + "primes");
-            final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(largeCache));
 
-            //Read each cache file
-            for (File file : FileManager.getInstance().getTaskCacheDirectory(this).listFiles()) {
-                Log.d(TAG, "Reading from: " + file.getAbsolutePath());
-                if (file.getAbsolutePath().contains("primes")) break;
-                final DataInputStream dataInputStream = new DataInputStream(new FileInputStream(file));
-                //final List<Long> numbers = new ArrayList<>();
-                //final int BUFFER_SIZE = 100_000;
-                try {
-                    while (true) {
-                            /*numbers.add(dataInputStream.readLong());
-                            if (numbers.size() >= BUFFER_SIZE){
-                                FileManager.writeCompact(numbers, largeCache, true);
-                                numbers.clear();
-                            }*/
-                        bufferedWriter.write(String.valueOf(dataInputStream.readLong()));
-                        bufferedWriter.write('\n');
-                    }
-                } catch (EOFException e) {
-                    dataInputStream.close();
-                        /*if (numbers.size() >= BUFFER_SIZE){
-                            FileManager.writeCompact(numbers, largeCache, true);
-                            numbers.clear();
-                        }*/
-                }
-            }
+            //Main cache file
+            final File cache = new File(FileManager.getInstance().getTaskCacheDirectory(this) + File.separator + "primes");
+            final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(cache, false));
 
-            final List<Long> primes = getSortedPrimes();
-            Log.d(TAG, "Writing remaining: " + primes.size());
-            //Debug.startMethodTracing("trace4");
-            //FileManager.writeCompact(primes, largeCache, true);
-            //Debug.stopMethodTracing();
-            if (primes.size() > 0) {
-                final long last = primes.get(primes.size() - 1);
-                for (long number : primes) {
-                    bufferedWriter.write(String.valueOf(number));
-                    if (number != last) {
-                        bufferedWriter.write('\n');
-                    }
-                }
-            }
-
-            //Delete old cache
+            //Create readers for each sub-task cache file
+            final List<DataInputStream> dataInputStreams = new ArrayList<>();
             for (File file : FileManager.getInstance().getTaskCacheDirectory(this).listFiles()) {
                 if (!file.getAbsolutePath().contains("primes")) {
-                    file.delete();
+                    dataInputStreams.add(new DataInputStream(new FileInputStream(file)));
                 }
             }
 
-            //Clear memory
+            final List<Long> numbers = new ArrayList<>();
+
+            //Read one number from each cache file
+            for (DataInputStream dataInputStream : dataInputStreams) {
+                try {
+                    numbers.add(dataInputStream.readLong());
+                } catch (EOFException e) {
+                    Log.d(TAG, "End of file reached!");
+                }
+            }
+
+            while (numbers.size() > 0) {
+
+                //Find the smallest number
+                int smallestIndex = 0;
+                for (int i = 0; i < numbers.size(); i++) {
+                    if (numbers.get(i) < numbers.get(smallestIndex)) {
+                        smallestIndex = i;
+                    }
+                }
+
+                //Write smallest number to large cache
+                bufferedWriter.write(String.valueOf(numbers.get(smallestIndex)));
+                bufferedWriter.write('\n');
+
+                //Refill numbers
+                try {
+                    numbers.remove(smallestIndex);
+                    numbers.add(smallestIndex, dataInputStreams.get(smallestIndex).readLong());
+                } catch (EOFException e) {
+                    //Log.d(TAG, "End of file reached!");
+                }
+            }
+
+            //Close readers
+            for (DataInputStream dataInputStream : dataInputStreams) {
+                dataInputStream.close();
+            }
+
+            //Save from lists
+            final List<List<Long>> lists = new ArrayList<>();
             for (Task task : getTasks()) {
-                ((BruteForceTask) task).primes.clear();
+                lists.add(((BruteForceTask) task).primes);
+            }
+
+            final int[] indexes = new int[lists.size()];
+
+            for (List<Long> list : lists) {
+                if (list.size() > 0) {
+                    numbers.add(list.get(0));
+                    indexes[lists.indexOf(list)] = 1;
+                }
+            }
+
+            while (numbers.size() > 0) {
+
+                //Find the smallest number
+                int smallestIndex = 0;
+                for (int i = 0; i < numbers.size(); i++) {
+                    if (numbers.get(i) < numbers.get(smallestIndex)) {
+                        smallestIndex = i;
+                    }
+                }
+
+                //Write smallest number to large cache
+                bufferedWriter.write(String.valueOf(numbers.get(smallestIndex)));
+                bufferedWriter.write('\n');
+
+                //Refill numbers
+                try {
+                    numbers.remove(smallestIndex);
+                    numbers.add(smallestIndex, lists.get(smallestIndex).get(indexes[smallestIndex]));
+                    indexes[smallestIndex]++;
+                } catch (IndexOutOfBoundsException e) {
+                    //Log.d(TAG, "End of list reached!");
+                }
             }
 
             bufferedWriter.close();
+
+            //Delete files and clear lists
+            if (delete) {
+                for (File file : FileManager.getInstance().getTaskCacheDirectory(this).listFiles()) {
+                    if (!file.getAbsolutePath().contains("primes")) {
+                        file.delete();
+                    }
+                }
+
+                for (List<Long> list : lists) {
+                    list.clear();
+                }
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
-        System.out.println("Finished merge in " + (System.currentTimeMillis() - sortStart) + " ms.");
+    @Override
+    public void pause(boolean wait) {
+        Log.d(TAG, "pause(): " + getState());
+        super.pause(wait);
+    }
+
+    @Override
+    public void resume() {
+        Log.d(TAG, "resume(): " + getState());
+        super.resume();
+    }
+
+    @Override
+    protected void dispatchPaused() {
+        Log.d(TAG, "dispatchPaused()");
+        super.dispatchPaused();
+    }
+
+    @Override
+    protected void dispatchPausing() {
+        Log.d(TAG, "dispatchPausing()");
+        super.dispatchPausing();
+    }
+
+    @Override
+    protected void dispatchResumed() {
+        Log.d(TAG, "dispatchResumed()");
+        super.dispatchResumed();
+    }
+
+    @Override
+    protected void dispatchResuming() {
+        Log.d(TAG, "dispatchResuming()");
+        super.dispatchResuming();
     }
 
     private volatile boolean takeFlag = false;
@@ -500,61 +580,49 @@ public class FindPrimesTask extends MultithreadedTask {
                 currentNumber += increment;
             }
 
-            int sqrtMax;
-            boolean isPrime;
-
             boolean running = true;
 
-            while (running) {
+            while (running && (currentNumber <= endValue || endValue == -1)) {
 
-                // Check if the end value has been reached
-                if (currentNumber <= endValue || endValue == -1) {
+                /*
+                 * Get the square root of the number. We only need to calculate up to the square
+                 * root to determine if the number is prime. The square root of a long will
+                 * always fit inside the value range of an int.
+                 */
+                final int sqrtMax = (int) Math.sqrt(currentNumber);
 
-                    /*
-                     * Get the square root of the number. We only need to calculate up to the square
-                     * root to determine if the number is prime. The square root of a long will
-                     * always fit inside the value range of an int.
-                     */
-                    sqrtMax = (int) Math.sqrt(currentNumber);
+                // Assume the number is prime
+                boolean isPrime = true;
 
-                    // Assume the number is prime
-                    isPrime = true;
+                /*
+                 * Check if the number is divisible by every odd number below it's square root.
+                 */
+                for (int i = 3; i <= sqrtMax; i += 2) {
 
-                    /*
-                     * Check if the number is divisible by every odd number below it's square root.
-                     */
-                    for (int i = 3; i <= sqrtMax; i += 2) {
-
-                        // Check if the number divides perfectly
-                        if (currentNumber % i == 0) {
-                            isPrime = false;
-                            break;
-                        }
-
-                        // Check if we should pause
-                        tryPause();
-                        if (shouldStop()) {
-                            running = false;
-                            break;
-                        }
+                    // Check if the number divides perfectly
+                    if (currentNumber % i == 0) {
+                        isPrime = false;
+                        break;
                     }
 
-                    // Check if the number was prime
-                    if (isPrime) {
-                        dispatchPrimeFound(currentNumber);
+                    // Check if we should pause
+                    tryPause();
+                    if (shouldStop()) {
+                        running = false;
+                        break;
                     }
+                }
 
-                    currentNumber += increment;
+                // Check if the number was prime
+                if (isPrime) {
+                    dispatchPrimeFound(currentNumber);
+                }
 
-                    // Calculate total progress
-                    if (endValue != -1) {
-                        setProgress(((float) (currentNumber - startValue) / (endValue - startValue)));
-                    }
+                currentNumber += increment;
 
-                } else {
-                    currentNumber = endValue;
-                    setProgress(1);
-                    break;
+                // Calculate total progress
+                if (endValue != -1) {
+                    setProgress(((float) (currentNumber - startValue) / (endValue - startValue)));
                 }
             }
         }

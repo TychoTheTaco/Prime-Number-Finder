@@ -32,7 +32,7 @@ public class TaskManager{
     public void pauseAllTasks() {
         for (Task task : tasks.keySet()) {
             tasks.put(task, task.getState());
-            task.pause();
+            task.pause(true);
         }
     }
 
@@ -41,7 +41,7 @@ public class TaskManager{
      */
     public void resumeAllTasks() {
         for (Task task : tasks.keySet()) {
-            if (tasks.get(task) == Task.State.RUNNING){
+            if (tasks.get(task) == Task.State.RUNNING || tasks.get(task) == Task.State.RESUMING){
                 task.resume();
             }
         }

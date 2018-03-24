@@ -420,7 +420,7 @@ public final class FileManager {
 
             final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
 
-            final int MAX = 1_000;
+            final int MAX = 10_000;
 
             for (int i = 0; i < MAX; i++){
                 bufferedWriter.write(String.valueOf(i));

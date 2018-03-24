@@ -84,7 +84,7 @@ public abstract class StatisticsFragment extends TaskFragment {
     @Override
     public void onTaskPaused() {
         super.onTaskPaused();
-        uiUpdater.pause();
+        uiUpdater.pause(false);
         packStatistics(statisticData);
         handler.post(new Runnable() {
             @Override
@@ -103,7 +103,7 @@ public abstract class StatisticsFragment extends TaskFragment {
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        uiUpdater.pause();
+        uiUpdater.pause(false);
         packStatistics(statisticData);
         handler.post(new Runnable() {
             @Override

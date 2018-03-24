@@ -175,6 +175,9 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
                             }
                             editTextSearchRangeEnd.setSelection(formattedText.length());
                         }
+
+                        notifyWhenFinishedCheckbox.setEnabled(getEndValue().compareTo(BigInteger.valueOf(FindPrimesTask.INFINITY)) != 0);
+                        autoSaveCheckbox.setEnabled(getEndValue().compareTo(BigInteger.valueOf(FindPrimesTask.INFINITY)) != 0);
                     }
 
                     //Check if the number is valid

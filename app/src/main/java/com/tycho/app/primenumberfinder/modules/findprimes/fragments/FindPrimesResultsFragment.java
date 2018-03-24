@@ -103,38 +103,49 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             @Override
             public void onClick(View v) {
 
+                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+                progressDialog.setTitle("Loading...");
+                progressDialog.show();
+
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
 
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getActivity(), getString(R.string.loading), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
+                        //Pause the task
                         final Task.State state = getTask().getState();
-                        getTask().pause();
-                        final File file = new File(getActivity().getFilesDir() + File.separator + "temp");
-                        final boolean success = FileManager.getInstance().savePrimes(getTask().getSortedPrimes(), file);
-                        if (!success) {
+                        getTask().pause(true);
+
+                        try {
+                            final File file;
+
+                            //Check if cached file exists
+                            final File cached = new File(FileManager.getInstance().getTaskCacheDirectory(getTask()) + File.separator + "primes");
+                            if (cached.exists() && getTask().getState() == Task.State.STOPPED){
+                                file = cached;
+                            }else{
+                                file = getTask().saveToFile();
+                            }
+
+                            //Resume the task
+                            if (state == Task.State.RUNNING) {
+                                getTask().resume();
+                            }
+
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(getActivity(), getString(R.string.general_error), Toast.LENGTH_SHORT).show();
+                                    progressDialog.dismiss();
                                 }
                             });
-                        }
-                        if (state == Task.State.RUNNING) {
-                            getTask().resume();
-                        }
 
-                        final Intent intent = new Intent(getActivity(), DisplayPrimesActivity.class);
-                        intent.putExtra("filePath", file.getAbsolutePath());
-                        intent.putExtra("title", false);
-                        getActivity().startActivity(intent);
+                            final Intent intent = new Intent(getActivity(), DisplayPrimesActivity.class);
+                            intent.putExtra("filePath", file.getAbsolutePath());
+                            intent.putExtra("title", false);
+                            getActivity().startActivity(intent);
 
+                        }catch (IOException e){
+                            e.printStackTrace();
+                        }
                     }
                 }).start();
             }
@@ -153,7 +164,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                     public void run() {
 
                         try {
-                            FileManager.copy(getTask().saveToFile(), new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getTask().getStartValue() + " to " + getTask().getEndValue() + EXTENSION));
+                            FileManager.copy(getTask().saveToFile(), new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getTask().getStartValue() + " to " + (getTask().getEndValue() == FindPrimesTask.INFINITY ? getTask().getCurrentValue() : getTask().getEndValue()) + EXTENSION));
                         }catch (IOException e){
                             e.printStackTrace();
                             handler.post(new Runnable() {
@@ -186,16 +197,18 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     public void onTaskStarted() {
         super.onTaskStarted();
-
+        Log.d(TAG, "onTaskStarted()");
         handler.post(new Runnable() {
             @Override
             public void run() {
                 if (isAdded() && !isDetached() && getTask() != null) {
+                    Log.d(TAG, "onTaskStarted() handler posted");
                     title.setText(getString(R.string.status_searching));
                     progressBarInfinite.setVisibility(View.VISIBLE);
                     subtitleTextView.setText(formatSubtitle());
                     switch (getTask().getSearchOptions().getSearchMethod()){
                         case BRUTE_FORCE:
+                            viewAllButton.setVisibility(View.VISIBLE);
                             break;
 
                         case SIEVE_OF_ERATOSTHENES:
@@ -238,7 +251,15 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                     title.setText(getString(R.string.status_paused));
                     progressBarInfinite.setVisibility(View.GONE);
                     subtitleTextView.setText(formatSubtitle());
-                    saveButton.setVisibility(View.VISIBLE);
+                    switch (getTask().getSearchOptions().getSearchMethod()){
+                        case BRUTE_FORCE:
+                            saveButton.setVisibility(View.VISIBLE);
+                            break;
+
+                        case SIEVE_OF_ERATOSTHENES:
+                            saveButton.setVisibility(View.GONE);
+                            break;
+                    }
 
                     //Update progress
                     if (getTask().getEndValue() != FindPrimesTask.INFINITY) {
@@ -252,10 +273,12 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     public void onTaskResuming() {
         super.onTaskResuming();
+        Log.d(TAG, "onTaskResuming()");
         handler.post(new Runnable() {
             @Override
             public void run() {
                 if (isAdded() && !isDetached() && getTask() != null) {
+                    Log.d(TAG, "onTaskResuming() handler posted");
                     title.setText(getString(R.string.state_resuming));
                     subtitleTextView.setText(formatSubtitle());
                 }
@@ -266,6 +289,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     public void onTaskResumed() {
         super.onTaskResumed();
+        Log.d(TAG, "onTaskResumed()");
         onTaskStarted();
     }
 
@@ -344,6 +368,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
     private void init() {
         if (getTask() != null) {
+
+            Log.d(TAG, "init()");
 
             //Make sure view is visible
             resultsView.setVisibility(View.VISIBLE);

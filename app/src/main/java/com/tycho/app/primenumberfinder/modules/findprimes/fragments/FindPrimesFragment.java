@@ -580,6 +580,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             case REQUEST_CODE_NEW_TASK:
                 if (data != null && data.getExtras() != null) {
                     final FindPrimesTask.SearchOptions searchOptions = data.getExtras().getParcelable("searchOptions");
+                    Log.d(TAG, "Read: " + searchOptions.getEndValue());
                     final FindPrimesTask task = (FindPrimesTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) data.getExtras().get("taskId"));
                     Log.d(TAG, "Task: " + task);
                     if (task == null) {
@@ -593,6 +594,8 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
     }
 
     private void startTask(final FindPrimesTask.SearchOptions searchOptions) {
+
+        boolean valid = false;
 
         //Make sure there is enough memory
         if (searchOptions.getSearchMethod() == FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES){
@@ -609,50 +612,57 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             Log.d(TAG, "Req: " + requiredMB);
 
             if (requiredMB <= availHeapSizeInMB * 0.9f){
-                final FindPrimesTask task = new FindPrimesTask(searchOptions, getActivity());
-                task.addTaskListener(new TaskAdapter() {
-                    @Override
-                    public void onTaskStopped() {
-                        if (task.getSearchOptions().autoSave) {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    final boolean success = FileManager.getInstance().savePrimes(task.getStartValue(), task.getEndValue(), task.getSortedPrimes());
-                                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                }
-                            }).start();
-                        }
-
-                        if (task.getSearchOptions().notifyWhenFinished) {
-                            NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity())
-                                    .setSmallIcon(R.drawable.circle_white)
-                                    .setContentTitle("Task Finished")
-                                    .setContentText("Task \"Primes from " + task.getStartValue() + " to " + task.getEndValue() + "\" finished.");
-                            final NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-                            notificationManager.notify(0, builder.build());
-                        }
-                        task.removeTaskListener(this);
-                    }
-                });
-                taskListFragment.addTask(task);
-                PrimeNumberFinder.getTaskManager().registerTask(task);
-
-                //Start the task
-                task.startOnNewThread();
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        taskListFragment.setSelected(task);
-                    }
-                });
+                valid = true;
             }else{
+                valid = false;
                 Toast.makeText(getActivity(), "Not enough memory to start task!", Toast.LENGTH_SHORT).show();
             }
+        }else{
+            valid = true;
+        }
+
+        if (valid){
+            final FindPrimesTask task = new FindPrimesTask(searchOptions, getActivity());
+            task.addTaskListener(new TaskAdapter() {
+                @Override
+                public void onTaskStopped() {
+                    if (task.getSearchOptions().autoSave) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                final boolean success = FileManager.getInstance().savePrimes(task.getStartValue(), task.getEndValue(), task.getSortedPrimes());
+                                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        }).start();
+                    }
+
+                    if (task.getSearchOptions().notifyWhenFinished) {
+                        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity())
+                                .setSmallIcon(R.drawable.circle_white)
+                                .setContentTitle("Task Finished")
+                                .setContentText("Task \"Primes from " + task.getStartValue() + " to " + task.getEndValue() + "\" finished.");
+                        final NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+                        notificationManager.notify(0, builder.build());
+                    }
+                    task.removeTaskListener(this);
+                }
+            });
+            taskListFragment.addTask(task);
+            PrimeNumberFinder.getTaskManager().registerTask(task);
+
+            //Start the task
+            task.startOnNewThread();
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    taskListFragment.setSelected(task);
+                }
+            });
         }
     }
 }
