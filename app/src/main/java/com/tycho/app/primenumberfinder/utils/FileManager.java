@@ -20,12 +20,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import easytasks.Task;
@@ -556,10 +558,12 @@ public final class FileManager {
         }
     }
 
-    public File convert(final File file, final String fileName, final String itemSeparator) {
+    public File convert(final File file, final String fileName, final String itemSeparator, final boolean includeCommas) {
         final List<Long> items = readNumbers(file);
 
         final File output = new File(getExportCacheDirectory() + File.separator + fileName);
+
+        final NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
 
         try {
 
@@ -568,7 +572,11 @@ public final class FileManager {
             final long lastItem = items.get(items.size() - 1);
 
             for (long number : items) {
-                bufferedWriter.write(String.valueOf(number));
+                if (includeCommas){
+                    bufferedWriter.write(numberFormat.format(number));
+                }else{
+                    bufferedWriter.write(String.valueOf(number));
+                }
 
                 if (number != lastItem) {
                     bufferedWriter.write(itemSeparator);

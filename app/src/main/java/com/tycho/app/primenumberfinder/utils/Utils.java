@@ -125,6 +125,11 @@ public final class Utils {
         }
     }
 
+    /**
+     * Sort a list of files by date.
+     * @param files
+     * @param ascending
+     */
     public static void sortByDate(final List<File> files, final boolean ascending){
         Collections.sort(files, new Comparator<File>() {
             @Override

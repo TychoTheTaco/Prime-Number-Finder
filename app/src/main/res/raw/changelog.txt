@@ -1,5 +1,5 @@
 01/10/2016 > FindPrime version 1.0
-- First Release
+- Initial Release
 
 02/17/2016 > FindPrime version 1.1.0
 - Added ability to find all factors of a number
@@ -61,14 +61,24 @@
 
 ??/??/2018 > Prime Number Finder version 1.3.0
 - Factor tree performance improvements
-+ Many export options added for factor trees
-	- Image background color
-	- Vertical item spacing
-	- Branch color
-	- Branch width
-	- Item text color
-	- Item text size
-	- Item background color
-	- Item border color
-	- Item border width
-	- Prime factor text color
++ New export options
+	+ Primes
+		- Include comma's in numbers
+	+ Factor trees
+		- Image background color
+		- Vertical item spacing
+		- Branch color
+		- Branch width
+		- Item text color
+		- Item text size
+		- Item background color
+		- Item border color
+		- Item border width
+		- Prime factor text color
+- Tasks will now show results in the task list when they are finished
++ 'Find Primes' task improvements
+	- Can now use brute-force or sieve of Eratosthenes for searching
+	- Added multi-threading support (brute-force only)
+	- Added option to show a notification when finished
+	- Added option to automatically save results when finished
+- Fixed a bug that sometimes caused saved files to be sorted incorrectly

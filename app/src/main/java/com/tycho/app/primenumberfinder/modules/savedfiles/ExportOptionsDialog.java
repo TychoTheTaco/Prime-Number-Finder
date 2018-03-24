@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -84,12 +85,16 @@ public class ExportOptionsDialog extends Dialog {
             @Override
             public void onClick(View v) {
 
+                //Get item separator
                 final String separator;
                 if (newLineButton.isChecked()){
                     separator = System.lineSeparator();
                 }else{
                     separator = itemSeparatorInput.getText().toString().replace("\\n", System.lineSeparator());
                 }
+
+                //Get format options
+                final boolean includeCommas = ((CheckBox) findViewById(R.id.include_commas_checkbox)).isChecked();
 
                 final ProgressDialog progressDialog = new ProgressDialog(context);
                 progressDialog.setTitle("Exporting...");
@@ -100,7 +105,7 @@ public class ExportOptionsDialog extends Dialog {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        final File output = FileManager.getInstance().convert(file, fileNameInput.getText().toString().trim() + ".txt", separator);
+                        final File output = FileManager.getInstance().convert(file, fileNameInput.getText().toString().trim() + ".txt", separator, includeCommas);
                         progressDialog.dismiss();
 
                         final Uri path = FileProvider.getUriForFile(context, "com.tycho.app.primenumberfinder", output);

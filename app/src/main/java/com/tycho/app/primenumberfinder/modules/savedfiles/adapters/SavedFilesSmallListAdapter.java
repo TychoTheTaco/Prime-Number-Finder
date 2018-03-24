@@ -190,14 +190,12 @@ public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesS
     class ViewHolder extends RecyclerView.ViewHolder{
 
         private final TextView fileName;
-        private final TextView dateCreated;
         private final TextView icon;
 
         ViewHolder(final View itemView){
             super(itemView);
             icon = itemView.findViewById(R.id.icon);
             fileName = itemView.findViewById(R.id.file_name);
-            dateCreated =  itemView.findViewById(R.id.textView_dateCreated);
         }
     }
 }
