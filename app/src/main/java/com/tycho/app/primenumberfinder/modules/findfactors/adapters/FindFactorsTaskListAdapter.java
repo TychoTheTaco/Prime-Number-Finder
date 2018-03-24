@@ -5,8 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
@@ -20,7 +18,7 @@ import java.util.Locale;
  * Created by tycho on 11/16/2017.
  */
 
-public class FindFactorsTaskListAdapter extends AbstractTaskListAdapter<AbstractTaskListAdapter.AbstractTaskListItemViewHolder> {
+public class FindFactorsTaskListAdapter extends AbstractTaskListAdapter<AbstractTaskListAdapter.ViewHolder> {
 
     /**
      * Tag used for logging and debugging.
@@ -36,15 +34,15 @@ public class FindFactorsTaskListAdapter extends AbstractTaskListAdapter<Abstract
     }
 
     @Override
-    public AbstractTaskListItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.find_factors_task_list_item, parent, false);
-        return new AbstractTaskListItemViewHolder(view);
+        return new ViewHolder(view);
     }
 
     @Override
     protected void doOnBindViewHolder(RecyclerView.ViewHolder h, int position) {
 
-        final AbstractTaskListItemViewHolder holder = (AbstractTaskListItemViewHolder) h;
+        final ViewHolder holder = (ViewHolder) h;
 
         //Get the current task
         final FindFactorsTask task = (FindFactorsTask) tasks.get(position);

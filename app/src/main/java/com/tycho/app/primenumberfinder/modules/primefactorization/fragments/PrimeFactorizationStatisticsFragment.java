@@ -17,6 +17,7 @@ import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Statistic;
 import com.tycho.app.primenumberfinder.StatisticData;
+import com.tycho.app.primenumberfinder.modules.StatisticsFragment;
 import com.tycho.app.primenumberfinder.modules.TaskFragment;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 
@@ -35,7 +36,7 @@ import static com.tycho.app.primenumberfinder.utils.Utils.formatTime;
  * Created by tycho on 10/6/2017.
  */
 
-public class PrimeFactorizationStatisticsFragment extends TaskFragment {
+public class PrimeFactorizationStatisticsFragment extends StatisticsFragment {
 
     /**
      * Tag used for logging and debugging.
@@ -48,7 +49,7 @@ public class PrimeFactorizationStatisticsFragment extends TaskFragment {
     private TextView textViewElapsedTime;
     private TextView estimatedTimeRemainingTextView;
 
-    private final UiUpdater uiUpdater = new UiUpdater();
+    private long lastUpdate = 0;
 
     @Nullable
     @Override
@@ -66,15 +67,15 @@ public class PrimeFactorizationStatisticsFragment extends TaskFragment {
         return rootView;
     }
 
-    public void updateData(StatisticData statisticData){
-        if (getView() != null){
+    public void updateData(StatisticData statisticData) {
+        if (getView() != null) {
             setTimeElapsed(statisticData.optLong(Statistic.TIME_ELAPSED));
 
             final String string = formatTime(statisticData.optLong(Statistic.ESTIMATED_TIME_REMAINING));
-            if (string.equals("infinity")){
+            if (string.equals("infinity")) {
                 estimatedTimeRemainingTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_infinity_white_24dp, 0);
 
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                     for (Drawable drawable : estimatedTimeRemainingTextView.getCompoundDrawables()) {
                         if (drawable != null) {
                             drawable.setColorFilter(new PorterDuffColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN));
@@ -83,157 +84,60 @@ public class PrimeFactorizationStatisticsFragment extends TaskFragment {
                 }
 
                 estimatedTimeRemainingTextView.setText("");
-            }else{
+            } else {
                 estimatedTimeRemainingTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
                 estimatedTimeRemainingTextView.setText(string);
             }
         }
     }
 
-    public void setTimeElapsed(final long millis){
+    public void setTimeElapsed(final long millis) {
         textViewElapsedTime.setText(formatTime(millis));
     }
 
     @Override
     public void setTask(Task task) {
         super.setTask(task);
-
-        try {
+        if (getView() != null) {
             init();
-        }catch (NullPointerException e){}
+        }
     }
 
-    private void init(){
-        if (getTask() == null){
+    private void init() {
+        if (getTask() == null) {
             statisticsView.setVisibility(View.GONE);
             noTaskView.setVisibility(View.VISIBLE);
-            if (uiUpdater.getState() != Task.State.NOT_STARTED) uiUpdater.pause();
-        }else{
+        } else {
             statisticsView.setVisibility(View.VISIBLE);
             noTaskView.setVisibility(View.GONE);
 
-            final StatisticData statisticData = new StatisticData();
-            try {
-                statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
-                statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
-            }catch (JSONException e){}
-            updateData(statisticData);
-
-            //Start UI updater
-            if (uiUpdater.getState() == Task.State.NOT_STARTED) {
-                uiUpdater.addTaskListener(new TaskAdapter() {
-                    @Override
-                    public void onTaskStarted() {
-                        Log.d(TAG, "UI updater started");
-                    }
-
-                    @Override
-                    public void onTaskPaused() {
-                        Log.d(TAG, "UI updater paused");
-                    }
-
-                    @Override
-                    public void onTaskResumed() {
-                        Log.d(TAG, "UI updater resumed");
-                    }
-
-                    @Override
-                    public void onTaskStopped() {
-                        Log.d(TAG, "UI updater stopped");
-                    }
-                });
-                uiUpdater.startOnNewThread();
-            } else {
-                uiUpdater.resume();
-            }
-
-            switch (getTask().getState()){
+            switch (getTask().getState()) {
                 case RUNNING:
-                    uiUpdater.resume();
+                    onTaskStarted();
                     break;
 
                 case PAUSED:
+                    onTaskPaused();
+                    break;
+
                 case STOPPED:
-                    uiUpdater.pause();
+                    onTaskStopped();
                     break;
             }
         }
     }
 
     @Override
-    public void onTaskPaused() {
-        super.onTaskPaused();
-        uiUpdater.pause();
-    }
-
-    @Override
-    public void onTaskResumed() {
-        super.onTaskResumed();
-        uiUpdater.resume();
-    }
-
-    @Override
-    public void onTaskStopped() {
-        super.onTaskStopped();
-        uiUpdater.pause();
-        if (getTask() != null){
-            try {
-                final StatisticData statisticData = new StatisticData();
-                statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateData(statisticData);
-                    }
-                });
-            }catch (JSONException e){}
+    protected void packStatistics(StatisticData statisticData) {
+        statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
+        if (System.currentTimeMillis() - lastUpdate >= 1000) {
+            statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
+            lastUpdate = System.currentTimeMillis();
         }
     }
 
     @Override
     public PrimeFactorizationTask getTask() {
         return (PrimeFactorizationTask) super.getTask();
-    }
-
-    private class UiUpdater extends Task {
-
-        private StatisticData statisticData = new StatisticData();
-
-        private long lastUpdate;
-
-        @Override
-        protected void run() {
-            while (true) {
-
-                if (getTask() != null){
-                    try {
-                        statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
-                        if (System.currentTimeMillis() - lastUpdate >= 1000){
-                            statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
-                            lastUpdate = System.currentTimeMillis();
-                        }
-                    }catch (JSONException e){}
-
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateData(statisticData);
-                        }
-                    });
-                }
-
-                tryPause();
-
-                if (shouldStop()) {
-                    break;
-                }
-
-                try {
-                    Thread.sleep(PrimeNumberFinder.UPDATE_LIMIT_MS * 2);
-                } catch (InterruptedException e) {
-                    //Ignore exception
-                }
-            }
-        }
     }
 }

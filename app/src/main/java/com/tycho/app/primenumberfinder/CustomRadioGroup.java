@@ -112,4 +112,17 @@ public class CustomRadioGroup extends LinearLayout {
             onCheckChangedListener.onChecked(radioButton, isChecked);
         }
     }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+
+        for (int i = 0; i < getChildCount(); i++){
+            getChildAt(i).setEnabled(enabled);
+        }
+    }
+
+    public void check(final int id){
+        ((RadioButton) findViewById(id)).setChecked(true);
+    }
 }

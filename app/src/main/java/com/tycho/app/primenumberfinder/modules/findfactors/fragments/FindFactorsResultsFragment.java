@@ -20,10 +20,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayFactorsActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
@@ -37,7 +39,7 @@ import easytasks.Task;
  * Created by tycho on 11/19/2017.
  */
 
-public class FindFactorsResultsFragment extends ResultsFragment implements FindFactorsTask.EventListener{
+public class FindFactorsResultsFragment extends ResultsFragment{
 
     /**
      * Tag used for logging and debugging.
@@ -102,7 +104,7 @@ public class FindFactorsResultsFragment extends ResultsFragment implements FindF
                         });
 
                         final Task.State state = getTask().getState();
-                        getTask().pause();
+                        getTask().pause(true);
                         final File file = new File(getActivity().getFilesDir() + File.separator + "temp");
                         final boolean success = FileManager.getInstance().saveFactors(getTask().getFactors(), file);
                         if (!success){
@@ -129,15 +131,14 @@ public class FindFactorsResultsFragment extends ResultsFragment implements FindF
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+                progressDialog.setTitle("Saving...");
+                progressDialog.show();
+
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getActivity(), getString(R.string.saving_file), Toast.LENGTH_SHORT).show();
-                            }
-                        });
                         final boolean success = FileManager.getInstance().saveFactors(getTask().getFactors(), getTask().getNumber());
                         handler.post(new Runnable() {
                             @Override
@@ -145,54 +146,77 @@ public class FindFactorsResultsFragment extends ResultsFragment implements FindF
                                 Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
                             }
                         });
+                        progressDialog.dismiss();
                     }
                 }).start();
             }
         });
 
+        init();
+
         return rootView;
     }
 
     @Override
-    public void onFactorFound(long prime) {
-        requestUiUpdate();
-    }
-
-    @Override
-    protected void onUiUpdate() {
-        if (getTask() != null){
-
-            //Update task state
-            switch (getTask().getState()){
-                case RUNNING:
+    public void onTaskStarted() {
+        super.onTaskStarted();
+        if (isAdded() && !isDetached()){
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
                     title.setText(getString(R.string.status_searching));
                     progressBarInfinite.setVisibility(View.VISIBLE);
                     saveButton.setVisibility(View.GONE);
+                }
+            });
+        }
+    }
 
-                    //Set progress
-                    progress.setVisibility(View.VISIBLE);
-                    progress.setText(getString(R.string.task_progress, decimalFormat.format(getTask().getProgress() * 100)));
-                    break;
-
-                case PAUSED:
+    @Override
+    public void onTaskPaused() {
+        super.onTaskPaused();
+        if (isAdded() && !isDetached()){
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
                     title.setText(getString(R.string.status_paused));
                     progressBarInfinite.setVisibility(View.GONE);
                     saveButton.setVisibility(View.VISIBLE);
 
                     //Set progress
-                    progress.setVisibility(View.VISIBLE);
-                    progress.setText(getString(R.string.task_progress, decimalFormat.format(getTask().getProgress() * 100)));
-                    break;
+                    progress.setText(getString(R.string.task_progress, DECIMAL_FORMAT.format(getTask().getProgress() * 100)));
+                }
+            });
+        }
+    }
 
-                case STOPPED:
+    @Override
+    public void onTaskResumed() {
+        super.onTaskResumed();
+        onTaskStarted();
+    }
+
+    @Override
+    public void onTaskStopped() {
+        super.onTaskStopped();
+        if (isAdded() && !isDetached()){
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
                     progressBarInfinite.setVisibility(View.GONE);
                     title.setText(getString(R.string.status_finished));
                     saveButton.setVisibility(View.VISIBLE);
 
                     //Set progress
                     progress.setVisibility(View.GONE);
-                    break;
-            }
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onUiUpdate() {
+        if (getTask() != null){
 
             //Update recyclerView
             if (lastAdapterSize != adapter.getItemCount()){
@@ -228,27 +252,11 @@ public class FindFactorsResultsFragment extends ResultsFragment implements FindF
     }
 
     @Override
-    public void setTask(Task task) {
-
-        //Remove task listener from previous task
-        if (getTask() != null){
-            if (!getTask().removeEventListener(this)){
-                Log.d(TAG, "Failed to remove event listener!");
-            }
-        }
-
+    public void setTask(final Task task) {
         super.setTask(task);
-
-        //Add task listener to new task
-        if (getTask() != null){
-            getTask().addEventListener(this);
-        }
-
-        try {
+        if (getView() != null){
             init();
-        }catch (NullPointerException e){}
-
-        updateUi();
+        }
     }
 
     private void init(){
@@ -262,6 +270,20 @@ public class FindFactorsResultsFragment extends ResultsFragment implements FindF
             adapter.setTask(getTask());
             adapter.notifyDataSetChanged();
             recyclerView.scrollToPosition(adapter.getItemCount() - 1);
+
+            switch (getTask().getState()) {
+                case RUNNING:
+                    onTaskStarted();
+                    break;
+
+                case PAUSED:
+                    onTaskPaused();
+                    break;
+
+                case STOPPED:
+                    onTaskStopped();
+                    break;
+            }
 
         }else{
             resultsView.setVisibility(View.GONE);

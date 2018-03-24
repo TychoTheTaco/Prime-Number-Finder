@@ -58,12 +58,11 @@
         </LinearLayout>
 
         <TextView
+            style="@style/TaskFragmentSubtitle"
             android:id="@+id/subtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="2dp"
-            android:textColor="@color/secondary_text"
-            android:textSize="14sp" />
+            android:paddingTop="2dp" />
 
         <!-- Main content -->
         <android.support.v7.widget.RecyclerView

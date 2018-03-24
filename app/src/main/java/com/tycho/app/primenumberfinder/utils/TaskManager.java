@@ -1,8 +1,11 @@
 package com.tycho.app.primenumberfinder.utils;
 
+import android.util.Log;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import easytasks.Task;
 
@@ -29,7 +32,7 @@ public class TaskManager{
     public void pauseAllTasks() {
         for (Task task : tasks.keySet()) {
             tasks.put(task, task.getState());
-            task.pause();
+            task.pause(true);
         }
     }
 
@@ -38,7 +41,7 @@ public class TaskManager{
      */
     public void resumeAllTasks() {
         for (Task task : tasks.keySet()) {
-            if (tasks.get(task) == Task.State.RUNNING){
+            if (tasks.get(task) == Task.State.RUNNING || tasks.get(task) == Task.State.RESUMING){
                 task.resume();
             }
         }
@@ -46,5 +49,14 @@ public class TaskManager{
 
     public Set<Task> getTasks(){
         return tasks.keySet();
+    }
+
+    public Task findTaskById(final UUID id){
+        for (Task task : tasks.keySet()){
+            if (task.getId().equals(id)){
+                return task;
+            }
+        }
+        return null;
     }
 }

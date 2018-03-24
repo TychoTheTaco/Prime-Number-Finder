@@ -140,6 +140,7 @@
                     android:layout_weight="1"
                     android:id="@+id/credits"
                     android:padding="8dp"
+                    android:textColor="@color/primary_text"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:text="@string/about_page_icon_credits"

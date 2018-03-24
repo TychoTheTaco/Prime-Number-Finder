@@ -57,4 +57,9 @@ public class GeneralStatisticsFragment extends StatisticsFragment {
             getChildFragmentManager().beginTransaction().replace(container.getId(), content).commit();
         }
     }
+
+    @Override
+    protected void packStatistics(StatisticData statisticData) {
+
+    }
 }

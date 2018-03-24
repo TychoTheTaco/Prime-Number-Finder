@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,7 @@ import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrim
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayFactorsActivity;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimesActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -26,16 +28,18 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import easytasks.Task;
+
 /**
  * @author Tycho Bellers
  *         Date Created: 11/3/2016
  */
 
-public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesSmallListAdapter.ViewHolderSavedFiles>{
+public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesSmallListAdapter.ViewHolder>{
+
+    private static final String TAG = "SavedFilesSmListAdptr";
 
     private final List<File> files = new ArrayList<>();
-    private final SparseBooleanArray selectedPositions = new SparseBooleanArray();
-    private boolean isSelecting = false;
 
     private final FileType fileType;
 
@@ -60,13 +64,13 @@ public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesS
     }
 
     @Override
-    public ViewHolderSavedFiles onCreateViewHolder(ViewGroup parent, int viewType){
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
         final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_saved_file, parent, false);
-        return new SavedFilesSmallListAdapter.ViewHolderSavedFiles(view);
+        return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolderSavedFiles holder, int position){
+    public void onBindViewHolder(ViewHolder holder, int position){
 
         final File file = files.get(position);
 
@@ -85,6 +89,7 @@ public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesS
                     public void onClick(View view){
                         Intent intent = new Intent(context, DisplayPrimesActivity.class);
                         intent.putExtra("filePath", file.getAbsolutePath());
+                        intent.putExtra("allowExport", true);
                         intent.putExtra("title", true);
                         context.startActivity(intent);
                     }
@@ -99,6 +104,7 @@ public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesS
                     public void onClick(View view){
                         Intent intent = new Intent(context, DisplayFactorsActivity.class);
                         intent.putExtra("filePath", file.getAbsolutePath());
+                        intent.putExtra("allowExport", true);
                         intent.putExtra("title", true);
                         context.startActivity(intent);
                     }
@@ -169,16 +175,8 @@ public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesS
                 files.addAll(Arrays.asList(FileManager.getInstance().getSavedTreesDirectory().listFiles()));
                 break;
         }
+        Utils.sortByDate(files, false);
         notifyDataSetChanged();
-    }
-
-    public void sortByDate(){
-        Collections.sort(files, new Comparator<File>(){
-            @Override
-            public int compare(File file0, File file1){
-                return (int) (file1.lastModified() - file0.lastModified());
-            }
-        });
     }
 
     public List<File> getFiles(){
@@ -189,17 +187,15 @@ public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesS
         return fileType;
     }
 
-    protected class ViewHolderSavedFiles extends RecyclerView.ViewHolder{
+    class ViewHolder extends RecyclerView.ViewHolder{
 
-        protected final TextView fileName;
-        protected final TextView dateCreated;
-        protected final TextView icon;
+        private final TextView fileName;
+        private final TextView icon;
 
-        public ViewHolderSavedFiles(final View itemView){
+        ViewHolder(final View itemView){
             super(itemView);
-            icon = (TextView) itemView.findViewById(R.id.icon);
-            fileName = (TextView) itemView.findViewById(R.id.file_name);
-            dateCreated = (TextView) itemView.findViewById(R.id.textView_dateCreated);
+            icon = itemView.findViewById(R.id.icon);
+            fileName = itemView.findViewById(R.id.file_name);
         }
     }
 }

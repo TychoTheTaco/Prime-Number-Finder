@@ -76,8 +76,10 @@ public class ChangelogActivity extends AppCompatActivity {
 
     private List<ChangelogListAdapter.ChangelogItem> readChangelog(){
         Pattern versionPattern = Pattern.compile("(\\d+\\/\\d+\\/\\d+).+?(\\d+\\..+)");
+        final Pattern devVersionPattern = Pattern.compile("(\\?+\\/\\?+\\/\\d+).+?(\\d+\\..+)");
         Pattern itemPattern = Pattern.compile(".+");
         Matcher matcher;
+        Matcher devMatcher;
         Matcher itemMatcher;
 
         final List<ChangelogListAdapter.ChangelogItem> changelogItems = new ArrayList<>();
@@ -90,9 +92,12 @@ public class ChangelogActivity extends AppCompatActivity {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(getResources().openRawResource(R.raw.changelog)));
             while ((line = bufferedReader.readLine()) != null){
                 matcher = versionPattern.matcher(line);
+                devMatcher = devVersionPattern.matcher(line);
                 itemMatcher = itemPattern.matcher(line);
-                if (matcher.find()){
-                    version = matcher.group(2);
+                if (matcher.find() || devMatcher.find()){
+                    try{ version = matcher.group(2);}catch (Exception e){
+                        version = devMatcher.group(2);
+                    }
                     notes = new ArrayList<>();
                 }else if (itemMatcher.find()){
                     notes.add(itemMatcher.group());

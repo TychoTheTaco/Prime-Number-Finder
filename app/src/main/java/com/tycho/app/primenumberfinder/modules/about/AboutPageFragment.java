@@ -42,7 +42,7 @@ public class AboutPageFragment extends Fragment{
 		//Set version
         ((TextView) rootView.findViewById(R.id.app_version)).setText(getString(R.string.app_version_name, PrimeNumberFinder.getVersionName(getActivity())));
         ((TextView) rootView.findViewById(R.id.new_version_name)).setText("New in version " + PrimeNumberFinder.getVersionName(getActivity()));
-        ((Button) rootView.findViewById(R.id.contact_developer_button)).setOnClickListener(new View.OnClickListener() {
+        rootView.findViewById(R.id.contact_developer_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto","tycho.developer@gmail.com", null));
@@ -53,7 +53,7 @@ public class AboutPageFragment extends Fragment{
 
         //Set changelog data
         ((TextView) rootView.findViewById(R.id.changelog)).setText(getCurrentUpdate());
-        ((Button) rootView.findViewById(R.id.view_changelog_button)).setOnClickListener(new View.OnClickListener() {
+        rootView.findViewById(R.id.view_changelog_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final Intent intent = new Intent(getActivity(), ChangelogActivity.class);
@@ -69,8 +69,9 @@ public class AboutPageFragment extends Fragment{
 	}
 
 	private String getCurrentUpdate(){
-        Pattern versionPattern = Pattern.compile("(\\d+\\/\\d+\\/\\d+).+?(\\d+\\..+)");
-        Pattern itemPattern = Pattern.compile(".+");
+        final Pattern versionPattern = Pattern.compile("(\\d+\\/\\d+\\/\\d+).+?(\\d+\\..+)");
+        final Pattern devVersionPattern = Pattern.compile("(\\?+\\/\\?+\\/\\d+).+?(\\d+\\..+)");
+        final Pattern itemPattern = Pattern.compile(".+");
         Matcher matcher;
         Matcher itemMatcher;
 
@@ -78,11 +79,11 @@ public class AboutPageFragment extends Fragment{
 
         String line;
         try{
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(getResources().openRawResource(R.raw.changelog)));
+            final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(getResources().openRawResource(R.raw.changelog)));
             while ((line = bufferedReader.readLine()) != null){
                 matcher = versionPattern.matcher(line);
                 itemMatcher = itemPattern.matcher(line);
-                if (matcher.find()){
+                if (matcher.find() || devVersionPattern.matcher(line).find()){
                     notes.clear();
                 }else if (itemMatcher.find()){
                     notes.add(itemMatcher.group());
@@ -101,6 +102,10 @@ public class AboutPageFragment extends Fragment{
             stringBuilder.append(System.lineSeparator());
         }
 
-        return stringBuilder.substring(0, stringBuilder.length() - 1);
+        if (stringBuilder.length() > 0){
+            return stringBuilder.substring(0, stringBuilder.length() - 1);
+        }else{
+            return "";
+        }
     }
 }

@@ -1,5 +1,7 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.adapters;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,13 +11,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
+import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+
+import static android.content.Context.CLIPBOARD_SERVICE;
 
 /**
  * @author Tycho Bellers
@@ -27,12 +33,12 @@ public class PrimesAdapter extends RecyclerView.Adapter<PrimesAdapter.ViewHolder
     /**
      * List of prime numbers in this adapter.
      */
-    private List<Long> primes = new ArrayList<>();
+    private final List<Long> primes = new ArrayList<>();
 
     /**
      * {@linkplain NumberFormat} used for formatting numbers.
      */
-    private final NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
+    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
     /**
      * The context used to display toast messages.
@@ -51,7 +57,7 @@ public class PrimesAdapter extends RecyclerView.Adapter<PrimesAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.number.setText(numberFormat.format(primes.get(position)));
+        holder.number.setText(NUMBER_FORMAT.format(primes.get(position)));
     }
 
     @Override
@@ -59,17 +65,8 @@ public class PrimesAdapter extends RecyclerView.Adapter<PrimesAdapter.ViewHolder
         return primes.size();
     }
 
-    /**
-     * Set the task that the adapter should get its prime numbers from. The task keeps the original list, and this adapter will keep a reference to it.
-     *
-     * @param task
-     */
-    public void setTask(FindPrimesTask task) {
-        if (task == null) {
-            primes = new ArrayList<>();
-        }else{
-            this.primes = task.getPrimes();
-        }
+    public void add(final long number){
+        this.primes.add(number);
     }
 
     public List<Long> getPrimes() {
@@ -91,9 +88,20 @@ public class PrimesAdapter extends RecyclerView.Adapter<PrimesAdapter.ViewHolder
                 @Override
                 public void onClick(View v) {
                     Toast.makeText(context, context.getString(R.string.primes_list_toast_message,
-                            numberFormat.format(primes.get(getAdapterPosition())),
+                            NUMBER_FORMAT.format(primes.get(getAdapterPosition())),
                             Utils.formatNumberOrdinal(getAdapterPosition() + 1)),
                             Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    final ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                    final ClipData clip = ClipData.newPlainText(NUMBER_FORMAT.format(primes.get(getAdapterPosition())), String.valueOf(primes.get(getAdapterPosition())));
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(context, "Number Copied!", Toast.LENGTH_SHORT).show();
+                    return true;
                 }
             });
         }

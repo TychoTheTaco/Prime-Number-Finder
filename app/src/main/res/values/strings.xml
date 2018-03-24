@@ -15,10 +15,10 @@
     <string name="action_bar_item_title_export">Export</string>
 
     <!-- Navigation drawer items -->
-    <string name="title_scan_for_primes">Find primes</string>
-    <string name="title_find_factors">Find factors</string>
-    <string name="title_factor_tree">Prime factorization</string>
-    <string name="title_saved_files">Saved files</string>
+    <string name="title_find_primes">Find Primes</string>
+    <string name="title_find_factors">Find Factors</string>
+    <string name="title_factor_tree">Prime Factorization</string>
+    <string name="title_saved_files">Saved Files</string>
     <string name="title_settings">Settings</string>
     <string name="title_about">About</string>
 
@@ -68,14 +68,14 @@
 
     <!-- About page -->
     <string name="about_description">FindPrime is an application that can be used to find prime numbers and factors of any number. Prime numbers and factors can be saved to a text file for later use.\n\nThis application was created by Tycho Bellers.</string>
-    <string name="about_page_icon_credits">Application icons by <a href="https://material.io/icons/">Material Icons</a> and <a href="https://icons8.com/">Icons8</a>.</string>
+    <string name="about_page_icon_credits">Application icons by&#160;<a href="https://material.io/icons/">Material Icons</a> and&#160;<a href="https://icons8.com/">Icons8</a>.</string>
 
     <!-- Bottom sheet -->
     <string name="bottom_sheet_title">Task Options</string>
     <string name="statistics_monitor_level_none">None</string>
     <string name="statistics_monitor_level_simple">Simple</string>
     <string name="statistics_monitor_level_advanced">Advanced</string>
-    <string name="find_primes_search_method_label">Search method</string>
+    <string name="find_primes_search_method_label">Search Method</string>
     <string name="find_primes_search_method_brute_force">Brute force</string>
     <string name="find_primes_search_method_sieve_of_eratosthenes">Sieve of Eratosthenes</string>
 
@@ -103,7 +103,9 @@
     <!-- Task status -->
     <string name="status_ready">Ready</string>
     <string name="status_searching">Searching&#8230;</string>
+    <string name="state_pausing">Pausing&#8230;</string>
     <string name="status_paused">Paused</string>
+    <string name="state_resuming">Resuming&#8230;</string>
     <string name="status_stopped">Stopped</string>
     <string name="status_finished">Finished</string>
 
@@ -118,6 +120,8 @@
     <string name="custom_separator">Other: </string>
     <string name="export_button">Export</string>
     <string name="progress_dialog_title">Progressing&#8230;</string>
+    <string name="format">Format</string>
+    <string name="include_numbers_description">Include comma\'s in numbers</string>
 
     <!-- Error messages -->
     <string name="error_invalid_number">Invalid number!</string>

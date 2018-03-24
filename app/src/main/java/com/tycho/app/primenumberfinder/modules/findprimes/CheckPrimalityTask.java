@@ -57,10 +57,7 @@ public class CheckPrimalityTask extends Task {
                     }
 
                     //Check if we should pause
-                    //tryPause();
-                    if (requestPause){
-                        pauseThread();
-                    }
+                    tryPause();
                     if (/*shouldStop()*/requestStop){
                         //running = false;
                         isFinished = false;

@@ -42,7 +42,7 @@
 
     <!-- Miscellaneous -->
     <color name="divider">#B6B6B6</color>
-    <color name="item_disabled">#8C8C8C</color>
+    <color name="item_disabled">#9e9e9e</color>
     <color name="background_light">#EEEEEE</color>
     <color name="drawer_background">@color/background_light</color>
 

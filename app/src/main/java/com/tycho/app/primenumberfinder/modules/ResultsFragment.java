@@ -2,6 +2,7 @@ package com.tycho.app.primenumberfinder.modules;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,8 @@ import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.modules.TaskFragment;
 
 import java.text.DecimalFormat;
+
+import easytasks.Task;
 
 /**
  * Created by tycho on 11/19/2017.
@@ -22,7 +25,12 @@ public abstract class ResultsFragment extends TaskFragment {
      */
     private static final String TAG = "ResultsFragment";
 
-    protected final DecimalFormat decimalFormat = new DecimalFormat("##0.00");
+    /**
+     * Decimal format used for displaying task progress.
+     */
+    protected static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("##0.00");
+
+    protected final UIUpdater uiUpdater = new UIUpdater();
 
     /**
      * The last time in milliseconds that the UI was updated.
@@ -36,31 +44,29 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public void onTaskStarted() {
         super.onTaskStarted();
-        updateUi();
+        if (uiUpdater.getState() == Task.State.NOT_STARTED){
+            uiUpdater.startOnNewThread();
+        }else{
+            uiUpdater.resume();
+        }
     }
 
     @Override
     public void onTaskPaused() {
         super.onTaskPaused();
-        updateUi();
+        uiUpdater.pause(false);
     }
 
     @Override
     public void onTaskResumed() {
         super.onTaskResumed();
-        updateUi();
+        uiUpdater.resume();
     }
 
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        updateUi();
-    }
-
-    @Override
-    public void onProgressChanged(float progress) {
-        super.onProgressChanged(progress);
-        requestUiUpdate();
+        uiUpdater.pause(false);
     }
 
     protected void updateUi(){
@@ -71,15 +77,37 @@ public abstract class ResultsFragment extends TaskFragment {
                     onUiUpdate();
                 }
             });
-        }
-    }
-
-    protected void requestUiUpdate(){
-        if (System.currentTimeMillis() - lastUiUpdateTime >= PrimeNumberFinder.UPDATE_LIMIT_MS * 30){
-            updateUi();
-            lastUiUpdateTime = System.currentTimeMillis();
+        }else{
+            Log.d(TAG, "Wasn't added or was detached!");
         }
     }
 
     protected abstract void onUiUpdate();
+
+    protected final class UIUpdater extends Task{
+
+        @Override
+        protected void run() {
+            while (true) {
+
+                if (getTask() == null) pause(false);
+
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateUi();
+                    }
+                });
+
+                try {
+                    Thread.sleep(1000 / 2);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    break;
+                }
+
+                tryPause();
+            }
+        }
+    }
 }

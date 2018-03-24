@@ -4,8 +4,7 @@
     android:layout_height="match_parent"
     android:clipToPadding="false"
     android:clipChildren="false"
-    android:orientation="vertical"
-    android:padding="8dp">
+    android:orientation="vertical">
 
     <!-- Message to display when no active task -->
     <TextView
@@ -19,14 +18,16 @@
     <LinearLayout
         android:id="@+id/results_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="vertical"
-        android:clipChildren="false"
         android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="28dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -34,7 +35,6 @@
                 android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Searching..."
                 android:textColor="@color/primary_text"
                 android:textSize="20sp" />
 
@@ -48,12 +48,10 @@
                 android:id="@+id/textView_search_progress"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
                 android:layout_weight="1"
                 android:gravity="end|center_vertical"
                 android:lines="1"
                 android:singleLine="true"
-                android:text="100%"
                 android:textColor="@color/secondary_text"
                 android:textSize="16sp" />
 
@@ -65,48 +63,38 @@
             android:layout_height="wrap_content"
             android:paddingBottom="2dp"
             android:paddingTop="2dp"
-            android:text="There are 7 prime numbers between 0 and 9,403,103."
-            android:textColor="@color/secondary_text"
-            android:textSize="14sp" />
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            style="@style/TaskFragmentSubtitle" />
 
-        <!-- Main content -->
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="8dp"
-            android:layout_weight="1"
-            android:paddingEnd="8dp"
-            android:paddingStart="8dp"
-            android:paddingTop="2dp"
-            android:scrollbars="vertical" />
+    </LinearLayout>
 
-        <!-- TODO: This button's shadow clips the bottom of the view-->
-        <LinearLayout
-            android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button_view_all"
+            style="@style/Button"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:text="@string/view_all" />
 
-            <Button
-                android:id="@+id/button_view_all"
-                style="@style/Button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/view_all" />
+        <View
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="1dp"/>
 
-            <View
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="1dp"/>
-
-            <Button
-                android:id="@+id/button_save"
-                style="@style/Button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/save" />
-
-        </LinearLayout>
+        <Button
+            android:id="@+id/button_save"
+            style="@style/Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/save" />
 
     </LinearLayout>
 </LinearLayout>

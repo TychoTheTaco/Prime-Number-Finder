@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -21,6 +22,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
+import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.modules.about.AboutPageFragment;
 import com.tycho.app.primenumberfinder.settings.SettingsFragment;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
@@ -69,6 +71,8 @@ public class MainActivity extends AppCompatActivity{
 
     private final Handler handler = new Handler(Looper.getMainLooper());
 
+    private FloatingActionButton floatingActionButton;
+
     /**
      * Maps drawer item ids to the corresponding fragment tag. The ids and tags are used to find
      * the corresponding fragment when a new drawer item is selected.
@@ -110,8 +114,23 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
+        //Set up floating action button
+        floatingActionButton = findViewById(R.id.fab);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentFragment instanceof FloatingActionButtonListener){
+                    ((FloatingActionButtonListener) currentFragment).onClick(v);
+                }
+            }
+        });
+
         //Select the first drawer item
         selectDrawerItem(0);
+    }
+
+    public FloatingActionButton getFab(){
+        return this.floatingActionButton;
     }
 
     @Override
@@ -127,13 +146,8 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
-        //Inflate the menu
         getMenuInflater().inflate(R.menu.main, menu);
-
-        //Assign menu
         this.menu = menu;
-
         return true;
     }
 
@@ -232,6 +246,9 @@ public class MainActivity extends AppCompatActivity{
         //Get the new fragment
         currentFragment = getFragment(menuItem.getItemId());
 
+        //Change floating action button visibility
+        floatingActionButton.setVisibility(currentFragment instanceof FloatingActionButtonListener ? View.VISIBLE : View.GONE);
+
         //Add the new fragment if it doesn't exist yet
         if (getFragmentManager().findFragmentByTag(fragmentIds.get(menuItem.getItemId())) == null) {
             fragmentTransaction.add(R.id.main_content_frame, currentFragment, fragmentIds.get(menuItem.getItemId()));
@@ -255,7 +272,7 @@ public class MainActivity extends AppCompatActivity{
                 break;
 
             case R.id.drawer_item_find_primes:
-                setTitle(getString(R.string.title_scan_for_primes));
+                setTitle(getString(R.string.title_find_primes));
                 navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.purple)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.purple_dark)));
                 applyThemeColor(ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));

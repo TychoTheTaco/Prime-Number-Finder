@@ -17,6 +17,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    /*externalNativeBuild {
+        cmake {
+            path 'CMakeLists.txt'
+        }
+    }*/
 }
 
 dependencies {
@@ -29,5 +34,5 @@ dependencies {
     compile 'com.jaredrummler:colorpicker:1.0.2'
     compile project(':simplegraphs')
     implementation files('libs/Simple Trees 1.1.1.DEV.jar')
-    implementation files('libs/Easy Tasks 1.1.20.DEV.jar')
+    implementation files('libs/Easy Tasks 1.1.33.DEV.jar')
 }

@@ -3,6 +3,7 @@ package com.tycho.app.primenumberfinder.modules.savedfiles.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -19,6 +20,7 @@ import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrim
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimesActivity;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.SavedFilesListActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -71,15 +73,18 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                 files.addAll(Arrays.asList(FileManager.getInstance().getSavedTreesDirectory().listFiles()));
                 break;
         }
+
+        Utils.sortByDate(files, false);
+        notifyDataSetChanged();
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
             case 0:
-                return new ViewHolderHeader(LayoutInflater.from(parent.getContext()).inflate(R.layout.saved_files_header, parent, false));
+                return new HeaderViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.saved_files_header, parent, false));
             case 1:
-                return new ViewHolderSavedFiles(LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_saved_file_large, parent, false));
+                return new ItemViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_saved_file_large, parent, false));
         }
         return null;
     }
@@ -87,10 +92,10 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
-        if (holder instanceof ViewHolderHeader) {
-            bindHeader((ViewHolderHeader) holder, position);
-        } else if (holder instanceof ViewHolderSavedFiles) {
-            bindItem((ViewHolderSavedFiles) holder, position);
+        if (holder instanceof HeaderViewHolder) {
+            bindHeader((HeaderViewHolder) holder, position);
+        } else if (holder instanceof ItemViewHolder) {
+            bindItem((ItemViewHolder) holder, position);
         }
     }
 
@@ -107,7 +112,7 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         return isSelecting;
     }
 
-    private void bindHeader(final ViewHolderHeader viewHolder, final int position) {
+    private void bindHeader(final HeaderViewHolder viewHolder, final int position) {
         switch (fileType) {
 
             case PRIMES:
@@ -132,7 +137,7 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         viewHolder.subTitle.setText("You have " + files.size() + " saved files." + (isSelecting ? (" Selected " + selectedCount + " items.") : ""));
     }
 
-    private void bindItem(final ViewHolderSavedFiles viewHolder, final int position) {
+    private void bindItem(final ItemViewHolder viewHolder, final int position) {
         final File file = files.get(position - 1);
         final String fileName = file.getName().replace((fileType == FileType.TREE ? FileManager.TREE_EXTENSION : FileManager.EXTENSION), "");
 
@@ -159,6 +164,9 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         if (selectedPositions.get(position)){
             viewHolder.icon.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(viewHolder.itemView.getContext(), R.color.accent)));
             viewHolder.icon.setText("");
+            viewHolder.fileSize.setTextColor(ContextCompat.getColor(context, R.color.secondary_text));
+        }else{
+            viewHolder.fileSize.setTextColor(Color.parseColor("#bebebe"));
         }
 
         viewHolder.dateCreated.setText(simpleDateFormat.format(new Date(file.lastModified())));
@@ -190,6 +198,7 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                         case PRIMES:
                             intent = new Intent(context, DisplayPrimesActivity.class);
                             intent.putExtra("filePath", file.getAbsolutePath());
+                            intent.putExtra("allowExport", true);
                             intent.putExtra("title", true);
                             context.startActivity(intent);
                             break;
@@ -197,6 +206,7 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                         case FACTORS:
                             intent = new Intent(context, DisplayFactorsActivity.class);
                             intent.putExtra("filePath", file.getAbsolutePath());
+                            intent.putExtra("allowExport", true);
                             intent.putExtra("title", true);
                             context.startActivity(intent);
                             break;
@@ -204,6 +214,7 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                         case TREE:
                             intent = new Intent(context, DisplayPrimeFactorizationActivity.class);
                             intent.putExtra("filePath", file.getAbsolutePath());
+                            intent.putExtra("allowExport", true);
                             intent.putExtra("title", true);
                             context.startActivity(intent);
                             break;
@@ -226,15 +237,6 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                     return true;
                 }
                 return false;
-            }
-        });
-    }
-
-    public void sortByDate() {
-        Collections.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(File file0, File file1) {
-                return (int) (file1.lastModified() - file0.lastModified());
             }
         });
     }
@@ -304,31 +306,31 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         }
     }
 
-    private class ViewHolderSavedFiles extends RecyclerView.ViewHolder {
+    private class ItemViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView fileName;
         private final TextView dateCreated;
         private final TextView fileSize;
         protected final TextView icon;
 
-        public ViewHolderSavedFiles(final View itemView) {
+        ItemViewHolder(final View itemView) {
             super(itemView);
-            icon = (TextView) itemView.findViewById(R.id.icon);
-            fileName = (TextView) itemView.findViewById(R.id.file_name);
-            dateCreated = (TextView) itemView.findViewById(R.id.textView_dateCreated);
-            fileSize = (TextView) itemView.findViewById(R.id.file_size);
+            icon = itemView.findViewById(R.id.icon);
+            fileName = itemView.findViewById(R.id.file_name);
+            dateCreated =  itemView.findViewById(R.id.textView_dateCreated);
+            fileSize = itemView.findViewById(R.id.file_size);
         }
     }
 
-    private class ViewHolderHeader extends RecyclerView.ViewHolder {
+    private class HeaderViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView title;
         private final TextView subTitle;
 
-        public ViewHolderHeader(final View itemView) {
+        HeaderViewHolder(final View itemView) {
             super(itemView);
-            title = (TextView) itemView.findViewById(R.id.title);
-            subTitle = (TextView) itemView.findViewById(R.id.subtitle);
+            title = itemView.findViewById(R.id.title);
+            subTitle = itemView.findViewById(R.id.subtitle);
         }
     }
 

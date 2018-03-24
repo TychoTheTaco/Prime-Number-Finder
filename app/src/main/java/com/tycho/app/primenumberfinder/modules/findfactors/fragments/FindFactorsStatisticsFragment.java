@@ -12,8 +12,10 @@ import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Statistic;
 import com.tycho.app.primenumberfinder.StatisticData;
+import com.tycho.app.primenumberfinder.modules.StatisticsFragment;
 import com.tycho.app.primenumberfinder.modules.TaskFragment;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 
 import org.json.JSONException;
 
@@ -30,7 +32,7 @@ import static com.tycho.app.primenumberfinder.utils.Utils.formatTime;
  * Created by tycho on 10/6/2017.
  */
 
-public class FindFactorsStatisticsFragment extends TaskFragment {
+public class FindFactorsStatisticsFragment extends StatisticsFragment {
 
     /**
      * Tag used for logging and debugging.
@@ -44,7 +46,9 @@ public class FindFactorsStatisticsFragment extends TaskFragment {
     private TextView estimatedTimeRemaining;
     private TextView textViewNumbersPerSecond;
 
-    private final UiUpdater uiUpdater = new UiUpdater();
+    private View estimatedTimeRemainingLayout;
+
+    private long lastUpdate = 0;
 
     @Nullable
     @Override
@@ -57,11 +61,15 @@ public class FindFactorsStatisticsFragment extends TaskFragment {
         textViewElapsedTime = rootView.findViewById(R.id.textView_elapsed_time);
         estimatedTimeRemaining = rootView.findViewById(R.id.textView_eta);
         textViewNumbersPerSecond = rootView.findViewById(R.id.textView_numbers_per_second);
+        estimatedTimeRemainingLayout = rootView.findViewById(R.id.estimated_time_remaining_layout);
+
+        init();
 
         return rootView;
     }
 
     public void updateData(StatisticData statisticData){
+        //Log.d(TAG, "updateData " + getView());
         if (getView() != null){
             setTimeElapsed(statisticData.optLong(Statistic.TIME_ELAPSED));
             textViewNumbersPerSecond.setText(NumberFormat.getInstance().format(statisticData.optInt(Statistic.NUMBERS_PER_SECOND)));
@@ -76,93 +84,45 @@ public class FindFactorsStatisticsFragment extends TaskFragment {
     @Override
     public void setTask(Task task) {
         super.setTask(task);
+        if (getView() != null) {
+            init();
+        }
+    }
 
-        if (task == null){
+    private void init(){
+        if (getTask() == null){
             statisticsView.setVisibility(View.GONE);
             noTaskView.setVisibility(View.VISIBLE);
-            if (uiUpdater.getState() != Task.State.NOT_STARTED) uiUpdater.pause();
         }else{
             statisticsView.setVisibility(View.VISIBLE);
             noTaskView.setVisibility(View.GONE);
 
-            final StatisticData statisticData = new StatisticData();
-            try {
-                statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
-                statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getNumbersPerSecond());
-                statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
-            }catch (JSONException e){}
-            updateData(statisticData);
-
-            //Start UI updater
-            if (uiUpdater.getState() == Task.State.NOT_STARTED) {
-                uiUpdater.addTaskListener(new TaskAdapter() {
-                    @Override
-                    public void onTaskStarted() {
-                        Log.d(TAG, "UI updater started");
-                    }
-
-                    @Override
-                    public void onTaskPaused() {
-                        Log.d(TAG, "UI updater paused");
-                    }
-
-                    @Override
-                    public void onTaskResumed() {
-                        Log.d(TAG, "UI updater resumed");
-                    }
-
-                    @Override
-                    public void onTaskStopped() {
-                        Log.d(TAG, "UI updater stopped");
-                    }
-                });
-                uiUpdater.startOnNewThread();
-            }
-
-            switch (getTask().getState()){
+            switch (getTask().getState()) {
                 case RUNNING:
-                    uiUpdater.resume();
+                    onTaskStarted();
                     break;
 
                 case PAUSED:
+                    onTaskPaused();
+                    break;
+
                 case STOPPED:
-                    uiUpdater.pause();
+                    onTaskStopped();
                     break;
             }
-
         }
-    }
-
-    @Override
-    public void onTaskPaused() {
-        super.onTaskPaused();
-        uiUpdater.pause();
-    }
-
-    @Override
-    public void onTaskResumed() {
-        super.onTaskResumed();
-        uiUpdater.resume();
     }
 
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        uiUpdater.pause();
-        //We need to wait here
-        if (getTask() != null){
-            try {
-                final StatisticData statisticData = new StatisticData();
-                statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
-                statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
-                statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getNumbersPerSecond());
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateData(statisticData);
-                    }
-                });
-            }catch (JSONException e){}
+        if (isAdded() && !isDetached()) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    estimatedTimeRemainingLayout.setVisibility(View.GONE);
+                }
+            });
         }
     }
 
@@ -171,48 +131,13 @@ public class FindFactorsStatisticsFragment extends TaskFragment {
         return (FindFactorsTask) super.getTask();
     }
 
-    private class UiUpdater extends Task {
-
-        private StatisticData statisticData = new StatisticData();
-
-        private long lastUpdate;
-
-        @Override
-        protected void run() {
-            while (true) {
-
-                if (getTask() != null){
-                    try {
-                        statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
-                        statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getNumbersPerSecond());
-                        if (System.currentTimeMillis() - lastUpdate >= 1000){
-                            statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
-                            lastUpdate = System.currentTimeMillis();
-                        }
-                    }catch (JSONException e){}
-
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (getState() != State.PAUSED){
-                                updateData(statisticData);
-                            }
-                        }
-                    });
-                }
-
-                tryPause();
-
-                if (shouldStop()) {
-                    break;
-                }
-
-                try {
-                    Thread.sleep(PrimeNumberFinder.UPDATE_LIMIT_MS * 2);
-                } catch (InterruptedException e) {
-                    //Ignore exception
-                }
-            }
+    @Override
+    protected void packStatistics(StatisticData statisticData) {
+        statisticData.put(Statistic.TIME_ELAPSED, getTask().getElapsedTime());
+        statisticData.put(Statistic.NUMBERS_PER_SECOND, getTask().getNumbersPerSecond());
+        if (System.currentTimeMillis() - lastUpdate >= 1000){
+            statisticData.put(Statistic.ESTIMATED_TIME_REMAINING, getTask().getEstimatedTimeRemaining());
+            lastUpdate = System.currentTimeMillis();
         }
     }
 }

@@ -2,31 +2,23 @@ package com.tycho.app.primenumberfinder.modules.primefactorization.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.TextView;
 
-import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
-
-import easytasks.Task;
 
 /**
  * Created by tycho on 11/16/2017.
  */
 
-public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<AbstractTaskListAdapter.AbstractTaskListItemViewHolder> {
+public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<AbstractTaskListAdapter.ViewHolder> {
 
     /**
      * Tag used for logging and debugging.
@@ -42,15 +34,15 @@ public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<A
     }
 
     @Override
-    public AbstractTaskListItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.prime_factorization_task_list_item, parent, false);
-        return new AbstractTaskListItemViewHolder(view);
+        return new ViewHolder(view);
     }
 
     @Override
     protected void doOnBindViewHolder(RecyclerView.ViewHolder h, int position) {
 
-        final AbstractTaskListItemViewHolder holder = (AbstractTaskListItemViewHolder) h;
+        final ViewHolder holder = (ViewHolder) h;
 
         //Get the current task
         final PrimeFactorizationTask task = (PrimeFactorizationTask) tasks.get(holder.getAdapterPosition());
@@ -84,7 +76,7 @@ public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<A
         //Set progress
         /*if (task.getState() != Task.State.STOPPED){
             holder.progress.setVisibility(View.VISIBLE);
-            holder.progress.setText(context.getString(R.string.task_progress, decimalFormat.format(task.getProgress() * 100)));
+            holder.progress.setText(context.getString(R.string.task_progress, DECIMAL_FORMAT.format(task.getProgress() * 100)));
         }else{
             holder.progress.setVisibility(View.GONE);
         }*/

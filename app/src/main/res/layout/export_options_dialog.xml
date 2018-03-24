@@ -101,6 +101,20 @@
         </com.tycho.app.primenumberfinder.CustomRadioGroup>
     </LinearLayout>
 
+    <TextView
+        android:textColor="@color/primary_text"
+        android:layout_marginTop="4dp"
+        android:textSize="14sp"
+        android:layout_width="wrap_content"
+        android:text="@string/format"
+        android:layout_height="wrap_content" />
+
+    <CheckBox
+        android:id="@+id/include_commas_checkbox"
+        android:layout_width="match_parent"
+        android:text="@string/include_numbers_description"
+        android:layout_height="wrap_content" />
+
     <Button
         style="@style/Button"
         android:id="@+id/export_button"
