@@ -64,6 +64,8 @@
 + New export options
 	+ Primes
 		- Include comma's in numbers
+	+ Factors
+		- Include comma's in numbers
 	+ Factor trees
 		- Image background color
 		- Vertical item spacing

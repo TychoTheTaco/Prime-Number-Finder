@@ -20,6 +20,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
@@ -130,15 +131,14 @@ public class FindFactorsResultsFragment extends ResultsFragment{
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+                progressDialog.setTitle("Saving...");
+                progressDialog.show();
+
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getActivity(), getString(R.string.saving_file), Toast.LENGTH_SHORT).show();
-                            }
-                        });
                         final boolean success = FileManager.getInstance().saveFactors(getTask().getFactors(), getTask().getNumber());
                         handler.post(new Runnable() {
                             @Override
@@ -146,6 +146,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                                 Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
                             }
                         });
+                        progressDialog.dismiss();
                     }
                 }).start();
             }
