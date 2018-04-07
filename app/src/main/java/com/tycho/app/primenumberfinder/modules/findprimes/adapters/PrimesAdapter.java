@@ -45,6 +45,8 @@ public class PrimesAdapter extends RecyclerView.Adapter<PrimesAdapter.ViewHolder
      */
     private final Context context;
 
+    private int offset = 0;
+
     public PrimesAdapter(final Context context){
         this.context = context;
     }
@@ -73,6 +75,10 @@ public class PrimesAdapter extends RecyclerView.Adapter<PrimesAdapter.ViewHolder
         return primes;
     }
 
+    public void setOffset(final int offset){
+        this.offset = offset;
+    }
+
     /**
      * View holder containing item views.
      */
@@ -89,7 +95,7 @@ public class PrimesAdapter extends RecyclerView.Adapter<PrimesAdapter.ViewHolder
                 public void onClick(View v) {
                     Toast.makeText(context, context.getString(R.string.primes_list_toast_message,
                             NUMBER_FORMAT.format(primes.get(getAdapterPosition())),
-                            Utils.formatNumberOrdinal(getAdapterPosition() + 1)),
+                            Utils.formatNumberOrdinal(getAdapterPosition() + 1 + offset)),
                             Toast.LENGTH_SHORT).show();
                 }
             });

@@ -152,7 +152,7 @@ public class DisplayFactorsActivity extends AppCompatActivity{
             @Override
             public void run(){
 
-                final List<Long> numbers = FileManager.getInstance().readNumbers(file);
+                final List<Long> numbers = FileManager.readNumbers(file);
                 adapter.getFactors().addAll(numbers);
 
                 new Handler(getMainLooper()).post(new Runnable(){

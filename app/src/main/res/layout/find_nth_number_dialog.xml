@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:gravity="center_vertical"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:padding="4dp"
+    android:layout_height="match_parent">
+
+    <TextView
+    android:id="@+id/title"
+    android:layout_width="wrap_content"
+    android:text="Go To Number"
+    android:textSize="20sp"
+    android:textColor="@color/primary_text"
+    android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:text="Go to the "
+            android:textSize="14sp"
+            android:textColor="@color/primary_text"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/number_input"
+            android:layout_width="wrap_content"
+            android:minWidth="70dp"
+            android:inputType="number"
+            android:layout_height="wrap_content"
+            android:hint="nth"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:text=" number."
+            android:textSize="14sp"
+            android:textColor="@color/primary_text"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/find_button"
+        style="@style/Button"
+        android:layout_width="match_parent"
+        android:text="Find"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

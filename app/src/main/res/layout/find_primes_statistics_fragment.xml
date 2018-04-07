@@ -70,7 +70,9 @@
 
         </LinearLayout>
 
+        <!-- Numbers per second-->
         <LinearLayout
+            android:id="@+id/numbers_per_second_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
@@ -93,7 +95,9 @@
 
         </LinearLayout>
 
+        <!-- Primes per second-->
         <LinearLayout
+            android:id="@+id/primes_per_second_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">

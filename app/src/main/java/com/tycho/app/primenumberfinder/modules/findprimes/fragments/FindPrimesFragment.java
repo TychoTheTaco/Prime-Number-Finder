@@ -36,7 +36,6 @@ import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
-import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimeFactorizationActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.math.BigInteger;
@@ -47,7 +46,6 @@ import java.util.UUID;
 
 import easytasks.Task;
 import easytasks.TaskAdapter;
-import easytasks.TaskListener;
 
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
@@ -615,7 +613,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                 valid = true;
             }else{
                 valid = false;
-                Toast.makeText(getActivity(), "Not enough memory to start task!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Not enough RAM to start task! Use Brute Force instead!", Toast.LENGTH_SHORT).show();
             }
         }else{
             valid = true;

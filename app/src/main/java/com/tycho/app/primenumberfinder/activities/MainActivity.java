@@ -16,6 +16,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,8 +32,11 @@ import com.tycho.app.primenumberfinder.modules.findfactors.fragments.FindFactors
 import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesFragment;
 import com.tycho.app.primenumberfinder.modules.primefactorization.fragments.PrimeFactorizationFragment;
 import com.tycho.app.primenumberfinder.modules.savedfiles.SavedFilesFragment;
+import com.tycho.app.primenumberfinder.utils.FileManager;
 
+import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;

@@ -179,7 +179,24 @@ public class FactorTreeExportOptionsActivity extends AppCompatActivity implement
                             exportOptions.verticalSpacing = 0 + (progress * 1);
                             verticalItemSpacing.setText(String.valueOf((int) exportOptions.verticalSpacing));
                             treeView.recalculate();
-                            imageSizeTextView.setText("(" + treeView.getBoundingRect().width() + " x " + Math.abs(treeView.getBoundingRect().height()) + ")");
+                            //treeView.recalculateBounds();
+                            //treeView.invalidate();
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Log.d(TAG, "Waiting...");
+                                    while (!treeView.isGenerated()){
+                                        //Wait
+                                    }
+                                    Log.d(TAG, "Done waiting.");
+                                    new Handler(getMainLooper()).post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            imageSizeTextView.setText("(" + treeView.getBoundingRect().width() + " x " + Math.abs(treeView.getBoundingRect().height()) + ")");
+                                        }
+                                    });
+                                }
+                            }).start();
                         }
 
                         @Override

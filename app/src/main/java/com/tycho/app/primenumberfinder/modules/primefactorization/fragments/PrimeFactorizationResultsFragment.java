@@ -85,12 +85,6 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getActivity(), getString(R.string.saving_file), Toast.LENGTH_SHORT).show();
-                            }
-                        });
                         final boolean success = FileManager.getInstance().saveTree(getTask().getFactorTree());
                         handler.post(new Runnable() {
                             @Override

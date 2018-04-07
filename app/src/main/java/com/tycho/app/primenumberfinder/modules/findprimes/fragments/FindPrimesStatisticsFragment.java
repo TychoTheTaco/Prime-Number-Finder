@@ -51,6 +51,8 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
     private TextView noTaskView;
 
     private View estimatedTimeRemainingLayout;
+    private View numbersPerSecondLayout;
+    private View primesPerSecondLayout;
 
     private TextView textViewElapsedTime;
     private TextView estimatedTimeRemaining;
@@ -71,6 +73,8 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
         textViewPrimesPerSecond = rootView.findViewById(R.id.textView_primes_per_second);
 
         estimatedTimeRemainingLayout = rootView.findViewById(R.id.estimated_time_remaining_layout);
+        numbersPerSecondLayout = rootView.findViewById(R.id.numbers_per_second_layout);
+        primesPerSecondLayout = rootView.findViewById(R.id.primes_per_second_layout);
 
         init();
 
@@ -141,6 +145,8 @@ public class FindPrimesStatisticsFragment extends StatisticsFragment{
             noTaskView.setVisibility(View.GONE);
 
             estimatedTimeRemainingLayout.setVisibility((getTask().getEndValue() == FindPrimesTask.INFINITY) ? View.GONE : View.VISIBLE);
+            numbersPerSecondLayout.setVisibility(getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE ? View.VISIBLE : View.GONE);
+            primesPerSecondLayout.setVisibility(getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE ? View.VISIBLE : View.GONE);
 
             switch (getTask().getState()) {
                 case RUNNING:

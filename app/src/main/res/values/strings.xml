@@ -13,6 +13,7 @@
     <string name="action_bar_item_title_save">Save</string>
     <string name="action_bar_item_title_delete">Delete</string>
     <string name="action_bar_item_title_export">Export</string>
+    <string name="find_nth_number_title">Find Nth number</string>
 
     <!-- Navigation drawer items -->
     <string name="title_find_primes">Find Primes</string>

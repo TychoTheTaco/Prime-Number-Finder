@@ -13,12 +13,16 @@ import android.widget.TextView;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -254,7 +258,7 @@ public class FindPrimesTask extends MultithreadedTask {
         //System.out.println("Finished merge in " + (System.currentTimeMillis() - sortStart) + " ms.");
     }
 
-    public File saveToFile() throws IOException {
+    public File saveToFile(){
 
         final File largeCache = new File(FileManager.getInstance().getTaskCacheDirectory(this) + File.separator + "primes");
         if (searchMethod == SearchMethod.BRUTE_FORCE) {
@@ -262,15 +266,7 @@ public class FindPrimesTask extends MultithreadedTask {
             sortCache(false);
         } else {
             if (getState() != State.STOPPED) return largeCache;
-            final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(largeCache));
-            final int lastNumber = ((SieveTask) getTasks().get(0)).primes.get(((SieveTask) getTasks().get(0)).primes.size() - 1);
-            for (int number : ((SieveTask) getTasks().get(0)).primes) {
-                bufferedWriter.write(String.valueOf(number));
-                if (number != lastNumber) {
-                    bufferedWriter.write('\n');
-                }
-            }
-            bufferedWriter.close();
+            FileManager.getInstance().writeNumbersQuick(((SieveTask) getTasks().get(0)).primes, largeCache, false);
         }
         return largeCache;
     }
@@ -280,7 +276,7 @@ public class FindPrimesTask extends MultithreadedTask {
 
             //Main cache file
             final File cache = new File(FileManager.getInstance().getTaskCacheDirectory(this) + File.separator + "primes");
-            final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(cache, false));
+            final DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(cache, false)));
 
             //Create readers for each sub-task cache file
             final List<DataInputStream> dataInputStreams = new ArrayList<>();
@@ -312,8 +308,7 @@ public class FindPrimesTask extends MultithreadedTask {
                 }
 
                 //Write smallest number to large cache
-                bufferedWriter.write(String.valueOf(numbers.get(smallestIndex)));
-                bufferedWriter.write('\n');
+                dataOutputStream.writeLong(numbers.get(smallestIndex));
 
                 //Refill numbers
                 try {
@@ -355,8 +350,7 @@ public class FindPrimesTask extends MultithreadedTask {
                 }
 
                 //Write smallest number to large cache
-                bufferedWriter.write(String.valueOf(numbers.get(smallestIndex)));
-                bufferedWriter.write('\n');
+                dataOutputStream.writeLong(numbers.get(smallestIndex));
 
                 //Refill numbers
                 try {
@@ -368,7 +362,7 @@ public class FindPrimesTask extends MultithreadedTask {
                 }
             }
 
-            bufferedWriter.close();
+            dataOutputStream.close();
 
             //Delete files and clear lists
             if (delete) {
@@ -492,7 +486,7 @@ public class FindPrimesTask extends MultithreadedTask {
 
             case SIEVE_OF_ERATOSTHENES:
                 for (int i = 0; i < primeCount - 1; i++) {
-                    primes.add(Long.valueOf(((SieveTask) getTasks().get(0)).primes.get(i)));
+                    primes.add(((SieveTask) getTasks().get(0)).primes.get(i));
                 }
                 break;
         }
@@ -651,7 +645,7 @@ public class FindPrimesTask extends MultithreadedTask {
                 }
 
                 //Write to 1 file with no commas use byte offset for quick reads
-                FileManager.getInstance().writeToCache(primes, new File(FileManager.getInstance().getContext().getFilesDir() + File.separator + "cache" + File.separator + FindPrimesTask.this.getId() + File.separator + getId() + ".cache"), true);
+                FileManager.getInstance().writeNumbersQuick(primes, new File(FileManager.getInstance().getTaskCacheDirectory(FindPrimesTask.this) + File.separator + getId() + ".cache"), true);
                 primes.clear();
             }
         }
@@ -664,7 +658,7 @@ public class FindPrimesTask extends MultithreadedTask {
 
     private class SieveTask extends MultithreadedTask.SubTask {
 
-        private final List<Integer> primes = new ArrayList<>();
+        private final List<Long> primes = new ArrayList<>();
 
         @Override
         protected void run() {
@@ -690,8 +684,8 @@ public class FindPrimesTask extends MultithreadedTask {
                 tryPause();
             }
 
-            for (int i = 2; i < endValue; i++) {
-                if (bitSet.get(i)) {
+            for (long i = 2; i < endValue; i++) {
+                if (bitSet.get((int) i)) {
                     primes.add(i);
                     primeCount++;
                 }

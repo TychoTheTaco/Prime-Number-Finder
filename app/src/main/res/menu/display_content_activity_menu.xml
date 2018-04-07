@@ -2,8 +2,16 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/export"
+        android:id="@+id/find"
         android:orderInCategory="0"
+        app:showAsAction="ifRoom"
+        android:visible="true"
+        android:icon="@drawable/ic_search_white_24dp"
+        android:title="@string/find_nth_number_title"/>
+
+    <item
+        android:id="@+id/export"
+        android:orderInCategory="1"
         app:showAsAction="ifRoom"
         android:visible="true"
         android:icon="@drawable/ic_file_upload_white_24dp"

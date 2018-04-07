@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,12 +15,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.ExportOptionsDialog;
+import com.tycho.app.primenumberfinder.modules.savedfiles.FindNthNumberDialog;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;
@@ -29,10 +33,10 @@ import java.util.List;
 
 /**
  * @author Tycho Bellers
- *         Date Created: 11/5/2016
+ * Date Created: 11/5/2016
  */
 
-public class DisplayPrimesActivity extends AppCompatActivity{
+public class DisplayPrimesActivity extends AppCompatActivity {
 
     /**
      * Tag used for logging and debugging.
@@ -47,13 +51,18 @@ public class DisplayPrimesActivity extends AppCompatActivity{
 
     //private TextView subtitle;
 
+    private final Handler handler = new Handler(Looper.getMainLooper());
+
     final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
     private final CustomScrollListener scrollListener = new CustomScrollListener();
 
     private boolean allowExport;
 
+    private FloatingActionButton scrollToTopFab;
+    private FloatingActionButton scrollToBottomFab;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.display_primes_activity);
 
@@ -66,15 +75,15 @@ public class DisplayPrimesActivity extends AppCompatActivity{
 
         //Get the intent
         final Intent intent = getIntent();
-        if (intent != null){
+        if (intent != null) {
 
             //Get extras from the intent
             final Bundle extras = intent.getExtras();
-            if (extras != null){
+            if (extras != null) {
 
                 //Get the file path from the extras
                 final String filePath = extras.getString("filePath");
-                if (filePath != null){
+                if (filePath != null) {
 
                     file = new File(filePath);
 
@@ -91,30 +100,47 @@ public class DisplayPrimesActivity extends AppCompatActivity{
 
                     loadFile(file);
 
-                    if (extras.getBoolean("title", true)){
+                    if (extras.getBoolean("title", true)) {
                         setTitle(formatTitle(file.getName().split("\\.")[0]));
                     }
 
                     allowExport = extras.getBoolean("allowExport", false);
 
-                }else{
+                    //Set up floating action buttons
+                    scrollToTopFab = findViewById(R.id.scroll_to_top_fab);
+                    scrollToTopFab.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            specialScrollToPosition(0);
+                        }
+                    });
+
+                    scrollToBottomFab = findViewById(R.id.scroll_to_bottom_fab);
+                    scrollToBottomFab.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            specialScrollToPosition(scrollListener.totalNumbers - 1);
+                        }
+                    });
+
+                } else {
                     Log.e(TAG, "Invalid file path!");
                     Toast.makeText(this, "Error loading file!", Toast.LENGTH_SHORT).show();
                     finish();
                 }
-            }else{
+            } else {
                 Log.e(TAG, "Intent had no extras!");
                 Toast.makeText(this, "Error loading file!", Toast.LENGTH_SHORT).show();
                 finish();
             }
-        }else{
+        } else {
             Log.e(TAG, "Activity was started without an intent!");
             Toast.makeText(this, "Error loading file!", Toast.LENGTH_SHORT).show();
             finish();
         }
     }
 
-    private class CustomScrollListener extends RecyclerView.OnScrollListener{
+    private class CustomScrollListener extends RecyclerView.OnScrollListener {
         private int totalNumbers = 0;
 
         private int totalItemCount, lastVisibleItem, visibleThreshold = 0;
@@ -131,11 +157,11 @@ public class DisplayPrimesActivity extends AppCompatActivity{
             lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
 
             if (!loading) {
-                if (totalItemCount - 1 <= (lastVisibleItem + visibleThreshold)){
+                if (totalItemCount - 1 <= (lastVisibleItem + visibleThreshold)) {
                     loading = true;
                     loadMore(true);
                     loading = false;
-                }else if (linearLayoutManager.findFirstVisibleItemPosition() <= 0){
+                } else if (linearLayoutManager.findFirstVisibleItemPosition() <= visibleThreshold) {
                     loading = true;
                     loadMore(false);
                     loading = false;
@@ -143,30 +169,36 @@ public class DisplayPrimesActivity extends AppCompatActivity{
             }
         }
 
-        public void setTotalNumbers(final int count){
+        public void setTotalNumbers(final int count) {
+            Log.d(TAG, "Set total: " + count);
             this.totalNumbers = count;
         }
 
-        public void setRange(final int start, final int end){
-            range[0] = start;
-            range[1] = end;
+        public int getTotalNumbers() {
+            return this.totalNumbers;
         }
 
-        private void loadMore(final boolean end){
-            if (end && range[1] >= totalNumbers - 1){
+        public void setRange(final int start, final int end) {
+            range[0] = start;
+            range[1] = end;
+            primesAdapter.setOffset(start);
+        }
+
+        private void loadMore(final boolean end) {
+            if (end && range[1] >= totalNumbers - 1) {
                 return;
             }
-            if (!end && range[0] == 0){
+            if (!end && range[0] == 0) {
                 return;
             }
             //Log.d(TAG, "Loading more...");
 
             //Log.d(TAG, "Before: " + primesAdapter.getPrimes());
-            if (end){
+            if (end) {
 
                 //Remove first half
                 final Iterator<Long> iterator = primesAdapter.getPrimes().iterator();
-                for (int i = 0; i < INCREMENT; i++){
+                for (int i = 0; i < INCREMENT; i++) {
                     iterator.next();
                     iterator.remove();
                 }
@@ -190,15 +222,15 @@ public class DisplayPrimesActivity extends AppCompatActivity{
 
                 range[0] += INCREMENT;
                 range[1] += INCREMENT;
-            }else{
+            } else {
                 final List<Long> numbers = FileManager.getInstance().readNumbers(file, range[0] - INCREMENT, range[0]);
 
                 //Remove last half
                 final Iterator<Long> iterator = primesAdapter.getPrimes().iterator();
                 final int size = primesAdapter.getPrimes().size();
-                for (int i = 0; i < size; i++){
+                for (int i = 0; i < size; i++) {
                     iterator.next();
-                    if (i >= size - INCREMENT){
+                    if (i >= size - INCREMENT) {
                         iterator.remove();
                     }
                 }
@@ -212,7 +244,7 @@ public class DisplayPrimesActivity extends AppCompatActivity{
                 //Log.d(TAG, "After remove: " + primesAdapter.getPrimes());
 
                 //Add
-                for (int i = numbers.size() - 1; i >= 0; i--){
+                for (int i = numbers.size() - 1; i >= 0; i--) {
                     primesAdapter.getPrimes().add(0, numbers.get(i));
                 }
 
@@ -226,36 +258,47 @@ public class DisplayPrimesActivity extends AppCompatActivity{
                 range[0] -= INCREMENT;
                 range[1] -= INCREMENT;
             }
-            //Log.d(TAG, "After: " + primesAdapter.getPrimes());
+            primesAdapter.setOffset(range[0]);
+            Log.d(TAG, "After: " + primesAdapter.getItemCount());
         }
     }
 
-    private void loadFile(final File file){
+    private void loadFile(final File file) {
         final ProgressDialog progressDialog = ProgressDialog.show(this, "Loading...", "Loading file.");
 
         //Load file in another thread
-        new Thread(new Runnable(){
+        new Thread(new Runnable() {
             @Override
-            public void run(){
+            public void run() {
 
-                scrollListener.setTotalNumbers(FileManager.countTotalNumbers(file));
-                scrollListener.setRange(0, 999);
-                primesAdapter.getPrimes().addAll(FileManager.getInstance().readNumbers(file, 0, 999));
+                scrollListener.setTotalNumbers(FileManager.countTotalNumbersQuick(file));
+                final List<Long> numbers = FileManager.getInstance().readNumbers(file, 0, 999);
+                scrollListener.setRange(0, numbers.size() - 1);
+                primesAdapter.getPrimes().addAll(numbers);
 
-                new Handler(getMainLooper()).post(new Runnable(){
+                handler.post(new Runnable() {
                     @Override
-                    public void run(){
+                    public void run() {
                         primesAdapter.notifyItemRangeInserted(0, primesAdapter.getItemCount());
                         progressDialog.dismiss();
+
+                        recyclerView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                final int visibility = ((linearLayoutManager.findLastVisibleItemPosition() - linearLayoutManager.findFirstVisibleItemPosition()) == scrollListener.totalNumbers - 1) ? View.GONE : View.VISIBLE;
+                                scrollToTopFab.setVisibility(visibility);
+                                scrollToBottomFab.setVisibility(visibility);
+                            }
+                        });
                     }
                 });
             }
         }).start();
     }
 
-    private String formatTitle(final String string){
+    private String formatTitle(final String string) {
 
-        try{
+        try {
             //Replace all the numbers
             String replaceNumbers = string.replaceAll("[0-9]+", "<number>");
 
@@ -265,20 +308,21 @@ public class DisplayPrimesActivity extends AppCompatActivity{
             //Get all numbers from the string
             String numbers[] = onlyNumbers.trim().split("<text>");
             final List<Long> formattedNumbers = new ArrayList<>();
-            for (String numberString : numbers){
-                if (!numberString.equals("")){
+            for (String numberString : numbers) {
+                if (!numberString.equals("")) {
                     formattedNumbers.add(Long.valueOf(numberString));
                 }
             }
 
             //Replace all place holders with formatted numbers
             String title = replaceNumbers;
-            for (int i = 0; i < formattedNumbers.size(); i++){
+            for (int i = 0; i < formattedNumbers.size(); i++) {
                 title = title.replaceFirst("<number>", NumberFormat.getInstance().format(formattedNumbers.get(i)));
             }
 
             return title;
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
 
         return string;
     }
@@ -306,9 +350,24 @@ public class DisplayPrimesActivity extends AppCompatActivity{
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
+                break;
+
+            case R.id.find:
+                final FindNthNumberDialog findNthNumberDialog = new FindNthNumberDialog(this, scrollListener.totalNumbers);
+                findNthNumberDialog.addListener(new FindNthNumberDialog.OnFindClickedListener() {
+                    @Override
+                    public void onFindClicked(final int number) {
+                        if (number > 0 && number < scrollListener.getTotalNumbers()) {
+                            specialScrollToPosition(number - 1);
+                        } else {
+                            Toast.makeText(DisplayPrimesActivity.this, "Invalid number", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                findNthNumberDialog.show();
                 break;
 
             case R.id.export:
@@ -318,6 +377,34 @@ public class DisplayPrimesActivity extends AppCompatActivity{
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void specialScrollToPosition(final int position) {
+
+        Log.d(TAG, "Scrolling to " + position);
+
+        //Scroll to correct position
+        int startIndex = (position / scrollListener.INCREMENT) * (scrollListener.INCREMENT);
+        //List<Long> numbers = FileManager.getInstance().readNumbers(file, startIndex, startIndex + 999);
+        List<Long> numbers = FileManager.getInstance().readNumbers(file, startIndex, startIndex + 999);
+        int extra = 0;
+        while (numbers.size() < (scrollListener.INCREMENT * 3)){
+            startIndex -= scrollListener.INCREMENT;
+            extra += scrollListener.INCREMENT;
+            numbers = FileManager.getInstance().readNumbers(file, startIndex, startIndex + 999);
+        }
+        final int extraAdded = extra;
+        Log.d(TAG, "Extra: " + extra);
+        scrollListener.setRange(startIndex, startIndex + numbers.size());
+        primesAdapter.getPrimes().clear();
+        primesAdapter.getPrimes().addAll(numbers);
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                primesAdapter.notifyItemRangeInserted(0, primesAdapter.getItemCount());
+                recyclerView.scrollToPosition(position % scrollListener.INCREMENT + extraAdded);
+            }
+        });
     }
 
     @Override

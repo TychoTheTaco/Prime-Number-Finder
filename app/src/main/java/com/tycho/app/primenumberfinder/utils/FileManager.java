@@ -3,8 +3,8 @@ package com.tycho.app.primenumberfinder.utils;
 import android.content.Context;
 import android.util.Log;
 
-import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
-
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -20,12 +20,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.lang.ref.WeakReference;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -62,7 +60,7 @@ public final class FileManager {
     public static final String EXTENSION = ".txt";
     public static final String TREE_EXTENSION = ".tree";
 
-    private final Context context;
+    private final WeakReference<Context> context;
 
     /**
      * Initialize the file manager. This will create 1 instance that will be used throughout the
@@ -88,7 +86,7 @@ public final class FileManager {
      */
     private FileManager(final Context context) {
 
-        this.context = context;
+        this.context = new WeakReference<>(context);
 
         //Initialize save directories
         savedPrimesDirectory = new File(context.getFilesDir().getAbsolutePath() + File.separator + "primes");
@@ -138,43 +136,32 @@ public final class FileManager {
         }
     }
 
-    public Context getContext() {
-        return this.context;
-    }
-
     public File getTaskCacheDirectory(final Task task) {
-        final File cacheDirectory = new File(FileManager.getInstance().getContext().getFilesDir() + File.separator + "cache" + File.separator + task.getId() + File.separator);
+        final File cacheDirectory = new File(context.get().getFilesDir() + File.separator + "cache" + File.separator + task.getId() + File.separator);
         if (!cacheDirectory.exists()) {
             cacheDirectory.mkdirs();
         }
         return cacheDirectory;
     }
 
-    public boolean savePrimes(final long startValue, final long endValue, final List<Long> primes) {
-        final File file = new File(savedPrimesDirectory.getAbsolutePath() + File.separator + "Prime numbers from " + startValue + " to " + endValue + EXTENSION);
-        return writeNumbers(primes, file);
+    public boolean savePrimes(final long startValue, final long endValue, final List<Long> primes){
+        return writeNumbersQuick(primes, new File(savedPrimesDirectory.getAbsolutePath() + File.separator + "Prime numbers from " + startValue + " to " + endValue + EXTENSION), false);
     }
 
-    public boolean savePrimes(final List<Long> primes, final File file) {
-        return writeNumbers(primes, file);
+    public void savePrimes(final List<Long> primes, final File file){
+        writeNumbersQuick(primes, file, false);
     }
 
     public boolean saveFactors(final List<Long> factors, final long number) {
-        final File file = new File(savedFactorsDirectory.getAbsolutePath() + File.separator + "Factors of " + number + EXTENSION);
-        return writeNumbers(factors, file);
+        return writeNumbersQuick(factors, new File(savedFactorsDirectory.getAbsolutePath() + File.separator + "Factors of " + number + EXTENSION), false);
     }
 
     public boolean saveFactors(final List<Long> factors, final File file) {
-        return writeNumbers(factors, file);
-    }
-
-    public boolean saveFactors(final List<Long> factors) {
-        return saveFactors(factors, factors.get(factors.size() - 1));
+        return writeNumbersQuick(factors, file, false);
     }
 
     public boolean saveTree(final Tree<?> tree) {
-        final File file = new File(savedTreesDirectory.getAbsolutePath() + File.separator + "Factor tree of " + tree.getValue() + TREE_EXTENSION);
-        return saveTree(tree, file);
+        return saveTree(tree, new File(savedTreesDirectory.getAbsolutePath() + File.separator + "Factor tree of " + tree.getValue() + TREE_EXTENSION));
     }
 
     public boolean saveTree(final Tree<?> tree, final File file) {
@@ -194,7 +181,7 @@ public final class FileManager {
     }
 
     public void writeToCache(final List<Long> numbers, final UUID id, final boolean append) {
-        writeToCache(numbers, new File(FileManager.getInstance().getContext().getFilesDir() + File.separator + "cache" + File.separator + id + File.separator + "cache"), append);
+        writeNumbersQuick(numbers, new File(context.get().getFilesDir() + File.separator + "cache" + File.separator + id + File.separator + "cache"), append);
     }
 
     public static void writeCompact(final List<Long> numbers, final File file, final boolean append) {
@@ -308,51 +295,10 @@ public final class FileManager {
         return numbers;
     }
 
-    public void writeToCache(final List<Long> numbers, final File file, final boolean append) {
-        try {
-            final DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(file, append));
-
-            for (long number : numbers) {
-                dataOutputStream.writeLong(number);
-            }
-
-            dataOutputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private boolean writeNumbers(final List<Long> numbers, final File file) {
+    public boolean writeNumbersQuick(final List<Long> numbers, final File file, final boolean append) {
 
         try {
-
-            final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
-
-            final long lastNumber = numbers.get(numbers.size() - 1);
-
-            for (long number : numbers) {
-                bufferedWriter.write(String.valueOf(number));
-
-                if (number != lastNumber) {
-                    bufferedWriter.write(LIST_ITEM_SEPARATOR);
-                }
-            }
-
-            bufferedWriter.flush();
-            bufferedWriter.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        return true;
-    }
-
-    public boolean writeNumbersNew(final List<Long> numbers, final File file) {
-
-        try {
-            final DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(file));
+            final DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file, append)));
 
             for (long number : numbers) {
                 dataOutputStream.writeLong(number);
@@ -370,20 +316,21 @@ public final class FileManager {
 
     //Read methods
 
-    public List<Long> readNumbers(final File file) {
-
+    public static List<Long> readNumbers(final File file){
         final List<Long> numbers = new ArrayList<>();
 
         try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
 
-            String line;
+            try {
+                while (true){
+                    numbers.add(dataInputStream.readLong());
+                }
+            } catch (EOFException e) {
 
-            while ((line = bufferedReader.readLine()) != null) {
-                numbers.add(Long.valueOf(line));
+            }finally {
+                dataInputStream.close();
             }
-
-            bufferedReader.close();
 
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
@@ -392,23 +339,24 @@ public final class FileManager {
         return numbers;
     }
 
-    public List<Long> readNumbers(final File file, final int startIndex, final int endIndex) {
+    public List<Long> readNumbers(final File file, final int startIndex, final int endIndex){
         final List<Long> numbers = new ArrayList<>();
 
         try {
-            final BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
 
-            //Slip lines until startIndex
-            for (int i = 0; i < startIndex; i++) {
-                bufferedReader.readLine();
+            //Skip numbers
+            dataInputStream.skipBytes(startIndex * 8);
+
+            try {
+                for (int i = startIndex; i < endIndex; i++){
+                    numbers.add(dataInputStream.readLong());
+                }
+            } catch (EOFException e) {
+
+            }finally {
+                dataInputStream.close();
             }
-
-            String line;
-            for (int i = 0; i < (endIndex - startIndex) && (line = bufferedReader.readLine()) != null; i++) {
-                numbers.add(Long.valueOf(line));
-            }
-
-            bufferedReader.close();
 
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
@@ -439,46 +387,8 @@ public final class FileManager {
         }
     }
 
-    public static int countTotalNumbers(final File file) {
-
-        int count = 0;
-
-        try {
-            final BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-
-            while (bufferedReader.readLine() != null) {
-                count++;
-            }
-
-            bufferedReader.close();
-
-        } catch (IOException | NumberFormatException e) {
-            e.printStackTrace();
-        }
-
-        return count;
-    }
-
-    public List<Long> readNumbersNew(final File file) {
-
-        final List<Long> numbers = new ArrayList<>();
-
-        try {
-            final DataInputStream dataInputStream = new DataInputStream(new FileInputStream(file));
-
-            try {
-                while (true) {
-                    numbers.add(dataInputStream.readLong());
-                }
-            } catch (EOFException e) {
-                dataInputStream.close();
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return numbers;
+    public static int countTotalNumbersQuick(final File file){
+        return (int) (file.length() / 8);
     }
 
     public Tree<Long> readTree(final File file) {
@@ -515,7 +425,7 @@ public final class FileManager {
 
                 //Read old file
                 try {
-                    BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+                    final BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
                     String line;
                     while ((line = bufferedReader.readLine()) != null) {
                         numbers.add(Long.valueOf(line));
@@ -606,7 +516,7 @@ public final class FileManager {
     }
 
     public File getExportCacheDirectory() {
-        return new File(context.getFilesDir() + File.separator + "export" + File.separator);
+        return new File(context.get().getFilesDir() + File.separator + "export" + File.separator);
     }
 
     public static void copy(File src, File dst) throws IOException {
@@ -620,5 +530,44 @@ public final class FileManager {
                 }
             }
         }
+    }
+
+    public static long estimateFileSize(int method, final int count){
+        switch (method){
+
+            /*
+            Method 1
+            Using a BufferedWriter to write the string values of each number separated by a new line character.
+             */
+            case 0:
+                int digits = 0;
+                for (int i = 1; i < count; i++){
+                    digits += (int)(Math.log10(i)+1);
+                }
+                return (digits + count);
+
+                /*
+            Method 2
+            Using a DataOutputStream to write each long.
+             */
+            case 1:
+                return (count * 8);
+
+                 /*
+            Method 3
+            Compacting each number so that each digit fits into 4 bits, separated by 4 full bits.
+             */
+            case 2:
+                digits = 0;
+                for (int i = 1; i < count; i++){
+                    digits += (int)(Math.log10(i)+1);
+                }
+                return ((digits + count) / 4);
+        }
+        return -1;
+    }
+
+    public static int calc(final int n){
+        return (int) (Math.pow(10, n) - Math.pow(10, n - 1));
     }
 }

@@ -98,7 +98,11 @@ public class TreeView extends View {
         }
     }
 
-    boolean generated = false;
+    private boolean generated = false;
+
+    public boolean isGenerated(){
+        return this.generated;
+    }
 
     //TODO: maybe make border padding = text size?
     private final float borderPadding = 10;
@@ -180,6 +184,7 @@ public class TreeView extends View {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        //recalculateBounds();
                         do{
                             dirty = false;
                             while (true) {
@@ -212,6 +217,22 @@ public class TreeView extends View {
         paint.setStrokeWidth(0);
         canvas.drawRect(0, 0, getWidth(), getHeight(), paint);
     }
+
+    /*public void recalculateBounds(){
+        translationX = 0;
+        translationY = scrollPaddingTop;
+        horizontalSpacing = new float[tree.getLevels()];
+        generated = false;
+        dirty = true;
+        do{
+            dirty = false;
+            while (true) {
+                itemTree = generateRectangleTree(tree, exportOptions);
+                if (!checkChildren(itemTree, 0)) break;
+            }
+            generated = true;
+        }while(dirty);
+    }*/
 
     private float scrollPaddingLeft = 20;
     private float scrollPaddingRight = 20;
