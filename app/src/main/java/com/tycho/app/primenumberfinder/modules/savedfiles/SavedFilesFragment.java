@@ -44,9 +44,9 @@ public class SavedFilesFragment extends Fragment{
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         cards = new SavedFilesCard[]{
-                new SavedFilesCard(getActivity(), "primeNumbers", "Prime numbers", "subTitle", R.color.purple, FileType.PRIMES),
+                new SavedFilesCard(getActivity(), "primeNumbers", "Prime Numbers", "subTitle", R.color.purple, FileType.PRIMES),
                 new SavedFilesCard(getActivity(), "factors", "Factors", "subTitle", R.color.orange, FileType.FACTORS),
-                new SavedFilesCard(getActivity(), "factorTree", "Factor trees", "subTitle", R.color.green, FileType.TREE)
+                new SavedFilesCard(getActivity(), "factorTree", "Factor Trees", "subTitle", R.color.green, FileType.TREE)
         };
     }
 

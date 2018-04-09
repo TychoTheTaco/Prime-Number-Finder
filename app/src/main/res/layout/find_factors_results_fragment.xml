@@ -4,8 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:clipToPadding="false"
-    android:clipChildren="false"
-    android:padding="8dp">
+    android:clipChildren="false">
 
     <!-- Message to display when no active task -->
     <TextView
@@ -16,89 +15,142 @@
         android:text="@string/no_task_selected_message"
         android:visibility="visible" />
 
-    <LinearLayout
-        android:id="@+id/results_view"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:clipChildren="false"
-        android:visibility="gone">
+        android:id="@+id/results_view"
+        android:layout_weight="1"
+        android:layout_height="0dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:padding="8dp"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:gravity="center_vertical"
+                android:layout_height="wrap_content">
+
+                <ProgressBar
+                    android:id="@+id/progress_bar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="2dp"
+                    android:max="10000"
+                    android:progress="0"
+                    android:progressDrawable="@drawable/circular" />
+
+                <TextView
+                    android:id="@+id/textView_search_progress"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:gravity="center"
+                    android:lines="1"
+                    android:textStyle="bold"
+                    android:singleLine="true"
+                    android:textColor="@color/primary_text"
+                    android:textSize="16sp" />
+
+                <LinearLayout
+                    android:layout_toEndOf="@id/progress_bar"
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:layout_marginStart="4dp"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:textColor="@color/primary_text"
+                        android:textSize="22sp" />
+
+                    <!-- Time elapsed-->
+                    <TextView
+                        android:id="@+id/textView_elapsed_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/secondary_text" />
+                </LinearLayout>
+
+            </RelativeLayout>
 
             <TextView
-                android:id="@+id/title"
+                android:id="@+id/subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                style="@style/TaskFragmentSubtitle" />
+
+            <!-- Main content -->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:paddingTop="2dp"
+                android:scrollbars="vertical" />
+
+            <TextView
+                android:textSize="16sp"
+                android:text="Statistics"
+                android:textStyle="bold"
                 android:textColor="@color/primary_text"
-                android:textSize="20sp" />
+                android:layout_width="wrap_content"
+                android:layout_marginTop="32dp"
+                android:layout_height="wrap_content" />
 
-            <ProgressBar
-                android:id="@+id/progressBar_infinite"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:padding="4dp" />
-
+            <!-- Time remaining-->
             <TextView
-                android:id="@+id/textView_search_progress"
-                android:layout_width="0dp"
+                android:id="@+id/textView_eta"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:gravity="end|center_vertical"
-                android:lines="1"
-                android:singleLine="true"
-                android:textColor="@color/secondary_text"
-                android:textSize="16sp" />
+                android:textSize="14sp"
+                android:textColor="@color/primary_text" />
+
+            <!-- Numbers per second-->
+            <TextView
+                android:id="@+id/textView_numbers_per_second"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@color/primary_text" />
 
         </LinearLayout>
 
-        <TextView
-            style="@style/TaskFragmentSubtitle"
-            android:id="@+id/subtitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="2dp" />
+    </ScrollView>
 
-        <!-- Main content -->
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="4dp"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button_view_all"
+            style="@style/Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/view_all" />
+
+        <View
+            android:layout_width="0dp"
             android:layout_weight="1"
-            android:paddingTop="2dp"
-            android:scrollbars="vertical" />
+            android:layout_height="1dp"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/button_save"
+            style="@style/Button"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/button_view_all"
-                style="@style/Button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/view_all" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="1dp"/>
-
-            <Button
-                android:id="@+id/button_save"
-                style="@style/Button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/save" />
-
-        </LinearLayout>
+            android:text="@string/save" />
 
     </LinearLayout>
+
 </LinearLayout>

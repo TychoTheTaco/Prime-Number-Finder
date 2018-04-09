@@ -57,7 +57,6 @@ public class PrimeFactorizationFragment extends Fragment {
 
     private final PrimeFactorizationTaskListFragment taskListFragment = new PrimeFactorizationTaskListFragment();
     private final PrimeFactorizationResultsFragment resultsFragment = new PrimeFactorizationResultsFragment();
-    private final PrimeFactorizationStatisticsFragment statisticsFragment = new PrimeFactorizationStatisticsFragment();
 
     @Nullable
     @Override
@@ -73,7 +72,6 @@ public class PrimeFactorizationFragment extends Fragment {
                     @Override
                     public void onTaskSelected(Task task) {
                         resultsFragment.setTask(task);
-                        statisticsFragment.setTask(task);
                     }
 
                     @Override
@@ -86,15 +84,13 @@ public class PrimeFactorizationFragment extends Fragment {
 
                         if (resultsFragment.getTask() == task){
                             resultsFragment.setTask(null);
-                            statisticsFragment.setTask(null);
                         }
 
                         taskListFragment.update();
                     }
-                });/**/
+                });
 
         fragmentAdapter.add("Results", resultsFragment);
-        fragmentAdapter.add("Statistics", statisticsFragment);
         viewPager.setAdapter(fragmentAdapter);
         viewPager.setOffscreenPageLimit(2);
         final TabLayout tabLayout = rootView.findViewById(R.id.tab_layout);

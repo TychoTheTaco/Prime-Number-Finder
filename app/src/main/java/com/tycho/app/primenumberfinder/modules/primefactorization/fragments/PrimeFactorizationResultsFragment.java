@@ -1,18 +1,14 @@
 package com.tycho.app.primenumberfinder.modules.primefactorization.fragments;
 
-import android.content.Intent;
-import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.text.style.SuperscriptSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,21 +21,14 @@ import com.tycho.app.primenumberfinder.TreeView;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
-import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayFactorsActivity;
-import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimeFactorizationActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
-import java.io.File;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import easytasks.Task;
-import simpletrees.Tree;
 
 /**
  * Created by tycho on 11/19/2017.
@@ -58,9 +47,12 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     private TextView title;
     private TextView subtitle;
     private TextView primeFactorization;
-    private ProgressBar progressBarInfinite;
+    private ProgressBar progressBar;
     private TextView progress;
     private Button saveButton;
+
+    private TextView timeElapsedTextView;
+    private TextView etaTextView;
 
     private TreeView treeView;
 
@@ -72,12 +64,15 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         title = rootView.findViewById(R.id.title);
         subtitle = rootView.findViewById(R.id.subtitle);
         primeFactorization = rootView.findViewById(R.id.prime_factorization);
-        progressBarInfinite = rootView.findViewById(R.id.progressBar_infinite);
+        progressBar= rootView.findViewById(R.id.progress_bar);
         resultsView = rootView.findViewById(R.id.results_view);
         noTaskView = rootView.findViewById(R.id.empty_message);
         progress = rootView.findViewById(R.id.textView_search_progress);
         saveButton = rootView.findViewById(R.id.button_save);
         treeView = rootView.findViewById(R.id.factor_tree);
+
+        timeElapsedTextView = rootView.findViewById(R.id.textView_elapsed_time);
+        etaTextView = rootView.findViewById(R.id.textView_eta);
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,7 +106,6 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                 public void run() {
 
                     title.setText(getString(R.string.status_searching));
-                    progressBarInfinite.setVisibility(View.VISIBLE);
                     saveButton.setVisibility(View.GONE);
 
                     //Format subtitle
@@ -142,9 +136,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-
                     title.setText(getString(R.string.status_paused));
-                    progressBarInfinite.setVisibility(View.GONE);
                     saveButton.setVisibility(View.VISIBLE);
                 }
             });
@@ -159,14 +151,12 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
 
     @Override
     public void onTaskStopped() {
+        updateUi();
         if (isAdded() && !isDetached()){
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-
                     title.setText(getString(R.string.status_finished));
-                    progressBarInfinite.setVisibility(View.GONE);
-                    progress.setVisibility(View.GONE);
                     saveButton.setVisibility(View.VISIBLE);
 
                     //Format subtitle
@@ -208,8 +198,11 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     protected void onUiUpdate() {
         if (getTask() != null){
             //Update progress
-            progress.setText(getString(R.string.task_progress, DECIMAL_FORMAT.format(getTask().getProgress() * 100)));
+            progress.setText(String.valueOf((int) (getTask().getProgress() * 100)));
+            progressBar.setProgress((int) (getTask().getProgress() * 1_000));
 
+            timeElapsedTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime()));
+            etaTextView.setText("Time remaining: " + Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining()));
         }
     }
 

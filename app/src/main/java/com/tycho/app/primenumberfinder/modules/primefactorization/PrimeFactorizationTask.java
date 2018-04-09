@@ -43,6 +43,8 @@ public class PrimeFactorizationTask extends Task {
         findFactorsTask.start();
         final List<Long> factors = findFactorsTask.getFactors();
 
+        setProgress(0.33f);
+
         for (long n : factors){
             final CheckPrimalityTask checkPrimalityTask = new CheckPrimalityTask(n);
             checkPrimalityTask.start();
@@ -50,7 +52,9 @@ public class PrimeFactorizationTask extends Task {
                 total++;
             }
         }
+        setProgress(0.67f);
         this.factorTree = generateTree(number);
+        setProgress(1);
     }
 
     private Tree<Long> generateTree(long number) {

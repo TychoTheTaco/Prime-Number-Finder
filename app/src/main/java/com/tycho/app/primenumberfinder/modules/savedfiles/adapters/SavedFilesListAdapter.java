@@ -199,6 +199,7 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                             intent = new Intent(context, DisplayPrimesActivity.class);
                             intent.putExtra("filePath", file.getAbsolutePath());
                             intent.putExtra("allowExport", true);
+                            intent.putExtra("enableSearch", true);
                             intent.putExtra("title", true);
                             context.startActivity(intent);
                             break;

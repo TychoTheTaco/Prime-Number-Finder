@@ -16,11 +16,9 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- *
  * This class contains lots of random utility methods.
- *
+ * <p>
  * Created by tycho on 11/13/2017.
- *
  */
 public final class Utils {
 
@@ -37,21 +35,23 @@ public final class Utils {
 
     /**
      * Convert a DP value to its pixel value.
+     *
      * @param context Context used by display metrics.
-     * @param dp DP value to convert.
+     * @param dp      DP value to convert.
      * @return Equivalent value in pixels
      */
-    public static float dpToPx(final Context context, final float dp){
+    public static float dpToPx(final Context context, final float dp) {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
     }
 
     /**
      * Map a value between a and b to a value between c and d.
+     *
      * @param value The value to map.
-     * @param a Minimum value of original value's range.
-     * @param b Maximum value of original value's range.
-     * @param c Minimum value of new range.
-     * @param d Maximum value of new range.
+     * @param a     Minimum value of original value's range.
+     * @param b     Maximum value of original value's range.
+     * @param c     Minimum value of new range.
+     * @param d     Maximum value of new range.
      * @return The mapped value between c and d.
      */
     public static float map(float value, float a, float b, float c, float d) {
@@ -60,12 +60,13 @@ public final class Utils {
 
     /**
      * Format the time like a stopwatch.
+     *
      * @param millis The time in milliseconds.
      * @return A string with the corresponding time formatted like a stopwatch.
      */
-    public static String formatTime(final long millis){
+    public static String formatTime(final long millis) {
 
-        if (millis == -1){
+        if (millis == -1) {
             return "infinity";
         }
 
@@ -77,23 +78,61 @@ public final class Utils {
 
         final String time;
 
-        if (days > 0){
-            time = String.format(Locale.getDefault(),"%03d:%02d:%02d:%02d.%03d", days, hours, minutes, seconds, milliseconds);
-        }else if (hours > 0){
-            time = String.format(Locale.getDefault(),"%02d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds);
-        }else{
-            time = String.format(Locale.getDefault(),"%02d:%02d.%03d", minutes, seconds, milliseconds);
+        if (days > 0) {
+            time = String.format(Locale.getDefault(), "%03d:%02d:%02d:%02d.%03d", days, hours, minutes, seconds, milliseconds);
+        } else if (hours > 0) {
+            time = String.format(Locale.getDefault(), "%02d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds);
+        } else {
+            time = String.format(Locale.getDefault(), "%02d:%02d.%03d", minutes, seconds, milliseconds);
         }
 
         return time;
     }
 
+    public static String formatTimeHuman(final long millis) {
+
+        if (millis == -1) {
+            return "infinite";
+        }
+
+        final int milliseconds = (int) (millis % 1000);
+        final int seconds = (int) ((millis / 1000) % 60);
+        final int minutes = (int) ((millis / (1000 * 60)) % 60);
+        final int hours = (int) ((millis / (1000 * 60 * 60)) % 24);
+        final int days = (int) ((millis / (1000 * 60 * 60 * 24)) % 7);
+
+        final int[] times = new int[]{milliseconds, seconds, minutes, hours, days};
+        final String[] parts = new String[]{milliseconds + " ms", seconds + " seconds", minutes + " minutes", hours + " hours", days + " days"};
+
+        final int MAX_COUNT = 2;
+
+        final StringBuilder stringBuilder = new StringBuilder();
+        int count = 0;
+        for (int i = times.length - 1; i >= 0; i--){
+            if (times[i] > 0){
+                stringBuilder.append(parts[i]);
+                stringBuilder.append(' ');
+                count++;
+                if (count == MAX_COUNT){
+                    break;
+                }
+            }
+        }
+
+        if (stringBuilder.length() == 0){
+            stringBuilder.append(parts[0]);
+        }
+
+        return stringBuilder.toString().trim();
+    }
+
     /**
      * Append an ordinal indicator to the end of a number. This method will also format the number using {@linkplain NumberFormat#format(long)}.
+     *
      * @param number The number to append to.
      * @return A string containing the formatted number with an ordinal indicator appended.
      */
-    public static String formatNumberOrdinal(final long number){
+    public static String formatNumberOrdinal(final long number) {
         String output = NumberFormat.getInstance(Locale.getDefault()).format(number);
 
         final long ones = number % 10;
@@ -101,11 +140,11 @@ public final class Utils {
 
         if (ones == 1 && tens != 11) {
             output += "st";
-        }else if (ones == 2 && tens != 12) {
+        } else if (ones == 2 && tens != 12) {
             output += "nd";
-        }else if (ones == 3 && tens != 13) {
+        } else if (ones == 3 && tens != 13) {
             output += "rd";
-        }else{
+        } else {
             output += "th";
         }
 
@@ -114,6 +153,7 @@ public final class Utils {
 
     /**
      * Hide the Android virtual keyboard.
+     *
      * @param context The activity context to use.
      */
     public static void hideKeyboard(final Context context) {
@@ -127,16 +167,17 @@ public final class Utils {
 
     /**
      * Sort a list of files by date.
+     *
      * @param files
      * @param ascending
      */
-    public static void sortByDate(final List<File> files, final boolean ascending){
+    public static void sortByDate(final List<File> files, final boolean ascending) {
         Collections.sort(files, new Comparator<File>() {
             @Override
             public int compare(File file0, File file1) {
-                if (ascending){
+                if (ascending) {
                     return Long.valueOf(file0.lastModified()).compareTo(file1.lastModified());
-                }else{
+                } else {
                     return Long.valueOf(file1.lastModified()).compareTo(file0.lastModified());
                 }
             }

@@ -57,6 +57,7 @@ public class DisplayPrimesActivity extends AppCompatActivity {
     private final CustomScrollListener scrollListener = new CustomScrollListener();
 
     private boolean allowExport;
+    private boolean enableSearch;
 
     private FloatingActionButton scrollToTopFab;
     private FloatingActionButton scrollToBottomFab;
@@ -105,6 +106,7 @@ public class DisplayPrimesActivity extends AppCompatActivity {
                     }
 
                     allowExport = extras.getBoolean("allowExport", false);
+                    enableSearch = extras.getBoolean("enableSearch", false);
 
                     //Set up floating action buttons
                     scrollToTopFab = findViewById(R.id.scroll_to_top_fab);
@@ -170,7 +172,6 @@ public class DisplayPrimesActivity extends AppCompatActivity {
         }
 
         public void setTotalNumbers(final int count) {
-            Log.d(TAG, "Set total: " + count);
             this.totalNumbers = count;
         }
 
@@ -343,6 +344,7 @@ public class DisplayPrimesActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.display_content_activity_menu, menu);
+        menu.findItem(R.id.find).setVisible(enableSearch);
         menu.findItem(R.id.export).setVisible(allowExport);
         return true;
     }
@@ -381,11 +383,8 @@ public class DisplayPrimesActivity extends AppCompatActivity {
 
     private void specialScrollToPosition(final int position) {
 
-        Log.d(TAG, "Scrolling to " + position);
-
         //Scroll to correct position
         int startIndex = (position / scrollListener.INCREMENT) * (scrollListener.INCREMENT);
-        //List<Long> numbers = FileManager.getInstance().readNumbers(file, startIndex, startIndex + 999);
         List<Long> numbers = FileManager.getInstance().readNumbers(file, startIndex, startIndex + 999);
         int extra = 0;
         while (numbers.size() < (scrollListener.INCREMENT * 3)){
@@ -394,7 +393,6 @@ public class DisplayPrimesActivity extends AppCompatActivity {
             numbers = FileManager.getInstance().readNumbers(file, startIndex, startIndex + 999);
         }
         final int extraAdded = extra;
-        Log.d(TAG, "Extra: " + extra);
         scrollListener.setRange(startIndex, startIndex + numbers.size());
         primesAdapter.getPrimes().clear();
         primesAdapter.getPrimes().addAll(numbers);

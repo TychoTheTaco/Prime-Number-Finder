@@ -72,19 +72,16 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
      */
     private final FindPrimesTaskListFragment taskListFragment = new FindPrimesTaskListFragment();
     private final GeneralResultsFragment generalResultsFragment = new GeneralResultsFragment();
-    private final GeneralStatisticsFragment generalStatisticsFragment = new GeneralStatisticsFragment();
 
     /*
     Find primes fragments
      */
     private final FindPrimesResultsFragment findPrimesResultsFragment = new FindPrimesResultsFragment();
-    private final FindPrimesStatisticsFragment findPrimesStatisticsFragment = new FindPrimesStatisticsFragment();
 
     /*
     Check primality fragments
      */
     private final CheckPrimalityResultsFragment checkPrimalityResultsFragment = new CheckPrimalityResultsFragment();
-    private final CheckPrimalityStatisticsFragment checkPrimalityStatisticsFragment = new CheckPrimalityStatisticsFragment();
 
     private final NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
 
@@ -106,26 +103,14 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                     findPrimesResultsFragment.setTask(task);
                     checkPrimalityResultsFragment.setTask(null);
                     generalResultsFragment.setContent(findPrimesResultsFragment);
-
-                    findPrimesStatisticsFragment.setTask(task);
-                    checkPrimalityStatisticsFragment.setTask(null);
-                    generalStatisticsFragment.setContent(findPrimesStatisticsFragment);
                 } else if (task instanceof CheckPrimalityTask) {
                     findPrimesResultsFragment.setTask(null);
                     checkPrimalityResultsFragment.setTask(task);
                     generalResultsFragment.setContent(checkPrimalityResultsFragment);
-
-                    findPrimesStatisticsFragment.setTask(null);
-                    checkPrimalityStatisticsFragment.setTask(task);
-                    generalStatisticsFragment.setContent(checkPrimalityStatisticsFragment);
                 } else {
                     //generalResultsFragment.setContent(null);
                     findPrimesResultsFragment.setTask(null);
                     checkPrimalityResultsFragment.setTask(null);
-
-                    //generalStatisticsFragment.setContent(null);
-                    findPrimesStatisticsFragment.setTask(null);
-                    checkPrimalityStatisticsFragment.setTask(null);
                 }
             }
 
@@ -138,7 +123,6 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             public void onTaskRemoved(Task task) {
                 if (findPrimesResultsFragment.getTask() == task) {
                     findPrimesResultsFragment.setTask(null);
-                    findPrimesStatisticsFragment.setTask(null);
                 }
                 if (checkPrimalityResultsFragment.getTask() == task) {
                     checkPrimalityResultsFragment.setTask(null);
@@ -149,9 +133,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             }
         });
         fragmentAdapter.add("Results", generalResultsFragment);
-        fragmentAdapter.add("Statistics", generalStatisticsFragment);
         generalResultsFragment.setContent(findPrimesResultsFragment);
-        generalStatisticsFragment.setContent(findPrimesStatisticsFragment);
         viewPager.setAdapter(fragmentAdapter);
         viewPager.setOffscreenPageLimit(2);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {

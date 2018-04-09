@@ -11,10 +11,12 @@ import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -25,9 +27,9 @@ import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayFactorsActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -56,10 +58,17 @@ public class FindFactorsResultsFragment extends ResultsFragment{
     private RecyclerView recyclerView;
     private Button viewAllButton;
     private Button saveButton;
+    private TextView timeElapsedTextView;
+    private TextView etaTextView;
+    private TextView numbersPerSecondTextView;
 
     private FactorsListAdapter adapter;
 
     private int lastAdapterSize = 0;
+
+    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getNumberInstance(Locale.getDefault());
+
+    private final RotateAnimation rotate = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
 
     @Override
     public void onAttach(Activity activity) {
@@ -74,19 +83,27 @@ public class FindFactorsResultsFragment extends ResultsFragment{
 
         //Set up recycler view
         recyclerView = rootView.findViewById(R.id.recyclerView);
-        recyclerView.setHasFixedSize(true);
+        recyclerView.setHasFixedSize(false);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(null);
 
+        rotate.setDuration(3000);
+        rotate.setRepeatCount(Animation.INFINITE);
+        rotate.setRepeatMode(Animation.INFINITE);
+        rotate.setInterpolator(new LinearInterpolator());
+
         title = rootView.findViewById(R.id.title);
         subtitle = rootView.findViewById(R.id.subtitle);
-        progressBarInfinite = rootView.findViewById(R.id.progressBar_infinite);
+        progressBarInfinite = rootView.findViewById(R.id.progress_bar);
         resultsView = rootView.findViewById(R.id.results_view);
         noTaskView = rootView.findViewById(R.id.empty_message);
         progress = rootView.findViewById(R.id.textView_search_progress);
         viewAllButton = rootView.findViewById(R.id.button_view_all);
         saveButton = rootView.findViewById(R.id.button_save);
+        timeElapsedTextView = rootView.findViewById(R.id.textView_elapsed_time);
+        etaTextView = rootView.findViewById(R.id.textView_eta);
+        numbersPerSecondTextView = rootView.findViewById(R.id.textView_numbers_per_second);
 
         viewAllButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,8 +182,9 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                 @Override
                 public void run() {
                     title.setText(getString(R.string.status_searching));
-                    progressBarInfinite.setVisibility(View.VISIBLE);
+                    //progressBarInfinite.setVisibility(View.VISIBLE);
                     saveButton.setVisibility(View.GONE);
+                    progressBarInfinite.startAnimation(rotate);
                 }
             });
         }
@@ -175,16 +193,14 @@ public class FindFactorsResultsFragment extends ResultsFragment{
     @Override
     public void onTaskPaused() {
         super.onTaskPaused();
+        updateUi();
         if (isAdded() && !isDetached()){
             handler.post(new Runnable() {
                 @Override
                 public void run() {
                     title.setText(getString(R.string.status_paused));
-                    progressBarInfinite.setVisibility(View.GONE);
+                    //progressBarInfinite.setVisibility(View.GONE);
                     saveButton.setVisibility(View.VISIBLE);
-
-                    //Set progress
-                    progress.setText(getString(R.string.task_progress, DECIMAL_FORMAT.format(getTask().getProgress() * 100)));
                 }
             });
         }
@@ -199,24 +215,27 @@ public class FindFactorsResultsFragment extends ResultsFragment{
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
+        updateUi();
         if (isAdded() && !isDetached()){
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    progressBarInfinite.setVisibility(View.GONE);
                     title.setText(getString(R.string.status_finished));
                     saveButton.setVisibility(View.VISIBLE);
-
-                    //Set progress
-                    progress.setVisibility(View.GONE);
+                    progressBarInfinite.clearAnimation();
                 }
             });
         }
     }
 
+    private long lastCurrentValue;
+
     @Override
     protected void onUiUpdate() {
         if (getTask() != null){
+
+            progress.setText(String.valueOf((int) (getTask().getProgress() * 100)));
+            progressBarInfinite.setProgress((int) (getTask().getProgress() * 10_000));
 
             //Update recyclerView
             if (lastAdapterSize != adapter.getItemCount()){
@@ -243,6 +262,11 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                 }
             }
             subtitle.setText(spannableStringBuilder);
+
+            //Update statistics
+            timeElapsedTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime()));
+            etaTextView.setText("Time remaining: " + Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining()));
+            numbersPerSecondTextView.setText("Numbers per second: " + NUMBER_FORMAT.format(getTask().getNumbersPerSecond()));
         }
     }
 

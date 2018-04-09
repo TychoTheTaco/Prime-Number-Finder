@@ -20,29 +20,32 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:padding="8dp"
         android:orientation="vertical"
         android:visibility="gone">
 
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:gravity="center_horizontal"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textColor="@color/secondary_text"
+            android:textSize="24sp" />
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="28dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
 
+            <!-- Time elapsed-->
             <TextView
-                android:id="@+id/title"
+                android:id="@+id/textView_elapsed_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/primary_text"
-                android:textSize="20sp" />
-
-            <ProgressBar
-                android:id="@+id/progressBar_infinite"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:padding="4dp" />
+                android:textSize="14sp"
+                android:text="3 minutes 28 seconds"
+                android:textColor="@color/primary_text" />
 
             <TextView
                 android:id="@+id/textView_search_progress"
@@ -57,15 +60,54 @@
 
         </LinearLayout>
 
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            style="?android:attr/progressBarStyleHorizontal"/>
+
         <TextView
             android:id="@+id/subtitle"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
             style="@style/TaskFragmentSubtitle" />
+
+        <TextView
+            android:textSize="16sp"
+            android:text="Statistics"
+            android:textStyle="bold"
+            android:textColor="@color/primary_text"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="32dp"
+            android:layout_height="wrap_content" />
+
+        <!-- Time remaining-->
+        <TextView
+            android:id="@+id/textView_eta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:text="Time remaining: 1 minute 54 seconds"
+            android:textColor="@color/primary_text" />
+
+        <!-- Numbers per second-->
+        <TextView
+            android:id="@+id/textView_numbers_per_second"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:text="Numbers per second: 1938"
+            android:textColor="@color/primary_text" />
+
+        <!-- Primes per second-->
+        <TextView
+            android:id="@+id/textView_primes_per_second"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:text="Primes per second: 581"
+            android:textColor="@color/primary_text" />
 
     </LinearLayout>
 

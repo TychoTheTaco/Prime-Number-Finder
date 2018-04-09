@@ -131,6 +131,11 @@ public class MainActivity extends AppCompatActivity{
 
         //Select the first drawer item
         selectDrawerItem(0);
+
+        Log.d(TAG, "1,000: " + FileManager.estimateFileSize(0, 1_000));
+        Log.d(TAG, "1,000: " + FileManager.estimateFileSize(1, 1_000));
+        Log.d(TAG, "1,000,000: " + FileManager.estimateFileSize(0, 1_000_000));
+        Log.d(TAG, "1,000,000: " + FileManager.estimateFileSize(1, 1_000_000));
     }
 
     public FloatingActionButton getFab(){

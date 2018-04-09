@@ -1,7 +1,11 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.adapters;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -105,7 +109,9 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
             case STOPPED:
                 holder.state.setText(context.getString(R.string.status_finished));
                 if (task instanceof CheckPrimalityTask){
-                    holder.state.setText(context.getString(R.string.status_finished) + ": " + context.getString(R.string.check_primality_result, NumberFormat.getInstance(Locale.getDefault()).format(((CheckPrimalityTask) task).getNumber()), ((CheckPrimalityTask) task).isPrime() ? "prime" : "not prime"));
+                    final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(context.getString(R.string.status_finished) + ": " + context.getString(R.string.check_primality_result, NumberFormat.getInstance(Locale.getDefault()).format(((CheckPrimalityTask) task).getNumber()), ((CheckPrimalityTask) task).isPrime() ? "prime" : "not prime"));
+                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accent_dark)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                    holder.state.setText(spannableStringBuilder);
                 }
                 holder.pauseButton.setVisibility(View.GONE);
                 holder.editButton.setVisibility(View.GONE);

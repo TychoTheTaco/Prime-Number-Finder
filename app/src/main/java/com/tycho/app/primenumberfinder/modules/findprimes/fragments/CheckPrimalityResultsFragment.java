@@ -7,7 +7,6 @@ import android.support.v4.content.ContextCompat;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +16,8 @@ import android.widget.TextView;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -43,7 +41,7 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     private TextView subtitle;
     private ProgressBar progressBarInfinite;
     private TextView progress;
-    private TextView result;
+    private TextView elapsedTimeTextView;
 
     @Nullable
     @Override
@@ -52,11 +50,11 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
 
         title = rootView.findViewById(R.id.title);
         subtitle = rootView.findViewById(R.id.subtitle);
-        progressBarInfinite = rootView.findViewById(R.id.progressBar_infinite);
+        progressBarInfinite = rootView.findViewById(R.id.progress_bar);
         resultsView = rootView.findViewById(R.id.results_view);
         noTaskView = rootView.findViewById(R.id.empty_message);
         progress = rootView.findViewById(R.id.textView_search_progress);
-        result = rootView.findViewById(R.id.content);
+        elapsedTimeTextView = rootView.findViewById(R.id.textView_elapsed_time);
 
         init();
 
@@ -72,7 +70,7 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
                 public void run() {
 
                     title.setText(getString(R.string.status_searching));
-                    progressBarInfinite.setVisibility(View.VISIBLE);
+                    //progressBarInfinite.setVisibility(View.VISIBLE);
 
                     //Format subtitle
                     final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(getString(R.string.check_primality_task_status, NumberFormat.getInstance(Locale.getDefault()).format(getTask().getNumber())));
@@ -92,7 +90,7 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
                 @Override
                 public void run() {
                     title.setText(getString(R.string.status_paused));
-                    progressBarInfinite.setVisibility(View.GONE);
+                    //progressBarInfinite.setVisibility(View.GONE);
 
                     //Set progress
                     progress.setText(getString(R.string.task_progress, DECIMAL_FORMAT.format(getTask().getProgress() * 100)));
@@ -110,16 +108,17 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
+        updateUi();
         if (isAdded() && !isDetached()) {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
 
                     title.setText(getString(R.string.status_finished));
-                    progressBarInfinite.setVisibility(View.GONE);
+                    //progressBarInfinite.setVisibility(View.GONE);
 
                     //Set progress
-                    progress.setVisibility(View.GONE);
+                    //progress.setVisibility(View.GONE);
 
                     //Format subtitle
                     final String[] splitSubtitle = getString(R.string.check_primality_result).split("%\\d\\$.");
@@ -148,6 +147,10 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     protected void onUiUpdate() {
         //Update progress
         progress.setText(getString(R.string.task_progress, DECIMAL_FORMAT.format(getTask().getProgress() * 100)));
+        progressBarInfinite.setMax(10_000);
+        progressBarInfinite.setProgress((int) (getTask().getProgress() * 10_000));
+
+        elapsedTimeTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime()));
     }
 
     @Override

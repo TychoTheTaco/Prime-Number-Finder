@@ -1,14 +1,11 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
@@ -25,23 +22,16 @@ import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimesActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 
 import easytasks.Task;
-import easytasks.TaskAdapter;
-import easytasks.TaskListener;
 
 import static com.tycho.app.primenumberfinder.utils.FileManager.EXTENSION;
 
@@ -65,6 +55,10 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     private TextView progress;
     private Button viewAllButton;
     private Button saveButton;
+    private TextView elapsedTimeTextView;
+    private TextView etaTextView;
+    private TextView numbersPerSecondTextView;
+    private TextView primesPerSecondTextView;
 
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
@@ -92,12 +86,16 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
         title = rootView.findViewById(R.id.title);
         subtitleTextView = rootView.findViewById(R.id.subtitle);
-        progressBarInfinite = rootView.findViewById(R.id.progressBar_infinite);
+        progressBarInfinite = rootView.findViewById(R.id.progress_bar);
         resultsView = rootView.findViewById(R.id.results_view);
         noTaskView = rootView.findViewById(R.id.empty_message);
         progress = rootView.findViewById(R.id.textView_search_progress);
         viewAllButton = rootView.findViewById(R.id.button_view_all);
         saveButton = rootView.findViewById(R.id.button_save);
+        elapsedTimeTextView = rootView.findViewById(R.id.textView_elapsed_time);
+        etaTextView = rootView.findViewById(R.id.textView_eta);
+        numbersPerSecondTextView = rootView.findViewById(R.id.textView_numbers_per_second);
+        primesPerSecondTextView = rootView.findViewById(R.id.textView_primes_per_second);
 
         viewAllButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,6 +137,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
                         final Intent intent = new Intent(getActivity(), DisplayPrimesActivity.class);
                         intent.putExtra("filePath", file.getAbsolutePath());
+                        intent.putExtra("enableSearch", true);
                         intent.putExtra("title", false);
                         getActivity().startActivity(intent);
                     }
@@ -199,7 +198,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                 if (isAdded() && !isDetached() && getTask() != null) {
                     Log.d(TAG, "onTaskStarted() handler posted");
                     title.setText(getString(R.string.status_searching));
-                    progressBarInfinite.setVisibility(View.VISIBLE);
+                    //progressBarInfinite.setVisibility(View.VISIBLE);
                     subtitleTextView.setText(formatSubtitle());
                     switch (getTask().getSearchOptions().getSearchMethod()) {
                         case BRUTE_FORCE:
@@ -244,7 +243,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             public void run() {
                 if (isAdded() && !isDetached() && getTask() != null) {
                     title.setText(getString(R.string.status_paused));
-                    progressBarInfinite.setVisibility(View.GONE);
+                    //progressBarInfinite.setVisibility(View.GONE);
                     subtitleTextView.setText(formatSubtitle());
                     switch (getTask().getSearchOptions().getSearchMethod()) {
                         case BRUTE_FORCE:
@@ -292,12 +291,13 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     public void onTaskStopped() {
         super.onTaskStopped();
         if (isAdded() && !isDetached() && getTask() != null) {
+            updateUi();
             handler.post(new Runnable() {
                 @Override
                 public void run() {
                     title.setText(getString(R.string.status_finished));
-                    progressBarInfinite.setVisibility(View.GONE);
-                    progress.setVisibility(View.GONE);
+                    //progressBarInfinite.setVisibility(View.GONE);
+                    //progress.setVisibility(View.GONE);
                     subtitleTextView.setText(formatSubtitle());
                     viewAllButton.setVisibility(View.VISIBLE);
                     saveButton.setVisibility(View.VISIBLE);
@@ -308,6 +308,9 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         //FileManager.saveDebugFile(new File(FileManager.getInstance().getSavedPrimesDirectory() +  File.separator + "debug"));
     }
 
+    private long lastCurrentValue;
+    private long lastPrimeCount;
+
     @Override
     protected void onUiUpdate() {
         if (getTask() != null) {
@@ -315,13 +318,24 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             //Update progress
             if (getTask().getEndValue() != FindPrimesTask.INFINITY) {
                 progress.setText(getString(R.string.task_progress, DECIMAL_FORMAT.format(getTask().getProgress() * 100)));
+                progressBarInfinite.setMax(10_000);
+                progressBarInfinite.setProgress((int) (getTask().getProgress() * 10_000));
             }
 
             final String count = NUMBER_FORMAT.format(getTask().getPrimeCount());
             subtitleStringBuilder.replace(subtitleItems[0].length(), subtitleItems[0].length() + subtitleItems[1].length(), count);
             subtitleItems[1] = count;
 
+            elapsedTimeTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime()));
+
             subtitleTextView.setText(subtitleStringBuilder);
+
+            //Update statistics
+            etaTextView.setText("Time remaining: " + Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining()));
+            numbersPerSecondTextView.setText("Numbers per second: " + NUMBER_FORMAT.format(getTask().getCurrentValue() - lastCurrentValue));
+            lastCurrentValue = getTask().getCurrentValue();
+            primesPerSecondTextView.setText("Primes per second: " + NUMBER_FORMAT.format(getTask().getPrimeCount() - lastPrimeCount));
+            lastPrimeCount = getTask().getPrimeCount();
         }
     }
 

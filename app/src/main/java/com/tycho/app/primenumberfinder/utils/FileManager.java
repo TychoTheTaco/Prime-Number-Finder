@@ -365,25 +365,43 @@ public final class FileManager {
         return numbers;
     }
 
-    public static void saveDebugFile(final File file){
-        try {
+    public static void saveDebugFile(final int version, final int count, final File file){
+        switch (version){
+            default:
+                Log.d(TAG, "Invalid version: " + version);
+                break;
 
-            final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
+            case 0:
+                try {
+                    final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
 
-            final int MAX = 10_000;
+                    for (int i = 0; i < count; i++){
+                        bufferedWriter.write(String.valueOf(i));
+                        if (i != count - 1) {
+                            bufferedWriter.write(LIST_ITEM_SEPARATOR);
+                        }
+                    }
 
-            for (int i = 0; i < MAX; i++){
-                bufferedWriter.write(String.valueOf(i));
-                if (i != MAX - 1) {
-                    bufferedWriter.write(LIST_ITEM_SEPARATOR);
+                    bufferedWriter.flush();
+                    bufferedWriter.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            }
+                break;
 
-            bufferedWriter.flush();
-            bufferedWriter.close();
+            case 1:
+                try {
+                    final DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
 
-        } catch (IOException e) {
-            e.printStackTrace();
+                    for (int i = 0; i < count; i++){
+                        dataOutputStream.writeLong(i);
+                    }
+
+                    dataOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
         }
     }
 
@@ -544,6 +562,7 @@ public final class FileManager {
                 for (int i = 1; i < count; i++){
                     digits += (int)(Math.log10(i)+1);
                 }
+                Log.d(TAG, "Digits: " + digits);
                 return (digits + count);
 
                 /*
@@ -567,7 +586,7 @@ public final class FileManager {
         return -1;
     }
 
-    public static int calc(final int n){
+    public static int numbersWithNDigits(final int n){
         return (int) (Math.pow(10, n) - Math.pow(10, n - 1));
     }
 }

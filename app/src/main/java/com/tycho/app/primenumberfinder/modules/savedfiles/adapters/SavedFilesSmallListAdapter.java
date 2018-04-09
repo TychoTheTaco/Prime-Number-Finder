@@ -90,6 +90,7 @@ public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesS
                         Intent intent = new Intent(context, DisplayPrimesActivity.class);
                         intent.putExtra("filePath", file.getAbsolutePath());
                         intent.putExtra("allowExport", true);
+                        intent.putExtra("enableSearch", true);
                         intent.putExtra("title", true);
                         context.startActivity(intent);
                     }

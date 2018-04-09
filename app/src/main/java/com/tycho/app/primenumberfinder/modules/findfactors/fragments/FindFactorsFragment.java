@@ -65,7 +65,6 @@ public class FindFactorsFragment extends Fragment {
 
     private final FindFactorsTaskListFragment taskListFragment = new FindFactorsTaskListFragment();
     private final FindFactorsResultsFragment resultsFragment = new FindFactorsResultsFragment();
-    private final FindFactorsStatisticsFragment statisticsFragment = new FindFactorsStatisticsFragment();
 
     //Override methods
 
@@ -82,7 +81,6 @@ public class FindFactorsFragment extends Fragment {
             @Override
             public void onTaskSelected(Task task) {
                 resultsFragment.setTask(task);
-                statisticsFragment.setTask(task);
             }
 
             @Override
@@ -94,7 +92,6 @@ public class FindFactorsFragment extends Fragment {
             public void onTaskRemoved(Task task) {
                 if (resultsFragment.getTask() == task) {
                     resultsFragment.setTask(null);
-                    statisticsFragment.setTask(null);
                 }
 
                 taskListFragment.update();
@@ -102,7 +99,6 @@ public class FindFactorsFragment extends Fragment {
         });
 
         fragmentAdapter.add("Results", resultsFragment);
-        fragmentAdapter.add("Statistics", statisticsFragment);
         viewPager.setAdapter(fragmentAdapter);
         viewPager.setOffscreenPageLimit(2);
         final TabLayout tabLayout = rootView.findViewById(R.id.tab_layout);

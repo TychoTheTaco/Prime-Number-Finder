@@ -74,6 +74,7 @@ public class CheckPrimalityTask extends Task {
             finishedSearch = true;
         }
 
+        setProgress(1);
     }
 
     public boolean isPrime(){

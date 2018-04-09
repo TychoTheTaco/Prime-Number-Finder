@@ -552,15 +552,6 @@ public class FindPrimesTask extends MultithreadedTask {
             this.startValue = startValue;
             this.endValue = endValue;
             this.increment = increment;
-            /*addTaskListener(new TaskAdapter(){
-                @Override
-                public void onTaskStopped() {
-                    synchronized (QUEUE_LOCK){
-                        QUEUE_LOCK.notify();
-                    }
-                    Log.d(TAG, "Thread took " + getElapsedTime() + " ms.");
-                }
-            });*/
         }
 
         @Override
