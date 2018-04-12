@@ -43,20 +43,11 @@ public class FindFactorsTask extends Task {
      */
     private final List<EventListener> eventListeners = new ArrayList<>();
 
-    /**
-     * This array holds data for statistics.
-     * The format of which is:
-     * <code>statistics[0] = {Counter, Previous second, Last update time}</code>
-     *
-     * 0 - Numbers scanned per second
-     * 1 - Factors found per second
-     */
-    private final long[][]statistics = new long[2][3];
-
-
     public boolean didFinish = false;
 
     private final SearchOptions searchOptions;
+
+    private long i;
 
     public FindFactorsTask(final SearchOptions searchOptions) {
         this.searchOptions = searchOptions;
@@ -68,7 +59,7 @@ public class FindFactorsTask extends Task {
 
         final int sqrtMax = (int) Math.sqrt(number);
 
-        for (long i = 1; i <= sqrtMax; i++) {
+        for (i = 1; i <= sqrtMax; i++) {
 
             //Check if the number divides perfectly
             if (number % i == 0) {
@@ -80,28 +71,8 @@ public class FindFactorsTask extends Task {
             }
 
             tryPause();
-
-            if (requestStop) {
+            if (shouldStop()) {
                 return;
-            }
-
-            //Update statistics
-            if (searchOptions.getMonitorType() != SearchOptions.MonitorType.NONE) {
-
-                final long currentTime = System.currentTimeMillis();
-
-                if (currentTime - statistics[0][2] >= 1000){
-                    statistics[0][1] = statistics[0][0];
-                    statistics[0][0] = 0;
-                    statistics[0][2] = currentTime;
-                }
-                statistics[0][0]++;
-
-                if (currentTime - statistics[1][2] >= 1000){
-                    statistics[1][1] = statistics[1][0];
-                    statistics[1][0] = 0;
-                    statistics[1][2] = currentTime;
-                }
             }
 
             setProgress((float) i / sqrtMax);
@@ -129,22 +100,14 @@ public class FindFactorsTask extends Task {
         for (EventListener eventListener : eventListeners) {
             eventListener.onFactorFound(factor);
         }
-        statistics[1][0]++;
     }
 
     public interface EventListener {
         void onFactorFound(final long factor);
     }
 
-    public long getNumbersPerSecond() {
-        if (getElapsedTime() < 1000){
-            return statistics[0][0];
-        }
-        return statistics[0][1];
-    }
-
-    public long getFactorsPerSecond() {
-        return statistics[1][1];
+    public long getCurrentValue(){
+        return i;
     }
 
     public List<Long> getFactors() {

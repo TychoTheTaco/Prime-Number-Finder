@@ -13,6 +13,7 @@ import com.tycho.app.primenumberfinder.modules.TaskFragment;
 import java.text.DecimalFormat;
 
 import easytasks.Task;
+import easytasks.TaskAdapter;
 
 /**
  * Created by tycho on 11/19/2017.
@@ -32,10 +33,7 @@ public abstract class ResultsFragment extends TaskFragment {
 
     protected final UIUpdater uiUpdater = new UIUpdater();
 
-    /**
-     * The last time in milliseconds that the UI was updated.
-     */
-    private long lastUiUpdateTime = 0;
+    private volatile int updateRequests = 0;
 
     @Nullable
     @Override
@@ -43,9 +41,22 @@ public abstract class ResultsFragment extends TaskFragment {
 
     @Override
     public void onTaskStarted() {
-        super.onTaskStarted();
+        super.onTaskStarted(); //This sometimes gets called twice but only in FindFactorsResults fragment
+        Log.d(TAG, "onTaskStarted()");
         if (uiUpdater.getState() == Task.State.NOT_STARTED){
             uiUpdater.startOnNewThread();
+            Log.d(TAG, "Adding task listener...");
+            uiUpdater.addTaskListener(new TaskAdapter(){
+                @Override
+                public void onTaskPaused() {
+                    Log.d(TAG, "UI Updater paused.");
+                }
+
+                @Override
+                public void onTaskResumed() {
+                    Log.d(TAG, "UI Updater resumed.");
+                }
+            });
         }else{
             uiUpdater.resume();
         }
@@ -66,15 +77,43 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        uiUpdater.pause(false);
+        Log.d(TAG, "onTaskStopped()");
+        uiUpdater.pause(true);
     }
+
+    /**
+     * Make sure the task isn't changed while the UI is updating.
+     * @param task
+     */
+    @Override
+    public void setTask(Task task) {
+        synchronized (LOCK){
+            try {
+                if (updateRequests > 0){
+                    LOCK.wait();
+                }
+            }catch (InterruptedException e){
+                e.printStackTrace();
+            }
+        }
+        super.setTask(task);
+    }
+
+    private static final Object LOCK = new Object();
 
     protected void updateUi(){
         if (isAdded() && !isDetached()){
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    onUiUpdate();
+                    synchronized (LOCK){
+                        updateRequests++;
+                        onUiUpdate();
+                        updateRequests--;
+                        if (updateRequests == 0){
+                            LOCK.notify();
+                        }
+                    }
                 }
             });
         }else{
@@ -90,17 +129,13 @@ public abstract class ResultsFragment extends TaskFragment {
         protected void run() {
             while (true) {
 
-                if (getTask() == null) pause(false);
+                if (getTask() == null) pause(true);
 
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateUi();
-                    }
-                });
+                Log.d(TAG, "Sending UI update! State: " + getState());
+                updateUi();
 
                 try {
-                    Thread.sleep(1000 / 2);
+                    Thread.sleep(1000 / 25);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     break;

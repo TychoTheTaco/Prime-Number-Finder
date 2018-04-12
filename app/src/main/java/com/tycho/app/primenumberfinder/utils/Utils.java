@@ -89,10 +89,14 @@ public final class Utils {
         return time;
     }
 
-    public static String formatTimeHuman(final long millis) {
+    public static String formatTimeHuman(final long millis, final int precision) {
 
         if (millis == -1) {
             return "infinite";
+        }
+
+        if (precision < 1){
+            return "";
         }
 
         final int milliseconds = (int) (millis % 1000);
@@ -102,20 +106,23 @@ public final class Utils {
         final int days = (int) ((millis / (1000 * 60 * 60 * 24)) % 7);
 
         final int[] times = new int[]{milliseconds, seconds, minutes, hours, days};
-        final String[] parts = new String[]{milliseconds + " ms", seconds + " seconds", minutes + " minutes", hours + " hours", days + " days"};
-
-        final int MAX_COUNT = 2;
+        final String[] parts = new String[]{milliseconds + " ms", seconds + " second", minutes + " minute", hours + " hour", days + " day"};
 
         final StringBuilder stringBuilder = new StringBuilder();
         int count = 0;
         for (int i = times.length - 1; i >= 0; i--){
             if (times[i] > 0){
                 stringBuilder.append(parts[i]);
+                if (i != 0 && times[i] != 1){
+                    stringBuilder.append('s');
+                }
                 stringBuilder.append(' ');
                 count++;
-                if (count == MAX_COUNT){
+                if (count == precision){
                     break;
                 }
+            }else if (stringBuilder.length() > 0){
+                break;
             }
         }
 

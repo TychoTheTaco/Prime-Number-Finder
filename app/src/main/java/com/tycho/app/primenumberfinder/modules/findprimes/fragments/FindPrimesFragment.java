@@ -126,7 +126,6 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                 }
                 if (checkPrimalityResultsFragment.getTask() == task) {
                     checkPrimalityResultsFragment.setTask(null);
-                    checkPrimalityResultsFragment.setTask(null);
                 }
 
                 taskListFragment.update();
@@ -595,7 +594,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                 valid = true;
             }else{
                 valid = false;
-                Toast.makeText(getActivity(), "Not enough RAM to start task! Use Brute Force instead!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Not enough RAM to start task! Use Brute Force instead!", Toast.LENGTH_LONG).show();
             }
         }else{
             valid = true;

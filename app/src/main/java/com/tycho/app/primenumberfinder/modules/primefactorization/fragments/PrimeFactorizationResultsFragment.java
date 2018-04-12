@@ -151,6 +151,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
 
     @Override
     public void onTaskStopped() {
+        super.onTaskStopped();
         updateUi();
         if (isAdded() && !isDetached()){
             handler.post(new Runnable() {
@@ -201,8 +202,8 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
             progress.setText(String.valueOf((int) (getTask().getProgress() * 100)));
             progressBar.setProgress((int) (getTask().getProgress() * 1_000));
 
-            timeElapsedTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime()));
-            etaTextView.setText("Time remaining: " + Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining()));
+            timeElapsedTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime(), 2));
+            etaTextView.setText("Time remaining: " + Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 2));
         }
     }
 

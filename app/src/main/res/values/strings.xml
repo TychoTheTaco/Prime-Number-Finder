@@ -10,7 +10,6 @@
     <string name="preference_summary_allow_background_threads">Allow the app to run tasks in the background (such as searching for prime numbers). Warning: this can cause significant battery loss if you are not careful.</string>
 
     <!-- Action bar items -->
-    <string name="action_bar_item_title_save">Save</string>
     <string name="action_bar_item_title_delete">Delete</string>
     <string name="action_bar_item_title_export">Export</string>
     <string name="find_nth_number_title">Find Nth number</string>
@@ -29,15 +28,15 @@
     <string name="input_range_description">Or enter a range to search for primes.</string>
     <string name="to">to</string>
     <string name="infinity_text">infinity</string>
-    <string name="content_description_infinity_button">Infinity</string>
     <string name="find_primes_button">Find primes</string>
-    <string name="find_primes_result">There are %1$s prime numbers between %2$s and %3$s.</string>
+    <string name="find_primes_subtitle_result">There are %1$s prime numbers between %2$s and %3$s.</string>
+    <string name="find_primes_subtitle">Searching for prime numbers between %1$s and %2$s using %3$s.</string>
+    <string name="find_primes_body_text">Already found %1$s prime numbers.</string>
+    <string name="find_primes_body_text_sieve_counting">Counting primes: %1$s.</string>
+    <string name="find_primes_body_text_sieve">Counting primes: %1$s.</string>
     <string name="check_primality_result">%1$s is %2$s.</string>
-    <string name="primality_result">%1$s is %2$s.</string>
-    <string name="no_tasks_message">No tasks. Start one with the button above.</string>
-    <string name="no_tasks_message_plural">No tasks. Start one with the buttons above.</string>
+    <string name="no_tasks_message">No tasks. Start one with the buttons above or the floating action button.</string>
     <string name="no_task_selected_message">Select a task to view its status and results.</string>
-    <string name="no_task_selected_statistics_message">Select a task to view its statistics.</string>
     <string name="find_primes_task_list_item_title">Primes from %1$s to %2$s</string>
     <string name="check_primality_task_status">Checking primality of %1$s</string>
     <string name="check_primality_subtitle_searching">Checking the primality of %1$s&#8230;</string>
@@ -46,7 +45,9 @@
     <!-- Find factors page -->
     <string name="find_factors_input_number_description">Enter a number to find its factors.</string>
     <string name="find_factors_button">Find factors</string>
-    <plurals name="find_factors_results_description">
+    <string name="find_factors_subtitle">Finding factors of %1$s.</string>
+    <string name="find_factors_body_text">Already found %1$s factors.</string>
+    <plurals name="find_factors_subtitle_results">
         <item quantity="one">%1$s has %2$s factor.</item>
         <item quantity="other">%1$s has %2$s factors.</item>
     </plurals>
@@ -81,6 +82,7 @@
     <string name="find_primes_search_method_sieve_of_eratosthenes">Sieve of Eratosthenes</string>
 
     <!-- Statistics -->
+    <string name="statistics_title">Statistics</string>
     <string name="elapsed_time_label">Time elapsed</string>
     <string name="eta_label">Estimated time remaining</string>
     <string name="numbers_per_second_label">Numbers scanned per second</string>

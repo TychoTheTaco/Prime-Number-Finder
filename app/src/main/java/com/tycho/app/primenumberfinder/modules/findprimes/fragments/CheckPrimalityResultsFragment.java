@@ -150,7 +150,7 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
         progressBarInfinite.setMax(10_000);
         progressBarInfinite.setProgress((int) (getTask().getProgress() * 10_000));
 
-        elapsedTimeTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime()));
+        elapsedTimeTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime(), 2));
     }
 
     @Override

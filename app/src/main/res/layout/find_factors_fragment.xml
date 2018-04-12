@@ -14,7 +14,7 @@
         <!-- Number input -->
         <TextView
             android:id="@+id/input_number_label"
-            style="@style/SectionDescription"
+            style="@style/DefaultText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:labelFor="@+id/editText_input_number"

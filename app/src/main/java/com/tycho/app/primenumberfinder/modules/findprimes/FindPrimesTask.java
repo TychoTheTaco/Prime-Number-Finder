@@ -649,7 +649,13 @@ public class FindPrimesTask extends MultithreadedTask {
 
     private class SieveTask extends MultithreadedTask.SubTask {
 
+        private String status = "searching";
+
         private final List<Long> primes = new ArrayList<>();
+
+        private final int sqrtMax = (int) Math.sqrt(endValue);
+        private int factor;
+        private long counter;
 
         @Override
         protected void run() {
@@ -657,49 +663,69 @@ public class FindPrimesTask extends MultithreadedTask {
             final BitSet bitSet = new BitSet((int) (endValue + 1));
             bitSet.set(0, bitSet.size() - 1, true);
 
-            final int sqrtMax = (int) Math.sqrt(endValue);
+            //final int sqrtMax = (int) Math.sqrt(endValue);
 
             // mark non-primes <= n using Sieve of Eratosthenes
-            for (int factor = 2; factor <= sqrtMax; factor++) {
+            for (factor = 2; factor <= sqrtMax; factor++) {
 
                 // if factor is prime, then mark multiples of factor as nonprime
                 // suffices to consider mutiples factor, factor+1, ...,  n/factor
                 if (bitSet.get(factor)) {
                     for (int j = factor; factor * j <= endValue; j++) {
                         bitSet.set(factor * j, false);
-                        //tryPause();
                     }
                 }
 
-                setProgress(((float) factor / sqrtMax) / 2);
                 tryPause();
             }
 
-            for (long i = 2; i < endValue; i++) {
-                if (bitSet.get((int) i)) {
-                    primes.add(i);
+            if (shouldStop()){
+                return;
+            }
+
+            status = "counting";
+
+            //Count primes
+            for (counter = 2; counter < endValue; counter++) {
+                if (bitSet.get((int) counter)) {
+                    primes.add(counter);
                     primeCount++;
                 }
-                //setProgress(0.5f + (((float) i / endValue) / 2));
+                tryPause();
             }
             setProgress(1);
+            status = String.valueOf(getState());
+        }
+
+        @Override
+        public float getProgress() {
+            switch (status){
+                default:
+                    return super.getProgress();
+
+                case "searching":
+                    return ((float) factor / sqrtMax) / 2;
+
+                case "counting":
+                    return 0.5f + (((float) counter / endValue) / 2);
+            }
         }
     }
 
     private void searchSieve() {
         addTask(new SieveTask());
         executeTasks();
-        /*final List<Integer> numbers = new ArrayList<>();
-        for (int i : ((SieveTask) getTasks().get(0)).primes){
-            numbers.add(i);
-        }*/
-        //Debug.startMethodTracing("run0");
-        //FileManager.writeCompact(numbers, new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "large"), false);
-        //Debug.stopMethodTracing();
+    }
 
-        /*for (int x = 0, y = 0; x < 10 && y < 10; x++, y += ((x == 10) ? 1 : 0), x = (x == 10 ? 0 : x)){
-            Log.d(TAG, "(" + x + ", " + y + ")");
-        }*/
+    public String getStatus(){
+        switch (searchMethod){
+            case BRUTE_FORCE:
+                break;
+
+            case SIEVE_OF_ERATOSTHENES:
+                return ((SieveTask) getTasks().get(0)).status;
+        }
+        return String.valueOf(getState());
     }
 
     // Android

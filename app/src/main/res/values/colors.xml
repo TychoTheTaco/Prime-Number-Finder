@@ -39,6 +39,7 @@
     <color name="gray">#757575</color> <!-- 600 -->
     <color name="white">#FFFFFF</color>
     <color name="red">#f44336</color>
+    <color name="black">#000000</color>
 
     <!-- Miscellaneous -->
     <color name="divider">#B6B6B6</color>

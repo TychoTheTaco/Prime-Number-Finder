@@ -15,7 +15,7 @@
         <!-- Number input -->
         <TextView
             android:id="@+id/input_number_label"
-            style="@style/SectionDescription"
+            style="@style/DefaultText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:labelFor="@+id/primality_input"
@@ -52,7 +52,7 @@
         <!-- Range input -->
         <TextView
             android:id="@+id/input_range_label"
-            style="@style/SectionDescription"
+            style="@style/DefaultText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:labelFor="@+id/editText_input_number"
@@ -88,7 +88,7 @@
                     android:layout_weight="1" />
 
                 <TextView
-                    style="@style/SectionDescription"
+                    style="@style/DefaultText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/to" />
@@ -105,7 +105,7 @@
                     android:layout_width="32dp"
                     android:layout_height="match_parent"
                     android:background="@drawable/ripple_clear"
-                    android:contentDescription="@string/content_description_infinity_button"
+                    android:contentDescription="@string/include_numbers_description"
                     android:src="@drawable/ic_infinity_white_24dp"
                     android:tint="@color/infinity_button_tint" />
 

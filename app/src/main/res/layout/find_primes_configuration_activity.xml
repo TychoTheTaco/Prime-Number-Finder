@@ -10,7 +10,7 @@
 
     <!-- Range input -->
     <TextView
-        style="@style/SectionDescription"
+        style="@style/DefaultText"
         android:layout_width="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
@@ -34,7 +34,7 @@
             android:layout_weight="1" />
 
         <TextView
-            style="@style/SectionDescription"
+            style="@style/DefaultText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/to" />
@@ -51,7 +51,7 @@
             android:layout_width="44dp"
             android:layout_height="match_parent"
             android:background="?android:selectableItemBackground"
-            android:contentDescription="@string/content_description_infinity_button"
+            android:contentDescription="@string/infinity_text"
             android:src="@drawable/ic_infinity_white_24dp"
             android:tint="@color/infinity_button_tint" />
 
@@ -66,7 +66,7 @@
         android:layout_height="wrap_content">
 
         <TextView
-            style="@style/SectionDescription"
+            style="@style/DefaultText"
             android:id="@+id/search_method_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -106,7 +106,7 @@
         android:layout_height="wrap_content">
 
         <TextView
-            style="@style/SectionDescription"
+            style="@style/DefaultText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Threads"/>

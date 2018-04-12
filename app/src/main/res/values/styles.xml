@@ -30,14 +30,7 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
-    <style name="TaskFragmentSubtitle">
-        <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/primary_text</item>
-    </style>
-
-
-
-    <style name="SectionDescription">
+    <style name="DefaultText">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/primary_text</item>
     </style>

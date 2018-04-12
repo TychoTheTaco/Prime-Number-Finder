@@ -64,8 +64,6 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
      */
     private final CopyOnWriteArrayList<ActionViewListener> actionViewListeners = new CopyOnWriteArrayList<>();
 
-    private long lastUiUpdateTime = 0;
-
     private final TaskAdapter taskAdapter = new TaskAdapter() {
         @Override
         public void onTaskStarted() {
@@ -138,7 +136,7 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                         @Override
                         public void run() {
                             if (holder != null) {
-                                holder.uiUpdater.pause(false);
+                                holder.uiUpdater.pause(true);
                                 notifyItemChanged(holder.getAdapterPosition());
                             }
                         }
@@ -190,7 +188,7 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                         @Override
                         public void run() {
                             if (holder != null) {
-                                holder.uiUpdater.pause(false);
+                                holder.uiUpdater.stop();
                                 notifyItemChanged(holder.getAdapterPosition());
                             }
                         }
@@ -377,9 +375,14 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                 });
 
                 try {
-                    Thread.sleep(1000 / 2);
+                    Thread.sleep(1000 / 25);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    break;
+                }
+
+                tryPause();
+                if (shouldStop()){
                     break;
                 }
             }

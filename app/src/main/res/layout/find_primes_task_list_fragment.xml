@@ -9,8 +9,9 @@
         android:id="@+id/empty_message"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:padding="8dp"
         android:gravity="center"
-        android:text="@string/no_tasks_message_plural"
+        android:text="@string/no_tasks_message"
         android:visibility="visible" />
 
     <!-- Task list-->
