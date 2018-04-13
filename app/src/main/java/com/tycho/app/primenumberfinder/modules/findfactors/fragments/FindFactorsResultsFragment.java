@@ -67,7 +67,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
     private TextView bodyTextView;
 
     //Statistics
-    private TextView statisticsTitle;
+    private ViewGroup statisticsLayout;
     private TextView timeElapsedTextView;
     private TextView etaTextView;
     private TextView numbersPerSecondTextView;
@@ -115,7 +115,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
         bodyTextView = rootView.findViewById(R.id.text);
 
         //Statistics
-        statisticsTitle = rootView.findViewById(R.id.statistics_title);
+        statisticsLayout = rootView.findViewById(R.id.statistics_layout);
         timeElapsedTextView = rootView.findViewById(R.id.textView_elapsed_time);
         etaTextView = rootView.findViewById(R.id.textView_eta);
         numbersPerSecondTextView = rootView.findViewById(R.id.textView_numbers_per_second);

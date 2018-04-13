@@ -3,6 +3,7 @@ package com.tycho.app.primenumberfinder.modules.primefactorization.fragments;
 import android.app.Fragment;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
@@ -11,6 +12,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,7 +38,7 @@ import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
 /**
  * @author Tycho Bellers
- *         Date Created: 3/2/2017
+ * Date Created: 3/2/2017
  */
 
 public class PrimeFactorizationFragment extends Fragment {
@@ -44,7 +46,7 @@ public class PrimeFactorizationFragment extends Fragment {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "PrimeFactorizationFragment";
+    private static final String TAG = "PrimeFactorizationFrgmt";
 
     /**
      * All UI updates are posted to this {@link Handler} on the main thread.
@@ -60,36 +62,34 @@ public class PrimeFactorizationFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.prime_factorization_fragment, container, false);
 
         //Set up tab layout for results and statistics
         final FragmentAdapter fragmentAdapter = new FragmentAdapter(getChildFragmentManager());
         final ViewPager viewPager = rootView.findViewById(R.id.view_pager);
         fragmentAdapter.add("Tasks", taskListFragment);
+        taskListFragment.addEventListener(new PrimeFactorizationTaskListAdapter.EventListener() {
+            @Override
+            public void onTaskSelected(Task task) {
+                resultsFragment.setTask(task);
+            }
 
-                taskListFragment.addEventListener(new PrimeFactorizationTaskListAdapter.EventListener() {
-                    @Override
-                    public void onTaskSelected(Task task) {
-                        resultsFragment.setTask(task);
-                    }
+            @Override
+            public void onPausePressed(Task task) {
 
-                    @Override
-                    public void onPausePressed(Task task) {
+            }
 
-                    }
+            @Override
+            public void onTaskRemoved(Task task) {
 
-                    @Override
-                    public void onTaskRemoved(Task task) {
+                if (resultsFragment.getTask() == task) {
+                    resultsFragment.setTask(null);
+                }
 
-                        if (resultsFragment.getTask() == task){
-                            resultsFragment.setTask(null);
-                        }
-
-                        taskListFragment.update();
-                    }
-                });
-
+                taskListFragment.update();
+            }
+        });
         fragmentAdapter.add("Results", resultsFragment);
         viewPager.setAdapter(fragmentAdapter);
         viewPager.setOffscreenPageLimit(2);
@@ -160,7 +160,6 @@ public class PrimeFactorizationFragment extends Fragment {
                     final Task task = new PrimeFactorizationTask(getNumberToFactor());
                     fragmentAdapter.notifyDataSetChanged();
                     taskListFragment.addTask(task);
-                    taskListFragment.update();
                     PrimeNumberFinder.getTaskManager().registerTask(task);
 
                     //Start the task
@@ -207,13 +206,7 @@ public class PrimeFactorizationFragment extends Fragment {
         return number.longValue();
     }
 
-    private void applyDefaults() {
-        editTextInput.setEnabled(true);
-        editTextInput.setText("");
-        buttonFactorize.setEnabled(true);
-    }
-
-    public void addActionViewListener(final ActionViewListener actionViewListener){
+    public void addActionViewListener(final ActionViewListener actionViewListener) {
         taskListFragment.addActionViewListener(actionViewListener);
     }
 }

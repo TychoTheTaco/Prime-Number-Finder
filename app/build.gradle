@@ -34,5 +34,5 @@ dependencies {
     implementation 'com.jaredrummler:colorpicker:1.0.2'
     implementation project(':simplegraphs')
     implementation files('libs/Simple Trees 1.1.1.DEV.jar')
-    implementation files('libs/Easy Tasks 1.1.36.DEV.jar')
+    implementation files('libs/Easy Tasks 1.1.52.DEV.jar')
 }

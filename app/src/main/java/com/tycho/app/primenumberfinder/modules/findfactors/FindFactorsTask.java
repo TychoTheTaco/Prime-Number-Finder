@@ -38,11 +38,6 @@ public class FindFactorsTask extends Task {
      */
     private final List<Long> inverse = new LinkedList<>();
 
-    /**
-     * Event listeners for task-specific events.
-     */
-    private final List<EventListener> eventListeners = new ArrayList<>();
-
     public boolean didFinish = false;
 
     private final SearchOptions searchOptions;
@@ -67,7 +62,6 @@ public class FindFactorsTask extends Task {
                 if ((number / i) != i) {
                     inverse.add(0, number / i);
                 }
-                sendOnFactorFound(i);
             }
 
             tryPause();
@@ -81,29 +75,10 @@ public class FindFactorsTask extends Task {
         if (!requestStop){
             for (Long n : inverse) {
                 factors.add(n);
-                sendOnFactorFound(n);
             }
 
             didFinish = true;
         }
-    }
-
-    public void addEventListener(final EventListener eventListener) {
-        if (!eventListeners.contains(eventListener)) eventListeners.add(eventListener);
-    }
-
-    public boolean removeEventListener(final EventListener eventListener){
-        return eventListeners.remove(eventListener);
-    }
-
-    private void sendOnFactorFound(final long factor) {
-        for (EventListener eventListener : eventListeners) {
-            eventListener.onFactorFound(factor);
-        }
-    }
-
-    public interface EventListener {
-        void onFactorFound(final long factor);
     }
 
     public long getCurrentValue(){

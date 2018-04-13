@@ -51,6 +51,10 @@ public class PrimeFactorizationTask extends Task {
             if (checkPrimalityTask.isPrime()){
                 total++;
             }
+            tryPause();
+            if (shouldStop()){
+                return;
+            }
         }
         setProgress(0.67f);
         this.factorTree = generateTree(number);
@@ -98,7 +102,7 @@ public class PrimeFactorizationTask extends Task {
                 number2 = findFactorsTask.getFactors().get((size / 2));
             }
 
-            setProgress(primeFactors.size() / total);
+            //setProgress(primeFactors.size() / total);
 
             tree.addNode(generateTree(number1));
             tree.addNode(generateTree(number2));

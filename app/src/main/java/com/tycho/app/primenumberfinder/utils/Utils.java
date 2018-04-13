@@ -2,9 +2,17 @@ package com.tycho.app.primenumberfinder.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Typeface;
+import android.support.v4.content.ContextCompat;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.inputmethod.InputMethodManager;
+
+import com.tycho.app.primenumberfinder.R;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -189,5 +197,21 @@ public final class Utils {
                 }
             }
         });
+    }
+
+    public static SpannableStringBuilder formatSpannable(final SpannableStringBuilder spannableStringBuilder, final String raw, final String[] content, final int color){
+        spannableStringBuilder.clear();
+        spannableStringBuilder.clearSpans();
+        final String[] split = raw.split("%\\d\\$s");
+        for (int i = 0; i < split.length; i++){
+            spannableStringBuilder.append(split[i]);
+            if (i < content.length){
+                final int position = spannableStringBuilder.length();
+                spannableStringBuilder.append(content[i]);
+                spannableStringBuilder.setSpan(new ForegroundColorSpan(color), position, position + content[i].length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, position + content[i].length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            }
+        }
+        return spannableStringBuilder;
     }
 }

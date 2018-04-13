@@ -36,7 +36,7 @@ public abstract class TaskFragment extends Fragment implements TaskListener {
 
     @Override
     public void onTaskStarted() {
-
+        Log.d(TAG, "onTaskStarted()");
     }
 
     @Override

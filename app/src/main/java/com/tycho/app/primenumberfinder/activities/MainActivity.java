@@ -5,6 +5,7 @@ import android.app.FragmentTransaction;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -131,11 +132,6 @@ public class MainActivity extends AppCompatActivity{
 
         //Select the first drawer item
         selectDrawerItem(0);
-
-        Log.d(TAG, "1,000: " + FileManager.estimateFileSize(0, 1_000));
-        Log.d(TAG, "1,000: " + FileManager.estimateFileSize(1, 1_000));
-        Log.d(TAG, "1,000,000: " + FileManager.estimateFileSize(0, 1_000_000));
-        Log.d(TAG, "1,000,000: " + FileManager.estimateFileSize(1, 1_000_000));
     }
 
     public FloatingActionButton getFab(){

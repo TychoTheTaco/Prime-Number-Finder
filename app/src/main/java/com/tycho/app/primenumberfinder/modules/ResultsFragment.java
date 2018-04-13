@@ -41,11 +41,11 @@ public abstract class ResultsFragment extends TaskFragment {
 
     @Override
     public void onTaskStarted() {
-        super.onTaskStarted(); //This sometimes gets called twice but only in FindFactorsResults fragment
-        Log.d(TAG, "onTaskStarted()");
+        super.onTaskStarted(); //This sometimes gets called twice but only in FindFactorsResults fragment and PrimeFactorization fragment
+        Log.d(TAG, "onTaskStarted(): " + getTask());
         if (uiUpdater.getState() == Task.State.NOT_STARTED){
+            Log.w(TAG, "Starting task " + uiUpdater + " for " + this + " on new thread with state: " + uiUpdater.getState());
             uiUpdater.startOnNewThread();
-            Log.d(TAG, "Adding task listener...");
             uiUpdater.addTaskListener(new TaskAdapter(){
                 @Override
                 public void onTaskPaused() {
@@ -77,8 +77,9 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        Log.d(TAG, "onTaskStopped()");
+        Log.d(TAG, "onTaskStopped(): " + getTask());
         uiUpdater.pause(true);
+        Log.d(TAG, "After pause returned.");
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
+import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,9 +8,14 @@ import android.support.v4.content.ContextCompat;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -39,9 +45,26 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     private TextView noTaskView;
     private TextView title;
     private TextView subtitle;
-    private ProgressBar progressBarInfinite;
+    private ProgressBar progressBar;
     private TextView progress;
-    private TextView elapsedTimeTextView;
+    private TextView timeElapsedTextView;
+
+    //Buttons
+    private ImageButton pauseButton;
+
+    private final RotateAnimation rotate = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        //Set up progress animation
+        rotate.setDuration(3000);
+        rotate.setRepeatCount(Animation.INFINITE);
+        rotate.setRepeatMode(Animation.INFINITE);
+        rotate.setInterpolator(new LinearInterpolator());
+    }
 
     @Nullable
     @Override
@@ -50,11 +73,25 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
 
         title = rootView.findViewById(R.id.title);
         subtitle = rootView.findViewById(R.id.subtitle);
-        progressBarInfinite = rootView.findViewById(R.id.progress_bar);
+        progressBar = rootView.findViewById(R.id.progress_bar);
         resultsView = rootView.findViewById(R.id.results_view);
         noTaskView = rootView.findViewById(R.id.empty_message);
         progress = rootView.findViewById(R.id.textView_search_progress);
-        elapsedTimeTextView = rootView.findViewById(R.id.textView_elapsed_time);
+        timeElapsedTextView = rootView.findViewById(R.id.textView_elapsed_time);
+
+        //Buttons
+        pauseButton = rootView.findViewById(R.id.pause_button);
+
+        pauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (getTask().getState() == Task.State.RUNNING) {
+                    getTask().pause(false);
+                } else if (getTask().getState() == Task.State.PAUSED) {
+                    getTask().resume();
+                }
+            }
+        });
 
         init();
 
@@ -68,15 +105,35 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    onUiUpdate();
 
+                    //Title
                     title.setText(getString(R.string.status_searching));
-                    //progressBarInfinite.setVisibility(View.VISIBLE);
+                    progressBar.startAnimation(rotate);
 
                     //Format subtitle
-                    final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(getString(R.string.check_primality_task_status, NumberFormat.getInstance(Locale.getDefault()).format(getTask().getNumber())));
-                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.purple_dark)), 0, spannableStringBuilder.length(), 0);
-                    spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, spannableStringBuilder.length(), 0);
-                    subtitle.setText(spannableStringBuilder);
+                    subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_subtitle_searching), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onTaskPausing() {
+        super.onTaskPausing();
+        if (isAdded() && !isDetached()) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    onUiUpdate();
+
+                    //Title
+                    title.setText(getString(R.string.state_pausing));
+
+                    //Format subtitle
+                    subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_subtitle_searching), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+
                 }
             });
         }
@@ -89,14 +146,35 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    title.setText(getString(R.string.status_paused));
-                    //progressBarInfinite.setVisibility(View.GONE);
+                    onUiUpdate();
 
-                    //Set progress
-                    progress.setText(getString(R.string.task_progress, DECIMAL_FORMAT.format(getTask().getProgress() * 100)));
+                    //Title
+                    title.setText(getString(R.string.status_paused));
+                    progressBar.clearAnimation();
+
+                    //Buttons
+                    pauseButton.setEnabled(true);
+                    pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
                 }
             });
         }
+    }
+
+    @Override
+    public void onTaskResuming() {
+        super.onTaskResuming();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (isAdded() && !isDetached() && getTask() != null) {
+                    //Title
+                    title.setText(getString(R.string.state_resuming));
+
+                    //Buttons
+                    pauseButton.setEnabled(false);
+                }
+            }
+        });
     }
 
     @Override
@@ -104,6 +182,8 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
         super.onTaskResumed();
         onTaskStarted();
     }
+
+    private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
     @Override
     public void onTaskStopped() {
@@ -113,15 +193,20 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    Log.d(TAG, "Call onUiUpdate() one last time.");
+                    onUiUpdate();
+                    Log.d(TAG, "Begin final UI update.");
 
+                    //Title
                     title.setText(getString(R.string.status_finished));
-                    //progressBarInfinite.setVisibility(View.GONE);
-
-                    //Set progress
-                    //progress.setVisibility(View.GONE);
+                    progressBar.clearAnimation();
 
                     //Format subtitle
-                    final String[] splitSubtitle = getString(R.string.check_primality_result).split("%\\d\\$.");
+                    subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_result), new String[]{
+                            NUMBER_FORMAT.format(getTask().getNumber()),
+                            getTask().isPrime() ? "prime" : "not prime"
+                    }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                    /*final String[] splitSubtitle = getString(R.string.check_primality_result).split("%\\d\\$.");
                     final String[] subtitleItems = new String[4 + 1];
                     subtitleItems[0] = splitSubtitle[0];
                     subtitleItems[1] = NumberFormat.getInstance(Locale.getDefault()).format(getTask().getNumber());
@@ -137,7 +222,10 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
                             subtitleStringBuilder.append(subtitleItems[i]);
                         }
                     }
-                    subtitle.setText(subtitleStringBuilder);
+                    subtitle.setText(subtitleStringBuilder);*/
+
+                    //Buttons
+                    pauseButton.setVisibility(View.GONE);
                 }
             });
         }
@@ -146,11 +234,11 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     @Override
     protected void onUiUpdate() {
         //Update progress
-        progress.setText(getString(R.string.task_progress, DECIMAL_FORMAT.format(getTask().getProgress() * 100)));
-        progressBarInfinite.setMax(10_000);
-        progressBarInfinite.setProgress((int) (getTask().getProgress() * 10_000));
+        progress.setText(String.valueOf((int) (getTask().getProgress() * 100)));
+        progressBar.setProgress((int) (getTask().getProgress() * 100));
 
-        elapsedTimeTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime(), 2));
+        //Elapsed time
+        timeElapsedTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime(), 2));
     }
 
     @Override
@@ -178,8 +266,20 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
                     onTaskStarted();
                     break;
 
+                case PAUSING:
+                    onTaskPausing();
+                    break;
+
                 case PAUSED:
                     onTaskPaused();
+                    break;
+
+                case RESUMING:
+                    onTaskResuming();
+                    break;
+
+                case STOPPING:
+                    onTaskStopping();
                     break;
 
                 case STOPPED:

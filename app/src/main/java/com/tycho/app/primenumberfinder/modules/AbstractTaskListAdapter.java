@@ -91,6 +91,7 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
         final Task task = tasks.get(position);
         customEventListeners.get(task).setViewHolder(holder);
         if (holder.uiUpdater.getState() == Task.State.NOT_STARTED) {
+            Log.d(TAG, "Task " + holder.uiUpdater + " had state: " + holder.uiUpdater.getState());
             holder.uiUpdater.startOnNewThread();
         } else {
             holder.uiUpdater.resume();
