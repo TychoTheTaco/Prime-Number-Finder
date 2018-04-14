@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
@@ -22,10 +23,13 @@ import android.widget.TextView;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import easytasks.Task;
 
@@ -47,7 +51,11 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     private TextView subtitle;
     private ProgressBar progressBar;
     private TextView progress;
+
+    //Statistics
+    private ViewGroup statisticsLayout;
     private TextView timeElapsedTextView;
+    private TextView etaTextView;
 
     //Buttons
     private ImageButton pauseButton;
@@ -77,7 +85,11 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
         resultsView = rootView.findViewById(R.id.results_view);
         noTaskView = rootView.findViewById(R.id.empty_message);
         progress = rootView.findViewById(R.id.textView_search_progress);
+
+        //Statistics
+        statisticsLayout = rootView.findViewById(R.id.statistics_layout);
         timeElapsedTextView = rootView.findViewById(R.id.textView_elapsed_time);
+        etaTextView = rootView.findViewById(R.id.textView_eta);
 
         //Buttons
         pauseButton = rootView.findViewById(R.id.pause_button);
@@ -193,9 +205,7 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(TAG, "Call onUiUpdate() one last time.");
                     onUiUpdate();
-                    Log.d(TAG, "Begin final UI update.");
 
                     //Title
                     title.setText(getString(R.string.status_finished));
@@ -206,23 +216,9 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
                             NUMBER_FORMAT.format(getTask().getNumber()),
                             getTask().isPrime() ? "prime" : "not prime"
                     }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
-                    /*final String[] splitSubtitle = getString(R.string.check_primality_result).split("%\\d\\$.");
-                    final String[] subtitleItems = new String[4 + 1];
-                    subtitleItems[0] = splitSubtitle[0];
-                    subtitleItems[1] = NumberFormat.getInstance(Locale.getDefault()).format(getTask().getNumber());
-                    subtitleItems[2] = splitSubtitle[1];
-                    subtitleItems[3] = getTask().isPrime() ? "prime" : "not prime";
-                    subtitleItems[4] = splitSubtitle[2];
-                    final SpannableStringBuilder subtitleStringBuilder = new SpannableStringBuilder();
-                    for (int i = 0; i < subtitleItems.length; i++) {
-                        if (i % 2 != 0) {
-                            subtitleStringBuilder.append(subtitleItems[i], new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.purple_dark)), 0);
-                            subtitleStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), subtitleStringBuilder.length() - subtitleItems[i].length(), subtitleStringBuilder.length(), 0);
-                        } else {
-                            subtitleStringBuilder.append(subtitleItems[i]);
-                        }
-                    }
-                    subtitle.setText(subtitleStringBuilder);*/
+
+                    //Statistics
+                    statisticsLayout.setVisibility(View.GONE);
 
                     //Buttons
                     pauseButton.setVisibility(View.GONE);
@@ -237,8 +233,11 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
         progress.setText(String.valueOf((int) (getTask().getProgress() * 100)));
         progressBar.setProgress((int) (getTask().getProgress() * 100));
 
-        //Elapsed time
+        //Time elapsed
         timeElapsedTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime(), 2));
+
+        //Time remaining
+        etaTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
     }
 
     @Override

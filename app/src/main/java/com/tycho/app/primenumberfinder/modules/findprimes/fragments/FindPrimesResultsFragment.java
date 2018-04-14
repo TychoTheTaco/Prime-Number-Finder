@@ -33,7 +33,9 @@ import com.tycho.app.primenumberfinder.utils.Utils;
 import java.io.File;
 import java.io.IOException;
 import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import easytasks.Task;
 
@@ -72,24 +74,34 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     private TextView numbersPerSecondTextView;
     private TextView primesPerSecondTextView;
 
+
     private final RotateAnimation rotate = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
-    private final String[] subtitleItems = new String[7];
-    private final SpannableStringBuilder subtitleStringBuilder = new SpannableStringBuilder();
-
     private boolean showStatistics = true;
+
+    final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+
+    /**
+     * This map holds the statistics for each task. When {@linkplain FindPrimesResultsFragment#setTask(Task)} is called,
+     * the current task's statistics are saved to the map so that they can be used later when
+     * {@linkplain FindPrimesResultsFragment#setTask(Task)} is called with the same task.
+     */
+    private final Map<FindPrimesTask, Statistics> statisticsMap = new HashMap<>();
+
+    /**
+     * This class keeps the statistics for a task.
+     */
+    private class Statistics {
+        private long lastCurrentValue;
+        private long lastPrimeCount;
+        private long lastUpdateTime = -1000;
+    }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         Log.d(TAG, "onAttach()");
-
-        final String[] splitSubtitle = getString(R.string.find_primes_subtitle_result).split("%\\d\\$.");
-        subtitleItems[0] = splitSubtitle[0];
-        subtitleItems[2] = splitSubtitle[1];
-        subtitleItems[4] = splitSubtitle[2];
-        subtitleItems[6] = splitSubtitle[3];
 
         //Set up progress animation
         rotate.setDuration(3000);
@@ -251,7 +263,9 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                     }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
                     //Buttons
-                    centerView.getLayoutParams().width = (int) Utils.dpToPx(getActivity(), 64);
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
+                    centerView.setLayoutParams(layoutParams);
                     pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(true);
                     pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
@@ -320,7 +334,17 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                     title.setText(getString(R.string.status_paused));
                     progressBar.clearAnimation();
 
+                    //Subtitle
+                    subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_primes_subtitle), new String[]{
+                            NUMBER_FORMAT.format(getTask().getStartValue()),
+                            NUMBER_FORMAT.format(getTask().getEndValue()),
+                            getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE ? "brute force" : "the sieve of Eratosthenes"
+                    }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+
                     //Buttons
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
+                    centerView.setLayoutParams(layoutParams);
                     pauseButton.setEnabled(true);
                     pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
                     switch (getTask().getSearchOptions().getSearchMethod()) {
@@ -348,10 +372,30 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             public void run() {
                 if (isAdded() && !isDetached() && getTask() != null) {
                     Log.d(TAG, "onTaskResuming() handler posted");
+
+                    //Title
                     title.setText(getString(R.string.state_resuming));
+
+                    //Subtitle
+                    subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_primes_subtitle), new String[]{
+                            NUMBER_FORMAT.format(getTask().getStartValue()),
+                            NUMBER_FORMAT.format(getTask().getEndValue()),
+                            getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE ? "brute force" : "the sieve of Eratosthenes"
+                    }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
                     //Buttons
                     pauseButton.setEnabled(false);
+                    switch (getTask().getSearchOptions().getSearchMethod()) {
+                        case BRUTE_FORCE:
+                            saveButton.setVisibility(View.VISIBLE);
+                            viewAllButton.setVisibility(View.VISIBLE);
+                            break;
+
+                        case SIEVE_OF_ERATOSTHENES:
+                            saveButton.setVisibility(View.GONE);
+                            viewAllButton.setVisibility(View.GONE);
+                            break;
+                    }
                 }
             }
         });
@@ -380,11 +424,13 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                     title.setText(getString(R.string.status_finished));
                     progressBar.clearAnimation();
 
-                    formatSubtitle();
-                    final String count = NUMBER_FORMAT.format(getTask().getPrimeCount());
-                    subtitleStringBuilder.replace(subtitleItems[0].length(), subtitleItems[0].length() + subtitleItems[1].length(), count);
-                    subtitleItems[1] = count;
-                    subtitleTextView.setText(subtitleStringBuilder);
+
+                    //Subtitle
+                    subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_primes_subtitle_result), new String[]{
+                            NUMBER_FORMAT.format(getTask().getPrimeCount()),
+                            NUMBER_FORMAT.format(getTask().getStartValue()),
+                            NUMBER_FORMAT.format(getTask().getEndValue())
+                    }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
                     //Body
                     bodyTextView.setVisibility(View.GONE);
@@ -402,13 +448,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         }
     }
 
-    private long lastCurrentValue;
-    private long lastPrimeCount;
-    private long lastUpdateTime = 0;
-
-    final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-    final SpannableStringBuilder statusStringBuilder = new SpannableStringBuilder();
-
     @Override
     protected void onUiUpdate() {
         if (getTask() != null) {
@@ -423,97 +462,50 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             timeElapsedTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime(), 2));
 
             //Body
-            spannableStringBuilder.clear();
-            spannableStringBuilder.clearSpans();
-            final String primes = NUMBER_FORMAT.format(getTask().getPrimeCount());
-            switch (getTask().getSearchOptions().getSearchMethod()){
+            String text = "";
+            final String[] content = new String[]{NUMBER_FORMAT.format(getTask().getPrimeCount())};
+            switch (getTask().getSearchOptions().getSearchMethod()) {
                 case BRUTE_FORCE:
-                    spannableStringBuilder.append(getString(R.string.find_primes_body_text, primes));
-                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.purple_dark)), spannableStringBuilder.toString().indexOf(primes), spannableStringBuilder.toString().indexOf(primes) + primes.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                    spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), spannableStringBuilder.toString().indexOf(primes), spannableStringBuilder.toString().indexOf(primes) + primes.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                    bodyTextView.setText(spannableStringBuilder);
+                    text = getString(R.string.find_primes_body_text);
                     break;
 
                 case SIEVE_OF_ERATOSTHENES:
-                    switch (getTask().getStatus()){
+                    switch (getTask().getStatus()) {
                         default:
-                            spannableStringBuilder.append(getString(R.string.find_primes_body_text, primes));
-                            spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.purple_dark)), spannableStringBuilder.toString().indexOf(primes), spannableStringBuilder.toString().indexOf(primes) + primes.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                            spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), spannableStringBuilder.toString().indexOf(primes), spannableStringBuilder.toString().indexOf(primes) + primes.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                            bodyTextView.setText(spannableStringBuilder);
+                            text = getString(R.string.find_primes_body_text);
                             break;
 
                         case "counting":
-                            spannableStringBuilder.append(getString(R.string.find_primes_body_text_sieve_counting, primes));
-                            spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.purple_dark)), spannableStringBuilder.toString().indexOf(primes), spannableStringBuilder.toString().indexOf(primes) + primes.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                            spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), spannableStringBuilder.toString().indexOf(primes), spannableStringBuilder.toString().indexOf(primes) + primes.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                            bodyTextView.setText(spannableStringBuilder);
+                            text = getString(R.string.find_primes_body_text_sieve_counting);
                             break;
 
                         case "searching":
-                            bodyTextView.setText("Marking all non-primes...");
+                            text = "Marking all non-primes...";
                             break;
                     }
                     break;
             }
+            bodyTextView.setText(Utils.formatSpannable(spannableStringBuilder, text, content, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
             //Time remaining
-            spannableStringBuilder.clear();
-            spannableStringBuilder.clearSpans();
-            final String time = Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1);
-            spannableStringBuilder.append(time);
-            spannableStringBuilder.append(" remaining");
-            spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.purple_dark)), 0, time.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-            etaTextView.setText(spannableStringBuilder);
+            etaTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
             //Update statistics every second
-            if (showStatistics && System.currentTimeMillis() - lastUpdateTime >= 1000) {
+            if (showStatistics && getTask().getElapsedTime() - statisticsMap.get(getTask()).lastUpdateTime >= 1000) {
 
                 //Numbers per second
-                spannableStringBuilder.clear();
-                spannableStringBuilder.clearSpans();
-                final String nps = NUMBER_FORMAT.format(getTask().getCurrentValue() - lastCurrentValue);
-                spannableStringBuilder.append(nps);
-                spannableStringBuilder.append(" numbers per second");
-                spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.purple_dark)), 0, nps.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                numbersPerSecondTextView.setText(spannableStringBuilder);
-                lastCurrentValue = getTask().getCurrentValue();
+                final long currentValue = getTask().getCurrentValue();
+                numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(currentValue - statisticsMap.get(getTask()).lastCurrentValue)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                statisticsMap.get(getTask()).lastCurrentValue = currentValue;
 
                 //Primes per second
-                spannableStringBuilder.clear();
-                spannableStringBuilder.clearSpans();
-                spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getPrimeCount() - lastPrimeCount));
-                spannableStringBuilder.append(" primes per second");
-                spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.purple_dark)), 0, NUMBER_FORMAT.format(getTask().getPrimeCount() - lastPrimeCount).length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                primesPerSecondTextView.setText(spannableStringBuilder);
-                lastPrimeCount = getTask().getPrimeCount();
+                final long primeCount = getTask().getPrimeCount();
+                primesPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.primes_per_second), new String[]{NUMBER_FORMAT.format(primeCount - statisticsMap.get(getTask()).lastPrimeCount)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                statisticsMap.get(getTask()).lastPrimeCount = primeCount;
 
-                lastUpdateTime = System.currentTimeMillis();
+                statisticsMap.get(getTask()).lastUpdateTime = getTask().getElapsedTime();
             }
         }
-    }
-
-    private SpannableStringBuilder formatSubtitle() {
-        final String count = NUMBER_FORMAT.format(getTask().getPrimeCount());
-        final String start = NUMBER_FORMAT.format(getTask().getStartValue());
-        String end = NUMBER_FORMAT.format(getTask().getEndValue());
-        if (getTask().getEndValue() == FindPrimesTask.INFINITY) {
-            end = getString(R.string.infinity_text);
-        }
-
-        subtitleItems[1] = count;
-        subtitleItems[3] = start;
-        subtitleItems[5] = end;
-        subtitleStringBuilder.clear();
-        for (int i = 0; i < subtitleItems.length; i++) {
-            if (i % 2 != 0) {
-                subtitleStringBuilder.append(subtitleItems[i], new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.purple_dark)), 0);
-                subtitleStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), subtitleStringBuilder.length() - subtitleItems[i].length(), subtitleStringBuilder.length(), 0);
-            } else {
-                subtitleStringBuilder.append(subtitleItems[i]);
-            }
-        }
-        return subtitleStringBuilder;
     }
 
     @Override
@@ -524,6 +516,11 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     public void setTask(final Task task) {
         super.setTask(task);
+        if (getTask() != null) {
+            if (!statisticsMap.containsKey(getTask())) {
+                statisticsMap.put(getTask(), new Statistics());
+            }
+        }
         if (getView() != null) {
             init();
         }
@@ -531,8 +528,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
     private void init() {
         if (getTask() != null) {
-            Log.d(TAG, "init()");
-
             showStatistics = getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE;
 
             //Reset view states
@@ -544,14 +539,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             saveButton.setVisibility(View.VISIBLE);
             etaTextView.setVisibility(View.VISIBLE);
             statisticsLayout.setVisibility(showStatistics ? View.VISIBLE : View.GONE);
-
-            //Required to init some fields
-            formatSubtitle();
-
-            //Reset statistics
-            lastUpdateTime = 0;
-            lastCurrentValue = 0;
-            lastPrimeCount = 0;
 
             switch (getTask().getState()) {
                 case RUNNING:

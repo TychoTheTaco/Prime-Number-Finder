@@ -58,7 +58,6 @@
     <string name="generate_factor_tree_button">Find Prime Factors</string>
     <string name="factor_tree_label">Factor tree</string>
     <string name="prime_factorization_subtitle">Finding prime factors of %1$s.</string>
-    <string name="prime_factorization_body">%1$s = %2$s.</string>
     <string name="prime_factorization_task_list_item_title">Prime factorization of %1$s</string>
     <plurals name="prime_factorization_subtitle_results">
         <item quantity="one">%1$s has %2$s prime factor.</item>
@@ -83,12 +82,9 @@
 
     <!-- Statistics -->
     <string name="statistics_title">Statistics</string>
-    <string name="elapsed_time_label">Time elapsed</string>
-    <string name="eta_label">Estimated time remaining</string>
-    <string name="numbers_per_second_label">Numbers scanned per second</string>
-    <string name="primes_per_second_label">Primes found per second</string>
-    <string name="factors_per_second_label">Factors found per second</string>
-    <string name="statistics_monitor_label">Statistics monitoring level</string>
+    <string name="time_remaining">%1$s remaining</string>
+    <string name="numbers_per_second">%1$s numbers per second</string>
+    <string name="primes_per_second">%1$s primes per second</string>
 
     <!-- Button text -->
     <string name="start">Start</string>

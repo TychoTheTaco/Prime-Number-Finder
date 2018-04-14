@@ -56,6 +56,8 @@ public class CheckPrimalityTask extends Task {
                         break;
                     }
 
+                    setProgress((float) i / sqrtMax);
+
                     //Check if we should pause
                     tryPause();
                     if (shouldStop()){

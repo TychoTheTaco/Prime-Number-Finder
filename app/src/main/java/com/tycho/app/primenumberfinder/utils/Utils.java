@@ -3,7 +3,9 @@ package com.tycho.app.primenumberfinder.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.os.Parcel;
 import android.support.v4.content.ContextCompat;
+import android.text.ParcelableSpan;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -200,18 +202,36 @@ public final class Utils {
     }
 
     public static SpannableStringBuilder formatSpannable(final SpannableStringBuilder spannableStringBuilder, final String raw, final String[] content, final int color){
+        final int[] spanPositions = getSpanPositions(spannableStringBuilder, raw, content);
+        for (int i = 0; i < spanPositions.length; i += 2){
+            spannableStringBuilder.setSpan(new ForegroundColorSpan(color), spanPositions[i], spanPositions[i + 1], Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), spanPositions[i], spanPositions[i + 1], Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        }
+        return spannableStringBuilder;
+    }
+
+    public static SpannableStringBuilder formatSpannableColor(final SpannableStringBuilder spannableStringBuilder, final String raw, final String[] content, final int color){
+        final int[] spanPositions = getSpanPositions(spannableStringBuilder, raw, content);
+        for (int i = 0; i < spanPositions.length; i += 2){
+            spannableStringBuilder.setSpan(new ForegroundColorSpan(color), spanPositions[i], spanPositions[i + 1], Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        }
+        return spannableStringBuilder;
+    }
+
+    private static int[] getSpanPositions(final SpannableStringBuilder spannableStringBuilder, final String raw, final String[] content){
         spannableStringBuilder.clear();
         spannableStringBuilder.clearSpans();
         final String[] split = raw.split("%\\d\\$s");
+        final int[] spanPositions = new int[content.length * 2];
         for (int i = 0; i < split.length; i++){
             spannableStringBuilder.append(split[i]);
             if (i < content.length){
                 final int position = spannableStringBuilder.length();
                 spannableStringBuilder.append(content[i]);
-                spannableStringBuilder.setSpan(new ForegroundColorSpan(color), position, position + content[i].length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, position + content[i].length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                spanPositions[i * 2] = position;
+                spanPositions[i * 2 + 1] = spannableStringBuilder.length();
             }
         }
-        return spannableStringBuilder;
+        return spanPositions;
     }
 }

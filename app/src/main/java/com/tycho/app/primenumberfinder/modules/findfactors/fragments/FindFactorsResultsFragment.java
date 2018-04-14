@@ -30,13 +30,16 @@ import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListA
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesResultsFragment;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayFactorsActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
 import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import easytasks.Task;
 
@@ -78,6 +81,23 @@ public class FindFactorsResultsFragment extends ResultsFragment{
 
     private final RotateAnimation rotate = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
+
+    private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+
+    /**
+     * This map holds the statistics for each task. When {@linkplain FindFactorsResultsFragment#setTask(Task)} is called,
+     * the current task's statistics are saved to the map so that they can be used later when
+     * {@linkplain FindFactorsResultsFragment#setTask(Task)} is called with the same task.
+     */
+    private final Map<FindFactorsTask, FindFactorsResultsFragment.Statistics> statisticsMap = new HashMap<>();
+
+    /**
+     * This class keeps the statistics for a task.
+     */
+    private class Statistics {
+        private long lastCurrentValue;
+        private long lastUpdateTime = -1000;
+    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -212,8 +232,13 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                     title.setText(getString(R.string.status_searching));
                     progressBar.startAnimation(rotate);
 
+                    //Subtitle
+                    subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+
                     //Buttons
-                    centerView.getLayoutParams().width = (int) Utils.dpToPx(getActivity(), 64);
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
+                    centerView.setLayoutParams(layoutParams);
                     pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(true);
                     pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
@@ -234,8 +259,18 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                     //Title
                     title.setText(getString(R.string.state_pausing));
 
+                    //Subtitle
+                    subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+
                     //Buttons
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
+                    centerView.setLayoutParams(layoutParams);
+                    pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(false);
+                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                    viewAllButton.setVisibility(View.VISIBLE);
+                    saveButton.setVisibility(View.GONE);
                 }
             }
         });
@@ -254,11 +289,18 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                     title.setText(getString(R.string.status_paused));
                     progressBar.clearAnimation();
 
+                    //Subtitle
+                    subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+
                     //Buttons
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
+                    centerView.setLayoutParams(layoutParams);
+                    pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(true);
                     pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                    saveButton.setVisibility(View.VISIBLE);
                     viewAllButton.setVisibility(View.VISIBLE);
+                    saveButton.setVisibility(View.GONE);
                 }
             });
         }
@@ -274,8 +316,18 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                     //Title
                     title.setText(getString(R.string.state_resuming));
 
+                    //Subtitle
+                    subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+
                     //Buttons
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
+                    centerView.setLayoutParams(layoutParams);
+                    pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(false);
+                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                    viewAllButton.setVisibility(View.VISIBLE);
+                    saveButton.setVisibility(View.GONE);
                 }
             }
         });
@@ -294,26 +346,14 @@ public class FindFactorsResultsFragment extends ResultsFragment{
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(TAG, "Call onUiUpdate() one last time.");
                     onUiUpdate();
-
-                    Log.d(TAG, "Begin final UI update.");
 
                     //Title
                     title.setText(getString(R.string.status_finished));
                     progressBar.clearAnimation();
 
                     //Subtitle
-                    spannableStringBuilder.clear();
-                    spannableStringBuilder.clearSpans();
-                    final String number = NUMBER_FORMAT.format(getTask().getNumber());
-                    final String factors = NUMBER_FORMAT.format(getTask().getFactors().size());
-                    spannableStringBuilder.append(getResources().getQuantityString(R.plurals.find_factors_subtitle_results, getTask().getFactors().size(), number, factors));
-                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.orange_dark)), spannableStringBuilder.toString().indexOf(number), spannableStringBuilder.toString().indexOf(number) + number.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                    spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), spannableStringBuilder.toString().indexOf(number), spannableStringBuilder.toString().indexOf(number) + number.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.orange_dark)), spannableStringBuilder.toString().indexOf(factors), spannableStringBuilder.toString().indexOf(factors) + factors.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                    spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), spannableStringBuilder.toString().indexOf(factors), spannableStringBuilder.toString().indexOf(factors) + factors.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                    subtitleTextView.setText(spannableStringBuilder);
+                    subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getResources().getQuantityString(R.plurals.find_factors_subtitle_results, getTask().getFactors().size()), new String[]{NUMBER_FORMAT.format(getTask().getNumber()), NUMBER_FORMAT.format(getTask().getFactors().size())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
 
                     //Body
                     bodyTextView.setVisibility(View.GONE);
@@ -322,7 +362,9 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                     etaTextView.setVisibility(View.GONE);
 
                     //Buttons
-                    centerView.getLayoutParams().width = 0;
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = 0;
+                    centerView.setLayoutParams(layoutParams);
                     pauseButton.setVisibility(View.GONE);
                     viewAllButton.setVisibility(View.VISIBLE);
                     saveButton.setVisibility(View.VISIBLE);
@@ -330,11 +372,6 @@ public class FindFactorsResultsFragment extends ResultsFragment{
             });
         }
     }
-
-    private long lastCurrentValue;
-
-    private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-    private long lastUpdateTime;
 
     @Override
     protected void onUiUpdate() {
@@ -347,48 +384,21 @@ public class FindFactorsResultsFragment extends ResultsFragment{
             //Elapsed time
             timeElapsedTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime(), 2));
 
-            //Subtitle
-            Log.d(TAG, "onUiUpdate()");
-            spannableStringBuilder.clear();
-            spannableStringBuilder.clearSpans();
-            final String number = NUMBER_FORMAT.format(getTask().getNumber());
-            spannableStringBuilder.append(getString(R.string.find_factors_subtitle, number));
-            spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.orange_dark)), spannableStringBuilder.toString().indexOf(number), spannableStringBuilder.toString().indexOf(number) + number.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-            spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), spannableStringBuilder.toString().indexOf(number), spannableStringBuilder.toString().indexOf(number) + number.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-            subtitleTextView.setText(spannableStringBuilder);
-
             //Body
-            spannableStringBuilder.clear();
-            spannableStringBuilder.clearSpans();
-            final String factors = NUMBER_FORMAT.format(getTask().getFactors().size());
-            spannableStringBuilder.append(getString(R.string.find_factors_body_text, factors));
-            spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.orange_dark)), spannableStringBuilder.toString().indexOf(factors), spannableStringBuilder.toString().indexOf(factors) + factors.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-            spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), spannableStringBuilder.toString().indexOf(factors), spannableStringBuilder.toString().indexOf(factors) + factors.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-            bodyTextView.setText(spannableStringBuilder);
+            bodyTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_body_text), new String[]{NUMBER_FORMAT.format(getTask().getFactors().size())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
 
             //Time remaining
-            spannableStringBuilder.clear();
-            spannableStringBuilder.clearSpans();
-            final String time = Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1);
-            spannableStringBuilder.append(time);
-            spannableStringBuilder.append(" remaining");
-            spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.orange_dark)), 0, time.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-            etaTextView.setText(spannableStringBuilder);
+            etaTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
 
             //Update statistics every second
-            if (System.currentTimeMillis() - lastUpdateTime >= 1000) {
+            if (getTask().getElapsedTime() - statisticsMap.get(getTask()).lastUpdateTime >= 1000) {
 
                 //Numbers per second
-                spannableStringBuilder.clear();
-                spannableStringBuilder.clearSpans();
-                final String nps = NUMBER_FORMAT.format(getTask().getCurrentValue() - lastCurrentValue);
-                spannableStringBuilder.append(nps);
-                spannableStringBuilder.append(" numbers per second");
-                spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.orange_dark)), 0, nps.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                numbersPerSecondTextView.setText(spannableStringBuilder);
-                lastCurrentValue = getTask().getCurrentValue();
+                final long currentValue = getTask().getCurrentValue();
+                numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(currentValue - statisticsMap.get(getTask()).lastCurrentValue)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+                statisticsMap.get(getTask()).lastCurrentValue = currentValue;
 
-                lastUpdateTime = System.currentTimeMillis();
+                statisticsMap.get(getTask()).lastUpdateTime = getTask().getElapsedTime();
             }
 
             //Update recyclerView
@@ -410,6 +420,11 @@ public class FindFactorsResultsFragment extends ResultsFragment{
     @Override
     public void setTask(final Task task) {
         super.setTask(task);
+        if (getTask() != null) {
+            if (!statisticsMap.containsKey(getTask())) {
+                statisticsMap.put(getTask(), new Statistics());
+            }
+        }
         if (getView() != null){
             init();
         }
@@ -425,10 +440,6 @@ public class FindFactorsResultsFragment extends ResultsFragment{
             pauseButton.setVisibility(View.VISIBLE);
             saveButton.setVisibility(View.VISIBLE);
             etaTextView.setVisibility(View.VISIBLE);
-
-            //Reset statistics
-            lastUpdateTime = 0;
-            lastCurrentValue = 0;
 
             //Add factors to the adapter
             adapter.setTask(getTask());

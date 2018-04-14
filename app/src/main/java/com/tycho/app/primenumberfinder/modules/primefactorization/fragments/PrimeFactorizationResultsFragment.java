@@ -99,6 +99,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
 
         //Statistics
         statisticsLayout = rootView.findViewById(R.id.statistics_layout);
+        statisticsLayout.setVisibility(View.GONE);
         timeElapsedTextView = rootView.findViewById(R.id.textView_elapsed_time);
         etaTextView = rootView.findViewById(R.id.textView_eta);
 
@@ -214,6 +215,13 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                     title.setText(getString(R.string.status_paused));
                     progressBar.clearAnimation();
 
+                    //Subtitle
+                    subtitle.setText(Utils.formatSpannable(spannableStringBuilder,
+                            getString(R.string.prime_factorization_subtitle),
+                            new String[]{NUMBER_FORMAT.format(getTask().getNumber())},
+                            ContextCompat.getColor(getActivity(), R.color.green_dark)
+                    ));
+
                     //Buttons
                     pauseButton.setEnabled(true);
                     pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
@@ -232,11 +240,17 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
             @Override
             public void run() {
                 if (isAdded() && !isDetached() && getTask() != null) {
-                    Log.d(TAG, "onTaskResuming() handler posted");
                     onUiUpdate();
 
                     //Title
                     title.setText(getString(R.string.state_resuming));
+
+                    //Subtitle
+                    subtitle.setText(Utils.formatSpannable(spannableStringBuilder,
+                            getString(R.string.prime_factorization_subtitle),
+                            new String[]{NUMBER_FORMAT.format(getTask().getNumber())},
+                            ContextCompat.getColor(getActivity(), R.color.green_dark)
+                    ));
 
                     //Buttons
                     pauseButton.setEnabled(false);
@@ -309,9 +323,6 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                     treeView.setVisibility(View.VISIBLE);
                     treeView.setTree(getTask().getFactorTree().formatNumbers());
 
-                    //Statistics
-                    //etaTextView.setVisibility(View.GONE);
-
                     //Buttons
                     centerView.getLayoutParams().width = 0;
                     pauseButton.setVisibility(View.GONE);
@@ -333,15 +344,6 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
 
             //Elapsed time
             timeElapsedTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime(), 2));
-
-            //Time remaining
-            spannableStringBuilder.clear();
-            spannableStringBuilder.clearSpans();
-            final String time = Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1);
-            spannableStringBuilder.append(time);
-            spannableStringBuilder.append(" remaining");
-            spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.purple_dark)), 0, time.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-            etaTextView.setText(spannableStringBuilder);
         }
     }
 
@@ -365,19 +367,8 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
             //Reset view states
             resultsView.setVisibility(View.VISIBLE);
             noTaskView.setVisibility(View.GONE);
-
-            //progress.setVisibility(View.VISIBLE);
-            //bodyTextView.setVisibility(View.VISIBLE);
-            //pauseButton.setVisibility(View.VISIBLE);
-            //saveButton.setVisibility(View.VISIBLE);
-            //etaTextView.setVisibility(View.VISIBLE);
-            //bodyTextView.setVisibility(View.GONE);
-            //treeView.setVisibility(View.GONE);
-            //statisticsLayout.setVisibility(View.VISIBLE);
-
-            /*if (getView() != null && getTask().getFactorTree() != null){
-                treeView.setTree(getTask().getFactorTree().formatNumbers());
-            }*/
+            bodyTextView.setVisibility(View.GONE);
+            treeView.setVisibility(View.GONE);
 
             switch (getTask().getState()) {
                 case RUNNING:

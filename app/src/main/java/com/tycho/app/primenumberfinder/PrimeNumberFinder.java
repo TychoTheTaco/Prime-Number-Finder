@@ -30,13 +30,6 @@ public class PrimeNumberFinder extends Application {
      */
     private static PreferenceManager preferenceManager;
 
-    /**
-     * Minimum delay between UI updates.
-     */
-    public static final int UPDATE_LIMIT_MS = (1000 / 60);
-
-    //Override methods
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -47,8 +40,6 @@ public class PrimeNumberFinder extends Application {
         preferenceManager = new PreferenceManager(this, "preferences");
     }
 
-    //Utility methods
-
     public static String getVersionName(final Context context) {
         try {
             return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
@@ -57,8 +48,6 @@ public class PrimeNumberFinder extends Application {
             return "unknown";
         }
     }
-
-    //Getters and setters
 
     public static PreferenceManager getPreferenceManager() {
         return preferenceManager;

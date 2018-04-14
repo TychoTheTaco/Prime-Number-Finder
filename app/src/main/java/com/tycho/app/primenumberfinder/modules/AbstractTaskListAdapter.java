@@ -87,14 +87,38 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
     };
 
     @Override
-    public void onBindViewHolder(AbstractTaskListAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(final AbstractTaskListAdapter.ViewHolder holder, int position) {
         final Task task = tasks.get(position);
         customEventListeners.get(task).setViewHolder(holder);
         if (holder.uiUpdater.getState() == Task.State.NOT_STARTED) {
-            Log.d(TAG, "Task " + holder.uiUpdater + " had state: " + holder.uiUpdater.getState());
+            holder.uiUpdater.addTaskListener(new TaskAdapter(){
+                @Override
+                public void onTaskPaused() {
+                    Log.d(TAG, "UI Updater paused: " + holder.uiUpdater);
+                }
+
+                @Override
+                public void onTaskResumed() {
+                    Log.d(TAG, "UI Updater resumed: " + holder.uiUpdater);
+                }
+            });
             holder.uiUpdater.startOnNewThread();
         } else {
-            holder.uiUpdater.resume();
+            switch (task.getState()){
+                case STARTING:
+                case RUNNING:
+                case PAUSING:
+                case STOPPING:
+                    holder.uiUpdater.resume();
+                    break;
+
+                case PAUSED:
+                case RESUMING:
+                case STOPPED:
+                    holder.uiUpdater.pause(false);
+                    break;
+            }
+
         }
         doOnBindViewHolder(holder, position);
     }

@@ -49,12 +49,12 @@ public abstract class ResultsFragment extends TaskFragment {
             uiUpdater.addTaskListener(new TaskAdapter(){
                 @Override
                 public void onTaskPaused() {
-                    Log.d(TAG, "UI Updater paused.");
+                    Log.d(TAG, "UI Updater paused: " + uiUpdater);
                 }
 
                 @Override
                 public void onTaskResumed() {
-                    Log.d(TAG, "UI Updater resumed.");
+                    Log.d(TAG, "UI Updater resumed: " + uiUpdater);
                 }
             });
         }else{
@@ -63,9 +63,21 @@ public abstract class ResultsFragment extends TaskFragment {
     }
 
     @Override
+    public void onTaskPausing() {
+        super.onTaskPausing();
+        uiUpdater.resume();
+    }
+
+    @Override
     public void onTaskPaused() {
         super.onTaskPaused();
         uiUpdater.pause(false);
+    }
+
+    @Override
+    public void onTaskResuming() {
+        super.onTaskResuming();
+        uiUpdater.resume();
     }
 
     @Override
@@ -130,9 +142,12 @@ public abstract class ResultsFragment extends TaskFragment {
         protected void run() {
             while (true) {
 
-                if (getTask() == null) pause(true);
+                if (getTask() == null){
+                    Log.w(TAG, "Pausing because task was null");
+                    pause(true);
+                }
 
-                Log.d(TAG, "Sending UI update! State: " + getState());
+                //Log.d(TAG, "Sending UI update! State: " + getState());
                 updateUi();
 
                 try {
