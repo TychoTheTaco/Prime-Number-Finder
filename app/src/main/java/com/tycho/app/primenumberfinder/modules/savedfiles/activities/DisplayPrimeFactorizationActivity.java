@@ -2,6 +2,7 @@ package com.tycho.app.primenumberfinder.modules.savedfiles.activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,12 +10,17 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.text.style.SuperscriptSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,17 +55,19 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity{
 
     private Tree<Long> factorTree;
 
-    private TextView primeFactorization;
-    private TextView title;
+    private TextView bodyTextView;
     private TreeView treeView;
+
+    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
+
+    private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.display_prime_factorization_activity);
 
-        primeFactorization = findViewById(R.id.prime_factorization);
-        title = findViewById(R.id.title);
+        bodyTextView = findViewById(R.id.body);
         treeView = findViewById(R.id.factor_tree);
 
         //Set up the toolbar
@@ -86,7 +94,7 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity{
 
                     if (extras.getBoolean("title")){
                         //setTitleTextView(formatTitle(file.getName().split("\\.")[0]));
-                        setTitle("Prime factorization");
+                        setTitle("Prime Factorization");
                     }
 
                 }else{
@@ -122,22 +130,39 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity{
                     @Override
                     public void run() {
                         treeView.setTree(factorTree.formatNumbers());
-                        title.setText("Prime factorization of " + NumberFormat.getInstance(Locale.getDefault()).format(factorTree.getValue()));
 
-                        final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+                        //Body
+                        spannableStringBuilder.clear();
+                        spannableStringBuilder.clearSpans();
+                        spannableStringBuilder.append(NUMBER_FORMAT.format(factorTree.getValue()));
+                        spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), R.color.green_dark)), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                        spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                        int position = spannableStringBuilder.length();
+                        spannableStringBuilder.append(" = ");
+                        spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
                         final Map<Long, Integer> map = new TreeMap<>();
                         getPrimeFactors(map, factorTree);
                         for (Object factor : map.keySet()){
-                            spannableStringBuilder.append(NumberFormat.getInstance(Locale.getDefault()).format(factor));
-                            final int startIndex = spannableStringBuilder.length();
-                            spannableStringBuilder.append(NumberFormat.getInstance(Locale.getDefault()).format(map.get(factor)), new SuperscriptSpan(), 0);
-                            final int endIndex = spannableStringBuilder.length();
-                            spannableStringBuilder.setSpan(new RelativeSizeSpan(0.8f), startIndex, endIndex, 0);
-                            spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getApplicationContext(), R.color.green_dark)), startIndex, endIndex, 0);
-                            spannableStringBuilder.append(" x ");
+                            position = spannableStringBuilder.length();
+                            String content = NUMBER_FORMAT.format(factor);
+                            spannableStringBuilder.append(content);
+                            spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), R.color.green_dark)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                            spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+
+                            position = spannableStringBuilder.length();
+                            content = NUMBER_FORMAT.format(map.get(factor));
+                            spannableStringBuilder.append(content);
+                            spannableStringBuilder.setSpan(new SuperscriptSpan(), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                            spannableStringBuilder.setSpan(new RelativeSizeSpan(0.8f), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+
+                            position = spannableStringBuilder.length();
+                            content = " x ";
+                            spannableStringBuilder.append(content);
+                            spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
                         }
                         spannableStringBuilder.delete(spannableStringBuilder.length() - 3, spannableStringBuilder.length());
-                        primeFactorization.setText(spannableStringBuilder);
+                        bodyTextView.setVisibility(View.VISIBLE);
+                        bodyTextView.setText(spannableStringBuilder);
                     }
                 });
 
@@ -206,6 +231,7 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.display_content_activity_menu, menu);
+        menu.findItem(R.id.find).setVisible(false);
         return true;
     }
 

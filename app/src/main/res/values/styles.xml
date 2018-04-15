@@ -35,6 +35,15 @@
         <item name="android:textColor">@color/primary_text</item>
     </style>
 
+    <style name="Label" parent="DefaultText">
+        <item name="android:textSize">16sp</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="Label.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="NumberInput">
         <item name="android:textSize">16sp</item>
         <item name="android:inputType">number</item>
@@ -46,12 +55,6 @@
     <style name="Button">
         <item name="android:textColor">@color/white</item>
         <item name="android:backgroundTint">@color/accent</item>
-    </style>
-
-    <style name="Label">
-        <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/primary_text</item>
-        <item name="android:includeFontPadding">false</item>
     </style>
 
     <style name="ColorPicker">

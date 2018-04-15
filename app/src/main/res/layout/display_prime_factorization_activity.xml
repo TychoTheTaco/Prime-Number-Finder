@@ -7,18 +7,9 @@
     <include layout="@layout/app_bar" />
 
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/body"
         android:padding="8dp"
-        android:layout_marginTop="8dp"
-        android:gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:padding="8dp"
-        android:layout_marginTop="8dp"
-        android:gravity="center"
-        android:id="@+id/prime_factorization"
+        style="@style/DefaultText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

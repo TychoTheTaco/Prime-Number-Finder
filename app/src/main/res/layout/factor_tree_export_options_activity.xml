@@ -26,10 +26,9 @@
                 <!-- File name -->
                 <TextView
                     android:layout_width="wrap_content"
+                    style="@style/Label.Bold"
                     android:layout_height="wrap_content"
-                    android:text="@string/file_name"
-                    android:textColor="@color/primary_text"
-                    android:textSize="16sp" />
+                    android:text="@string/file_name" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -63,8 +62,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="Image Style"
-                    android:textColor="@color/primary_text"
-                    android:textSize="16sp" />
+                    style="@style/Label.Bold"/>
 
                 <!-- Image background color-->
                 <LinearLayout
@@ -76,7 +74,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        style="@style/Label"
+                        style="@style/DefaultText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Image background color:" />
@@ -98,7 +96,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        style="@style/Label"
+                        style="@style/DefaultText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Vertical item spacing:" />
@@ -138,7 +136,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        style="@style/Label"
+                        style="@style/DefaultText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Branch color:" />
@@ -160,7 +158,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        style="@style/Label"
+                        style="@style/DefaultText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Branch width:" />
@@ -196,8 +194,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="Item Style"
-                    android:textColor="@color/primary_text"
-                    android:textSize="16sp" />
+                    style="@style/Label.Bold" />
 
                 <!-- Item text color-->
                 <LinearLayout
@@ -209,7 +206,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        style="@style/Label"
+                        style="@style/DefaultText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Item text color:" />
@@ -231,7 +228,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        style="@style/Label"
+                        style="@style/DefaultText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Item text size:" />
@@ -279,7 +276,7 @@
 
                     <TextView
                         android:id="@+id/item_background_color_label"
-                        style="@style/Label"
+                        style="@style/DefaultText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Item background color:" />
@@ -304,7 +301,7 @@
 
                     <TextView
                         android:id="@+id/item_border_color_label"
-                        style="@style/Label"
+                        style="@style/DefaultText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Item border color:" />
@@ -326,7 +323,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        style="@style/Label"
+                        style="@style/DefaultText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Item border width:" />
@@ -366,7 +363,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        style="@style/Label"
+                        style="@style/DefaultText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Prime factor text color:" />
@@ -414,7 +411,7 @@
     <com.tycho.app.primenumberfinder.TreeView
         android:id="@+id/factor_tree_preview"
         android:layout_width="wrap_content"
-        android:layout_height="200dp"
+        android:layout_height="150dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         app:touchEnabled="true" />

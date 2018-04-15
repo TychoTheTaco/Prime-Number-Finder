@@ -110,7 +110,7 @@
 
     <!-- Export Options -->
     <string name="export_options_title">Export Options</string>
-    <string name="file_name">File name</string>
+    <string name="file_name">File Name</string>
     <string name="txt_extension">.txt</string>
     <string name="png_extension">.png</string>
     <string name="item_separator">Item Separator</string>
