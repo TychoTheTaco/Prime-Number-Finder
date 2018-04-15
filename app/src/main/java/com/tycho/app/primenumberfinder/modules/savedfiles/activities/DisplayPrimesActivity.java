@@ -49,7 +49,7 @@ public class DisplayPrimesActivity extends AppCompatActivity {
 
     private PrimesAdapter primesAdapter;
 
-    //private TextView subtitle;
+    private MenuItem findButton;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
 
@@ -194,7 +194,7 @@ public class DisplayPrimesActivity extends AppCompatActivity {
             }
             //Log.d(TAG, "Loading more...");
 
-            //Log.d(TAG, "Before: " + primesAdapter.getPrimes());
+            Log.d(TAG, "Before: " + primesAdapter.getPrimes().size());
             if (end) {
 
                 //Remove first half
@@ -213,18 +213,22 @@ public class DisplayPrimesActivity extends AppCompatActivity {
                 //Log.d(TAG, "After remove: " + primesAdapter.getPrimes());
 
                 //Add
-                primesAdapter.getPrimes().addAll(FileManager.getInstance().readNumbers(file, range[1], range[1] + INCREMENT));
+                //Log.d(TAG, "Before add range[1] = " + range[1]);
+                final List<Long> numbers = FileManager.readNumbers(file, range[1] + 1, INCREMENT);
+                //Log.d(TAG, "First added: " + numbers.get(0));
+                primesAdapter.getPrimes().addAll(numbers);
+                //Log.d(TAG, "Added " + numbers.size());
                 recyclerView.post(new Runnable() {
                     @Override
                     public void run() {
-                        primesAdapter.notifyItemRangeInserted(range[1], range[1] + INCREMENT);
+                        primesAdapter.notifyItemRangeInserted(range[1] + 1, numbers.size());
                     }
                 });
 
                 range[0] += INCREMENT;
-                range[1] += INCREMENT;
+                range[1] += numbers.size();
             } else {
-                final List<Long> numbers = FileManager.getInstance().readNumbers(file, range[0] - INCREMENT, range[0]);
+                final List<Long> numbers = FileManager.readNumbers(file, range[0] - INCREMENT, INCREMENT);
 
                 //Remove last half
                 final Iterator<Long> iterator = primesAdapter.getPrimes().iterator();
@@ -238,7 +242,7 @@ public class DisplayPrimesActivity extends AppCompatActivity {
                 recyclerView.post(new Runnable() {
                     @Override
                     public void run() {
-                        primesAdapter.notifyItemRangeRemoved(size - INCREMENT, size);
+                        primesAdapter.notifyItemRangeRemoved(size - INCREMENT, INCREMENT);
                     }
                 });
 
@@ -273,7 +277,8 @@ public class DisplayPrimesActivity extends AppCompatActivity {
             public void run() {
 
                 scrollListener.setTotalNumbers(FileManager.countTotalNumbersQuick(file));
-                final List<Long> numbers = FileManager.getInstance().readNumbers(file, 0, 999);
+                final List<Long> numbers = FileManager.readNumbers(file, 0, 1000);
+                Log.d(TAG, "Read " + numbers.size());
                 scrollListener.setRange(0, numbers.size() - 1);
                 primesAdapter.getPrimes().addAll(numbers);
 
@@ -289,6 +294,7 @@ public class DisplayPrimesActivity extends AppCompatActivity {
                                 final int visibility = ((linearLayoutManager.findLastVisibleItemPosition() - linearLayoutManager.findFirstVisibleItemPosition()) == scrollListener.totalNumbers - 1) ? View.GONE : View.VISIBLE;
                                 scrollToTopFab.setVisibility(visibility);
                                 scrollToBottomFab.setVisibility(visibility);
+                                findButton.setVisible(enableSearch && visibility == View.VISIBLE);
                             }
                         });
                     }
@@ -344,7 +350,8 @@ public class DisplayPrimesActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.display_content_activity_menu, menu);
-        menu.findItem(R.id.find).setVisible(enableSearch);
+        findButton = menu.findItem(R.id.find);
+        findButton.setVisible(enableSearch);
         menu.findItem(R.id.export).setVisible(allowExport);
         return true;
     }
@@ -385,12 +392,14 @@ public class DisplayPrimesActivity extends AppCompatActivity {
 
         //Scroll to correct position
         int startIndex = (position / scrollListener.INCREMENT) * (scrollListener.INCREMENT);
-        List<Long> numbers = FileManager.getInstance().readNumbers(file, startIndex, startIndex + 999);
+        final List<Long> numbers = new ArrayList<>();
+        boolean endOfFile = FileManager.readNumbers(file, numbers, startIndex, 1000);
         int extra = 0;
-        while (numbers.size() < (scrollListener.INCREMENT * 3)){
+        while (!endOfFile && numbers.size() < (scrollListener.INCREMENT * 3)){
             startIndex -= scrollListener.INCREMENT;
             extra += scrollListener.INCREMENT;
-            numbers = FileManager.getInstance().readNumbers(file, startIndex, startIndex + 999);
+            numbers.clear();
+            endOfFile = FileManager.readNumbers(file, numbers, startIndex, 1000);
         }
         final int extraAdded = extra;
         scrollListener.setRange(startIndex, startIndex + numbers.size());

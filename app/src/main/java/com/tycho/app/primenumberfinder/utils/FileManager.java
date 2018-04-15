@@ -339,9 +339,16 @@ public final class FileManager {
         return numbers;
     }
 
-    public List<Long> readNumbers(final File file, final int startIndex, final int endIndex){
-        final List<Long> numbers = new ArrayList<>();
-
+    /**
+     * Reads numbers from a file and adds them to the given list. Returns true if the end of file was reached.
+     * @param file
+     * @param numbers
+     * @param startIndex
+     * @param count
+     * @return
+     */
+    public static boolean readNumbers(final File file, final List<Long> numbers, final int startIndex, final int count){
+        boolean endOfFile = false;
         try {
             final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
 
@@ -349,11 +356,11 @@ public final class FileManager {
             dataInputStream.skipBytes(startIndex * 8);
 
             try {
-                for (int i = startIndex; i < endIndex; i++){
+                for (int i = 0; i < count; i++){
                     numbers.add(dataInputStream.readLong());
                 }
             } catch (EOFException e) {
-
+                endOfFile = true;
             }finally {
                 dataInputStream.close();
             }
@@ -362,6 +369,12 @@ public final class FileManager {
             e.printStackTrace();
         }
 
+        return endOfFile;
+    }
+
+    public static List<Long> readNumbers(final File file, final int startIndex, final int count){
+        final List<Long> numbers = new ArrayList<>();
+        readNumbers(file, numbers, startIndex, count);
         return numbers;
     }
 

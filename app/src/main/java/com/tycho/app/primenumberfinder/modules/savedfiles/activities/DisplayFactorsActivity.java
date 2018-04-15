@@ -122,6 +122,7 @@ public class DisplayFactorsActivity extends AppCompatActivity{
 
         //Hide the export option if this is a temp file
         menu.findItem(R.id.export).setVisible(!file.getName().equals("temp"));
+        menu.findItem(R.id.find).setVisible(false);
 
         return true;
     }
