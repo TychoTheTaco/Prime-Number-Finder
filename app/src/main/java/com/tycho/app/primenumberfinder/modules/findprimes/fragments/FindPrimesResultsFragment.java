@@ -74,7 +74,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     private TextView numbersPerSecondTextView;
     private TextView primesPerSecondTextView;
 
-
     private final RotateAnimation rotate = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
@@ -96,6 +95,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         private long lastCurrentValue;
         private long lastPrimeCount;
         private long lastUpdateTime = -1000;
+        private long finalNumbersPerSecond;
+        private long finalPrimesPerSecond;
     }
 
     @Override
@@ -303,6 +304,10 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                             getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE ? "brute force" : "the sieve of Eratosthenes"
                     }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
+                    //Statistics
+                    numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                    primesPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.primes_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalPrimesPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+
                     //Buttons
                     pauseButton.setEnabled(false);
                     switch (getTask().getSearchOptions().getSearchMethod()) {
@@ -340,6 +345,10 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                             NUMBER_FORMAT.format(getTask().getEndValue()),
                             getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE ? "brute force" : "the sieve of Eratosthenes"
                     }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+
+                    //Statistics
+                    numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                    primesPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.primes_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalPrimesPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
                     //Buttons
                     final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
@@ -383,6 +392,10 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                             getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE ? "brute force" : "the sieve of Eratosthenes"
                     }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
+                    //Statistics
+                    numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                    primesPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.primes_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalPrimesPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+
                     //Buttons
                     pauseButton.setEnabled(false);
                     switch (getTask().getSearchOptions().getSearchMethod()) {
@@ -417,13 +430,11 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                 public void run() {
                     Log.d(TAG, "Call onUiUpdate() one last time.");
                     onUiUpdate();
-
                     Log.d(TAG, "Begin final UI update.");
 
                     //Title
                     title.setText(getString(R.string.status_finished));
                     progressBar.clearAnimation();
-
 
                     //Subtitle
                     subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_primes_subtitle_result), new String[]{
@@ -437,6 +448,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
                     //Statistics
                     etaTextView.setVisibility(View.GONE);
+                    numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                    primesPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.primes_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalPrimesPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
                     //Buttons
                     centerView.getLayoutParams().width = 0;
@@ -463,7 +476,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
             //Body
             String text = "";
-            final String[] content = new String[]{NUMBER_FORMAT.format(getTask().getPrimeCount())};
+            String[] content = new String[]{NUMBER_FORMAT.format(getTask().getPrimeCount())};
             switch (getTask().getSearchOptions().getSearchMethod()) {
                 case BRUTE_FORCE:
                     text = getString(R.string.find_primes_body_text);
@@ -481,6 +494,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
                         case "searching":
                             text = "Marking all non-primes...";
+                            content = new String[0];
                             break;
                     }
                     break;
@@ -495,11 +509,13 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
                 //Numbers per second
                 final long currentValue = getTask().getCurrentValue();
+                statisticsMap.get(getTask()).finalNumbersPerSecond = currentValue - statisticsMap.get(getTask()).lastCurrentValue;
                 numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(currentValue - statisticsMap.get(getTask()).lastCurrentValue)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
                 statisticsMap.get(getTask()).lastCurrentValue = currentValue;
 
                 //Primes per second
                 final long primeCount = getTask().getPrimeCount();
+                statisticsMap.get(getTask()).finalPrimesPerSecond = primeCount - statisticsMap.get(getTask()).lastPrimeCount;
                 primesPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.primes_per_second), new String[]{NUMBER_FORMAT.format(primeCount - statisticsMap.get(getTask()).lastPrimeCount)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
                 statisticsMap.get(getTask()).lastPrimeCount = primeCount;
 

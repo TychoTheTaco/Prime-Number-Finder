@@ -97,6 +97,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
     private class Statistics {
         private long lastCurrentValue;
         private long lastUpdateTime = -1000;
+        private long finalNumbersPerSecond;
     }
 
     @Override
@@ -256,11 +257,16 @@ public class FindFactorsResultsFragment extends ResultsFragment{
             @Override
             public void run() {
                 if (isAdded() && !isDetached() && getTask() != null) {
+                    onUiUpdate();
+
                     //Title
                     title.setText(getString(R.string.state_pausing));
 
                     //Subtitle
                     subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+
+                    //Statistics
+                    numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
 
                     //Buttons
                     final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
@@ -292,6 +298,9 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                     //Subtitle
                     subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
 
+                    //Statistics
+                    numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+
                     //Buttons
                     final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
                     layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
@@ -313,11 +322,16 @@ public class FindFactorsResultsFragment extends ResultsFragment{
             @Override
             public void run() {
                 if (isAdded() && !isDetached() && getTask() != null) {
+                    onUiUpdate();
+
                     //Title
                     title.setText(getString(R.string.state_resuming));
 
                     //Subtitle
                     subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+
+                    //Statistics
+                    numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
 
                     //Buttons
                     final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
@@ -360,6 +374,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
 
                     //Statistics
                     etaTextView.setVisibility(View.GONE);
+                    numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
 
                     //Buttons
                     final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
@@ -395,6 +410,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
 
                 //Numbers per second
                 final long currentValue = getTask().getCurrentValue();
+                statisticsMap.get(getTask()).finalNumbersPerSecond = currentValue - statisticsMap.get(getTask()).lastCurrentValue;
                 numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(currentValue - statisticsMap.get(getTask()).lastCurrentValue)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
                 statisticsMap.get(getTask()).lastCurrentValue = currentValue;
 
