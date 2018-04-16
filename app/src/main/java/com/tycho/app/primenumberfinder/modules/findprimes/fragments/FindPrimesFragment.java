@@ -624,7 +624,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                         NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity())
                                 .setSmallIcon(R.drawable.circle_white)
                                 .setContentTitle("Task Finished")
-                                .setContentText("Task \"Primes from " + task.getStartValue() + " to " + task.getEndValue() + "\" finished.");
+                                .setContentText("Task \"Primes from " + NumberFormat.getInstance(Locale.getDefault()).format(task.getStartValue()) + " to " + NumberFormat.getInstance(Locale.getDefault()).format(task.getEndValue()) + "\" finished.");
                         final NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
                         notificationManager.notify(0, builder.build());
                     }

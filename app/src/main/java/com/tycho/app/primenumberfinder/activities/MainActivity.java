@@ -132,6 +132,8 @@ public class MainActivity extends AppCompatActivity{
 
         //Select the first drawer item
         selectDrawerItem(0);
+
+        //FileManager.saveDebugFile(1, 2762, new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "debug short"));
     }
 
     public FloatingActionButton getFab(){

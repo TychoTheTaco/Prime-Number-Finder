@@ -255,6 +255,7 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
             final FindPrimesTask.SearchOptions searchOptions = getIntent().getExtras().getParcelable("searchOptions");
             applyConfig(searchOptions);
         } catch (NullPointerException e) {
+            e.printStackTrace();
             applyConfig(null);
         }
 

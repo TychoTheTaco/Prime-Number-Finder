@@ -223,6 +223,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                     ));
 
                     //Buttons
+                    pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(true);
                     pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
                     saveButton.setVisibility(View.GONE);
@@ -362,7 +363,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
 
     private void init(){
         if (getTask() != null){
-            Log.d(TAG, "init()");
+            Log.d(TAG, "init(): " + getTask().getState());
 
             //Reset view states
             resultsView.setVisibility(View.VISIBLE);

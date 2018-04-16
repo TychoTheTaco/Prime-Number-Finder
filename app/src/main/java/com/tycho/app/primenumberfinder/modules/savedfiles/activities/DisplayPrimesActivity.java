@@ -113,7 +113,7 @@ public class DisplayPrimesActivity extends AppCompatActivity {
                     scrollToTopFab.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            specialScrollToPosition(0);
+                            scrollListener.specialScrollToPosition(0);
                         }
                     });
 
@@ -121,7 +121,7 @@ public class DisplayPrimesActivity extends AppCompatActivity {
                     scrollToBottomFab.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            specialScrollToPosition(scrollListener.totalNumbers - 1);
+                            scrollListener.specialScrollToPosition(scrollListener.totalNumbers - 1);
                         }
                     });
 
@@ -146,10 +146,11 @@ public class DisplayPrimesActivity extends AppCompatActivity {
         private int totalNumbers = 0;
 
         private int totalItemCount, lastVisibleItem, visibleThreshold = 0;
-        private boolean loading = false;
+
+        private volatile boolean loading = false;
 
         private final int INCREMENT = 250;
-        private final int[] range = new int[]{0, INCREMENT - 1};
+        private int firstItemIndex;
 
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -158,46 +159,66 @@ public class DisplayPrimesActivity extends AppCompatActivity {
             totalItemCount = linearLayoutManager.getItemCount();
             lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
 
-            if (!loading) {
-                if (totalItemCount - 1 <= (lastVisibleItem + visibleThreshold)) {
-                    loading = true;
-                    loadMore(true);
-                    loading = false;
-                } else if (linearLayoutManager.findFirstVisibleItemPosition() <= visibleThreshold) {
-                    loading = true;
-                    loadMore(false);
-                    loading = false;
+            if (totalItemCount - 1 <= (lastVisibleItem + visibleThreshold)) {
+                //Log.d(TAG, "TRIGGERED DOWN");
+                loadDown();
+            } else if (linearLayoutManager.findFirstVisibleItemPosition() <= visibleThreshold) {
+                if (firstItemIndex > 0) {
+                    //Log.d(TAG, "TRIGGERED DOWN");
+                    loadUp();
                 }
             }
+            primesAdapter.setOffset(firstItemIndex);
         }
 
-        public void setTotalNumbers(final int count) {
-            this.totalNumbers = count;
-        }
+        private void loadUp() {
+            loading = true;
+            //Log.d(TAG, "Size before: " + primesAdapter.getPrimes().size());
 
-        public int getTotalNumbers() {
-            return this.totalNumbers;
-        }
-
-        public void setRange(final int start, final int end) {
-            range[0] = start;
-            range[1] = end;
-            primesAdapter.setOffset(start);
-        }
-
-        private void loadMore(final boolean end) {
-            if (end && range[1] >= totalNumbers - 1) {
-                return;
+            //Remove items from end
+            final Iterator<Long> iterator = primesAdapter.getPrimes().iterator();
+            final int size = primesAdapter.getItemCount();
+            for (int i = 0; i < size; i++) {
+                iterator.next();
+                if (i >= size - INCREMENT) {
+                    iterator.remove();
+                }
             }
-            if (!end && range[0] == 0) {
-                return;
+            recyclerView.post(new Runnable() {
+                @Override
+                public void run() {
+                    primesAdapter.notifyItemRangeRemoved(size - INCREMENT, INCREMENT);
+                }
+            });
+
+            //Add items to beginning
+            Log.d(TAG, "Adding from " + (firstItemIndex - INCREMENT));
+            final List<Long> numbers = FileManager.readNumbers(file, firstItemIndex - INCREMENT, INCREMENT);
+            for (int i = numbers.size() - 1; i >= 0; i--) {
+                primesAdapter.getPrimes().add(0, numbers.get(i));
             }
-            //Log.d(TAG, "Loading more...");
+            recyclerView.post(new Runnable() {
+                @Override
+                public void run() {
+                    primesAdapter.notifyItemRangeInserted(0, numbers.size());
+                    loading = false;
+                }
+            });
 
-            Log.d(TAG, "Before: " + primesAdapter.getPrimes().size());
-            if (end) {
+            firstItemIndex -= numbers.size();
+           // Log.d(TAG, "Size after: " + primesAdapter.getPrimes().size());
+        }
 
-                //Remove first half
+        private void loadDown() {
+            loading = true;
+            //Log.d(TAG, "Size before: " + primesAdapter.getPrimes().size());
+
+            //Read new items
+            final List<Long> numbers = new ArrayList<>();
+            final boolean endOfFile = FileManager.readNumbers(file, numbers, firstItemIndex + totalItemCount, INCREMENT);
+
+            if (!endOfFile){
+                //Remove items
                 final Iterator<Long> iterator = primesAdapter.getPrimes().iterator();
                 for (int i = 0; i < INCREMENT; i++) {
                     iterator.next();
@@ -209,62 +230,77 @@ public class DisplayPrimesActivity extends AppCompatActivity {
                         primesAdapter.notifyItemRangeRemoved(0, INCREMENT);
                     }
                 });
-
-                //Log.d(TAG, "After remove: " + primesAdapter.getPrimes());
-
-                //Add
-                //Log.d(TAG, "Before add range[1] = " + range[1]);
-                final List<Long> numbers = FileManager.readNumbers(file, range[1] + 1, INCREMENT);
-                //Log.d(TAG, "First added: " + numbers.get(0));
-                primesAdapter.getPrimes().addAll(numbers);
-                //Log.d(TAG, "Added " + numbers.size());
-                recyclerView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        primesAdapter.notifyItemRangeInserted(range[1] + 1, numbers.size());
-                    }
-                });
-
-                range[0] += INCREMENT;
-                range[1] += numbers.size();
-            } else {
-                final List<Long> numbers = FileManager.readNumbers(file, range[0] - INCREMENT, INCREMENT);
-
-                //Remove last half
-                final Iterator<Long> iterator = primesAdapter.getPrimes().iterator();
-                final int size = primesAdapter.getPrimes().size();
-                for (int i = 0; i < size; i++) {
-                    iterator.next();
-                    if (i >= size - INCREMENT) {
-                        iterator.remove();
-                    }
-                }
-                recyclerView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        primesAdapter.notifyItemRangeRemoved(size - INCREMENT, INCREMENT);
-                    }
-                });
-
-                //Log.d(TAG, "After remove: " + primesAdapter.getPrimes());
-
-                //Add
-                for (int i = numbers.size() - 1; i >= 0; i--) {
-                    primesAdapter.getPrimes().add(0, numbers.get(i));
-                }
-
-                recyclerView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        primesAdapter.notifyItemRangeInserted(0, INCREMENT);
-                    }
-                });
-
-                range[0] -= INCREMENT;
-                range[1] -= INCREMENT;
             }
-            primesAdapter.setOffset(range[0]);
-            Log.d(TAG, "After: " + primesAdapter.getItemCount());
+
+            //Add new items
+            primesAdapter.getPrimes().addAll(numbers);
+            recyclerView.post(new Runnable() {
+                @Override
+                public void run() {
+                    primesAdapter.notifyItemRangeInserted(primesAdapter.getItemCount(), numbers.size());
+                    loading = false;
+                }
+            });
+
+            if (!endOfFile){
+                firstItemIndex += numbers.size();
+            }
+
+            //Log.d(TAG, "Size after: " + primesAdapter.getPrimes().size());
+        }
+
+        private void specialScrollToPosition(final int position) {
+            loading = true;
+            Log.d(TAG, "specialScrollTo: " + position);
+
+            //Scroll to correct position
+            int startIndex = (position / scrollListener.INCREMENT) * (scrollListener.INCREMENT);
+            final List<Long> numbers = new ArrayList<>();
+
+            //Try to read from start
+            startIndex -= INCREMENT;
+            if (startIndex < 0){
+                startIndex = 0;
+            }
+            final boolean endOfFile = FileManager.readNumbers(file, numbers, startIndex, primesAdapter.getItemCount());
+
+            if (endOfFile){
+                int previousSize = 0;
+                while (FileManager.readNumbers(file, numbers, startIndex, primesAdapter.getItemCount()) && previousSize != numbers.size()) {
+                    //Log.d(TAG, "Read " + numbers.size());
+                    startIndex -= (primesAdapter.getItemCount() - numbers.size());
+                    previousSize = numbers.size();
+                    numbers.clear();
+                }
+            }
+
+            //Log.d(TAG, "startIndex: " + startIndex);
+            //Log.d(TAG, "Numbers: (" + numbers.get(0) + ", " + numbers.get(numbers.size() - 1) + ")");
+            //Log.d(TAG, "size: " + numbers.size());
+            primesAdapter.getPrimes().clear();
+            primesAdapter.getPrimes().addAll(numbers);
+            scrollListener.setFirstItemIndex(startIndex);
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    primesAdapter.notifyItemRangeInserted(0, primesAdapter.getItemCount());
+                    recyclerView.scrollToPosition(position - scrollListener.firstItemIndex);
+                    loading = false;
+                }
+            });
+        }
+
+        public void setTotalNumbers(final int count) {
+            this.totalNumbers = count;
+        }
+
+        public int getTotalNumbers() {
+            return this.totalNumbers;
+        }
+
+        public void setFirstItemIndex(final int index) {
+            firstItemIndex = index;
+            primesAdapter.setOffset(index);
         }
     }
 
@@ -278,8 +314,6 @@ public class DisplayPrimesActivity extends AppCompatActivity {
 
                 scrollListener.setTotalNumbers(FileManager.countTotalNumbersQuick(file));
                 final List<Long> numbers = FileManager.readNumbers(file, 0, 1000);
-                Log.d(TAG, "Read " + numbers.size());
-                scrollListener.setRange(0, numbers.size() - 1);
                 primesAdapter.getPrimes().addAll(numbers);
 
                 handler.post(new Runnable() {
@@ -370,7 +404,7 @@ public class DisplayPrimesActivity extends AppCompatActivity {
                     @Override
                     public void onFindClicked(final int number) {
                         if (number > 0 && number < scrollListener.getTotalNumbers()) {
-                            specialScrollToPosition(number - 1);
+                            scrollListener.specialScrollToPosition(number - 1);
                         } else {
                             Toast.makeText(DisplayPrimesActivity.this, "Invalid number", Toast.LENGTH_SHORT).show();
                         }
@@ -386,32 +420,6 @@ public class DisplayPrimesActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void specialScrollToPosition(final int position) {
-
-        //Scroll to correct position
-        int startIndex = (position / scrollListener.INCREMENT) * (scrollListener.INCREMENT);
-        final List<Long> numbers = new ArrayList<>();
-        boolean endOfFile = FileManager.readNumbers(file, numbers, startIndex, 1000);
-        int extra = 0;
-        while (!endOfFile && numbers.size() < (scrollListener.INCREMENT * 3)){
-            startIndex -= scrollListener.INCREMENT;
-            extra += scrollListener.INCREMENT;
-            numbers.clear();
-            endOfFile = FileManager.readNumbers(file, numbers, startIndex, 1000);
-        }
-        final int extraAdded = extra;
-        scrollListener.setRange(startIndex, startIndex + numbers.size());
-        primesAdapter.getPrimes().clear();
-        primesAdapter.getPrimes().addAll(numbers);
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                primesAdapter.notifyItemRangeInserted(0, primesAdapter.getItemCount());
-                recyclerView.scrollToPosition(position % scrollListener.INCREMENT + extraAdded);
-            }
-        });
     }
 
     @Override

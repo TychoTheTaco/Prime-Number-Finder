@@ -40,8 +40,8 @@ public abstract class ResultsFragment extends TaskFragment {
     public abstract View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState);
 
     @Override
-    public void onTaskStarted() {
-        super.onTaskStarted(); //This sometimes gets called twice but only in FindFactorsResults fragment and PrimeFactorization fragment
+    public synchronized void onTaskStarted() {
+        super.onTaskStarted();
         Log.d(TAG, "onTaskStarted(): " + getTask());
         if (uiUpdater.getState() == Task.State.NOT_STARTED){
             Log.w(TAG, "Starting task " + uiUpdater + " for " + this + " on new thread with state: " + uiUpdater.getState());
@@ -63,31 +63,31 @@ public abstract class ResultsFragment extends TaskFragment {
     }
 
     @Override
-    public void onTaskPausing() {
+    public synchronized void onTaskPausing() {
         super.onTaskPausing();
         uiUpdater.resume();
     }
 
     @Override
-    public void onTaskPaused() {
+    public synchronized void onTaskPaused() {
         super.onTaskPaused();
         uiUpdater.pause(false);
     }
 
     @Override
-    public void onTaskResuming() {
+    public synchronized void onTaskResuming() {
         super.onTaskResuming();
         uiUpdater.resume();
     }
 
     @Override
-    public void onTaskResumed() {
+    public synchronized void onTaskResumed() {
         super.onTaskResumed();
         uiUpdater.resume();
     }
 
     @Override
-    public void onTaskStopped() {
+    public synchronized void onTaskStopped() {
         super.onTaskStopped();
         Log.d(TAG, "onTaskStopped(): " + getTask());
         uiUpdater.pause(true);
