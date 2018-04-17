@@ -29,6 +29,7 @@ import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.TreeView;
 import com.tycho.app.primenumberfinder.modules.savedfiles.FactorTreeExportOptionsActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -55,6 +56,7 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity{
 
     private Tree<Long> factorTree;
 
+    private TextView subtitleTextView;
     private TextView bodyTextView;
     private TreeView treeView;
 
@@ -67,6 +69,7 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.display_prime_factorization_activity);
 
+        subtitleTextView = findViewById(R.id.subtitle);
         bodyTextView = findViewById(R.id.body);
         treeView = findViewById(R.id.factor_tree);
 
@@ -131,6 +134,16 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity{
                     public void run() {
                         treeView.setTree(factorTree.formatNumbers());
 
+                        final Map<Long, Integer> map = new TreeMap<>();
+                        getPrimeFactors(map, factorTree);
+
+                        //Subtitle
+                        subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder,
+                                getResources().getQuantityString(R.plurals.prime_factorization_subtitle_results, map.keySet().size()),
+                                new String[]{NUMBER_FORMAT.format(factorTree.getValue()), NUMBER_FORMAT.format(map.keySet().size())},
+                                ContextCompat.getColor(getBaseContext(), R.color.green_dark)
+                        ));
+
                         //Body
                         spannableStringBuilder.clear();
                         spannableStringBuilder.clearSpans();
@@ -140,8 +153,6 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity{
                         int position = spannableStringBuilder.length();
                         spannableStringBuilder.append(" = ");
                         spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                        final Map<Long, Integer> map = new TreeMap<>();
-                        getPrimeFactors(map, factorTree);
                         for (Object factor : map.keySet()){
                             position = spannableStringBuilder.length();
                             String content = NUMBER_FORMAT.format(factor);

@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
@@ -367,14 +368,25 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                     progressBar.clearAnimation();
 
                     //Subtitle
-                    subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getResources().getQuantityString(R.plurals.find_factors_subtitle_results, getTask().getFactors().size()), new String[]{NUMBER_FORMAT.format(getTask().getNumber()), NUMBER_FORMAT.format(getTask().getFactors().size())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+                    Utils.formatSpannable(spannableStringBuilder, getResources().getQuantityString(R.plurals.find_factors_subtitle_results, getTask().getFactors().size()), new String[]{NUMBER_FORMAT.format(getTask().getNumber()), NUMBER_FORMAT.format(getTask().getFactors().size())}, ContextCompat.getColor(getActivity(), R.color.orange_dark));
+                    if (getTask().getFactors().size() != 2){
+                        subtitleTextView.setText(spannableStringBuilder);
+                    }else{
+                        final SpannableStringBuilder ssb = new SpannableStringBuilder();
+                        Utils.formatSpannable(ssb, getResources().getString(R.string.find_factors_subtitle_results_extension), new String[]{"prime"}, ContextCompat.getColor(getActivity(), R.color.orange_dark));
+                        subtitleTextView.setText(TextUtils.concat(spannableStringBuilder, " ", ssb));
+                    }
 
                     //Body
                     bodyTextView.setVisibility(View.GONE);
 
                     //Statistics
                     etaTextView.setVisibility(View.GONE);
-                    numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+                    double elapsed = (double) getTask().getElapsedTime() / 1000;
+                    if (elapsed <= 0){
+                        elapsed = 1;
+                    }
+                    numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_numbers_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getMaxValue() / elapsed))}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
 
                     //Buttons
                     final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();

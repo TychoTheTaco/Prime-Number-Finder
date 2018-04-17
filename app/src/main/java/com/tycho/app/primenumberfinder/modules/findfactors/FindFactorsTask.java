@@ -81,6 +81,10 @@ public class FindFactorsTask extends Task {
         }
     }
 
+    public long getMaxValue(){
+        return (long) Math.sqrt(number);
+    }
+
     public long getCurrentValue(){
         return i;
     }

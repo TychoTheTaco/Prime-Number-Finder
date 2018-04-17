@@ -32,7 +32,7 @@ public class TaskManager{
     public void pauseAllTasks() {
         for (Task task : tasks.keySet()) {
             tasks.put(task, task.getState());
-            task.pause(true);
+            task.pause(false);
         }
     }
 

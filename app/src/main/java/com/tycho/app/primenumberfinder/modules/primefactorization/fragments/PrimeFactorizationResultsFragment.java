@@ -20,6 +20,7 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,7 +59,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
 
     //Buttons
     private ImageButton pauseButton;
-    private ImageButton viewAllButton;
+    //private ImageButton viewAllButton;
     private ImageButton saveButton;
     private View centerView;
 
@@ -105,7 +106,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
 
         //Buttons
         pauseButton = rootView.findViewById(R.id.pause_button);
-        viewAllButton = rootView.findViewById(R.id.view_all_button);
+        //viewAllButton = rootView.findViewById(R.id.view_all_button);
         saveButton = rootView.findViewById(R.id.save_button);
         centerView = rootView.findViewById(R.id.center);
 
@@ -168,7 +169,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                     pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(true);
                     pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                    viewAllButton.setVisibility(View.GONE);
+                    //viewAllButton.setVisibility(View.GONE);
                     saveButton.setVisibility(View.GONE);
                 }
             });
@@ -194,9 +195,11 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                     ));
 
                     //Buttons
+                    pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(false);
+                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
                     saveButton.setVisibility(View.GONE);
-                    viewAllButton.setVisibility(View.GONE);
+                    //viewAllButton.setVisibility(View.GONE);
                 }
             }
         });
@@ -227,7 +230,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                     pauseButton.setEnabled(true);
                     pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
                     saveButton.setVisibility(View.GONE);
-                    viewAllButton.setVisibility(View.GONE);
+                    //viewAllButton.setVisibility(View.GONE);
                 }
             });
         }
@@ -325,9 +328,12 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                     treeView.setTree(getTask().getFactorTree().formatNumbers());
 
                     //Buttons
-                    centerView.getLayoutParams().width = 0;
+                    centerView.setVisibility(View.GONE);
                     pauseButton.setVisibility(View.GONE);
-                    viewAllButton.setVisibility(View.VISIBLE);
+                    //viewAllButton.setVisibility(View.VISIBLE);
+                    final RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) saveButton.getLayoutParams();
+                    layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                    saveButton.setLayoutParams(layoutParams);
                     saveButton.setVisibility(View.VISIBLE);
                 }
             });

@@ -50,6 +50,7 @@
         <item quantity="one">%1$s has %2$s factor.</item>
         <item quantity="other">%1$s has %2$s factors.</item>
     </plurals>
+    <string name="find_factors_subtitle_results_extension">This means it is %1$s.</string>
     <string name="find_factors_task_list_item_title">Factors of %1$s</string>
     <string name="factors_list_toast_message">%1$s is the %2$s factor.</string>
 
@@ -84,7 +85,9 @@
     <string name="statistics_title">Statistics</string>
     <string name="time_remaining">%1$s remaining</string>
     <string name="numbers_per_second">%1$s numbers per second</string>
+    <string name="average_numbers_per_second">%1$s average numbers per second</string>
     <string name="primes_per_second">%1$s primes per second</string>
+    <string name="average_primes_per_second">%1$s average primes per second</string>
 
     <!-- Button text -->
     <string name="start">Start</string>
