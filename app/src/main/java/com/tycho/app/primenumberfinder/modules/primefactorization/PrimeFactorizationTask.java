@@ -58,7 +58,6 @@ public class PrimeFactorizationTask extends Task {
         }
         setProgress(0.67f);
         this.factorTree = generateTree(number);
-        setProgress(1);
     }
 
     private Tree<Long> generateTree(long number) {

@@ -44,15 +44,16 @@ public class FindFactorsTask extends Task {
 
     private long i;
 
+    final int sqrtMax;
+
     public FindFactorsTask(final SearchOptions searchOptions) {
         this.searchOptions = searchOptions;
         this.number = searchOptions.getNumberToFactor();
+         sqrtMax = (int) Math.sqrt(number);
     }
 
     @Override
     public void run() {
-
-        final int sqrtMax = (int) Math.sqrt(number);
 
         for (i = 1; i <= sqrtMax; i++) {
 
@@ -69,7 +70,7 @@ public class FindFactorsTask extends Task {
                 return;
             }
 
-            setProgress((float) i / sqrtMax);
+            //setProgress((float) i / sqrtMax);
         }
 
         if (!requestStop){
@@ -79,6 +80,12 @@ public class FindFactorsTask extends Task {
 
             didFinish = true;
         }
+    }
+
+    @Override
+    public float getProgress() {
+        setProgress((float) i / sqrtMax);
+        return super.getProgress();
     }
 
     public long getMaxValue(){

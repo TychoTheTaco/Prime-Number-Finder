@@ -25,6 +25,9 @@ public class CheckPrimalityTask extends Task {
         this.number = number;
     }
 
+    private int i;
+    private int sqrtMax;
+
     @Override
     public void run(){
 
@@ -40,7 +43,7 @@ public class CheckPrimalityTask extends Task {
                  * root to determine if the number is prime. The square root of a long will
                  * always fit inside the value range of an int.
                  */
-                final int sqrtMax = (int) Math.sqrt(number);
+                sqrtMax = (int) Math.sqrt(number);
 
                 //Assume the number is prime
                 isPrime = true;
@@ -48,7 +51,7 @@ public class CheckPrimalityTask extends Task {
                 /*
                  * Check if the number is divisible by every odd number below it's square root.
                  */
-                for (int i = 3; i <= sqrtMax; i += 2){
+                for (i = 3; i <= sqrtMax; i += 2){
 
                     //Check if the number divides perfectly
                     if (number % i == 0){
@@ -56,7 +59,7 @@ public class CheckPrimalityTask extends Task {
                         break;
                     }
 
-                    setProgress((float) i / sqrtMax);
+                    //setProgress((float) i / sqrtMax);
 
                     //Check if we should pause
                     tryPause();
@@ -75,8 +78,11 @@ public class CheckPrimalityTask extends Task {
         if (isFinished){
             finishedSearch = true;
         }
+    }
 
-        setProgress(1);
+    @Override
+    public float getProgress() {
+        return ((float) i / sqrtMax);
     }
 
     public boolean isPrime(){

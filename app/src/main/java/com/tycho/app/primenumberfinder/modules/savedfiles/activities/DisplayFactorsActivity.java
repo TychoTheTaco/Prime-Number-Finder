@@ -24,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.ExportOptionsDialog;
@@ -208,5 +209,17 @@ public class DisplayFactorsActivity extends AppCompatActivity{
     private void applyThemeColor(final int statusBarColor, final int actionBarColor) {
         setStatusBarColor(statusBarColor);
         setActionBarColor(actionBarColor);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        PrimeNumberFinder.getTaskManager().resumeAllTasks();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        PrimeNumberFinder.getTaskManager().pauseAllTasks();
     }
 }

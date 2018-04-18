@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener;
+import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.TreeView;
 import com.tycho.app.primenumberfinder.modules.savedfiles.FactorTreeExportOptionsActivity;
@@ -262,5 +263,17 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity{
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        PrimeNumberFinder.getTaskManager().resumeAllTasks();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        PrimeNumberFinder.getTaskManager().pauseAllTasks();
     }
 }

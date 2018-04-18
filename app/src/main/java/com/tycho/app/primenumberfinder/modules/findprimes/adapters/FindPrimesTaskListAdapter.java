@@ -36,6 +36,7 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
     private static final String TAG = "FindPrimesTaskListAdptr";
 
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("##0.00");
+    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
     private final Context context;
 
@@ -108,11 +109,17 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
 
             case STOPPED:
                 holder.state.setText(context.getString(R.string.status_finished));
-                if (task instanceof CheckPrimalityTask){
-                    final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(context.getString(R.string.status_finished) + ": " + context.getString(R.string.check_primality_result, NumberFormat.getInstance(Locale.getDefault()).format(((CheckPrimalityTask) task).getNumber()), ((CheckPrimalityTask) task).isPrime() ? "prime" : "not prime"));
+                final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+                spannableStringBuilder.append(context.getString(R.string.status_finished));
+                spannableStringBuilder.append(": ");
+                if (task instanceof FindPrimesTask){
+                    spannableStringBuilder.append(context.getString(R.string.find_primes_result, NUMBER_FORMAT.format(((FindPrimesTask) task).getPrimeCount())));
                     spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accent_dark)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                    holder.state.setText(spannableStringBuilder);
+                }else if (task instanceof CheckPrimalityTask){
+                    spannableStringBuilder.append(context.getString(R.string.check_primality_result, NUMBER_FORMAT.format(((CheckPrimalityTask) task).getNumber()), ((CheckPrimalityTask) task).isPrime() ? "prime" : "not prime"));
+                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accent_dark)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                 }
+                holder.state.setText(spannableStringBuilder);
                 holder.pauseButton.setVisibility(View.GONE);
                 holder.editButton.setVisibility(View.GONE);
                 holder.deleteButton.setEnabled(true);

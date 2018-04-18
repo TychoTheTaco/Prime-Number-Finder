@@ -382,42 +382,6 @@ public class FindPrimesTask extends MultithreadedTask {
         }
     }
 
-    @Override
-    public void pause(boolean wait) {
-        Log.d(TAG, "pause(): " + getState());
-        super.pause(wait);
-    }
-
-    @Override
-    public void resume() {
-        Log.d(TAG, "resume(): " + getState());
-        super.resume();
-    }
-
-    @Override
-    protected void dispatchPaused() {
-        Log.d(TAG, "dispatchPaused()");
-        super.dispatchPaused();
-    }
-
-    @Override
-    protected void dispatchPausing() {
-        Log.d(TAG, "dispatchPausing()");
-        super.dispatchPausing();
-    }
-
-    @Override
-    protected void dispatchResumed() {
-        Log.d(TAG, "dispatchResumed()");
-        super.dispatchResumed();
-    }
-
-    @Override
-    protected void dispatchResuming() {
-        Log.d(TAG, "dispatchResuming()");
-        super.dispatchResuming();
-    }
-
     private volatile boolean takeFlag = false;
 
     private boolean areSubTasksDone() {
@@ -604,12 +568,14 @@ public class FindPrimesTask extends MultithreadedTask {
                 }
 
                 currentNumber += increment;
-
-                // Calculate total progress
-                if (endValue != -1) {
-                    setProgress(((float) (currentNumber - startValue) / (endValue - startValue)));
-                }
             }
+        }
+
+        @Override
+        public float getProgress() {
+            if (endValue == -1) return 0;
+            setProgress((float) (currentNumber - startValue) / (endValue - startValue));
+            return super.getProgress();
         }
 
         public long getCurrentValue() {
@@ -693,22 +659,21 @@ public class FindPrimesTask extends MultithreadedTask {
                 }
                 tryPause();
             }
-            setProgress(1);
             status = String.valueOf(getState());
         }
 
         @Override
         public float getProgress() {
             switch (status){
-                default:
-                    return super.getProgress();
-
                 case "searching":
-                    return ((float) factor / sqrtMax) / 2;
+                    setProgress(((float) factor / sqrtMax) / 2);
+                    break;
 
                 case "counting":
-                    return 0.5f + (((float) counter / endValue) / 2);
+                    setProgress(0.5f + (((float) counter / endValue) / 2));
+                    break;
             }
+            return super.getProgress();
         }
     }
 
