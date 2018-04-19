@@ -149,7 +149,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                 if (getTask().getState() == Task.State.RUNNING) {
                     getTask().pause(false);
                 } else if (getTask().getState() == Task.State.PAUSED) {
-                    getTask().resume();
+                    getTask().resume(false);
                 }
             }
         });
@@ -182,7 +182,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                             });
                         }
                         if (state == Task.State.RUNNING){
-                            getTask().resume();
+                            getTask().resume(false);
                         }
 
                         final Intent intent = new Intent(getActivity(), DisplayFactorsActivity.class);

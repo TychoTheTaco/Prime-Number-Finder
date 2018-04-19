@@ -155,7 +155,7 @@ public class FindPrimesTask extends MultithreadedTask {
 
         //Execute all tasks
 /*        final List<Thread> threads = new ArrayList<>();
-        for (Task task : getTasks()) {
+        for (Task task : getTaskStates()) {
             threads.add(task.startOnNewThread());
         }
 
@@ -163,10 +163,10 @@ public class FindPrimesTask extends MultithreadedTask {
 
         if (threadCount > 1){
             final List<Long> heads = new ArrayList<>();
-            for (int i = 0; i < getTasks().size(); i++) {
-                if (!(getTasks().get(i).getState() == State.STOPPED && ((BruteForceTask) getTasks().get(i)).queue.isEmpty())) {
+            for (int i = 0; i < getTaskStates().size(); i++) {
+                if (!(getTaskStates().get(i).getState() == State.STOPPED && ((BruteForceTask) getTaskStates().get(i)).queue.isEmpty())) {
                     try {
-                        heads.add(((BruteForceTask) getTasks().get(i)).queue.take());
+                        heads.add(((BruteForceTask) getTaskStates().get(i)).queue.take());
                     } catch (InterruptedException e) {
                         Log.wtf(TAG, "Sorting was interrupted!");
                     }
@@ -192,29 +192,29 @@ public class FindPrimesTask extends MultithreadedTask {
                     Log.w(TAG, "Head: " + number);
                 }
                 Log.d(TAG, "Lowest index was " + lowestIndex);
-                for (Task task : getTasks()){
+                for (Task task : getTaskStates()){
                     Log.w(TAG, "Queue: " + ((BruteForceTask) task).queue);
                 }*//*
 
                 sorted.add(heads.get(lowestIndex));
-                if (!(getTasks().get(lowestIndex).getState() == State.STOPPED && ((BruteForceTask) getTasks().get(lowestIndex)).queue.isEmpty())) {
+                if (!(getTaskStates().get(lowestIndex).getState() == State.STOPPED && ((BruteForceTask) getTaskStates().get(lowestIndex)).queue.isEmpty())) {
                     try {
-                        if (((BruteForceTask) getTasks().get(lowestIndex)).queue.isEmpty()){
+                        if (((BruteForceTask) getTaskStates().get(lowestIndex)).queue.isEmpty()){
                             //Wait until item added or task finished
-                            synchronized (((BruteForceTask) getTasks().get(lowestIndex)).QUEUE_LOCK){
-                                while (((BruteForceTask) getTasks().get(lowestIndex)).queue.isEmpty() && getTasks().get(lowestIndex).getState() != State.STOPPED){
+                            synchronized (((BruteForceTask) getTaskStates().get(lowestIndex)).QUEUE_LOCK){
+                                while (((BruteForceTask) getTaskStates().get(lowestIndex)).queue.isEmpty() && getTaskStates().get(lowestIndex).getState() != State.STOPPED){
                                     //Log.d(TAG, "Waiting...");
-                                    ((BruteForceTask) getTasks().get(lowestIndex)).QUEUE_LOCK.wait();
-                                    //Log.d(TAG, "Notified: " + ((BruteForceTask) getTasks().get(lowestIndex)).queue.size());
+                                    ((BruteForceTask) getTaskStates().get(lowestIndex)).QUEUE_LOCK.wait();
+                                    //Log.d(TAG, "Notified: " + ((BruteForceTask) getTaskStates().get(lowestIndex)).queue.size());
                                 }
                             }
                         }
-                        if (((BruteForceTask) getTasks().get(lowestIndex)).queue.isEmpty()){
-                            //Log.d(TAG, "Index " + lowestIndex + " still empty. state: " + getTasks().get(lowestIndex).getState());
+                        if (((BruteForceTask) getTaskStates().get(lowestIndex)).queue.isEmpty()){
+                            //Log.d(TAG, "Index " + lowestIndex + " still empty. state: " + getTaskStates().get(lowestIndex).getState());
                             heads.set(lowestIndex, -1L);
                         }else{
-                            //Log.d(TAG, "Taking from " + ((BruteForceTask) getTasks().get(lowestIndex)).queue);
-                            heads.set(lowestIndex, ((BruteForceTask) getTasks().get(lowestIndex)).queue.poll());
+                            //Log.d(TAG, "Taking from " + ((BruteForceTask) getTaskStates().get(lowestIndex)).queue);
+                            heads.set(lowestIndex, ((BruteForceTask) getTaskStates().get(lowestIndex)).queue.poll());
                             //Log.d(TAG, "Took " + heads.get(lowestIndex));
                             takeFlag = true;
                         }
@@ -227,7 +227,7 @@ public class FindPrimesTask extends MultithreadedTask {
                 }
             }
         }else{
-            sorted.addAll(((BruteForceTask) getTasks().get(0)).queue);
+            sorted.addAll(((BruteForceTask) getTaskStates().get(0)).queue);
         }
 
         Log.d(TAG, "Sorted: " + sorted);
@@ -521,6 +521,8 @@ public class FindPrimesTask extends MultithreadedTask {
         @Override
         protected void run() {
 
+            Log.w(TAG, "Running BFT: " + this + " with parameters (" + startValue + ", " + endValue + ", " + increment + ")");
+
             currentNumber = startValue;
             if (startValue < 3) {
                 if (endValue == INFINITY || endValue >= 2) {
@@ -548,16 +550,19 @@ public class FindPrimesTask extends MultithreadedTask {
                  */
                 for (int i = 3; i <= sqrtMax; i += 2) {
 
-                    // Check if the number divides perfectly
-                    if (currentNumber % i == 0) {
-                        isPrime = false;
-                        break;
-                    }
-
                     // Check if we should pause
+                    // Ideally, this check should go after the check for primality so it does not get
+                    // called every iteration. For now, this will remain here in case a thread
+                    // never finds a prime number.
                     tryPause();
                     if (shouldStop()) {
                         running = false;
+                        break;
+                    }
+
+                    // Check if the number divides perfectly
+                    if (currentNumber % i == 0) {
+                        isPrime = false;
                         break;
                     }
                 }
@@ -595,6 +600,7 @@ public class FindPrimesTask extends MultithreadedTask {
 
             if (primes.size() >= bufferSize) {
                 Log.d(TAG, "Swapping to disk! Size: " + primes.size());
+                Log.d(TAG, "Task: " + this + " main state: " + FindPrimesTask.this.getState() + " state: " + getState());
 
                 //Swap memory to disk
                 if (!taskDirectory.exists()) {

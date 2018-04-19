@@ -2,13 +2,11 @@ package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,10 +22,7 @@ import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfiguratio
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
 
-import java.util.Iterator;
-import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import easytasks.Task;
@@ -94,7 +89,7 @@ public class FindPrimesTaskListFragment extends Fragment {
         textViewNoTasks = rootView.findViewById(R.id.empty_message);
 
         //Restore tasks if fragment was destroyed
-        for (Task task : PrimeNumberFinder.getTaskManager().getTasks()) {
+        for (Task task : PrimeNumberFinder.getTaskManager().getTaskStates()) {
             if (task instanceof FindPrimesTask || task instanceof CheckPrimalityTask) {
                 taskListAdapter.addTask(task);
             }

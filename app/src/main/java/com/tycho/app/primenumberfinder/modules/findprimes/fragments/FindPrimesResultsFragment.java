@@ -102,7 +102,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        Log.d(TAG, "onAttach()");
 
         //Set up progress animation
         rotate.setDuration(3000);
@@ -115,8 +114,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_primes_results_fragment, container, false);
-
-        Log.d(TAG, "onCreateView()");
 
         title = rootView.findViewById(R.id.title);
         subtitleTextView = rootView.findViewById(R.id.subtitle);
@@ -145,7 +142,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                 if (getTask().getState() == Task.State.RUNNING) {
                     getTask().pause(false);
                 } else if (getTask().getState() == Task.State.PAUSED) {
-                    getTask().resume();
+                    getTask().resume(false);
                 }
             }
         });
@@ -178,7 +175,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
                         //Resume the task
                         if (state == Task.State.RUNNING) {
-                            getTask().resume();
+                            getTask().resume(false);
                         }
 
                         handler.post(new Runnable() {

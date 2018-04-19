@@ -109,7 +109,7 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                 case RUNNING:
                 case PAUSING:
                 case STOPPING:
-                    holder.uiUpdater.resume();
+                    holder.uiUpdater.resume(false);
                     break;
 
                 case PAUSED:
@@ -134,7 +134,7 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                         @Override
                         public void run() {
                             if (holder != null) {
-                                holder.uiUpdater.resume();
+                                holder.uiUpdater.resume(false);
                                 notifyItemChanged(holder.getAdapterPosition());
                             }
 
@@ -187,7 +187,7 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                         @Override
                         public void run() {
                             if (holder != null) {
-                                holder.uiUpdater.resume();
+                                holder.uiUpdater.resume(false);
                                 notifyItemChanged(holder.getAdapterPosition());
                             }
                         }
@@ -333,7 +333,7 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                     switch (tasks.get(getAdapterPosition()).getState()) {
 
                         case PAUSED:
-                            tasks.get(getAdapterPosition()).resume();
+                            tasks.get(getAdapterPosition()).resume(false);
                             break;
 
                         case RUNNING:

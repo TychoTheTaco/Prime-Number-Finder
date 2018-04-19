@@ -1,16 +1,20 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.app.Fragment;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
@@ -83,7 +87,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
      */
     private final CheckPrimalityResultsFragment checkPrimalityResultsFragment = new CheckPrimalityResultsFragment();
 
-    private final NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
+    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
 
     private final FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(0, FindPrimesTask.INFINITY, FindPrimesTask.SearchMethod.BRUTE_FORCE, 1);
@@ -187,7 +191,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
         //Set up number input
         editTextPrimalityInput = rootView.findViewById(R.id.primality_input);
-        editTextPrimalityInput.setHint(numberFormat.format(new Random().nextInt(1000000)));
+        editTextPrimalityInput.setHint(NUMBER_FORMAT.format(new Random().nextInt(1000000)));
         editTextPrimalityInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -255,8 +259,8 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
         //Set up range start input
         editTextSearchRangeStart = rootView.findViewById(R.id.search_range_start);
-        editTextSearchRangeStart.setText(numberFormat.format(searchOptions.getStartValue()));
-        editTextSearchRangeStart.setHint(numberFormat.format(0));
+        editTextSearchRangeStart.setText(NUMBER_FORMAT.format(searchOptions.getStartValue()));
+        editTextSearchRangeStart.setHint(NUMBER_FORMAT.format(0));
         editTextSearchRangeStart.addTextChangedListener(new TextWatcher() {
 
             private boolean isDirty = true;
@@ -309,7 +313,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
         //Set up range end input
         editTextSearchRangeEnd = rootView.findViewById(R.id.search_range_end);
-        editTextSearchRangeEnd.setHint(numberFormat.format(Integer.valueOf(editTextSearchRangeStart.getHint().toString().replace(",", "")) + new Random().nextInt(1000000)));
+        editTextSearchRangeEnd.setHint(NUMBER_FORMAT.format(Integer.valueOf(editTextSearchRangeStart.getHint().toString().replace(",", "")) + new Random().nextInt(1000000)));
         editTextSearchRangeEnd.addTextChangedListener(new TextWatcher() {
 
             private boolean isDirty = true;
@@ -603,6 +607,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         if (valid){
             final FindPrimesTask task = new FindPrimesTask(searchOptions, getActivity());
             task.addTaskListener(new TaskAdapter() {
+
                 @Override
                 public void onTaskStopped() {
                     if (task.getSearchOptions().autoSave) {
@@ -621,10 +626,28 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                     }
 
                     if (task.getSearchOptions().notifyWhenFinished) {
-                        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity())
+                        final String CHANNEL_ID = "default";
+
+                        //Create notification
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        PendingIntent pendingIntent = PendingIntent.getActivity(getActivity(), 0, intent, 0);
+
+                        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(), CHANNEL_ID)
                                 .setSmallIcon(R.drawable.circle_white)
                                 .setContentTitle("Task Finished")
-                                .setContentText("Task \"Primes from " + NumberFormat.getInstance(Locale.getDefault()).format(task.getStartValue()) + " to " + NumberFormat.getInstance(Locale.getDefault()).format(task.getEndValue()) + "\" finished.");
+                                .setContentText("Task \"Primes from " + NUMBER_FORMAT.format(task.getStartValue()) + " to " + NUMBER_FORMAT.format(task.getEndValue()) + "\" finished.")
+                                .setContentIntent(pendingIntent)
+                                .setAutoCancel(true);
+
+                        //Register notification channel
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            final NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Default", NotificationManager.IMPORTANCE_DEFAULT);
+                            channel.setDescription("Default notification channel.");
+                            final NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+                            notificationManager.createNotificationChannel(channel);
+                        }
+
                         final NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
                         notificationManager.notify(0, builder.build());
                     }
@@ -636,6 +659,8 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
             //Start the task
             task.startOnNewThread();
+
+            //Post to a handler because "java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState"
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {

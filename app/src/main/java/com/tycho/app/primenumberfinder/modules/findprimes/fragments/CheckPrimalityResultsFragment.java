@@ -100,7 +100,7 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
                 if (getTask().getState() == Task.State.RUNNING) {
                     getTask().pause(false);
                 } else if (getTask().getState() == Task.State.PAUSED) {
-                    getTask().resume();
+                    getTask().resume(false);
                 }
             }
         });

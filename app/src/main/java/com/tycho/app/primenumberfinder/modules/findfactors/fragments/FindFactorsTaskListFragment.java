@@ -2,7 +2,6 @@ package com.tycho.app.primenumberfinder.modules.findfactors.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,7 +17,6 @@ import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsTaskListAdapter;
-import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
 
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -78,7 +76,7 @@ public class FindFactorsTaskListFragment extends Fragment {
         textViewNoTasks = rootView.findViewById(R.id.empty_message);
 
         //Restore tasks if fragment was destroyed
-        for (Task task : PrimeNumberFinder.getTaskManager().getTasks()) {
+        for (Task task : PrimeNumberFinder.getTaskManager().getTaskStates()) {
             if (task instanceof FindFactorsTask) {
                 taskListAdapter.addTask(task);
             }

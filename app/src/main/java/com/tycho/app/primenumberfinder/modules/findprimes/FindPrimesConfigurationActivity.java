@@ -255,7 +255,7 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
             final FindPrimesTask.SearchOptions searchOptions = getIntent().getExtras().getParcelable("searchOptions");
             applyConfig(searchOptions);
         } catch (NullPointerException e) {
-            e.printStackTrace();
+            Log.w(TAG, "SearchOptions not found! Using defaults.");
             applyConfig(null);
         }
 
@@ -277,7 +277,7 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
                 radioGroupSearchMethod.setEnabled(false);
             }
         }catch (NullPointerException e){
-            e.printStackTrace();
+            Log.w(TAG, "Task not found.");
         }
     }
 

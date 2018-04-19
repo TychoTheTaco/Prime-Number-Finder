@@ -42,11 +42,15 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public synchronized void onTaskStarted() {
         super.onTaskStarted();
-        Log.d(TAG, "onTaskStarted(): " + getTask());
         if (uiUpdater.getState() == Task.State.NOT_STARTED){
-            Log.w(TAG, "Starting task " + uiUpdater + " for " + this + " on new thread with state: " + uiUpdater.getState());
             uiUpdater.startOnNewThread();
             uiUpdater.addTaskListener(new TaskAdapter(){
+
+                @Override
+                public void onTaskStarted() {
+                    Log.d(TAG, "UI Updater started: " + uiUpdater);
+                }
+
                 @Override
                 public void onTaskPaused() {
                     Log.d(TAG, "UI Updater paused: " + uiUpdater);
@@ -58,14 +62,14 @@ public abstract class ResultsFragment extends TaskFragment {
                 }
             });
         }else{
-            uiUpdater.resume();
+            uiUpdater.resume(false);
         }
     }
 
     @Override
     public synchronized void onTaskPausing() {
         super.onTaskPausing();
-        uiUpdater.resume();
+        uiUpdater.resume(false);
     }
 
     @Override
@@ -77,21 +81,19 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public synchronized void onTaskResuming() {
         super.onTaskResuming();
-        uiUpdater.resume();
+        uiUpdater.resume(false);
     }
 
     @Override
     public synchronized void onTaskResumed() {
         super.onTaskResumed();
-        uiUpdater.resume();
+        uiUpdater.resume(false);
     }
 
     @Override
     public synchronized void onTaskStopped() {
         super.onTaskStopped();
-        Log.d(TAG, "onTaskStopped(): " + getTask());
         uiUpdater.pause(true);
-        Log.d(TAG, "After pause returned.");
     }
 
     /**

@@ -348,12 +348,14 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onResume() {
         super.onResume();
+        Log.e(TAG, "MAIN Resumed");
         PrimeNumberFinder.getTaskManager().resumeAllTasks();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        Log.e(TAG, "MAIN Paused");
         if (!PrimeNumberFinder.getPreferenceManager().isAllowBackgroundTasks()) {
             PrimeNumberFinder.getTaskManager().pauseAllTasks();
         }

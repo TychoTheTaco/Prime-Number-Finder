@@ -73,7 +73,7 @@ public class FindFactorsTask extends Task {
             //setProgress((float) i / sqrtMax);
         }
 
-        if (!requestStop){
+        if (!shouldStop()){
             for (Long n : inverse) {
                 factors.add(n);
             }
