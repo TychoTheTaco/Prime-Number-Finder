@@ -36,7 +36,7 @@ public abstract class TaskFragment extends Fragment implements TaskListener {
 
     @Override
     public void onTaskStarted() {
-        Log.d(TAG, "onTaskStarted()");
+
     }
 
     @Override
@@ -88,8 +88,6 @@ public abstract class TaskFragment extends Fragment implements TaskListener {
 
         //Add task listener to new task
         if (task != null){
-            Log.d(TAG, "Adding " + this + " to " + task);
-            Log.d(TAG, "Already had: " + task.getTaskListeners());
             task.addTaskListener(this);
         }
     }

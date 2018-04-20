@@ -92,32 +92,55 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
         customEventListeners.get(task).setViewHolder(holder);
         if (holder.uiUpdater.getState() == Task.State.NOT_STARTED) {
             holder.uiUpdater.addTaskListener(new TaskAdapter(){
+
+                @Override
+                public void onTaskStarted() {
+                    Log.w(TAG, "UI Updater started: " + holder.uiUpdater);
+                }
+
+                @Override
+                public void onTaskPausing() {
+                    Log.w(TAG, "UI Updater pausing: " + holder.uiUpdater);
+                }
+
                 @Override
                 public void onTaskPaused() {
-                    Log.d(TAG, "UI Updater paused: " + holder.uiUpdater);
+                    Log.w(TAG, "UI Updater paused: " + holder.uiUpdater);
+                }
+
+                @Override
+                public void onTaskResuming() {
+                    Log.w(TAG, "UI Updater resuming: " + holder.uiUpdater);
                 }
 
                 @Override
                 public void onTaskResumed() {
-                    Log.d(TAG, "UI Updater resumed: " + holder.uiUpdater);
+                    Log.w(TAG, "UI Updater resumed: " + holder.uiUpdater);
+                }
+
+                @Override
+                public void onTaskStopping() {
+                    Log.w(TAG, "UI Updater stopping: " + holder.uiUpdater);
+                }
+
+                @Override
+                public void onTaskStopped() {
+                    Log.w(TAG, "UI Updater stopped: " + holder.uiUpdater);
                 }
             });
             holder.uiUpdater.startOnNewThread();
         } else {
+            /*Log.e(TAG, "Switching onBindViewHolder: " + holder.uiUpdater + " state: " + holder.uiUpdater.getState());
             switch (task.getState()){
-                case STARTING:
                 case RUNNING:
-                case PAUSING:
-                case STOPPING:
                     holder.uiUpdater.resume(false);
                     break;
 
                 case PAUSED:
-                case RESUMING:
                 case STOPPED:
                     holder.uiUpdater.pause(false);
                     break;
-            }
+            }*/
 
         }
         doOnBindViewHolder(holder, position);
@@ -161,7 +184,7 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                         @Override
                         public void run() {
                             if (holder != null) {
-                                holder.uiUpdater.pause(true);
+                                holder.uiUpdater.pause(false);
                                 notifyItemChanged(holder.getAdapterPosition());
                             }
                         }
@@ -213,7 +236,7 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                         @Override
                         public void run() {
                             if (holder != null) {
-                                holder.uiUpdater.stop();
+                                holder.uiUpdater.pause(false);
                                 notifyItemChanged(holder.getAdapterPosition());
                             }
                         }
@@ -329,7 +352,7 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
             pauseButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    Log.e(TAG, "PAUSE PRESSED: " + tasks.get(getAdapterPosition()) + " state: " + tasks.get(getAdapterPosition()).getState());
                     switch (tasks.get(getAdapterPosition()).getState()) {
 
                         case PAUSED:
@@ -348,7 +371,9 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    tasks.get(getAdapterPosition()).stop();
+
+                    //Pause the UI updater. It will be re-used by other ViewHolders
+                    tasks.get(getAdapterPosition()).pause(false);
 
                     if (getAdapterPosition() < selectedItemPosition) {
                         selectedItemPosition--;

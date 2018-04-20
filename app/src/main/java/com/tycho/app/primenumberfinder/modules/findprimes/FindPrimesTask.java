@@ -126,27 +126,6 @@ public class FindPrimesTask extends MultithreadedTask {
                 s -= 1;
             }
             final BruteForceTask task = new BruteForceTask(s, endValue, threadCount * 2);
-            task.addTaskListener(new TaskAdapter() {
-                @Override
-                public void onTaskStarted() {
-                    System.out.println("Thread " + task.startValue + " started.");
-                }
-
-                @Override
-                public void onTaskPaused() {
-                    System.out.println("Thread " + task.startValue + " paused.");
-                }
-
-                @Override
-                public void onTaskResumed() {
-                    System.out.println("Thread " + task.startValue + " resumed.");
-                }
-
-                @Override
-                public void onTaskStopped() {
-                    System.out.println("Thread " + task.startValue + " finished.");
-                }
-            });
             task.bufferSize = searchOptions.bufferSize / threadCount;
             addTask(task);
         }
@@ -239,16 +218,6 @@ public class FindPrimesTask extends MultithreadedTask {
                 e.printStackTrace();
             }
         }*/
-
-        System.out.println("All threads stopped.");
-        long time = 0;
-        for (Task task : getTasks()) {
-            time += task.getElapsedTime();
-            System.out.println("Task " + ((BruteForceTask) task).startValue + "\n    " /*+ ((BruteForceTask) task).primes.size() + " primes\n    "*/
-                    + task.getElapsedTime() + " milliseconds\n    " + ((BruteForceTask) task).totalDistance + " distance");
-        }
-        System.out.println("Average time: " + (time / getTasks().size()) + " milliseconds.");
-        System.out.println("Elapsed time: " + getElapsedTime() + " milliseconds.");
 
         //final long sortStart = System.currentTimeMillis();
         //System.out.println("Merging cache...");
@@ -521,8 +490,6 @@ public class FindPrimesTask extends MultithreadedTask {
         @Override
         protected void run() {
 
-            Log.w(TAG, "Running BFT: " + this + " with parameters (" + startValue + ", " + endValue + ", " + increment + ")");
-
             currentNumber = startValue;
             if (startValue < 3) {
                 if (endValue == INFINITY || endValue >= 2) {
@@ -600,7 +567,6 @@ public class FindPrimesTask extends MultithreadedTask {
 
             if (primes.size() >= bufferSize) {
                 Log.d(TAG, "Swapping to disk! Size: " + primes.size());
-                Log.d(TAG, "Task: " + this + " main state: " + FindPrimesTask.this.getState() + " state: " + getState());
 
                 //Swap memory to disk
                 if (!taskDirectory.exists()) {

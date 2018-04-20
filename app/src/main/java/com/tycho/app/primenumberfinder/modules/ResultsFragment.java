@@ -40,60 +40,43 @@ public abstract class ResultsFragment extends TaskFragment {
     public abstract View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState);
 
     @Override
-    public synchronized void onTaskStarted() {
+    public void onTaskStarted() {
         super.onTaskStarted();
         if (uiUpdater.getState() == Task.State.NOT_STARTED){
             uiUpdater.startOnNewThread();
-            uiUpdater.addTaskListener(new TaskAdapter(){
-
-                @Override
-                public void onTaskStarted() {
-                    Log.d(TAG, "UI Updater started: " + uiUpdater);
-                }
-
-                @Override
-                public void onTaskPaused() {
-                    Log.d(TAG, "UI Updater paused: " + uiUpdater);
-                }
-
-                @Override
-                public void onTaskResumed() {
-                    Log.d(TAG, "UI Updater resumed: " + uiUpdater);
-                }
-            });
         }else{
             uiUpdater.resume(false);
         }
     }
 
     @Override
-    public synchronized void onTaskPausing() {
+    public void onTaskPausing() {
         super.onTaskPausing();
         uiUpdater.resume(false);
     }
 
     @Override
-    public synchronized void onTaskPaused() {
+    public void onTaskPaused() {
         super.onTaskPaused();
         uiUpdater.pause(false);
     }
 
     @Override
-    public synchronized void onTaskResuming() {
+    public void onTaskResuming() {
         super.onTaskResuming();
         uiUpdater.resume(false);
     }
 
     @Override
-    public synchronized void onTaskResumed() {
+    public void onTaskResumed() {
         super.onTaskResumed();
         uiUpdater.resume(false);
     }
 
     @Override
-    public synchronized void onTaskStopped() {
+    public void onTaskStopped() {
         super.onTaskStopped();
-        uiUpdater.pause(true);
+        uiUpdater.pause(false);
     }
 
     /**
@@ -110,6 +93,9 @@ public abstract class ResultsFragment extends TaskFragment {
             }catch (InterruptedException e){
                 e.printStackTrace();
             }
+        }
+        if (task == null){
+            uiUpdater.pause(false);
         }
         super.setTask(task);
     }
@@ -144,12 +130,6 @@ public abstract class ResultsFragment extends TaskFragment {
         protected void run() {
             while (true) {
 
-                if (getTask() == null){
-                    Log.w(TAG, "Pausing because task was null");
-                    pause(true);
-                }
-
-                //Log.d(TAG, "Sending UI update! State: " + getState());
                 updateUi();
 
                 try {
@@ -160,6 +140,9 @@ public abstract class ResultsFragment extends TaskFragment {
                 }
 
                 tryPause();
+                if (shouldStop()){
+                    break;
+                }
             }
         }
     }
