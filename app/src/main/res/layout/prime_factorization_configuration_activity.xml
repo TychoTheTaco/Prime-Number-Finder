@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <include layout="@layout/app_bar" />
+
+    <!-- Number input -->
+    <TextView
+        android:id="@+id/input_number_label"
+        style="@style/DefaultText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/prime_factorization_input_number_description" />
+
+    <com.tycho.app.primenumberfinder.ValidEditText
+        android:id="@+id/number_input"
+        style="@style/NumberInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minWidth="200dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp" />
+
+    <!-- Thread count -->
+    <!--<LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/DefaultText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Threads" />
+
+        <Spinner
+            android:id="@+id/thread_count_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>-->
+
+    <CheckBox
+        android:id="@+id/notify_when_finished"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Notify when finished" />
+
+    <CheckBox
+        android:id="@+id/auto_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="Auto-save when finished" />
+
+</LinearLayout>

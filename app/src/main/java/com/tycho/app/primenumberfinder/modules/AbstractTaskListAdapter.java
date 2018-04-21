@@ -13,9 +13,12 @@ import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -63,6 +66,9 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
      * Action listeners for button presses. (delete / edit / pause).
      */
     private final CopyOnWriteArrayList<ActionViewListener> actionViewListeners = new CopyOnWriteArrayList<>();
+
+    protected static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("##0.00");
+    protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
     private final TaskAdapter taskAdapter = new TaskAdapter() {
         @Override
@@ -129,19 +135,10 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                 }
             });
             holder.uiUpdater.startOnNewThread();
-        } else {
-            /*Log.e(TAG, "Switching onBindViewHolder: " + holder.uiUpdater + " state: " + holder.uiUpdater.getState());
-            switch (task.getState()){
-                case RUNNING:
-                    holder.uiUpdater.resume(false);
-                    break;
 
-                case PAUSED:
-                case STOPPED:
-                    holder.uiUpdater.pause(false);
-                    break;
-            }*/
-
+            if (task.getState() == Task.State.PAUSED || task.getState() == Task.State.NOT_STARTED || task.getState() == Task.State.STOPPED){
+                holder.uiUpdater.pause(false);
+            }
         }
         doOnBindViewHolder(holder, position);
     }
@@ -278,6 +275,8 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
         void onPausePressed(final Task task);
 
         void onTaskRemoved(final Task task);
+
+        void onEditPressed(final Task task);
     }
 
     public void addEventListener(final EventListener eventListener) {
@@ -288,19 +287,25 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
         return eventListeners.remove(eventListener);
     }
 
-    protected void sendOnTaskSelected(final Task task) {
+    private void sendOnTaskSelected(final Task task) {
         for (EventListener eventListener : eventListeners) {
             eventListener.onTaskSelected(task);
         }
     }
 
-    protected void sendOnPausePressed(final Task task) {
+    private void sendOnPausePressed(final Task task) {
         for (EventListener eventListener : eventListeners) {
             eventListener.onPausePressed(task);
         }
     }
 
-    protected void sendOnDeletePressed(final Task task) {
+    private void sendOnEditClicked(final Task task){
+        for (EventListener eventListener : eventListeners){
+            eventListener.onEditPressed(task);
+        }
+    }
+
+    private void sendOnDeletePressed(final Task task) {
         for (EventListener eventListener : eventListeners) {
             eventListener.onTaskRemoved(task);
         }
@@ -321,7 +326,7 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
         public final TextView state;
         public final TextView progress;
         public final ImageButton pauseButton;
-        //public final ImageButton editButton;
+        public final ImageButton editButton;
         public final ImageButton deleteButton;
 
         private final UiUpdater uiUpdater = new UiUpdater(this);
@@ -334,7 +339,7 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
             state = itemView.findViewById(R.id.state);
             progress = itemView.findViewById(R.id.textView_search_progress);
             pauseButton = itemView.findViewById(R.id.pause_button);
-            //editButton = itemView.findViewById(R.id.edit_button);
+            editButton = itemView.findViewById(R.id.edit_button);
             deleteButton = itemView.findViewById(R.id.delete_button);
 
             root.setOnClickListener(new View.OnClickListener() {
@@ -352,7 +357,6 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
             pauseButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.e(TAG, "PAUSE PRESSED: " + tasks.get(getAdapterPosition()) + " state: " + tasks.get(getAdapterPosition()).getState());
                     switch (tasks.get(getAdapterPosition()).getState()) {
 
                         case PAUSED:
@@ -365,6 +369,13 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                     }
 
                     sendOnPausePressed(tasks.get(getAdapterPosition()));
+                }
+            });
+
+            editButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    sendOnEditClicked(tasks.get(getAdapterPosition()));
                 }
             });
 

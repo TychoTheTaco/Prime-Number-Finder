@@ -12,7 +12,7 @@
         android:orientation="vertical"
         android:paddingTop="8dp">
 
-        <!-- Number input -->
+        <!-- Check primality input -->
         <TextView
             android:id="@+id/input_number_label"
             style="@style/DefaultText"
@@ -26,14 +26,14 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
             android:clipChildren="false"
             android:clipToPadding="false"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingEnd="8dp"
             android:paddingStart="8dp">
 
-            <EditText
+            <com.tycho.app.primenumberfinder.ValidEditText
                 android:id="@id/primality_input"
                 style="@style/NumberInput"
                 android:layout_width="0dp"
@@ -63,10 +63,10 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:clipToPadding="false"
-            android:clipChildren="false"
             android:paddingEnd="8dp"
             android:paddingStart="8dp">
 
@@ -120,21 +120,22 @@
 
         </LinearLayout>
 
+        <!-- Tab layout-->
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            app:tabGravity="fill"
+            app:tabMode="fixed" />
+
         <!-- Main view pager -->
         <android.support.v4.view.ViewPager
             android:id="@+id/view_pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-            <android.support.design.widget.TabLayout
-                android:id="@+id/tab_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingEnd="8dp"
-                android:paddingStart="8dp" />
-
-        </android.support.v4.view.ViewPager>
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     </LinearLayout>
 

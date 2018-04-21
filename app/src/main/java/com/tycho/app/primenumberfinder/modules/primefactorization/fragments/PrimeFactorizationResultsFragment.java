@@ -276,9 +276,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(TAG, "Call onUiUpdate() one last time.");
                     onUiUpdate();
-                    Log.d(TAG, "Begin final UI update.");
 
                     //Title
                     title.setText(getString(R.string.status_finished));

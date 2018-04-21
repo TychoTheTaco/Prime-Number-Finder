@@ -30,6 +30,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
+import com.tycho.app.primenumberfinder.FabAnimator;
 import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
@@ -41,6 +42,7 @@ import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfiguratio
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.Validator;
 
 import java.math.BigInteger;
 import java.text.NumberFormat;
@@ -55,42 +57,42 @@ import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
 /**
  * @author Tycho Bellers
- *         Date Created: 11/12/2016
+ * Date Created: 11/12/2016
  */
 public class FindPrimesFragment extends Fragment implements FloatingActionButtonListener {
 
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "FindPrimesFragment";
+    private static final String TAG = FindPrimesFragment.class.getSimpleName();
 
-    /*
-     * Views.
-     */
-    private EditText editTextPrimalityInput;
+    //Views
+    private ValidEditText editTextPrimalityInput;
     private ValidEditText editTextSearchRangeStart;
     private ValidEditText editTextSearchRangeEnd;
 
-    /*
-    Fragments in the main adapter.
-     */
+    //Fragments in the main adapter.
     private final FindPrimesTaskListFragment taskListFragment = new FindPrimesTaskListFragment();
     private final GeneralResultsFragment generalResultsFragment = new GeneralResultsFragment();
 
-    /*
-    Find primes fragments
-     */
+    //Results fragments
     private final FindPrimesResultsFragment findPrimesResultsFragment = new FindPrimesResultsFragment();
-
-    /*
-    Check primality fragments
-     */
     private final CheckPrimalityResultsFragment checkPrimalityResultsFragment = new CheckPrimalityResultsFragment();
 
+    /**
+     * {@linkplain NumberFormat} instance used to format numbers with commas.
+     */
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
-
+    /**
+     * Search options used for starting tasks.
+     */
     private final FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(0, FindPrimesTask.INFINITY, FindPrimesTask.SearchMethod.BRUTE_FORCE, 1);
+
+    /**
+     * Request code for starting a new task.
+     */
+    private static final int REQUEST_CODE_NEW_TASK = 0;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
@@ -134,64 +136,25 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
                 taskListFragment.update();
             }
+
+            @Override
+            public void onEditPressed(Task task) {
+                final Intent intent = new Intent(getActivity(), FindPrimesConfigurationActivity.class);
+                intent.putExtra("searchOptions", ((FindPrimesTask) task).getSearchOptions());
+                intent.putExtra("taskId", task.getId());
+                startActivityForResult(intent, 0);
+            }
         });
         fragmentAdapter.add("Results", generalResultsFragment);
         generalResultsFragment.setContent(findPrimesResultsFragment);
         viewPager.setAdapter(fragmentAdapter);
-        viewPager.setOffscreenPageLimit(2);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
-            private final FloatingActionButton fab = ((MainActivity) getActivity()).getFab();
-            private int diameter;
-            private double circumference;
-
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-                diameter = fab.getWidth();
-                circumference = (2f * Math.PI * ((float) diameter / 2));
-                switch (position) {
-                    case 0:
-                        fab.setVisibility(View.VISIBLE);
-                        fab.setTranslationX(-positionOffsetPixels);
-                        if (circumference > 0) {
-                            fab.setRotation(-360 * positionOffset * ((float) (rootView.getWidth() / circumference)));
-                        }
-                        break;
-
-                    default:
-                        fab.setVisibility(View.GONE);
-                        break;
-                }
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
+        viewPager.addOnPageChangeListener(new FabAnimator(((MainActivity) getActivity()).getFab()));
         final TabLayout tabLayout = rootView.findViewById(R.id.tab_layout);
-        tabLayout.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                //TODO: We might not want to do this because the last fragment doesn't get even spacing. Either center it or allow scrolling.
-                /*
-                 * This empty touch listener is to prevent the scrolling behaviour of this
-                 * TabLayout's parent HorizontalScrollView.
-                 */
-                return true;
-            }
-        });
         tabLayout.setupWithViewPager(viewPager);
 
         //Set up number input
         editTextPrimalityInput = rootView.findViewById(R.id.primality_input);
-        editTextPrimalityInput.setHint(NUMBER_FORMAT.format(new Random().nextInt(1000000)));
+        editTextPrimalityInput.setHint(NUMBER_FORMAT.format(new Random().nextInt(1_000_000)));
         editTextPrimalityInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -207,27 +170,19 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             public void afterTextChanged(Editable editable) {
 
                 //Check if the number is valid
-                if (isNumberValid()) {
-                    editTextPrimalityInput.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.accent)));
+                if (Validator.isPrimalityInputValid(getPrimalityInput())) {
+                    editTextPrimalityInput.setValid(true);
 
-                    final String formattedText = NumberFormat.getNumberInstance(Locale.getDefault()).format(getPrimalityInput());
+                    //Format the number
+                    final String formattedText = NUMBER_FORMAT.format(getPrimalityInput());
                     if (!editable.toString().equals(formattedText)) {
                         editTextPrimalityInput.setText(formattedText);
                     }
                     editTextPrimalityInput.setSelection(formattedText.length());
 
                 } else {
-                    editTextPrimalityInput.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.red)));
+                    editTextPrimalityInput.setValid(false);
                 }
-            }
-        });
-        editTextPrimalityInput.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                //Clear text on touch
-                editTextPrimalityInput.getText().clear();
-                return false;
             }
         });
 
@@ -236,12 +191,11 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         buttonCheckPrimality.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 //Check if the number is valid
-                if (isNumberValid()) {
+                if (Validator.isPrimalityInputValid(getPrimalityInput())) {
 
                     //Create a new task
-                    final Task task = new CheckPrimalityTask(getPrimalityInput());
+                    final Task task = new CheckPrimalityTask(getPrimalityInput().longValue());
                     taskListFragment.addTask(task);
                     PrimeNumberFinder.getTaskManager().registerTask(task);
 
@@ -259,8 +213,8 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
         //Set up range start input
         editTextSearchRangeStart = rootView.findViewById(R.id.search_range_start);
-        editTextSearchRangeStart.setText(NUMBER_FORMAT.format(searchOptions.getStartValue()));
         editTextSearchRangeStart.setHint(NUMBER_FORMAT.format(0));
+        editTextSearchRangeStart.setText(NUMBER_FORMAT.format(searchOptions.getStartValue()));
         editTextSearchRangeStart.addTextChangedListener(new TextWatcher() {
 
             private boolean isDirty = true;
@@ -282,7 +236,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
                     //Format text
                     if (editable.length() > 0) {
-                        final String formattedText = NumberFormat.getNumberInstance(Locale.getDefault()).format(getStartValue());
+                        final String formattedText = NUMBER_FORMAT.format(getStartValue());
                         if (!editable.toString().equals(formattedText)) {
                             isDirty = false;
                             editTextSearchRangeStart.setText(formattedText);
@@ -291,10 +245,10 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                     }
 
                     //Check if the number is valid
-                    if (isRangeValid()){
+                    if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
                         editTextSearchRangeStart.setValid(true);
                         editTextSearchRangeEnd.setValid(true);
-                    }else if (editTextSearchRangeStart.hasFocus()){
+                    } else if (editTextSearchRangeStart.hasFocus()) {
                         editTextSearchRangeStart.setValid(editTextSearchRangeEnd.getText().length() == 0);
                     }
 
@@ -302,18 +256,10 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                 isDirty = true;
             }
         });
-        editTextSearchRangeStart.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                //Clear text on touch
-                editTextSearchRangeStart.getText().clear();
-                return false;
-            }
-        });
 
         //Set up range end input
         editTextSearchRangeEnd = rootView.findViewById(R.id.search_range_end);
-        editTextSearchRangeEnd.setHint(NUMBER_FORMAT.format(Integer.valueOf(editTextSearchRangeStart.getHint().toString().replace(",", "")) + new Random().nextInt(1000000)));
+        editTextSearchRangeEnd.setHint(NUMBER_FORMAT.format(Integer.valueOf(editTextSearchRangeStart.getHint().toString().replace(",", "")) + new Random().nextInt(1_000_000)));
         editTextSearchRangeEnd.addTextChangedListener(new TextWatcher() {
 
             private boolean isDirty = true;
@@ -341,7 +287,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                             }
                             editTextSearchRangeEnd.setSelection(editTextSearchRangeEnd.getText().length());
                         } else {
-                            final String formattedText = NumberFormat.getNumberInstance(Locale.getDefault()).format(getEndValue());
+                            final String formattedText = NUMBER_FORMAT.format(getEndValue());
                             if (!editable.toString().equals(formattedText)) {
                                 isDirty = false;
                                 editTextSearchRangeEnd.setText(formattedText);
@@ -351,22 +297,15 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                     }
 
                     //Check if the number is valid
-                    if (isRangeValid()){
+                    if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
                         editTextSearchRangeStart.setValid(true);
                         editTextSearchRangeEnd.setValid(true);
-                    }else if (editTextSearchRangeEnd.hasFocus()){
+                    } else if (editTextSearchRangeEnd.hasFocus()) {
                         editTextSearchRangeEnd.setValid(editTextSearchRangeStart.getText().length() == 0);
                     }
 
                 }
                 isDirty = true;
-            }
-        });
-        editTextSearchRangeEnd.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                editTextSearchRangeEnd.getText().clear();
-                return false;
             }
         });
 
@@ -385,14 +324,15 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             @Override
             public void onClick(View v) {
 
-                if (getStartValue().compareTo(BigInteger.ZERO) == 1 ||getEndValue().longValue() == FindPrimesTask.INFINITY || getEndValue().compareTo(BigInteger.valueOf(Integer.MAX_VALUE - 1)) == 1){
+                //Determine best search method
+                if (getStartValue().compareTo(BigInteger.ZERO) > 0 || getEndValue().longValue() == FindPrimesTask.INFINITY || getEndValue().compareTo(BigInteger.valueOf(Integer.MAX_VALUE - 1)) > 0) {
                     searchOptions.setSearchMethod(FindPrimesTask.SearchMethod.BRUTE_FORCE);
-                }else{
+                } else {
                     searchOptions.setSearchMethod(FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES);
                 }
 
                 //Check if the range is valid
-                if (isRangeValid()) {
+                if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
 
                     //Create a new task
                     searchOptions.setStartValue(getStartValue().longValue());
@@ -400,7 +340,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                     searchOptions.setThreadCount(1);
                     try {
                         startTask((FindPrimesTask.SearchOptions) searchOptions.clone());
-                    }catch (CloneNotSupportedException e){
+                    } catch (CloneNotSupportedException e) {
                         e.printStackTrace();
                     }
 
@@ -418,136 +358,24 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         return rootView;
     }
 
-    private long getPrimalityInput() {
-        final String input = editTextPrimalityInput.getText().toString().trim();
-        if (input.length() > 0) {
-            final BigInteger number = new BigInteger(input.replace(",", ""));
-            return number.longValue();
-        } else {
-            return 0;
-        }
-    }
-
-    private BigInteger getStartValue() {
-        final String input = editTextSearchRangeStart.getText().toString().trim();
-        if (input.length() > 0) {
-            return new BigInteger(input.replace(",", ""));
-        } else {
-            return BigInteger.ZERO;
-        }
-    }
-
-    private BigInteger getEndValue() {
-        final String input = editTextSearchRangeEnd.getText().toString().trim();
-
-        if (input.length() > 0) {
-            if (input.equals("infinity")) {
-                return BigInteger.valueOf(FindPrimesTask.INFINITY);
-            }
-            return new BigInteger(input.replace(",", ""));
-        } else {
-            return BigInteger.ZERO;
-        }
-    }
-
-    //Validation
-
-    /**
-     * Check if the primality input number is valid.
-     *
-     * @return <code>true</code> if valid. <code>false</code> if invalid.
-     */
-    private boolean isNumberValid() {
-        try {
-            final BigInteger number = new BigInteger(editTextPrimalityInput.getText().toString().replace(",", ""));
-
-            //Check if number is greater than long range
-            if (number.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) == 1) {
-                return false;
-            }
-
-            //Check if number is less than 1
-            if (number.compareTo(BigInteger.ONE) == -1) {
-                return false;
-            }
-
-        } catch (NumberFormatException e) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private boolean isRangeValid() {
-
-        //Validate the start value
-        try {
-            final BigInteger startValue = new BigInteger(editTextSearchRangeStart.getText().toString().replace(",", ""));
-            BigInteger endValue;
-            final String searchRangeEndText = editTextSearchRangeEnd.getText().toString();
-            if (searchRangeEndText.equals(getString(R.string.infinity_text))) {
-                endValue = BigInteger.valueOf(FindPrimesTask.INFINITY);
-            } else {
-                endValue = new BigInteger(searchRangeEndText.replace(",", ""));
-            }
-
-            //Check if numbers are greater than long range
-            if (startValue.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) == 1 || endValue.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) == 1) {
-                return false;
-            }
-
-            //The start value must be at least 0
-            if (startValue.compareTo(BigInteger.ZERO) == -1) {
-                return false;
-            }
-
-            //Depends on search method
-            switch (searchOptions.getSearchMethod()) {
-                case SIEVE_OF_ERATOSTHENES:
-
-                    //The start value must equal to 0
-                    if (startValue.compareTo(BigInteger.ZERO) != 0) {
-                        return false;
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_CODE_NEW_TASK:
+                if (data != null && data.getExtras() != null) {
+                    final FindPrimesTask task = (FindPrimesTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) data.getExtras().get("taskId"));
+                    final FindPrimesTask.SearchOptions searchOptions = data.getExtras().getParcelable("searchOptions");
+                    if (searchOptions != null) {
+                        if (task == null) {
+                            startTask(searchOptions);
+                        } else {
+                            task.setOptions(searchOptions);
+                        }
                     }
-
-                    //The end value cannot be infinity
-                    if (endValue.compareTo(BigInteger.valueOf(FindPrimesTask.INFINITY)) == 0) {
-                        return false;
-                    }
-
-                    break;
-
-                case BRUTE_FORCE:
-                    break;
-            }
-
-            if (endValue.compareTo(BigInteger.valueOf(FindPrimesTask.INFINITY)) != 0) {
-
-                //End value must be greater than start value
-                if (startValue.compareTo(endValue) >= 0) {
-                    return false;
                 }
-
-                //End value must be greater than current number
-                /*if (taskFragment != null && taskFragment.getTask() != null && taskFragment.getTask() instanceof FindPrimesTask) {
-                    if (endValue.compareTo(BigInteger.valueOf(((FindPrimesTask) taskFragment.getTask()).getCurrentNumber())) <= 0) {
-                        return false;
-                    }
-                }*/
-            }
-
-        } catch (NumberFormatException e) {
-            return false;
+                break;
         }
-
-        return true;
     }
-
-    public void addActionViewListener(final ActionViewListener actionViewListener) {
-        taskListFragment.addActionViewListener(actionViewListener);
-    }
-
-    private static final int REQUEST_CODE_NEW_TASK = 0;
 
     @Override
     public void onClick(View view) {
@@ -555,37 +383,16 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         startActivityForResult(intent, REQUEST_CODE_NEW_TASK);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        switch (requestCode) {
-
-            case REQUEST_CODE_NEW_TASK:
-                if (data != null && data.getExtras() != null) {
-                    final FindPrimesTask.SearchOptions searchOptions = data.getExtras().getParcelable("searchOptions");
-                    Log.d(TAG, "Read: " + searchOptions.getEndValue());
-                    final FindPrimesTask task = (FindPrimesTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) data.getExtras().get("taskId"));
-                    Log.d(TAG, "Task: " + task);
-                    if (task == null) {
-                        startTask(searchOptions);
-                    } else {
-                        task.setOptions(searchOptions);
-                    }
-                }
-                break;
-        }
-    }
-
     private void startTask(final FindPrimesTask.SearchOptions searchOptions) {
 
         boolean valid = false;
 
         //Make sure there is enough memory
-        if (searchOptions.getSearchMethod() == FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES){
+        if (searchOptions.getSearchMethod() == FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES) {
 
             final Runtime runtime = Runtime.getRuntime();
-            final long usedMemInMB=(runtime.totalMemory() - runtime.freeMemory()) / 1048576L;
-            final long maxHeapSizeInMB=runtime.maxMemory() / 1048576L;
+            final long usedMemInMB = (runtime.totalMemory() - runtime.freeMemory()) / 1048576L;
+            final long maxHeapSizeInMB = runtime.maxMemory() / 1048576L;
             final long availHeapSizeInMB = maxHeapSizeInMB - usedMemInMB;
 
             final long requiredMB = ((searchOptions.getEndValue() / 8) + (searchOptions.getEndValue() * 2)) / (1024 * 1024);
@@ -594,23 +401,23 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             Log.d(TAG, "Avail: " + availHeapSizeInMB);
             Log.d(TAG, "Req: " + requiredMB);
 
-            if (requiredMB <= availHeapSizeInMB * 0.9f){
+            if (requiredMB <= availHeapSizeInMB * 0.9f) {
                 valid = true;
-            }else{
+            } else {
                 valid = false;
                 Toast.makeText(getActivity(), "Not enough RAM to start task! Use Brute Force instead!", Toast.LENGTH_LONG).show();
             }
-        }else{
+        } else {
             valid = true;
         }
 
-        if (valid){
+        if (valid) {
             final FindPrimesTask task = new FindPrimesTask(searchOptions, getActivity());
             task.addTaskListener(new TaskAdapter() {
 
                 @Override
                 public void onTaskStopped() {
-                    if (task.getSearchOptions().autoSave) {
+                    if (task.getSearchOptions().isAutoSave()) {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -625,7 +432,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                         }).start();
                     }
 
-                    if (task.getSearchOptions().notifyWhenFinished) {
+                    if (task.getSearchOptions().isNotifyWhenFinished()) {
                         final String CHANNEL_ID = "default";
 
                         //Create notification
@@ -668,5 +475,40 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                 }
             });
         }
+    }
+
+    private BigInteger getPrimalityInput() {
+        final String input = editTextPrimalityInput.getText().toString().trim();
+        if (input.length() > 0) {
+            return new BigInteger(input.replace(",", ""));
+        } else {
+            return BigInteger.ZERO;
+        }
+    }
+
+    private BigInteger getStartValue() {
+        final String input = editTextSearchRangeStart.getText().toString().trim();
+        if (input.length() > 0) {
+            return new BigInteger(input.replace(",", ""));
+        } else {
+            return BigInteger.ZERO;
+        }
+    }
+
+    private BigInteger getEndValue() {
+        final String input = editTextSearchRangeEnd.getText().toString().trim();
+
+        if (input.length() > 0) {
+            if (input.equals("infinity")) {
+                return BigInteger.valueOf(FindPrimesTask.INFINITY);
+            }
+            return new BigInteger(input.replace(",", ""));
+        } else {
+            return BigInteger.ZERO;
+        }
+    }
+
+    public void addActionViewListener(final ActionViewListener actionViewListener) {
+        taskListFragment.addActionViewListener(actionViewListener);
     }
 }

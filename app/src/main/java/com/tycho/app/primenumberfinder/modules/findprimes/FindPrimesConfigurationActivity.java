@@ -38,6 +38,8 @@ import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.ValidEditText;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
+import com.tycho.app.primenumberfinder.utils.Utils;
+import com.tycho.app.primenumberfinder.utils.Validator;
 
 import java.math.BigInteger;
 import java.text.NumberFormat;
@@ -49,6 +51,7 @@ import easytasks.Task;
 import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchMethod.BRUTE_FORCE;
 import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES;
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
+import static com.tycho.app.primenumberfinder.utils.Utils.sortByDate;
 
 /**
  * Created by tycho on 1/24/2018.
@@ -85,7 +88,7 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        applyThemeColor(ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));
+        Utils.applyTheme(this, ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));
 
         //Set up range start input
         editTextSearchRangeStart = findViewById(R.id.search_range_start);
@@ -119,7 +122,7 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
                     }
 
                     //Check if the number is valid
-                    if (isRangeValid()){
+                    if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchMethod)){
                         editTextSearchRangeStart.setValid(true);
                         editTextSearchRangeEnd.setValid(true);
                     }else if (editTextSearchRangeStart.hasFocus()){
@@ -128,14 +131,6 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
 
                 }
                 isDirty = true;
-            }
-        });
-        editTextSearchRangeStart.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                //Clear text on touch
-                editTextSearchRangeStart.getText().clear();
-                return false;
             }
         });
 
@@ -181,7 +176,7 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
                     autoSaveCheckbox.setEnabled(getEndValue().compareTo(BigInteger.valueOf(FindPrimesTask.INFINITY)) != 0);
 
                     //Check if the number is valid
-                    if (isRangeValid()){
+                    if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchMethod)){
                         editTextSearchRangeStart.setValid(true);
                         editTextSearchRangeEnd.setValid(true);
                     }else if (editTextSearchRangeEnd.hasFocus()){
@@ -190,13 +185,6 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
 
                 }
                 isDirty = true;
-            }
-        });
-        editTextSearchRangeEnd.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                editTextSearchRangeEnd.getText().clear();
-                return false;
             }
         });
 
@@ -323,13 +311,13 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
                 break;
 
             case R.id.start:
-                if (isRangeValid()) {
+                if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchMethod)) {
                     final Intent intent = new Intent();
                     final FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(getStartValue().longValue(), getEndValue().longValue());
                     searchOptions.setSearchMethod(searchMethod);
                     searchOptions.setThreadCount(Integer.valueOf((String) threadCountSpinner.getSelectedItem()));
-                    searchOptions.notifyWhenFinished = notifyWhenFinishedCheckbox.isChecked();
-                    searchOptions.autoSave = autoSaveCheckbox.isChecked();
+                    searchOptions.setNotifyWhenFinished(notifyWhenFinishedCheckbox.isChecked());
+                    searchOptions.setAutoSave(autoSaveCheckbox.isChecked());
                     intent.putExtra("searchOptions", searchOptions);
                     if (task != null) intent.putExtra("taskId", task.getId());
                     setResult(0, intent);
@@ -340,15 +328,6 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
                 break;
         }
         return true;
-    }
-
-    private void applyThemeColor(final int statusBarColor, final int actionBarColor) {
-
-        //Set status bar color
-        getWindow().setStatusBarColor(statusBarColor);
-
-        //Set actionbar color
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(actionBarColor));
     }
 
     private BigInteger getStartValue() {
@@ -373,76 +352,6 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isRangeValid() {
-
-        //Validate the start value
-        try {
-            final BigInteger startValue = new BigInteger(editTextSearchRangeStart.getText().toString().replace(",", ""));
-            BigInteger endValue;
-            final String searchRangeEndText = editTextSearchRangeEnd.getText().toString();
-            if (searchRangeEndText.equals(getString(R.string.infinity_text))) {
-                endValue = BigInteger.valueOf(FindPrimesTask.INFINITY);
-            } else {
-                endValue = new BigInteger(searchRangeEndText.replace(",", ""));
-            }
-
-            //Check if numbers are greater than long range
-            if (startValue.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) == 1 || endValue.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) == 1) {
-                return false;
-            }
-
-            //The start value must be at least 0
-            if (startValue.compareTo(BigInteger.ZERO) == -1) {
-                return false;
-            }
-
-            //Depends on search method
-            switch (searchMethod) {
-                case SIEVE_OF_ERATOSTHENES:
-
-                    //The start value must equal to 0
-                    if (startValue.compareTo(BigInteger.ZERO) != 0) {
-                        return false;
-                    }
-
-                    //The end value cannot be infinity
-                    if (endValue.compareTo(BigInteger.valueOf(FindPrimesTask.INFINITY)) == 0) {
-                        return false;
-                    }
-
-                    //The end value cannot larger than an int
-                    if (endValue.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) == 1) {
-                        return false;
-                    }
-
-                    break;
-
-                case BRUTE_FORCE:
-                    break;
-            }
-
-            if (endValue.compareTo(BigInteger.valueOf(FindPrimesTask.INFINITY)) != 0) {
-
-                //End value must be greater than start value
-                if (startValue.compareTo(endValue) >= 0) {
-                    return false;
-                }
-
-                //End value must be greater than current number
-                /*if (taskFragment != null && taskFragment.getTask() != null && taskFragment.getTask() instanceof FindPrimesTask) {
-                    if (endValue.compareTo(BigInteger.valueOf(((FindPrimesTask) taskFragment.getTask()).getCurrentNumber())) <= 0) {
-                        return false;
-                    }
-                }*/
-            }
-
-        } catch (NumberFormatException e) {
-            return false;
-        }
-
-        return true;
-    }
-
     private void applyConfig(final FindPrimesTask.SearchOptions searchOptions) {
 
         if (searchOptions != null) {
@@ -464,8 +373,8 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
 
             threadCountSpinner.setSelection(searchOptions.getThreadCount() - 1);
 
-            notifyWhenFinishedCheckbox.setChecked(searchOptions.notifyWhenFinished);
-            autoSaveCheckbox.setChecked(searchOptions.autoSave);
+            notifyWhenFinishedCheckbox.setChecked(searchOptions.isNotifyWhenFinished());
+            autoSaveCheckbox.setChecked(searchOptions.isAutoSave());
         } else {
             editTextSearchRangeStart.setText(NumberFormat.getNumberInstance(Locale.getDefault()).format(0));
             editTextSearchRangeStart.setEnabled(true);

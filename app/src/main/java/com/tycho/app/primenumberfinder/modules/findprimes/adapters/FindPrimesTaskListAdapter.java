@@ -9,10 +9,8 @@ import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.TaskListAdapterCallbacks;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
@@ -28,19 +26,14 @@ import easytasks.Task;
  * Created by tycho on 11/16/2017.
  */
 
-public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrimesTaskListAdapter.ViewHolder>{
+public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<AbstractTaskListAdapter.ViewHolder>{
 
     /**
      * Tag used for logging and debugging.
      */
     private static final String TAG = "FindPrimesTaskListAdptr";
 
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("##0.00");
-    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
-
     private final Context context;
-
-    private final CopyOnWriteArrayList<TaskListAdapterCallbacks> taskListAdapterCallbacks = new CopyOnWriteArrayList<>();
 
     public FindPrimesTaskListAdapter(final Context context) {
         this.context = context;
@@ -154,36 +147,5 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
     @Override
     public int getItemCount() {
         return tasks.size();
-    }
-
-    class ViewHolder extends AbstractTaskListAdapter.ViewHolder {
-
-        private final ImageButton editButton;
-
-        public ViewHolder(View itemView){
-            super(itemView);
-            editButton = itemView.findViewById(R.id.edit_button);
-
-            editButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    sendOnEditClicked(tasks.get(getAdapterPosition()));
-                }
-            });
-        }
-    }
-
-    public void addTaskListAdapterCallbacks(final TaskListAdapterCallbacks taskListAdapterCallbacks){
-        this.taskListAdapterCallbacks.add(taskListAdapterCallbacks);
-    }
-
-    public void removeTaskListAdapterCallbacks(final TaskListAdapterCallbacks taskListAdapterCallbacks){
-        this.taskListAdapterCallbacks.remove(taskListAdapterCallbacks);
-    }
-
-    private void sendOnEditClicked(final Task task){
-        for (TaskListAdapterCallbacks taskListAdapterCallbacks : taskListAdapterCallbacks){
-            taskListAdapterCallbacks.onEditClicked(task);
-        }
     }
 }

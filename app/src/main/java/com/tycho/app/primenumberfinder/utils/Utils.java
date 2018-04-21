@@ -3,8 +3,10 @@ package com.tycho.app.primenumberfinder.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Parcel;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.text.ParcelableSpan;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -41,7 +43,7 @@ public final class Utils {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "Utils";
+    private static final String TAG = Utils.class.getSimpleName();
 
     /**
      * Convert a DP value to its pixel value.
@@ -233,5 +235,10 @@ public final class Utils {
             }
         }
         return spanPositions;
+    }
+
+    public static void applyTheme(final AppCompatActivity appCompatActivity, final int statusBarColor, final int actionBarColor){
+        appCompatActivity.getWindow().setStatusBarColor(statusBarColor);
+        appCompatActivity.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(actionBarColor));
     }
 }

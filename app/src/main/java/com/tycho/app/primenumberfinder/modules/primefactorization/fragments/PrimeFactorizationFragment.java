@@ -1,13 +1,21 @@
 package com.tycho.app.primenumberfinder.modules.primefactorization.fragments;
 
 import android.app.Fragment;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
@@ -22,17 +30,28 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
+import com.tycho.app.primenumberfinder.FabAnimator;
+import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.activities.MainActivity;
 import com.tycho.app.primenumberfinder.adapters.FragmentAdapter;
+import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsConfigurationActivity;
+import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfigurationActivity;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.adapters.PrimeFactorizationTaskListAdapter;
+import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.UUID;
 
 import easytasks.Task;
+import easytasks.TaskAdapter;
 
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
@@ -41,7 +60,7 @@ import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
  * Date Created: 3/2/2017
  */
 
-public class PrimeFactorizationFragment extends Fragment {
+public class PrimeFactorizationFragment extends Fragment implements FloatingActionButtonListener{
 
     /**
      * Tag used for logging and debugging.
@@ -55,10 +74,14 @@ public class PrimeFactorizationFragment extends Fragment {
 
     private EditText editTextInput;
 
+    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
+
     private Button buttonFactorize;
 
     private final PrimeFactorizationTaskListFragment taskListFragment = new PrimeFactorizationTaskListFragment();
     private final PrimeFactorizationResultsFragment resultsFragment = new PrimeFactorizationResultsFragment();
+
+    private final PrimeFactorizationTask.SearchOptions searchOptions = new PrimeFactorizationTask.SearchOptions(0);
 
     @Nullable
     @Override
@@ -89,22 +112,19 @@ public class PrimeFactorizationFragment extends Fragment {
 
                 taskListFragment.update();
             }
+
+            @Override
+            public void onEditPressed(Task task) {
+                final Intent intent = new Intent(getActivity(), PrimeFactorizationConfigurationActivity.class);
+                intent.putExtra("searchOptions", ((PrimeFactorizationTask) task).getSearchOptions());
+                intent.putExtra("taskId", task.getId());
+                startActivityForResult(intent, 0);
+            }
         });
         fragmentAdapter.add("Results", resultsFragment);
         viewPager.setAdapter(fragmentAdapter);
-        viewPager.setOffscreenPageLimit(2);
+        viewPager.addOnPageChangeListener(new FabAnimator(((MainActivity) getActivity()).getFab()));
         final TabLayout tabLayout = rootView.findViewById(R.id.tab_layout);
-        tabLayout.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                //TODO: We might not want to do this because the last fragment doesnt get even spacing. Either center it or allow scrolling.
-                /**
-                 * This empty touch listener is to prevent the scrolling behaviour of this
-                 * TabLayout's parent HorizontalScrollView.
-                 */
-                return true;
-            }
-        });
         tabLayout.setupWithViewPager(viewPager);
 
         //Set up factor input
@@ -157,14 +177,8 @@ public class PrimeFactorizationFragment extends Fragment {
                 if (isNumberValid()) {
 
                     //Create a new task
-                    final Task task = new PrimeFactorizationTask(getNumberToFactor());
-                    fragmentAdapter.notifyDataSetChanged();
-                    taskListFragment.addTask(task);
-                    PrimeNumberFinder.getTaskManager().registerTask(task);
-
-                    //Start the task
-                    task.startOnNewThread();
-                    taskListFragment.setSelected(task);
+                    searchOptions.setNumber(getNumberToFactor());
+                    startTask(searchOptions);
 
                     hideKeyboard(getActivity());
 
@@ -208,5 +222,100 @@ public class PrimeFactorizationFragment extends Fragment {
 
     public void addActionViewListener(final ActionViewListener actionViewListener) {
         taskListFragment.addActionViewListener(actionViewListener);
+    }
+
+    private static final int REQUEST_CODE_NEW_TASK = 0;
+
+    @Override
+    public void onClick(View view) {
+        final Intent intent = new Intent(getActivity(), PrimeFactorizationConfigurationActivity.class);
+        startActivityForResult(intent, REQUEST_CODE_NEW_TASK);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        switch (requestCode) {
+
+            case REQUEST_CODE_NEW_TASK:
+                if (data != null && data.getExtras() != null) {
+                    final PrimeFactorizationTask.SearchOptions searchOptions = data.getExtras().getParcelable("searchOptions");
+                    final PrimeFactorizationTask task = (PrimeFactorizationTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) data.getExtras().get("taskId"));
+                    if (task == null) {
+                        startTask(searchOptions);
+                    } else {
+                        task.setSearchOptions(searchOptions);
+                    }
+                }
+                break;
+        }
+    }
+
+    private void startTask(final PrimeFactorizationTask.SearchOptions searchOptions){
+        final PrimeFactorizationTask task = new PrimeFactorizationTask(searchOptions);
+        task.addTaskListener(new TaskAdapter() {
+
+            @Override
+            public void onTaskStopped() {
+
+                //Auto-save
+                if (task.getSearchOptions().isAutoSave()) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            final boolean success = FileManager.getInstance().saveTree(task.getFactorTree());
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }).start();
+                }
+
+                //Notify when finished
+                if (task.getSearchOptions().isNotifyWhenFinished()) {
+                    final String CHANNEL_ID = "default";
+
+                    //Create notification
+                    Intent intent = new Intent(getActivity(), MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(getActivity(), 0, intent, 0);
+
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(), CHANNEL_ID)
+                            .setSmallIcon(R.drawable.circle_white)
+                            .setContentTitle("Task Finished")
+                            .setContentText("Task \"Prime factorization of " + NUMBER_FORMAT.format(task.getNumber()) + "\" finished.")
+                            .setContentIntent(pendingIntent)
+                            .setAutoCancel(true);
+
+                    //Register notification channel
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        final NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Default", NotificationManager.IMPORTANCE_DEFAULT);
+                        channel.setDescription("Default notification channel.");
+                        final NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+                        notificationManager.createNotificationChannel(channel);
+                    }
+
+                    final NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.notify(0, builder.build());
+                }
+                task.removeTaskListener(this);
+            }
+        });
+        taskListFragment.addTask(task);
+        PrimeNumberFinder.getTaskManager().registerTask(task);
+
+        //Start the task
+        task.startOnNewThread();
+
+        //Post to a handler because "java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState"
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                taskListFragment.setSelected(task);
+            }
+        });
     }
 }

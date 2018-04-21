@@ -1,5 +1,11 @@
 package com.tycho.app.primenumberfinder.modules.findfactors;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,7 +46,7 @@ public class FindFactorsTask extends Task {
 
     public boolean didFinish = false;
 
-    private final SearchOptions searchOptions;
+    private SearchOptions searchOptions;
 
     private long i;
 
@@ -48,7 +54,7 @@ public class FindFactorsTask extends Task {
 
     public FindFactorsTask(final SearchOptions searchOptions) {
         this.searchOptions = searchOptions;
-        this.number = searchOptions.getNumberToFactor();
+        this.number = searchOptions.getNumber();
          sqrtMax = (int) Math.sqrt(number);
     }
 
@@ -83,9 +89,18 @@ public class FindFactorsTask extends Task {
     }
 
     @Override
+    //TODO: The downside of this is that getEstimatedTimeRemaining() will be inaccurate if getProgress() is never called because the progress is never set until this is called.
     public float getProgress() {
         setProgress((float) i / sqrtMax);
         return super.getProgress();
+    }
+
+    public void setSearchOptions(SearchOptions searchOptions) {
+        this.searchOptions = searchOptions;
+    }
+
+    public SearchOptions getSearchOptions() {
+        return searchOptions;
     }
 
     public long getMaxValue(){
@@ -100,40 +115,52 @@ public class FindFactorsTask extends Task {
         return factors;
     }
 
-    public static class SearchOptions {
+    public static class SearchOptions extends GeneralSearchOptions {
 
+        /**
+         * The number we are finding factors of.
+         */
         private long number;
 
-        public enum MonitorType {
-            NONE,
-            SIMPLE,
-            ADVANCED
-        }
-
-        private MonitorType monitorType;
-
-        public SearchOptions() {
-        }
-
-        public SearchOptions(long number, MonitorType monitorType) {
+        public SearchOptions(final long number, final int threadCount, final boolean notifyWhenFinished, final boolean autoSave) {
+            super(threadCount, notifyWhenFinished, autoSave);
             this.number = number;
-            this.monitorType = monitorType;
         }
 
-        public long getNumberToFactor() {
-            return number;
+        public SearchOptions(final long number) {
+            this(number, 1, false, false);
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeLong(this.number);
+        }
+
+        public static final Parcelable.Creator<SearchOptions> CREATOR = new Parcelable.Creator<SearchOptions>() {
+
+            @Override
+            public SearchOptions createFromParcel(Parcel in) {
+                return new SearchOptions(in);
+            }
+
+            @Override
+            public SearchOptions[] newArray(int size) {
+                return new SearchOptions[size];
+            }
+        };
+
+        private SearchOptions(final Parcel parcel) {
+            super(parcel);
+            this.number = parcel.readLong();
         }
 
         public void setNumber(long number) {
             this.number = number;
         }
 
-        public MonitorType getMonitorType() {
-            return monitorType;
-        }
-
-        public void setMonitorType(MonitorType monitorType) {
-            this.monitorType = monitorType;
+        public long getNumber() {
+            return number;
         }
     }
 

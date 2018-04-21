@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.BufferedOutputStream;
@@ -667,7 +668,7 @@ public class FindPrimesTask extends MultithreadedTask {
 
     // Android
 
-    public static class SearchOptions implements Parcelable, Cloneable {
+    public static class SearchOptions extends GeneralSearchOptions {
 
         /**
          * The value to start the search from. Inclusive.
@@ -685,32 +686,15 @@ public class FindPrimesTask extends MultithreadedTask {
         private SearchMethod searchMethod;
 
         /**
-         * The number of threads to use. This is ignored if the search method is {@linkplain SearchMethod#SIEVE_OF_ERATOSTHENES}.
-         */
-        private int threadCount;
-
-        /**
          * The maximum size of prime numbers in memory. If more numbers are found, the entire list will be saved onto the disk first.
          */
         private int bufferSize = 100_000;
 
-        /**
-         * Show a notification when the task is finished.
-         */
-        public boolean notifyWhenFinished;
-
-        /**
-         * Automatically save the results of this task.
-         */
-        public boolean autoSave;
-
         public SearchOptions(final long startValue, final long endValue, final SearchMethod searchMethod, final int threadCount, final boolean notifyWhenFinished, final boolean autoSave) {
+            super(threadCount, notifyWhenFinished, autoSave);
             this.startValue = startValue;
             this.endValue = endValue;
             this.searchMethod = searchMethod;
-            this.threadCount = threadCount;
-            this.notifyWhenFinished = notifyWhenFinished;
-            this.autoSave = autoSave;
         }
 
         public SearchOptions(final long startValue, final long endValue, final SearchMethod searchMethod, final int threadCount) {
@@ -721,19 +705,19 @@ public class FindPrimesTask extends MultithreadedTask {
             this(startValue, endValue, SearchMethod.BRUTE_FORCE, 1, false, false);
         }
 
-        @Override
-        public int describeContents() {
-            return 0;
+        private SearchOptions(final Parcel parcel) {
+            super(parcel);
+            this.startValue = parcel.readLong();
+            this.endValue = parcel.readLong();
+            this.searchMethod = (SearchMethod) parcel.readSerializable();
         }
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
             dest.writeLong(this.startValue);
             dest.writeLong(this.endValue);
             dest.writeSerializable(this.searchMethod);
-            dest.writeInt(this.threadCount);
-            dest.writeInt(this.notifyWhenFinished ? 1 : 0);
-            dest.writeInt(this.autoSave ? 1 : 0);
         }
 
         public static final Parcelable.Creator<SearchOptions> CREATOR = new Parcelable.Creator<SearchOptions>() {
@@ -748,19 +732,6 @@ public class FindPrimesTask extends MultithreadedTask {
                 return new SearchOptions[size];
             }
         };
-
-        private SearchOptions(final Parcel parcel) {
-            this.startValue = parcel.readLong();
-            this.endValue = parcel.readLong();
-            this.searchMethod = (SearchMethod) parcel.readSerializable();
-            this.threadCount = parcel.readInt();
-            this.notifyWhenFinished = parcel.readInt() == 1;
-            this.autoSave = parcel.readInt() == 1;
-        }
-
-        public Object clone() throws CloneNotSupportedException {
-            return super.clone();
-        }
 
         public long getStartValue() {
             return startValue;
@@ -784,14 +755,6 @@ public class FindPrimesTask extends MultithreadedTask {
 
         public void setSearchMethod(SearchMethod searchMethod) {
             this.searchMethod = searchMethod;
-        }
-
-        public int getThreadCount() {
-            return threadCount;
-        }
-
-        public void setThreadCount(int threadCount) {
-            this.threadCount = threadCount;
         }
     }
 }

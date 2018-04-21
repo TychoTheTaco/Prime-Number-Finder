@@ -1,7 +1,11 @@
 package com.tycho.app.primenumberfinder.modules.primefactorization;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
+import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,17 +37,27 @@ public class PrimeFactorizationTask extends Task {
 
     private int total;
 
-    public PrimeFactorizationTask(final long number) {
-        this.number = number;
+    private String status;
+
+    private SearchOptions searchOptions;
+
+    final FindFactorsTask findFactorsTask;
+
+    public PrimeFactorizationTask(final SearchOptions searchOptions){
+        this.number = searchOptions.getNumber();
+        this.searchOptions = searchOptions;
+        findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number));
     }
 
     @Override
     public void run() {
-        final FindFactorsTask findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number, FindFactorsTask.SearchOptions.MonitorType.NONE));
+
+        status = "findFactors";
+        //final FindFactorsTask findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number));
         findFactorsTask.start();
         final List<Long> factors = findFactorsTask.getFactors();
 
-        setProgress(0.33f);
+        status = "checkPrimality";
 
         for (long n : factors){
             final CheckPrimalityTask checkPrimalityTask = new CheckPrimalityTask(n);
@@ -56,15 +70,37 @@ public class PrimeFactorizationTask extends Task {
                 return;
             }
         }
-        setProgress(0.67f);
+        status = "generatingTree";
         this.factorTree = generateTree(number);
+        status = "";
+    }
+
+    @Override
+    public float getProgress() {
+        switch (status){
+            default:
+                break;
+
+            case "findFactors":
+                setProgress(0.33f * (findFactorsTask.getProgress()));
+                break;
+
+            case "checkPrimality":
+                setProgress(0.33f);
+                break;
+
+            case "generatingTree":
+                setProgress(0.67f);
+                break;
+        }
+        return super.getProgress();
     }
 
     private Tree<Long> generateTree(long number) {
 
         final Tree<Long> tree = new Tree<>(number);
 
-        final FindFactorsTask findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number, FindFactorsTask.SearchOptions.MonitorType.NONE));
+        final FindFactorsTask findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number));
         findFactorsTask.start();
 
         final int size = findFactorsTask.getFactors().size();
@@ -120,5 +156,62 @@ public class PrimeFactorizationTask extends Task {
 
     public long getNumber() {
         return number;
+    }
+
+    public SearchOptions getSearchOptions() {
+        return searchOptions;
+    }
+
+    public void setSearchOptions(SearchOptions searchOptions) {
+        this.searchOptions = searchOptions;
+    }
+
+    public static class SearchOptions extends GeneralSearchOptions {
+
+        /**
+         * The number we are finding factors of.
+         */
+        private long number;
+
+        public SearchOptions(final long number, final int threadCount, final boolean notifyWhenFinished, final boolean autoSave) {
+            super(threadCount, notifyWhenFinished, autoSave);
+            this.number = number;
+        }
+
+        public SearchOptions(final long number) {
+            this(number, 1, false, false);
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeLong(this.number);
+        }
+
+        public static final Parcelable.Creator<SearchOptions> CREATOR = new Parcelable.Creator<SearchOptions>() {
+
+            @Override
+            public SearchOptions createFromParcel(Parcel in) {
+                return new SearchOptions(in);
+            }
+
+            @Override
+            public SearchOptions[] newArray(int size) {
+                return new SearchOptions[size];
+            }
+        };
+
+        private SearchOptions(final Parcel parcel) {
+            super(parcel);
+            this.number = parcel.readLong();
+        }
+
+        public void setNumber(long number) {
+            this.number = number;
+        }
+
+        public long getNumber() {
+            return number;
+        }
     }
 }

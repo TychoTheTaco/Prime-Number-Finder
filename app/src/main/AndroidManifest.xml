@@ -36,11 +36,21 @@
 
         <activity
             android:theme="@style/Factors"
+            android:name=".modules.findfactors.FindFactorsConfigurationActivity"
+            android:label="Configure Task"/>
+
+        <activity
+            android:theme="@style/FactorTrees"
+            android:name=".modules.primefactorization.PrimeFactorizationConfigurationActivity"
+            android:label="Configure Task"/>
+
+        <activity
+            android:theme="@style/Factors"
             android:name=".modules.savedfiles.activities.DisplayFactorsActivity"
             android:label="Factors"/>
 
         <activity
-            android:theme="@style/FactorTrees"
+            android:theme="@style/PrimeNumbers"
             android:name=".modules.savedfiles.activities.DisplayPrimeFactorizationActivity"
             android:label="Prime Factorization"/>
 

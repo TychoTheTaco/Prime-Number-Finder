@@ -47,6 +47,7 @@
     <string name="find_factors_button">Find factors</string>
     <string name="find_factors_subtitle">Finding factors of %1$s.</string>
     <string name="find_factors_body_text">Already found %1$s factors.</string>
+    <string name="find_factors_result">%1$s factors found.</string>
     <plurals name="find_factors_subtitle_results">
         <item quantity="one">%1$s has %2$s factor.</item>
         <item quantity="other">%1$s has %2$s factors.</item>
@@ -61,6 +62,7 @@
     <string name="factor_tree_label">Factor tree</string>
     <string name="prime_factorization_subtitle">Finding prime factors of %1$s.</string>
     <string name="prime_factorization_task_list_item_title">Prime factorization of %1$s</string>
+    <string name="prime_factorization_result">%1$s prime factors found.</string>
     <plurals name="prime_factorization_subtitle_results">
         <item quantity="one">%1$s has %2$s prime factor.</item>
         <item quantity="other">%1$s has %2$s prime factors.</item>
