@@ -50,7 +50,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "FindPrimesResultsFgmnt";
+    private static final String TAG = FindPrimesResultsFragment.class.getSimpleName();
 
     //Views
     private ViewGroup resultsView;
@@ -241,12 +241,10 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     public void onTaskStarted() {
         super.onTaskStarted();
-        Log.d(TAG, "onTaskStarted()");
         handler.post(new Runnable() {
             @Override
             public void run() {
                 if (isAdded() && !isDetached() && getTask() != null) {
-                    Log.d(TAG, "onTaskStarted() handler posted");
                     onUiUpdate();
 
                     //Title
@@ -372,12 +370,11 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     public void onTaskResuming() {
         super.onTaskResuming();
-        Log.d(TAG, "onTaskResuming()");
         handler.post(new Runnable() {
             @Override
             public void run() {
                 if (isAdded() && !isDetached() && getTask() != null) {
-                    Log.d(TAG, "onTaskResuming() handler posted");
+                    onUiUpdate();
 
                     //Title
                     title.setText(getString(R.string.state_resuming));
@@ -414,7 +411,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     public void onTaskResumed() {
         super.onTaskResumed();
-        Log.d(TAG, "onTaskResumed()");
         onTaskStarted();
     }
 
@@ -425,9 +421,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(TAG, "Call onUiUpdate() one last time.");
                     onUiUpdate();
-                    Log.d(TAG, "Begin final UI update.");
 
                     //Title
                     title.setText(getString(R.string.status_finished));

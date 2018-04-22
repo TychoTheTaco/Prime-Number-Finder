@@ -18,7 +18,7 @@ public class PrimeNumberFinder extends Application {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "PrimeNumberFinder";
+    private static final String TAG = PrimeNumberFinder.class.getSimpleName();
 
     /**
      * Task manager to manage all application tasks.

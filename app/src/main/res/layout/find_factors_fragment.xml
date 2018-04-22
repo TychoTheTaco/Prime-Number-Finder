@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
     android:fitsSystemWindows="false">
 
     <LinearLayout
@@ -29,7 +30,7 @@
             android:paddingEnd="8dp"
             android:paddingStart="8dp">
 
-            <EditText
+            <com.tycho.app.primenumberfinder.ValidEditText
                 android:id="@id/editText_input_number"
                 style="@style/NumberInput"
                 android:layout_width="0dp"

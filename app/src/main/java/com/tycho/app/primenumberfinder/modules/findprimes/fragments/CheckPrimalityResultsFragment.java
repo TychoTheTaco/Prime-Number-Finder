@@ -63,6 +63,8 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     private final RotateAnimation rotate = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
+    private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -179,6 +181,8 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
             @Override
             public void run() {
                 if (isAdded() && !isDetached() && getTask() != null) {
+                    onUiUpdate();
+
                     //Title
                     title.setText(getString(R.string.state_resuming));
 
@@ -194,8 +198,6 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
         super.onTaskResumed();
         onTaskStarted();
     }
-
-    private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
     @Override
     public void onTaskStopped() {

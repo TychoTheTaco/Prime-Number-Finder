@@ -94,13 +94,16 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
      */
     private static final int REQUEST_CODE_NEW_TASK = 0;
 
+    private ViewPager viewPager;
+    private FabAnimator fabAnimator;
+
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_primes_fragment, viewGroup, false);
 
         //Set up tab layout for results and statistics
         final FragmentAdapter fragmentAdapter = new FragmentAdapter(getChildFragmentManager());
-        final ViewPager viewPager = rootView.findViewById(R.id.view_pager);
+        viewPager = rootView.findViewById(R.id.view_pager);
         fragmentAdapter.add("Tasks", taskListFragment);
         taskListFragment.addEventListener(new FindPrimesTaskListAdapter.EventListener() {
             @Override
@@ -148,7 +151,8 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         fragmentAdapter.add("Results", generalResultsFragment);
         generalResultsFragment.setContent(findPrimesResultsFragment);
         viewPager.setAdapter(fragmentAdapter);
-        viewPager.addOnPageChangeListener(new FabAnimator(((MainActivity) getActivity()).getFab()));
+        fabAnimator = new FabAnimator(((MainActivity) getActivity()).getFab());
+        viewPager.addOnPageChangeListener(fabAnimator);
         final TabLayout tabLayout = rootView.findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
 
@@ -355,6 +359,9 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             }
         });
 
+        //Give the root view focus to prevent EditTexts from initially getting focus
+        rootView.requestFocus();
+
         return rootView;
     }
 
@@ -381,6 +388,13 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
     public void onClick(View view) {
         final Intent intent = new Intent(getActivity(), FindPrimesConfigurationActivity.class);
         startActivityForResult(intent, REQUEST_CODE_NEW_TASK);
+    }
+
+    @Override
+    public void initFab(View view) {
+        if (fabAnimator != null){
+            fabAnimator.onPageScrolled(viewPager.getCurrentItem(), 0, 0);
+        }
     }
 
     private void startTask(final FindPrimesTask.SearchOptions searchOptions) {
@@ -497,7 +511,6 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
     private BigInteger getEndValue() {
         final String input = editTextSearchRangeEnd.getText().toString().trim();
-
         if (input.length() > 0) {
             if (input.equals("infinity")) {
                 return BigInteger.valueOf(FindPrimesTask.INFINITY);

@@ -32,6 +32,7 @@ import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.ActionViewListener;
+import com.tycho.app.primenumberfinder.ValidEditText;
 import com.tycho.app.primenumberfinder.activities.MainActivity;
 import com.tycho.app.primenumberfinder.adapters.FragmentAdapter;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsConfigurationActivity;
@@ -69,23 +70,21 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
      */
     private static final String TAG = "FindFactorsFragment";
 
-    /**
-     * All UI updates are posted to this {@link Handler} on the main thread.
-     */
-    private final Handler handler = new Handler(Looper.getMainLooper());
-
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
     /**
      * All views
      */
-    private EditText editTextNumberToFactor;
+    private ValidEditText editTextNumberToFactor;
     private Button buttonFindFactors;
 
     private final FindFactorsTask.SearchOptions searchOptions = new FindFactorsTask.SearchOptions(0);
 
     private final FindFactorsTaskListFragment taskListFragment = new FindFactorsTaskListFragment();
     private final FindFactorsResultsFragment resultsFragment = new FindFactorsResultsFragment();
+
+    private ViewPager viewPager;
+    private FabAnimator fabAnimator;
 
     //Override methods
 
@@ -95,7 +94,7 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
 
         //Set up tab layout for results and statistics
         final FragmentAdapter fragmentAdapter = new FragmentAdapter(getChildFragmentManager());
-        final ViewPager viewPager = rootView.findViewById(R.id.view_pager);
+        viewPager = rootView.findViewById(R.id.view_pager);
         fragmentAdapter.add("Tasks", taskListFragment);
         taskListFragment.addEventListener(new FindFactorsTaskListAdapter.EventListener() {
             @Override
@@ -127,7 +126,8 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
         });
         fragmentAdapter.add("Results", resultsFragment);
         viewPager.setAdapter(fragmentAdapter);
-        viewPager.addOnPageChangeListener(new FabAnimator(((MainActivity) getActivity()).getFab()));
+        fabAnimator = new FabAnimator(((MainActivity) getActivity()).getFab());
+        viewPager.addOnPageChangeListener(fabAnimator);
         final TabLayout tabLayout = rootView.findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
 
@@ -149,7 +149,7 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
 
                 //Check if the number is valid
                 if (Validator.isValidFactorInput(getNumberToFactor())) {
-                    editTextNumberToFactor.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.accent)));
+                    editTextNumberToFactor.setValid(true);
 
                     final String formattedText = NumberFormat.getNumberInstance(Locale.getDefault()).format(getNumberToFactor());
                     if (!editable.toString().equals(formattedText)) {
@@ -158,15 +158,8 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
                     editTextNumberToFactor.setSelection(formattedText.length());
 
                 } else {
-                    editTextNumberToFactor.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.red)));
+                    editTextNumberToFactor.setValid(false);
                 }
-            }
-        });
-        editTextNumberToFactor.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                editTextNumberToFactor.getText().clear();
-                return false;
             }
         });
 
@@ -196,6 +189,9 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
             }
         });
 
+        //Give the root view focus to prevent EditTexts from initially getting focus
+        rootView.requestFocus();
+
         return rootView;
     }
 
@@ -205,6 +201,13 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
     public void onClick(View view) {
         final Intent intent = new Intent(getActivity(), FindFactorsConfigurationActivity.class);
         startActivityForResult(intent, REQUEST_CODE_NEW_TASK);
+    }
+
+    @Override
+    public void initFab(View view) {
+        if (fabAnimator != null){
+            fabAnimator.onPageScrolled(viewPager.getCurrentItem(), 0, 0);
+        }
     }
 
     @Override

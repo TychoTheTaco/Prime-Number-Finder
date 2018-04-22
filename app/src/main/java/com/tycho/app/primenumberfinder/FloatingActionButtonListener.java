@@ -9,4 +9,6 @@ import android.view.View;
 public interface FloatingActionButtonListener {
 
     void onClick(final View view);
+
+    void initFab(final View view);
 }

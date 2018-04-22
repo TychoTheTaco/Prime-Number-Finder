@@ -261,9 +261,6 @@ public class MainActivity extends AppCompatActivity{
         //Get the new fragment
         currentFragment = getFragment(menuItem.getItemId());
 
-        //Change floating action button visibility
-        floatingActionButton.setVisibility(currentFragment instanceof FloatingActionButtonListener ? View.VISIBLE : View.GONE);
-
         //Add the new fragment if it doesn't exist yet
         if (getFragmentManager().findFragmentByTag(fragmentIds.get(menuItem.getItemId())) == null) {
             fragmentTransaction.add(R.id.main_content_frame, currentFragment, fragmentIds.get(menuItem.getItemId()));
@@ -275,6 +272,11 @@ public class MainActivity extends AppCompatActivity{
         //Commit changes
         fragmentTransaction.commit();
         menuItem.setChecked(true);
+
+        //Tell the fragment to initialize the floating action button
+        if (currentFragment instanceof FloatingActionButtonListener){
+            ((FloatingActionButtonListener) currentFragment).initFab(floatingActionButton);
+        }
 
         //Apply theme to activity based on current fragment
         switch (menuItem.getItemId()) {

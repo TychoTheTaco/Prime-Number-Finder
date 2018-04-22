@@ -131,7 +131,30 @@ public class FindPrimesTask extends MultithreadedTask {
             addTask(task);
         }
 
+        /*final long partition = (endValue - startValue) / threadCount;
+        for (int i = 0; i < threadCount; i++){
+            long start = partition * i;
+            if (start % 2 == 0){
+                start++;
+            }
+            addTask(new BruteForceTask(start, partition * (i + 1), 2));
+        }*/
+
         executeTasks();
+
+        /*
+        NEW VERSION
+        10,000,000 - 4 threads: 65 sec
+        10,000,000 - 3 threads: 84 sec
+        1,000,000 - 4 threads: 2.7 sec
+        1,000,000 - 3 threads: 3.1 sec
+
+        OLD VERSION
+        10,000,000 - 4 threads: 55 sec
+        10,000,000 - 3 threads: 98 sec
+        1,000,000 - 4 threads: 2.6 sec
+        1,000,000 - 3 threads: 3.7 sec
+         */
 
         //Execute all tasks
 /*        final List<Thread> threads = new ArrayList<>();
@@ -451,6 +474,14 @@ public class FindPrimesTask extends MultithreadedTask {
         return lowest;
     }
 
+    /*public long getNumbersPerSecond(){
+        long total = 0;
+        for (Task task : getTasks()) {
+            total += ((BruteForceTask) task).getCurrentValue();
+        }
+        return total;
+    }*/
+
     public void setOptions(final SearchOptions searchOptions) {
         this.searchOptions = searchOptions;
     }
@@ -480,7 +511,7 @@ public class FindPrimesTask extends MultithreadedTask {
 
         private final Object QUEUE_LOCK = new Object();
 
-        private int bufferSize;
+        private int bufferSize = -1;
 
         private BruteForceTask(final long startValue, final long endValue, final int increment) {
             this.startValue = startValue;
@@ -542,6 +573,8 @@ public class FindPrimesTask extends MultithreadedTask {
 
                 currentNumber += increment;
             }
+
+            Log.e(TAG, "SubTask: " + this + " finished. (" + startValue + ", " + endValue + ")");
         }
 
         @Override
@@ -566,7 +599,7 @@ public class FindPrimesTask extends MultithreadedTask {
                 primeCount++;
             }
 
-            if (primes.size() >= bufferSize) {
+            if (bufferSize != -1 && primes.size() >= bufferSize) {
                 Log.d(TAG, "Swapping to disk! Size: " + primes.size());
 
                 //Swap memory to disk

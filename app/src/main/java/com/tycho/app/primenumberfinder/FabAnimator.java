@@ -2,9 +2,17 @@ package com.tycho.app.primenumberfinder;
 
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 
+import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesFragment;
+
 public class FabAnimator implements ViewPager.OnPageChangeListener {
+
+    /**
+     * Tag used for logging and debugging.
+     */
+    private static final String TAG = FabAnimator.class.getSimpleName();
 
     private final FloatingActionButton fab;
 

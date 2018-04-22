@@ -34,6 +34,7 @@ import com.tycho.app.primenumberfinder.FabAnimator;
 import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.ValidEditText;
 import com.tycho.app.primenumberfinder.activities.MainActivity;
 import com.tycho.app.primenumberfinder.adapters.FragmentAdapter;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsConfigurationActivity;
@@ -44,6 +45,7 @@ import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactoriza
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.adapters.PrimeFactorizationTaskListAdapter;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.Validator;
 
 import java.math.BigInteger;
 import java.text.NumberFormat;
@@ -67,12 +69,7 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
      */
     private static final String TAG = "PrimeFactorizationFrgmt";
 
-    /**
-     * All UI updates are posted to this {@link Handler} on the main thread.
-     */
-    private final Handler handler = new Handler(Looper.getMainLooper());
-
-    private EditText editTextInput;
+    private ValidEditText editTextInput;
 
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
@@ -83,6 +80,9 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
 
     private final PrimeFactorizationTask.SearchOptions searchOptions = new PrimeFactorizationTask.SearchOptions(0);
 
+    private ViewPager viewPager;
+    private FabAnimator fabAnimator;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -90,7 +90,7 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
 
         //Set up tab layout for results and statistics
         final FragmentAdapter fragmentAdapter = new FragmentAdapter(getChildFragmentManager());
-        final ViewPager viewPager = rootView.findViewById(R.id.view_pager);
+        viewPager = rootView.findViewById(R.id.view_pager);
         fragmentAdapter.add("Tasks", taskListFragment);
         taskListFragment.addEventListener(new PrimeFactorizationTaskListAdapter.EventListener() {
             @Override
@@ -123,12 +123,13 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
         });
         fragmentAdapter.add("Results", resultsFragment);
         viewPager.setAdapter(fragmentAdapter);
-        viewPager.addOnPageChangeListener(new FabAnimator(((MainActivity) getActivity()).getFab()));
+        fabAnimator = new FabAnimator(((MainActivity) getActivity()).getFab());
+        viewPager.addOnPageChangeListener(fabAnimator);
         final TabLayout tabLayout = rootView.findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
 
         //Set up factor input
-        editTextInput = (EditText) rootView.findViewById(R.id.editText_input_number);
+        editTextInput = rootView.findViewById(R.id.editText_input_number);
         editTextInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -144,27 +145,19 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
             public void afterTextChanged(Editable editable) {
 
                 //Check if the number is valid
-                if (isNumberValid()) {
-                    editTextInput.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.accent)));
+                if (Validator.isValidFactorInput(getNumberToFactor())) {
+                    editTextInput.setValid(true);
 
-                    final String formattedText = NumberFormat.getNumberInstance(Locale.getDefault()).format(getNumberToFactor());
+                    final String formattedText = NUMBER_FORMAT.format(getNumberToFactor());
                     if (!editable.toString().equals(formattedText)) {
                         editTextInput.setText(formattedText);
                     }
                     editTextInput.setSelection(formattedText.length());
 
                 } else {
-                    editTextInput.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), R.color.red)));
+                    editTextInput.setValid(false);
                 }
             }
-        });
-        editTextInput.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                editTextInput.getText().clear();
-                return false;
-            }
-
         });
 
         //Set up start button
@@ -174,10 +167,10 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
             public void onClick(View v) {
 
                 //Check if the number is valid
-                if (isNumberValid()) {
+                if (Validator.isValidFactorInput(getNumberToFactor())) {
 
                     //Create a new task
-                    searchOptions.setNumber(getNumberToFactor());
+                    searchOptions.setNumber(getNumberToFactor().longValue());
                     startTask(searchOptions);
 
                     hideKeyboard(getActivity());
@@ -189,35 +182,17 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
             }
         });
 
+        //Give the root view focus to prevent EditTexts from initially getting focus
+        rootView.requestFocus();
+
         return rootView;
     }
 
-    private boolean isNumberValid() {
-
-        try {
-
-            final long number = getNumberToFactor();
-
-            //The number must be greater than 0
-            if (number <= 0) {
-                return false;
-            }
-
-        } catch (NumberFormatException e) {
-            return false;
+    private BigInteger getNumberToFactor() {
+        if (editTextInput.getText().length() > 0){
+            return new BigInteger(editTextInput.getText().toString().replace(",", ""));
         }
-
-        return true;
-    }
-
-    private long getNumberToFactor() {
-        final BigInteger number = new BigInteger(editTextInput.getText().toString().replace(",", ""));
-
-        if (number.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) == 1) {
-            return -1;
-        }
-
-        return number.longValue();
+        return BigInteger.valueOf(-1);
     }
 
     public void addActionViewListener(final ActionViewListener actionViewListener) {
@@ -230,6 +205,13 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
     public void onClick(View view) {
         final Intent intent = new Intent(getActivity(), PrimeFactorizationConfigurationActivity.class);
         startActivityForResult(intent, REQUEST_CODE_NEW_TASK);
+    }
+
+    @Override
+    public void initFab(View view) {
+        if (fabAnimator != null){
+            fabAnimator.onPageScrolled(viewPager.getCurrentItem(), 0, 0);
+        }
     }
 
     @Override
