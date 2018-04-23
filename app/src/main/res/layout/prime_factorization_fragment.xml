@@ -34,6 +34,7 @@
                 android:id="@id/editText_input_number"
                 style="@style/NumberInput"
                 android:layout_width="0dp"
+                android:imeOptions="actionDone"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1" />

@@ -43,6 +43,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="16dp"
+                        android:imeOptions="actionDone"
                         android:includeFontPadding="false"
                         android:inputType="textNoSuggestions|textVisiblePassword"
                         android:singleLine="true"
@@ -107,6 +108,7 @@
                         android:id="@+id/vertical_item_spacing"
                         android:layout_width="32dp"
                         android:gravity="center_horizontal"
+                        android:imeOptions="actionDone"
                         android:layout_height="wrap_content"
                         android:includeFontPadding="false"
                         android:inputType="number"
@@ -169,6 +171,7 @@
                         android:id="@+id/branch_widtth"
                         android:layout_width="32dp"
                         android:gravity="center_horizontal"
+                        android:imeOptions="actionDone"
                         android:layout_height="wrap_content"
                         android:includeFontPadding="false"
                         android:inputType="number"
@@ -239,6 +242,7 @@
                         android:id="@+id/item_text_size"
                         android:layout_width="32dp"
                         android:layout_height="wrap_content"
+                        android:imeOptions="actionDone"
                         android:includeFontPadding="false"
                         android:gravity="center_horizontal"
                         android:inputType="number"
@@ -271,7 +275,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="32dp"
+                    android:layout_marginStart="42dp"
                     android:layout_marginTop="4dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -296,7 +300,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="32dp"
+                    android:layout_marginStart="42dp"
                     android:layout_marginTop="4dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -317,11 +321,11 @@
 
                 </LinearLayout>
 
-                <!-- Item text size-->
+                <!-- Item border width -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="32dp"
+                    android:layout_marginStart="42dp"
                     android:orientation="horizontal">
 
                     <TextView
@@ -336,6 +340,7 @@
                         android:layout_height="wrap_content"
                         android:includeFontPadding="false"
                         android:gravity="center_horizontal"
+                        android:imeOptions="actionDone"
                         android:inputType="number"
                         android:textSize="14sp" />
 

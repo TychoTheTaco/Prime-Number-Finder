@@ -75,8 +75,6 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
 
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
-    private Button buttonFactorize;
-
     private final PrimeFactorizationTaskListFragment taskListFragment = new PrimeFactorizationTaskListFragment();
     private final PrimeFactorizationResultsFragment resultsFragment = new PrimeFactorizationResultsFragment();
 
@@ -165,8 +163,7 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
         });
 
         //Set up start button
-        buttonFactorize = rootView.findViewById(R.id.button_generate_factor_tree);
-        buttonFactorize.setOnClickListener(new View.OnClickListener() {
+        rootView.findViewById(R.id.button_generate_factor_tree).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 

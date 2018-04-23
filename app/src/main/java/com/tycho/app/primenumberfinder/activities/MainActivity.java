@@ -143,9 +143,8 @@ public class MainActivity extends AppCompatActivity implements FloatingActionBut
             }
         });
 
-        //Select the first drawer item
+        //Select the correct drawer item
         final int taskType = getIntent().getIntExtra("taskType", 0);
-        Log.e(TAG, "Intent: " + getIntent() + " extras: " + getIntent().getExtras());
         switch (taskType) {
             default:
                 selectDrawerItem(0);

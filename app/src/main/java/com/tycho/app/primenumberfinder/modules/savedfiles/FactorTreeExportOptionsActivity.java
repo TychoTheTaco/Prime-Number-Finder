@@ -29,6 +29,8 @@ import com.tycho.app.primenumberfinder.utils.FileManager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import simpletrees.Tree;
 
@@ -41,7 +43,9 @@ public class FactorTreeExportOptionsActivity extends AppCompatActivity implement
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "FactorTreeExprtOptsAct";
+    private static final String TAG = FactorTreeExportOptionsActivity.class.getSimpleName();
+
+    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
     private File file;
 
@@ -69,6 +73,8 @@ public class FactorTreeExportOptionsActivity extends AppCompatActivity implement
     private SeekBar itemTextSizeSeekBar;
     private SeekBar branchWidthSeekBar;
     private SeekBar itemBorderWidthSeekBar;
+
+    private TextView imageSizeTextView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -167,8 +173,13 @@ public class FactorTreeExportOptionsActivity extends AppCompatActivity implement
                     verticalItemSpacing = findViewById(R.id.vertical_item_spacing);
                     verticalItemSpacing.setText(String.valueOf((int) exportOptions.verticalSpacing));
 
-                    final TextView imageSizeTextView = findViewById(R.id.image_size);
-                    //imageSizeTextView.setText("(" + treeView.getBoundingRect().width() + " x " + treeView.getBoundingRect().height() + ")");
+                    imageSizeTextView = findViewById(R.id.image_size);
+                    imageSizeTextView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            imageSizeTextView.setText("(" + NUMBER_FORMAT.format(treeView.getBoundingRect().width()) + " x " + NUMBER_FORMAT.format(Math.abs(treeView.getBoundingRect().height())) + ")");
+                        }
+                    });
 
                     verticalItemSpacingSeekBar = findViewById(R.id.vertical_item_spacing_seekbar);
                     verticalItemSpacingSeekBar.setMax(400); // (max - min) / step
@@ -179,24 +190,7 @@ public class FactorTreeExportOptionsActivity extends AppCompatActivity implement
                             exportOptions.verticalSpacing = 0 + (progress * 1);
                             verticalItemSpacing.setText(String.valueOf((int) exportOptions.verticalSpacing));
                             treeView.recalculate();
-                            //treeView.recalculateBounds();
-                            //treeView.invalidate();
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Log.d(TAG, "Waiting...");
-                                    while (!treeView.isGenerated()){
-                                        //Wait
-                                    }
-                                    Log.d(TAG, "Done waiting.");
-                                    new Handler(getMainLooper()).post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            imageSizeTextView.setText("(" + treeView.getBoundingRect().width() + " x " + Math.abs(treeView.getBoundingRect().height()) + ")");
-                                        }
-                                    });
-                                }
-                            }).start();
+                            waitAndUpdateDimensions();
                         }
 
                         @Override
@@ -221,8 +215,8 @@ public class FactorTreeExportOptionsActivity extends AppCompatActivity implement
                         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                             exportOptions.itemTextSize = 8 + (progress * 1);
                             itemTextSize.setText(String.valueOf((int) exportOptions.itemTextSize));
-                            treeView.recalculate(); //TODO: recalculate happens on another thead. we need to wait for it to finish before chekcing bounds.
-                            imageSizeTextView.setText("(" + treeView.getBoundingRect().width() + " x " + Math.abs(treeView.getBoundingRect().height()) + ")");
+                            treeView.recalculate();
+                            waitAndUpdateDimensions();
                         }
 
                         @Override
@@ -248,7 +242,6 @@ public class FactorTreeExportOptionsActivity extends AppCompatActivity implement
                             exportOptions.branchWidth = 1 + (progress * 1);
                             branchWidth.setText(String.valueOf((int) exportOptions.branchWidth));
                             treeView.redraw();
-                            imageSizeTextView.setText("(" + treeView.getBoundingRect().width() + " x " + Math.abs(treeView.getBoundingRect().height()) + ")");
                         }
 
                         @Override
@@ -274,7 +267,7 @@ public class FactorTreeExportOptionsActivity extends AppCompatActivity implement
                             exportOptions.itemBorderWidth = 1 + (progress * 1);
                             itemBorderWidth.setText(String.valueOf((int) exportOptions.itemBorderWidth));
                             treeView.redraw();
-                            imageSizeTextView.setText("(" + treeView.getBoundingRect().width() + " x " + Math.abs(treeView.getBoundingRect().height()) + ")");
+                            //waitAndUpdateDimensions();
                         }
 
                         @Override
@@ -294,8 +287,13 @@ public class FactorTreeExportOptionsActivity extends AppCompatActivity implement
                     itemBackgroundsCheckbox.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+                            //Change dependent visibility
                             itemBackgroundColorTextView.setEnabled(itemBackgroundsCheckbox.isChecked());
                             itemBackgroundColorLabel.setEnabled(itemBackgroundsCheckbox.isChecked());
+                            itemBorderColorTextView.setEnabled(itemBackgroundsCheckbox.isChecked());
+                            itemBorderWidth.setEnabled(itemBackgroundsCheckbox.isChecked());
+                            itemBorderWidthSeekBar.setEnabled(itemBackgroundsCheckbox.isChecked());
+
                             exportOptions.itemBackgrounds = itemBackgroundsCheckbox.isChecked();
                             treeView.redraw();
                         }
@@ -365,7 +363,25 @@ public class FactorTreeExportOptionsActivity extends AppCompatActivity implement
             Toast.makeText(this, "Error loading file!", Toast.LENGTH_SHORT).show();
             finish();
         }
-        //applyThemeColor(ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
+    }
+
+    private void waitAndUpdateDimensions(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "Waiting...");
+                while (!treeView.isGenerated()){
+                    //TODO: This is bad
+                }
+                Log.d(TAG, "Done waiting.");
+                new Handler(getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        imageSizeTextView.setText("(" + NUMBER_FORMAT.format(treeView.getBoundingRect().width()) + " x " + NUMBER_FORMAT.format(Math.abs(treeView.getBoundingRect().height())) + ")");
+                    }
+                });
+            }
+        }).start();
     }
 
     private void loadFile(final File file) {

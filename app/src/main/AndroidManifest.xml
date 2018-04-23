@@ -26,6 +26,7 @@
 
         <activity
             android:theme="@style/PrimeNumbers"
+            android:windowSoftInputMode="adjustPan"
             android:name=".modules.savedfiles.activities.DisplayPrimesActivity"
             android:label="Primes"/>
 
@@ -46,6 +47,7 @@
 
         <activity
             android:theme="@style/Factors"
+            android:windowSoftInputMode="adjustPan"
             android:name=".modules.savedfiles.activities.DisplayFactorsActivity"
             android:label="Factors"/>
 

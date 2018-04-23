@@ -34,6 +34,7 @@
             android:minWidth="70dp"
             android:gravity="center_horizontal"
             android:inputType="number"
+            android:imeOptions="actionDone"
             android:layout_height="wrap_content"
             android:hint="nth"/>
 
