@@ -147,7 +147,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     @Override
     public void onTaskStarted() {
         super.onTaskStarted();
-        if (isAdded() && !isDetached()){
+        if (isAdded() && !isDetached() && getTask() != null){
             handler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -208,7 +208,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     @Override
     public void onTaskPaused() {
         super.onTaskPaused();
-        if (isAdded() && !isDetached()){
+        if (isAdded() && !isDetached() && getTask() != null){
             handler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -272,7 +272,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        if (isAdded() && !isDetached()){
+        if (isAdded() && !isDetached() && getTask() != null){
             handler.post(new Runnable() {
                 @Override
                 public void run() {

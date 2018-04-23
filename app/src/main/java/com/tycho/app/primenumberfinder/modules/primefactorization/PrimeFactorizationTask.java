@@ -77,14 +77,32 @@ public class PrimeFactorizationTask extends Task {
 
     @Override
     public void pause(boolean wait) {
-        findFactorsTask.pause(true);
-        dispatchPaused();
+        synchronized (STATE_LOCK){
+            if (findFactorsTask.getState() != State.STOPPED){
+                findFactorsTask.pause(true);
+                dispatchPaused();
+            }else{
+                super.pause(wait);
+            }
+        }
     }
 
     @Override
     public void resume(boolean wait) {
-        findFactorsTask.resume(true);
-        dispatchResumed();
+        synchronized (STATE_LOCK){
+            if (findFactorsTask.getState() == State.PAUSED){
+                findFactorsTask.resume(true);
+                dispatchResumed();
+            }else{
+                super.resume(wait);
+            }
+        }
+    }
+
+    @Override
+    public void stop() {
+        findFactorsTask.stop();
+        super.stop();
     }
 
     @Override
