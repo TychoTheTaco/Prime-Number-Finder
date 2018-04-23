@@ -76,6 +76,18 @@ public class PrimeFactorizationTask extends Task {
     }
 
     @Override
+    public void pause(boolean wait) {
+        findFactorsTask.pause(true);
+        dispatchPaused();
+    }
+
+    @Override
+    public void resume(boolean wait) {
+        findFactorsTask.resume(true);
+        dispatchResumed();
+    }
+
+    @Override
     public float getProgress() {
         switch (status){
             default:
