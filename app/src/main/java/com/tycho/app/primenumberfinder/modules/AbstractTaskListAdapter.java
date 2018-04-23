@@ -97,43 +97,6 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
         final Task task = tasks.get(position);
         customEventListeners.get(task).setViewHolder(holder);
         if (holder.uiUpdater.getState() == Task.State.NOT_STARTED) {
-            holder.uiUpdater.addTaskListener(new TaskAdapter(){
-
-                @Override
-                public void onTaskStarted() {
-                    Log.w(TAG, "UI Updater started: " + holder.uiUpdater);
-                }
-
-                @Override
-                public void onTaskPausing() {
-                    Log.w(TAG, "UI Updater pausing: " + holder.uiUpdater);
-                }
-
-                @Override
-                public void onTaskPaused() {
-                    Log.w(TAG, "UI Updater paused: " + holder.uiUpdater);
-                }
-
-                @Override
-                public void onTaskResuming() {
-                    Log.w(TAG, "UI Updater resuming: " + holder.uiUpdater);
-                }
-
-                @Override
-                public void onTaskResumed() {
-                    Log.w(TAG, "UI Updater resumed: " + holder.uiUpdater);
-                }
-
-                @Override
-                public void onTaskStopping() {
-                    Log.w(TAG, "UI Updater stopping: " + holder.uiUpdater);
-                }
-
-                @Override
-                public void onTaskStopped() {
-                    Log.w(TAG, "UI Updater stopped: " + holder.uiUpdater);
-                }
-            });
             holder.uiUpdater.startOnNewThread();
 
             if (task.getState() == Task.State.PAUSED || task.getState() == Task.State.NOT_STARTED || task.getState() == Task.State.STOPPED){
