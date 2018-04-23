@@ -1,10 +1,6 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.app.Fragment;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Build;
@@ -31,7 +27,9 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FabAnimator;
+import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
 import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
+import com.tycho.app.primenumberfinder.IntentReceiver;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.ValidEditText;
@@ -42,6 +40,7 @@ import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfiguratio
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.TaskManager;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
 import java.math.BigInteger;
@@ -59,7 +58,7 @@ import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
  * @author Tycho Bellers
  * Date Created: 11/12/2016
  */
-public class FindPrimesFragment extends Fragment implements FloatingActionButtonListener {
+public class FindPrimesFragment extends Fragment implements FloatingActionButtonListener, IntentReceiver {
 
     /**
      * Tag used for logging and debugging.
@@ -96,6 +95,8 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
     private ViewPager viewPager;
     private FabAnimator fabAnimator;
+
+    private Intent intent;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
@@ -151,7 +152,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         fragmentAdapter.add("Results", generalResultsFragment);
         generalResultsFragment.setContent(findPrimesResultsFragment);
         viewPager.setAdapter(fragmentAdapter);
-        fabAnimator = new FabAnimator(((MainActivity) getActivity()).getFab());
+        fabAnimator = new FabAnimator(((FloatingActionButtonHost) getActivity()).getFab(0));
         viewPager.addOnPageChangeListener(fabAnimator);
         final TabLayout tabLayout = rootView.findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
@@ -172,7 +173,6 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
             @Override
             public void afterTextChanged(Editable editable) {
-
                 //Check if the number is valid
                 if (Validator.isPrimalityInputValid(getPrimalityInput())) {
                     editTextPrimalityInput.setValid(true);
@@ -362,6 +362,14 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         //Give the root view focus to prevent EditTexts from initially getting focus
         rootView.requestFocus();
 
+        //Scroll to Results fragment if started from a notification
+        if (intent.getSerializableExtra("taskId") != null){
+            viewPager.setCurrentItem(1);
+        }
+
+        //Reset intent
+        this.intent = null;
+
         return rootView;
     }
 
@@ -392,14 +400,20 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
     @Override
     public void initFab(View view) {
-        if (fabAnimator != null){
+        if (fabAnimator != null) {
             fabAnimator.onPageScrolled(viewPager.getCurrentItem(), 0, 0);
         }
     }
 
+    @Override
+    public void giveIntent(Intent intent) {
+        this.intent = intent;
+        taskListFragment.giveIntent(intent);
+    }
+
     private void startTask(final FindPrimesTask.SearchOptions searchOptions) {
 
-        boolean valid = false;
+        boolean valid;
 
         //Make sure there is enough memory
         if (searchOptions.getSearchMethod() == FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES) {
@@ -447,30 +461,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                     }
 
                     if (task.getSearchOptions().isNotifyWhenFinished()) {
-                        final String CHANNEL_ID = "default";
-
-                        //Create notification
-                        Intent intent = new Intent(getActivity(), MainActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        PendingIntent pendingIntent = PendingIntent.getActivity(getActivity(), 0, intent, 0);
-
-                        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(), CHANNEL_ID)
-                                .setSmallIcon(R.drawable.circle_white)
-                                .setContentTitle("Task Finished")
-                                .setContentText("Task \"Primes from " + NUMBER_FORMAT.format(task.getStartValue()) + " to " + NUMBER_FORMAT.format(task.getEndValue()) + "\" finished.")
-                                .setContentIntent(pendingIntent)
-                                .setAutoCancel(true);
-
-                        //Register notification channel
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            final NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Default", NotificationManager.IMPORTANCE_DEFAULT);
-                            channel.setDescription("Default notification channel.");
-                            final NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-                            notificationManager.createNotificationChannel(channel);
-                        }
-
-                        final NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-                        notificationManager.notify(0, builder.build());
+                        com.tycho.app.primenumberfinder.utils.NotificationManager.displayNotification(getActivity(), "default", task, com.tycho.app.primenumberfinder.utils.NotificationManager.REQUEST_CODE_FIND_PRIMES, "Task \"Primes from " + NUMBER_FORMAT.format(task.getStartValue()) + " to " + NUMBER_FORMAT.format(task.getEndValue()) + "\" finished.");
                     }
                     task.removeTaskListener(this);
                 }

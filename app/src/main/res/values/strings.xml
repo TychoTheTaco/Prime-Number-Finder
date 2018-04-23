@@ -126,7 +126,7 @@
     <string name="export_button">Export</string>
     <string name="progress_dialog_title">Progressing&#8230;</string>
     <string name="format">Format</string>
-    <string name="include_numbers_description">Include comma\'s in numbers</string>
+    <string name="include_numbers_description">Include commas in numbers</string>
 
     <!-- Error messages -->
     <string name="error_invalid_number">Invalid number!</string>

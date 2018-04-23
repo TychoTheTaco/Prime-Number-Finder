@@ -24,7 +24,9 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
+import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
 import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
+import com.tycho.app.primenumberfinder.IntentReceiver;
 import com.tycho.app.primenumberfinder.modules.about.AboutPageFragment;
 import com.tycho.app.primenumberfinder.settings.SettingsFragment;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
@@ -41,13 +43,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.REQUEST_CODE_FIND_FACTORS;
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.REQUEST_CODE_FIND_PRIMES;
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.REQUEST_CODE_PRIME_FACTORIZATION;
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
 /**
  * @author Tycho Bellers
- *         Date Created: 1/10/2016
+ * Date Created: 1/10/2016
  */
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity implements FloatingActionButtonHost {
 
     /**
      * Tag used for logging and debugging.
@@ -115,7 +120,7 @@ public class MainActivity extends AppCompatActivity{
         for (int i = 0; i < navigationView.getMenu().size(); i++) {
             try {
                 setActionViewVisibility(i, View.GONE);
-            }catch (NullPointerException e){
+            } catch (NullPointerException e) {
                 //Ignore NPE because there is no action view
             }
         }
@@ -132,14 +137,32 @@ public class MainActivity extends AppCompatActivity{
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentFragment instanceof FloatingActionButtonListener){
+                if (currentFragment instanceof FloatingActionButtonListener) {
                     ((FloatingActionButtonListener) currentFragment).onClick(v);
                 }
             }
         });
 
         //Select the first drawer item
-        selectDrawerItem(0);
+        final int taskType = getIntent().getIntExtra("taskType", 0);
+        Log.e(TAG, "Intent: " + getIntent() + " extras: " + getIntent().getExtras());
+        switch (taskType) {
+            default:
+                selectDrawerItem(0);
+                break;
+
+            case REQUEST_CODE_FIND_PRIMES:
+                selectDrawerItem(0);
+                break;
+
+            case REQUEST_CODE_FIND_FACTORS:
+                selectDrawerItem(1);
+                break;
+
+            case REQUEST_CODE_PRIME_FACTORIZATION:
+                selectDrawerItem(2);
+                break;
+        }
     }
 
     @Override
@@ -191,18 +214,28 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
+    @Override
+    public FloatingActionButton getFab(int index) {
+        if (index == 0) {
+            return this.floatingActionButton;
+        }
+        return null;
+    }
+
     /**
      * Change the visibility of a menu item's action view.
-     * @param index The index of the {@linkplain MenuItem}.
+     *
+     * @param index      The index of the {@linkplain MenuItem}.
      * @param visibility The visibility to set.
      */
-    private void setActionViewVisibility(final int index, final int visibility){
+    private void setActionViewVisibility(final int index, final int visibility) {
         navigationView.getMenu().getItem(index).getActionView().setVisibility(visibility);
     }
 
     /**
      * Get the fragment with the specified ID. If the fragment has not been created yet, it will
      * create it now.
+     *
      * @param id The ID of the fragment.
      * @return The fragment with the corresponding ID.
      */
@@ -234,7 +267,7 @@ public class MainActivity extends AppCompatActivity{
         return getFragmentManager().findFragmentByTag(fragmentIds.get(id));
     }
 
-    private ActionViewListener getActionViewListener(final int index){
+    private ActionViewListener getActionViewListener(final int index) {
         return new ActionViewListener() {
             @Override
             public void onTaskStatesChanged(final boolean active) {
@@ -274,8 +307,15 @@ public class MainActivity extends AppCompatActivity{
         menuItem.setChecked(true);
 
         //Tell the fragment to initialize the floating action button
-        if (currentFragment instanceof FloatingActionButtonListener){
+        if (currentFragment instanceof FloatingActionButtonListener) {
             ((FloatingActionButtonListener) currentFragment).initFab(floatingActionButton);
+        } else {
+            floatingActionButton.setVisibility(View.GONE);
+        }
+
+        //Give Intent to the fragment
+        if (currentFragment instanceof IntentReceiver) {
+            ((IntentReceiver) currentFragment).giveIntent(getIntent());
         }
 
         //Apply theme to activity based on current fragment
@@ -348,9 +388,5 @@ public class MainActivity extends AppCompatActivity{
                         defaultColor,
                         selectedColor
                 });
-    }
-
-    public FloatingActionButton getFab(){
-        return this.floatingActionButton;
     }
 }

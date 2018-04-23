@@ -2,6 +2,7 @@ package com.tycho.app.primenumberfinder.modules.primefactorization.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
+import com.tycho.app.primenumberfinder.IntentReceiver;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
@@ -19,6 +21,7 @@ import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactoriza
 import com.tycho.app.primenumberfinder.modules.primefactorization.adapters.PrimeFactorizationTaskListAdapter;
 
 import java.util.Queue;
+import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import easytasks.Task;
@@ -27,12 +30,14 @@ import easytasks.Task;
  * Created by tycho on 11/19/2017.
  */
 
-public class PrimeFactorizationTaskListFragment extends Fragment {
+public class PrimeFactorizationTaskListFragment extends Fragment implements IntentReceiver{
 
     /**
      * Tag used for logging and debugging.
      */
     private static final String TAG = "FindFactorsTaskListFgmnt";
+
+    private RecyclerView recyclerView;
 
     private PrimeFactorizationTaskListAdapter taskListAdapter;
 
@@ -40,6 +45,8 @@ public class PrimeFactorizationTaskListFragment extends Fragment {
 
     private final Queue<AbstractTaskListAdapter.EventListener> eventListenerQueue = new LinkedBlockingQueue<>(5);
     private final Queue<ActionViewListener> actionViewListenerQueue = new LinkedBlockingQueue<>(5);
+
+    private Intent intent;
 
     /**
      * This deprecated version of {@linkplain Fragment#onAttach(Activity)} is needed in API < 22.
@@ -64,7 +71,7 @@ public class PrimeFactorizationTaskListFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.prime_factorization_task_list_fragment, container, false);
 
         //Set up the task list
-        final RecyclerView recyclerView = rootView.findViewById(R.id.task_list);
+        recyclerView = rootView.findViewById(R.id.task_list);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(taskListAdapter);
@@ -79,13 +86,23 @@ public class PrimeFactorizationTaskListFragment extends Fragment {
                 taskListAdapter.addTask(task);
             }
         }
-        if (taskListAdapter.getItemCount() > 0) {
+        if (intent == null && taskListAdapter.getItemCount() > 0) {
             taskListAdapter.setSelected(0);
+        }else{
+            taskListAdapter.setSelected(PrimeNumberFinder.getTaskManager().findTaskById((UUID) intent.getSerializableExtra("taskId")));
         }
 
         update();
 
+        //Reset intent
+        this.intent = null;
+
         return rootView;
+    }
+
+    @Override
+    public void giveIntent(Intent intent) {
+        this.intent = intent;
     }
 
     public void addTask(final Task task) {
@@ -111,6 +128,10 @@ public class PrimeFactorizationTaskListFragment extends Fragment {
 
     public void update() {
         textViewNoTasks.setVisibility(taskListAdapter.getItemCount() > 0 ? View.GONE : View.VISIBLE);
+    }
+
+    public void scrollToBottom() {
+        recyclerView.scrollToPosition(taskListAdapter.getItemCount() - 1);
     }
 
     public void addActionViewListener(final ActionViewListener actionViewListener){

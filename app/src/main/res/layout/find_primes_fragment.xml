@@ -38,6 +38,7 @@
                 android:id="@id/primality_input"
                 style="@style/NumberInput"
                 android:layout_width="0dp"
+                android:imeOptions="actionDone"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
 
@@ -84,6 +85,7 @@
                 <com.tycho.app.primenumberfinder.ValidEditText
                     android:id="@+id/search_range_start"
                     style="@style/NumberInput"
+                    android:imeOptions="actionDone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
@@ -97,6 +99,7 @@
                 <com.tycho.app.primenumberfinder.ValidEditText
                     android:id="@+id/search_range_end"
                     style="@style/NumberInput"
+                    android:imeOptions="actionDone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />

@@ -31,7 +31,9 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FabAnimator;
+import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
 import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
+import com.tycho.app.primenumberfinder.IntentReceiver;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.ValidEditText;
@@ -62,7 +64,7 @@ import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
  * Date Created: 3/2/2017
  */
 
-public class PrimeFactorizationFragment extends Fragment implements FloatingActionButtonListener{
+public class PrimeFactorizationFragment extends Fragment implements FloatingActionButtonListener, IntentReceiver{
 
     /**
      * Tag used for logging and debugging.
@@ -82,6 +84,8 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
 
     private ViewPager viewPager;
     private FabAnimator fabAnimator;
+
+    private Intent intent;
 
     @Nullable
     @Override
@@ -123,7 +127,7 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
         });
         fragmentAdapter.add("Results", resultsFragment);
         viewPager.setAdapter(fragmentAdapter);
-        fabAnimator = new FabAnimator(((MainActivity) getActivity()).getFab());
+        fabAnimator = new FabAnimator(((FloatingActionButtonHost) getActivity()).getFab(0));
         viewPager.addOnPageChangeListener(fabAnimator);
         final TabLayout tabLayout = rootView.findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
@@ -171,9 +175,12 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
 
                     //Create a new task
                     searchOptions.setNumber(getNumberToFactor().longValue());
-                    startTask(searchOptions);
+                    try {
+                        startTask((PrimeFactorizationTask.SearchOptions) searchOptions.clone());
+                    }catch (CloneNotSupportedException e){}
 
                     hideKeyboard(getActivity());
+                    taskListFragment.scrollToBottom();
 
                 } else {
                     Toast.makeText(getActivity(), "Invalid number", Toast.LENGTH_SHORT).show();
@@ -184,6 +191,14 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
 
         //Give the root view focus to prevent EditTexts from initially getting focus
         rootView.requestFocus();
+
+        //Scroll to Results fragment if started from a notification
+        if (intent.getSerializableExtra("taskId") != null){
+            viewPager.setCurrentItem(1);
+        }
+
+        //Reset intent
+        this.intent = null;
 
         return rootView;
     }
@@ -212,6 +227,12 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
         if (fabAnimator != null){
             fabAnimator.onPageScrolled(viewPager.getCurrentItem(), 0, 0);
         }
+    }
+
+    @Override
+    public void giveIntent(Intent intent) {
+        this.intent = intent;
+        taskListFragment.giveIntent(intent);
     }
 
     @Override
@@ -258,30 +279,7 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
 
                 //Notify when finished
                 if (task.getSearchOptions().isNotifyWhenFinished()) {
-                    final String CHANNEL_ID = "default";
-
-                    //Create notification
-                    Intent intent = new Intent(getActivity(), MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    PendingIntent pendingIntent = PendingIntent.getActivity(getActivity(), 0, intent, 0);
-
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(), CHANNEL_ID)
-                            .setSmallIcon(R.drawable.circle_white)
-                            .setContentTitle("Task Finished")
-                            .setContentText("Task \"Prime factorization of " + NUMBER_FORMAT.format(task.getNumber()) + "\" finished.")
-                            .setContentIntent(pendingIntent)
-                            .setAutoCancel(true);
-
-                    //Register notification channel
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        final NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Default", NotificationManager.IMPORTANCE_DEFAULT);
-                        channel.setDescription("Default notification channel.");
-                        final NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-                        notificationManager.createNotificationChannel(channel);
-                    }
-
-                    final NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-                    notificationManager.notify(0, builder.build());
+                    com.tycho.app.primenumberfinder.utils.NotificationManager.displayNotification(getActivity(), "default", task, com.tycho.app.primenumberfinder.utils.NotificationManager.REQUEST_CODE_PRIME_FACTORIZATION, "Task \"Prime factorization of " + NUMBER_FORMAT.format(task.getNumber()) + "\" finished.");
                 }
                 task.removeTaskListener(this);
             }

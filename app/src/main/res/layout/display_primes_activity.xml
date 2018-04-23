@@ -13,8 +13,8 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_marginTop="52dp"
         android:layout_height="match_parent"
+        android:layout_marginTop="52dp"
         android:scrollbars="vertical" />
 
     <android.support.design.widget.FloatingActionButton
@@ -24,8 +24,9 @@
         android:layout_gravity="end|top"
         android:layout_marginBottom="72dp"
         android:elevation="@dimen/fab_elevation"
-        android:visibility="gone"
         android:src="@drawable/ic_keyboard_arrow_up_white_24dp"
+        android:tooltipText="Scroll to top"
+        android:visibility="gone"
         app:fabSize="mini"
         app:layout_anchor="@id/scroll_to_bottom_fab"
         app:layout_anchorGravity="top" />
@@ -36,9 +37,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/fab_margin"
-        android:visibility="gone"
         android:elevation="@dimen/fab_elevation"
         android:src="@drawable/ic_keyboard_arrow_down_white_24dp"
+        android:tooltipText="Scroll to bottom"
+        android:visibility="gone"
         app:fabSize="mini" />
 
 </android.support.design.widget.CoordinatorLayout>

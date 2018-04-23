@@ -40,12 +40,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             case "allowBackgroundThreads":
                 PrimeNumberFinder.getPreferenceManager().setAllowBackgroundTasks(((CheckBoxPreference) preference).isChecked());
-                //PrimeNumberFinder.getPreferenceManager().putBoolean(KEY_ALLOW_BACKGROUND_TASKS, ((CheckBoxPreference) preference).isChecked());
-                //PreferenceManagerOld.setAllowBackgroundThreads(((CheckBoxPreference) preference).isChecked());
                 break;
         }
-
-        //PreferenceManagerOld.getInstance().saveAll();
         PrimeNumberFinder.getPreferenceManager().savePreferences();
     }
 }

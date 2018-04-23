@@ -2,6 +2,7 @@ package com.tycho.app.primenumberfinder.modules.findfactors.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
+import com.tycho.app.primenumberfinder.IntentReceiver;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
@@ -19,6 +21,7 @@ import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsTaskListAdapter;
 
 import java.util.Queue;
+import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import easytasks.Task;
@@ -27,7 +30,7 @@ import easytasks.Task;
  * Created by tycho on 11/19/2017.
  */
 
-public class FindFactorsTaskListFragment extends Fragment {
+public class FindFactorsTaskListFragment extends Fragment implements IntentReceiver{
 
     /**
      * Tag used for logging and debugging.
@@ -42,6 +45,8 @@ public class FindFactorsTaskListFragment extends Fragment {
 
     private Queue<AbstractTaskListAdapter.EventListener> eventListenerQueue = new LinkedBlockingQueue<>(5);
     private Queue<ActionViewListener> actionViewListenerQueue = new LinkedBlockingQueue<>(5);
+
+    private Intent intent;
 
     /**
      * This deprecated version of {@linkplain Fragment#onAttach(Activity)} is needed in API < 22.
@@ -81,13 +86,23 @@ public class FindFactorsTaskListFragment extends Fragment {
                 taskListAdapter.addTask(task);
             }
         }
-        if (taskListAdapter.getItemCount() > 0) {
+        if (intent == null && taskListAdapter.getItemCount() > 0) {
             taskListAdapter.setSelected(0);
+        }else{
+            taskListAdapter.setSelected(PrimeNumberFinder.getTaskManager().findTaskById((UUID) intent.getSerializableExtra("taskId")));
         }
 
         update();
 
+        //Reset intent
+        this.intent = null;
+
         return rootView;
+    }
+
+    @Override
+    public void giveIntent(Intent intent) {
+        this.intent = intent;
     }
 
     public void addEventListener(final AbstractTaskListAdapter.EventListener eventListener) {
