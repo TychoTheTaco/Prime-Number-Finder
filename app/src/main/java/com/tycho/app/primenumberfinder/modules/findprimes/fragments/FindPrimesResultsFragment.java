@@ -470,6 +470,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             if (getTask().getEndValue() != FindPrimesTask.INFINITY) {
                 progress.setText(String.valueOf((int) (getTask().getProgress() * 100)));
                 progressBar.setProgress((int) (getTask().getProgress() * 100));
+            }else{
+                progressBar.setProgress(50);
             }
 
             //Elapsed time

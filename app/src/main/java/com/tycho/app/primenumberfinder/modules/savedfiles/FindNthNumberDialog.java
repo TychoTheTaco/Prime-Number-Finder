@@ -94,7 +94,7 @@ public class FindNthNumberDialog extends Dialog {
         if (numberInput.getText().length() > 0){
             return new BigInteger(numberInput.getText().toString().replace(",", ""));
         }
-        return BigInteger.valueOf(-1);
+        return BigInteger.ZERO;
     }
 
     public interface OnFindClickedListener {

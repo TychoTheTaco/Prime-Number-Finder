@@ -163,7 +163,7 @@
             android:backgroundTint="@color/button_color"
             android:contentDescription="@string/view_all"
             android:elevation="2dp"
-            android:src="@drawable/ic_menu_white_24dp" />
+            android:src="@drawable/ic_list_white_24dp" />
 
         <View
             android:id="@+id/center"
