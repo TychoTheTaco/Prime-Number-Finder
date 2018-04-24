@@ -574,7 +574,7 @@ public class FindPrimesTask extends MultithreadedTask {
                 currentNumber += increment;
             }
 
-            Log.e(TAG, "SubTask: " + this + " finished. (" + startValue + ", " + endValue + ")");
+            //Log.e(TAG, "SubTask: " + this + " finished. (" + startValue + ", " + endValue + ")");
         }
 
         @Override
@@ -658,7 +658,7 @@ public class FindPrimesTask extends MultithreadedTask {
             status = "counting";
 
             //Count primes
-            for (counter = 2; counter < endValue; counter++) {
+            for (counter = 2; counter <= endValue; counter++) {
                 if (bitSet.get((int) counter)) {
                     primes.add(counter);
                     primeCount++;
