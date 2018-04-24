@@ -239,7 +239,6 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     @Override
     public void onTaskResuming() {
         super.onTaskResuming();
-        Log.d(TAG, "onTaskResuming()");
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -367,7 +366,6 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
 
     private void init(){
         if (getTask() != null){
-            Log.d(TAG, "init(): " + getTask().getState());
 
             //Reset view states
             resultsView.setVisibility(View.VISIBLE);

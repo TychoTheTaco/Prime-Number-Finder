@@ -111,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements FloatingActionBut
         //Initialize the fragment IDs
         fragmentIds.put(R.id.drawer_item_find_primes, "findPrimes");
         fragmentIds.put(R.id.drawer_item_find_factors, "findFactors");
+        fragmentIds.put(R.id.drawer_item_factor_tree, "primeFactorization");
         fragmentIds.put(R.id.drawer_item_saved_files, "savedFiles");
         fragmentIds.put(R.id.drawer_item_settings, "settings");
         fragmentIds.put(R.id.drawer_item_about, "about");
@@ -282,6 +283,8 @@ public class MainActivity extends AppCompatActivity implements FloatingActionBut
                     return new AboutPageFragment();
             }
         }
+
+        Log.w(TAG, "Returning old fragment: " + id);
 
         return getFragmentManager().findFragmentByTag(fragmentIds.get(id));
     }

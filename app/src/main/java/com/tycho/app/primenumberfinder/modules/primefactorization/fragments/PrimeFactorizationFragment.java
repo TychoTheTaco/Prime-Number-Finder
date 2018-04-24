@@ -204,7 +204,7 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
         if (editTextInput.getText().length() > 0){
             return new BigInteger(editTextInput.getText().toString().replace(",", ""));
         }
-        return BigInteger.valueOf(-1);
+        return BigInteger.ZERO;
     }
 
     public void addActionViewListener(final ActionViewListener actionViewListener) {

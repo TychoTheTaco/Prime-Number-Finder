@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +36,7 @@ public class PrimeFactorizationTaskListFragment extends Fragment implements Inte
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "FindFactorsTaskListFgmnt";
+    private static final String TAG = PrimeFactorizationTaskListFragment.class.getSimpleName();
 
     private RecyclerView recyclerView;
 
