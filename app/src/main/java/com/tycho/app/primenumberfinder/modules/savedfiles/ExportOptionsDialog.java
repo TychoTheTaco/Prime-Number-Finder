@@ -38,8 +38,8 @@ public class ExportOptionsDialog extends Dialog {
 
     private final File file;
 
-    public ExportOptionsDialog(final Context context, final File file){
-        super(context);
+    public ExportOptionsDialog(final Context context, final File file, final int style){
+        super(context, style);
         this.context = context;
         this.file = file;
     }

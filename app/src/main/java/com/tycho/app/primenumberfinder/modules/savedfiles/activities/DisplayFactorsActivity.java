@@ -134,7 +134,7 @@ public class DisplayFactorsActivity extends AppCompatActivity{
         switch (item.getItemId()){
 
             case R.id.export:
-                final ExportOptionsDialog exportOptionsDialog = new ExportOptionsDialog(this, file);
+                final ExportOptionsDialog exportOptionsDialog = new ExportOptionsDialog(this, file, R.style.FindFactorsDialog);
                 exportOptionsDialog.show();
                 break;
 

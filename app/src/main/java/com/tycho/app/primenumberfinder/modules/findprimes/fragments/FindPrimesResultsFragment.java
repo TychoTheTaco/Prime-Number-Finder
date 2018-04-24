@@ -3,6 +3,8 @@ package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -129,6 +131,25 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         etaTextView = rootView.findViewById(R.id.textView_eta);
         numbersPerSecondTextView = rootView.findViewById(R.id.textView_numbers_per_second);
         primesPerSecondTextView = rootView.findViewById(R.id.textView_primes_per_second);
+
+        //Apply black tint to icons
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
+            for (Drawable drawable : etaTextView.getCompoundDrawables()){
+                if (drawable != null){
+                    drawable.mutate().setTint(ContextCompat.getColor(getActivity(), R.color.black));
+                }
+            }
+            for (Drawable drawable : numbersPerSecondTextView.getCompoundDrawables()){
+                if (drawable != null){
+                    drawable.mutate().setTint(ContextCompat.getColor(getActivity(), R.color.black));
+                }
+            }
+            for (Drawable drawable : primesPerSecondTextView.getCompoundDrawables()){
+                if (drawable != null){
+                    drawable.mutate().setTint(ContextCompat.getColor(getActivity(), R.color.black));
+                }
+            }
+        }
 
         //Buttons
         pauseButton = rootView.findViewById(R.id.pause_button);

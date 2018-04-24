@@ -414,7 +414,7 @@ public class DisplayPrimesActivity extends AppCompatActivity {
                 break;
 
             case R.id.export:
-                final ExportOptionsDialog exportOptionsDialog = new ExportOptionsDialog(this, file);
+                final ExportOptionsDialog exportOptionsDialog = new ExportOptionsDialog(this, file, R.style.FindPrimesDialog);
                 exportOptionsDialog.show();
                 break;
         }

@@ -24,6 +24,52 @@
 
     <style name="AppBarOverlay" parent="Default"/>
 
+    <!-- Find Primes Theme -->
+    <style name="FindPrimesActivity" parent="Default.NoActionBar">
+        <item name="colorPrimary">@color/purple</item>
+        <item name="colorPrimaryDark">@color/purple_dark</item>
+        <item name="colorAccent">@color/purple</item>
+        <item name="colorControlActivated">@color/purple</item>
+    </style>
+
+    <style name="FindPrimesDialog" parent="Base.Theme.AppCompat.Light.Dialog">
+        <item name="colorPrimary">@color/purple</item>
+        <item name="colorPrimaryDark">@color/purple_dark</item>
+        <item name="colorAccent">@color/purple</item>
+        <item name="colorControlActivated">@color/purple</item>
+    </style>
+
+    <!-- Find Factors Theme -->
+    <style name="FindFactorsActivity" parent="Default.NoActionBar">
+        <item name="colorPrimary">@color/orange</item>
+        <item name="colorPrimaryDark">@color/orange_dark</item>
+        <item name="colorAccent">@color/orange</item>
+        <item name="colorControlActivated">@color/orange</item>
+    </style>
+
+    <style name="FindFactorsDialog" parent="Base.Theme.AppCompat.Light.Dialog">
+        <item name="colorPrimary">@color/orange</item>
+        <item name="colorPrimaryDark">@color/orange_dark</item>
+        <item name="colorAccent">@color/orange</item>
+        <item name="colorControlActivated">@color/orange</item>
+    </style>
+
+    <!-- Prime Factorization Theme -->
+    <style name="PrimeFactorizationActivity" parent="Default.NoActionBar">
+        <item name="colorPrimary">@color/green</item>
+        <item name="colorPrimaryDark">@color/green_dark</item>
+        <item name="colorAccent">@color/green</item>
+        <item name="colorControlActivated">@color/green</item>
+    </style>
+
+    <style name="PrimeFactorizationDialog" parent="Base.Theme.AppCompat.Light.Dialog">
+        <item name="colorPrimary">@color/green</item>
+        <item name="colorPrimaryDark">@color/green_dark</item>
+        <item name="colorAccent">@color/green</item>
+        <item name="colorControlActivated">@color/green</item>
+    </style>
+
+
     <!-- Toolbar popup menu -->
     <style name="PopupOverlay" parent="Default">
         <item name="android:colorBackground">@color/primary_light</item>
@@ -66,53 +112,4 @@
         <item name="android:includeFontPadding">false</item>
     </style>
 
-    <style name="sectionTitle">
-        <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/secondary_text</item>
-        <item name="android:gravity">center</item>
-        <item name="android:padding">0dp</item>
-    </style>
-
-    <style name="bigNumber">
-        <item name="android:textSize">28sp</item>
-        <item name="android:includeFontPadding">false</item>
-        <item name="android:textColor">@android:color/black</item>
-        <item name="android:gravity">center</item>
-        <item name="android:padding">2dp</item>
-    </style>
-
-    <style name="tile_normal">
-        <!--<item name="android:layout_marginStart">4dp</item>
-        <item name="android:layout_marginEnd">4dp</item>-->
-        <item name="android:background">#E0E0E0</item>
-        <item name="android:elevation">2dp</item>
-        <item name="android:padding">2dp</item>
-    </style>
-
-
-
-    <style name="PrimeNumbers" parent="Default.NoActionBar">
-        <item name="colorPrimary">@color/purple</item>
-        <item name="colorPrimaryDark">@color/purple_dark</item>
-        <item name="colorAccent">@color/purple</item>
-        <item name="colorControlActivated">@color/purple</item>
-    </style>
-
-    <style name="Factors" parent="Default.NoActionBar">
-        <item name="colorPrimary">@color/orange</item>
-        <item name="colorPrimaryDark">@color/orange_dark</item>
-        <item name="colorAccent">@color/orange</item>
-        <item name="colorControlActivated">@color/orange</item>
-    </style>
-
-    <style name="FactorTrees" parent="Default.NoActionBar">
-        <item name="android:statusBarColor">@color/green_dark</item>
-    </style>
-
-    <style name="StatisticDescription">
-        <item name="android:textSize">12sp</item>
-        <item name="android:gravity">center_vertical|start</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:textColor">@color/secondary_text</item>
-    </style>
 </resources>
