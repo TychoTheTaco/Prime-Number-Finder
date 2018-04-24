@@ -284,8 +284,6 @@ public class MainActivity extends AppCompatActivity implements FloatingActionBut
             }
         }
 
-        Log.w(TAG, "Returning old fragment: " + id);
-
         return getFragmentManager().findFragmentByTag(fragmentIds.get(id));
     }
 
