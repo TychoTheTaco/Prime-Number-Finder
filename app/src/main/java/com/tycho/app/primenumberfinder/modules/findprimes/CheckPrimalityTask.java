@@ -82,7 +82,10 @@ public class CheckPrimalityTask extends Task {
 
     @Override
     public float getProgress() {
-        return ((float) i / sqrtMax);
+        if (getState() != State.STOPPED){
+            setProgress((float) i / sqrtMax);
+        }
+        return super.getProgress();
     }
 
     public boolean isPrime(){

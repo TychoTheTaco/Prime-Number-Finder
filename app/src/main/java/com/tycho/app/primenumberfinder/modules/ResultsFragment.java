@@ -1,5 +1,6 @@
 package com.tycho.app.primenumberfinder.modules;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -25,11 +26,6 @@ public abstract class ResultsFragment extends TaskFragment {
      * Tag used for logging and debugging.
      */
     private static final String TAG = "ResultsFragment";
-
-    /**
-     * Decimal format used for displaying task progress.
-     */
-    protected static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("##0.00");
 
     protected final UIUpdater uiUpdater = new UIUpdater();
 
@@ -118,7 +114,7 @@ public abstract class ResultsFragment extends TaskFragment {
                 }
             });
         }else{
-            Log.d(TAG, "Wasn't added or was detached!");
+            Log.w(TAG, "Skipping UI update! Fragment wasn't added or was detached!");
         }
     }
 
@@ -145,5 +141,11 @@ public abstract class ResultsFragment extends TaskFragment {
                 }
             }
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUi();
     }
 }

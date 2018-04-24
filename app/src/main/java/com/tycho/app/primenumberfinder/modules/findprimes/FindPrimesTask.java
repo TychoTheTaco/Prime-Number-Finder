@@ -580,7 +580,9 @@ public class FindPrimesTask extends MultithreadedTask {
         @Override
         public float getProgress() {
             if (endValue == -1) return 0;
-            setProgress((float) (currentNumber - startValue) / (endValue - startValue));
+            if (getState() != State.STOPPED){
+                setProgress((float) (currentNumber - startValue) / (endValue - startValue));
+            }
             return super.getProgress();
         }
 

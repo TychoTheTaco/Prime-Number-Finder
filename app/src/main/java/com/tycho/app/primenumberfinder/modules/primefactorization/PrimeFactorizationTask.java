@@ -108,9 +108,6 @@ public class PrimeFactorizationTask extends Task {
     @Override
     public float getProgress() {
         switch (status){
-            default:
-                break;
-
             case "findFactors":
                 setProgress(0.33f * (findFactorsTask.getProgress()));
                 break;

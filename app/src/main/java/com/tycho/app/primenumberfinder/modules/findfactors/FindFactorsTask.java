@@ -91,7 +91,9 @@ public class FindFactorsTask extends Task {
     @Override
     //TODO: The downside of this is that getEstimatedTimeRemaining() will be inaccurate if getProgress() is never called because the progress is never set until this is called.
     public float getProgress() {
-        setProgress((float) i / sqrtMax);
+        if (getState() != State.STOPPED){
+            setProgress((float) i / sqrtMax);
+        }
         return super.getProgress();
     }
 
