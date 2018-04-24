@@ -3,6 +3,8 @@ package com.tycho.app.primenumberfinder.utils;
 import android.content.Context;
 import android.util.Log;
 
+import com.tycho.app.primenumberfinder.PrimeNumberFinder;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -23,6 +25,7 @@ import java.io.PrintWriter;
 import java.lang.ref.WeakReference;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -40,9 +43,9 @@ import simpletrees.Tree;
 public final class FileManager {
 
     /**
-     * Tag used for logging and debugging
+     * Tag used for logging and debugging.
      */
-    private static final String TAG = "FileManager";
+    private static final String TAG = FileManager.class.getSimpleName();
 
     /**
      * The current FileManager instance. There should only be 1 at a time.
@@ -314,8 +317,6 @@ public final class FileManager {
         return true;
     }
 
-    //Read methods
-
     public static List<Long> readNumbers(final File file){
         final List<Long> numbers = new ArrayList<>();
 
@@ -497,6 +498,46 @@ public final class FileManager {
             }
             factorsDirectory.delete();
         }
+    }
+
+    public void upgradeTo1_3_0(){
+        if (PrimeNumberFinder.getPreferenceManager().getFileVersion() == 0){
+
+            final List<File> files = new ArrayList<>();
+            files.addAll(Arrays.asList(savedPrimesDirectory.listFiles()));
+            files.addAll(Arrays.asList(savedFactorsDirectory.listFiles()));
+
+            //Update saved primes
+            for (File file : files){
+
+                //Read old file
+                final List<Long> numbers = new ArrayList<>();
+                try {
+                    BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+                    final StringBuilder stringBuilder = new StringBuilder("");
+
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        stringBuilder.append(line);
+                    }
+                    bufferedReader.close();
+
+                    final List<String> stringNumbers = Arrays.asList(stringBuilder.toString().split(","));
+                    for (String string : stringNumbers) {
+                        numbers.add(Long.valueOf(string));
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                //Save in new format
+                writeNumbersQuick(numbers, file, false);
+            }
+
+            PrimeNumberFinder.getPreferenceManager().setFileVersion(1);
+            PrimeNumberFinder.getPreferenceManager().savePreferences();
+        }
+
     }
 
     public File convert(final File file, final String fileName, final String itemSeparator, final boolean includeCommas) {

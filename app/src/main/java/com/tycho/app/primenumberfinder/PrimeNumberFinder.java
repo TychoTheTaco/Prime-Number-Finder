@@ -35,7 +35,6 @@ public class PrimeNumberFinder extends Application {
         super.onCreate();
 
         FileManager.init(this);
-        FileManager.getInstance().updateFileSystem(this);
         taskManager = new TaskManager();
         preferenceManager = new PreferenceManager(this, "preferences");
     }

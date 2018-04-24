@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 
 import java.util.HashMap;
 
+import static com.tycho.app.primenumberfinder.utils.PreferenceManager.Preference.FILE_VERSION;
+
 /**
  * Saves user preferences using Android's {@link SharedPreferences} implementation.
  *
@@ -25,9 +27,14 @@ public class PreferenceManager extends HashMap{
 
     private boolean allowBackgroundTasks;
 
+    private int fileVersion;
+
+    public static final int CURRENT_VERSION = 1;
+
     public PreferenceManager(final Context context, final String name){
         this.name = name;
         this.sharedPreferences = context.getSharedPreferences(name, Context.MODE_PRIVATE);
+        loadPreferences();
     }
 
     public String getName(){
@@ -38,11 +45,13 @@ public class PreferenceManager extends HashMap{
 
     private void loadPreferences(){
         this.allowBackgroundTasks = sharedPreferences.getBoolean(Preference.ALLOW_BACKGROUND_TASKS.getKey(), (boolean) Preference.ALLOW_BACKGROUND_TASKS.getDefaultValue());
+        this.fileVersion = sharedPreferences.getInt(FILE_VERSION.getKey(), (int) FILE_VERSION.getDefaultValue());
     }
 
     public void savePreferences(){
         sharedPreferences.edit()
                 .putBoolean(Preference.ALLOW_BACKGROUND_TASKS.getKey(), this.allowBackgroundTasks)
+                .putInt(FILE_VERSION.getKey(), this.fileVersion)
                 .apply();
     }
 
@@ -56,10 +65,19 @@ public class PreferenceManager extends HashMap{
         this.allowBackgroundTasks = allowBackgroundTasks;
     }
 
+    public void setFileVersion(final int version){
+        this.fileVersion = version;
+    }
+
+    public int getFileVersion(){
+        return this.fileVersion;
+    }
+
     //Options
 
     public enum Preference{
-        ALLOW_BACKGROUND_TASKS("allowBackgroundTasks", false);
+        ALLOW_BACKGROUND_TASKS("allowBackgroundTasks", false),
+        FILE_VERSION("fileVersion", 0);
 
         private final String key;
         private final Object defaultValue;

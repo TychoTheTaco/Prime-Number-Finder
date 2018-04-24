@@ -27,6 +27,7 @@ import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
 import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.IntentReceiver;
+import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.modules.about.AboutPageFragment;
 import com.tycho.app.primenumberfinder.settings.SettingsFragment;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
@@ -36,6 +37,7 @@ import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesFr
 import com.tycho.app.primenumberfinder.modules.primefactorization.fragments.PrimeFactorizationFragment;
 import com.tycho.app.primenumberfinder.modules.savedfiles.SavedFilesFragment;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
@@ -161,6 +163,24 @@ public class MainActivity extends AppCompatActivity implements FloatingActionBut
             case REQUEST_CODE_PRIME_FACTORIZATION:
                 selectDrawerItem(2);
                 break;
+        }
+
+        //Show a dialog while upgrading to the newest version
+        if (PrimeNumberFinder.getPreferenceManager().getFileVersion() < PreferenceManager.CURRENT_VERSION){
+            final ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Updating...");
+            progressDialog.show();
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    //Update file system
+                    FileManager.getInstance().updateFileSystem(getBaseContext());
+                    FileManager.getInstance().upgradeTo1_3_0();
+
+                    progressDialog.dismiss();
+                }
+            }).start();
         }
     }
 
