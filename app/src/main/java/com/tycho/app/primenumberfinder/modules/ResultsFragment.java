@@ -105,6 +105,9 @@ public abstract class ResultsFragment extends TaskFragment {
                 public void run() {
                     synchronized (LOCK){
                         updateRequests++;
+                        if (getView() == null){
+                            Log.e(TAG, "ERROR: getView() was null before UI update!");
+                        }
                         onUiUpdate();
                         updateRequests--;
                         if (updateRequests == 0){

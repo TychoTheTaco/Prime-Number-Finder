@@ -133,6 +133,7 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
                 isDirty = true;
             }
         });
+        editTextSearchRangeStart.setClearOnTouch(false);
 
         //Set up range end input
         editTextSearchRangeEnd = findViewById(R.id.search_range_end);
@@ -187,6 +188,7 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
                 isDirty = true;
             }
         });
+        editTextSearchRangeEnd.setClearOnTouch(false);
 
         //Set up infinity button
         final ImageButton infinityButton = findViewById(R.id.infinity_button);

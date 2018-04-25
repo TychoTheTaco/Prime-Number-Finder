@@ -231,15 +231,17 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
 
     @Override
     protected void onUiUpdate() {
-        //Update progress
-        progress.setText(String.valueOf((int) (getTask().getProgress() * 100)));
-        progressBar.setProgress((int) (getTask().getProgress() * 100));
+        if (getTask() != null) {
+            //Update progress
+            progress.setText(String.valueOf((int) (getTask().getProgress() * 100)));
+            progressBar.setProgress((int) (getTask().getProgress() * 100));
 
-        //Time elapsed
-        timeElapsedTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime(), 2));
+            //Time elapsed
+            timeElapsedTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime(), 2));
 
-        //Time remaining
-        etaTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+            //Time remaining
+            etaTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+        }
     }
 
     @Override
