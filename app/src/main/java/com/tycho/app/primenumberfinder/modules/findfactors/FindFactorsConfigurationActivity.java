@@ -206,10 +206,7 @@ public class FindFactorsConfigurationActivity extends AppCompatActivity {
     }
 
     private BigInteger getNumberToFactor() {
-        if (editTextNumberToFactor.getText().length() > 0) {
-            return new BigInteger(editTextNumberToFactor.getText().toString().replace(",", ""));
-        }
-        return BigInteger.valueOf(-1);
+        return Utils.textToNumber(editTextNumberToFactor.getText().toString());
     }
 
     private void applyConfig(final FindFactorsTask.SearchOptions searchOptions) {

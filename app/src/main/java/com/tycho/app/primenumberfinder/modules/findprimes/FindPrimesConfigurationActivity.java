@@ -333,25 +333,18 @@ public class FindPrimesConfigurationActivity extends AppCompatActivity {
     }
 
     private BigInteger getStartValue() {
-        final String input = editTextSearchRangeStart.getText().toString().trim();
-        if (input.length() > 0) {
-            return new BigInteger(input.replace(",", ""));
-        } else {
-            return BigInteger.ZERO;
-        }
+        return Utils.textToNumber(editTextSearchRangeStart.getText().toString());
     }
 
     private BigInteger getEndValue() {
         final String input = editTextSearchRangeEnd.getText().toString().trim();
 
-        if (input.length() > 0) {
-            if (input.equals("infinity")) {
-                return BigInteger.valueOf(FindPrimesTask.INFINITY);
-            }
-            return new BigInteger(input.replace(",", ""));
-        } else {
-            return BigInteger.ZERO;
+        //Check for infinity
+        if (input.equals("infinity")) {
+            return BigInteger.valueOf(FindPrimesTask.INFINITY);
         }
+
+        return Utils.textToNumber(editTextSearchRangeEnd.getText().toString());
     }
 
     private void applyConfig(final FindPrimesTask.SearchOptions searchOptions) {

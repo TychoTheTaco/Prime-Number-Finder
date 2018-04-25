@@ -5,10 +5,12 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.text.method.DigitsKeyListener;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Handler;
 

@@ -19,6 +19,7 @@ import android.view.inputmethod.InputMethodManager;
 import com.tycho.app.primenumberfinder.R;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -240,5 +241,50 @@ public final class Utils {
     public static void applyTheme(final AppCompatActivity appCompatActivity, final int statusBarColor, final int actionBarColor){
         appCompatActivity.getWindow().setStatusBarColor(statusBarColor);
         appCompatActivity.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(actionBarColor));
+    }
+
+    private static final String arabic = "\u0660\u06f1\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669";
+
+    public static boolean containsArabicDigit(final String string){
+        for (int i = 0; i < arabic.length(); i++){
+            if (string.contains(String.valueOf(arabic.charAt(i)))){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String arabicToDecimal(String number) {
+        char[] chars = new char[number.length()];
+        for(int i = 0; i < number.length(); i++) {
+            char ch = number.charAt(i);
+            if (ch >= 0x0660 && ch <= 0x0669)
+                ch -= 0x0660 - '0';
+            else if (ch >= 0x06f0 && ch <= 0x06F9)
+                ch -= 0x06f0 - '0';
+            chars[i] = ch;
+        }
+        return new String(chars);
+    }
+
+    public static BigInteger textToNumber(String text){
+        text = text.trim();
+
+        //Remove commas
+        text = text.replace(",", ""); //English
+        text = text.replace("\u066C", ""); //Arabic
+
+        //Make sure length is greater than 0
+        if (text.length() <= 0){
+            return BigInteger.ZERO;
+        }
+
+        //Check for arabic
+        if  (Utils.containsArabicDigit(text)){
+            return new BigInteger(Utils.arabicToDecimal(text));
+        }
+
+        //Assume english
+        return new BigInteger(text);
     }
 }

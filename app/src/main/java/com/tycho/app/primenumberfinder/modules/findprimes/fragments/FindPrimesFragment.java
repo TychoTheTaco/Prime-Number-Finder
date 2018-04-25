@@ -41,6 +41,7 @@ import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.TaskManager;
+import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
 import java.math.BigInteger;
@@ -483,33 +484,22 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
     }
 
     private BigInteger getPrimalityInput() {
-        final String input = editTextPrimalityInput.getText().toString().trim();
-        if (input.length() > 0) {
-            return new BigInteger(input.replace(",", ""));
-        } else {
-            return BigInteger.ZERO;
-        }
+        return Utils.textToNumber(editTextPrimalityInput.getText().toString());
     }
 
     private BigInteger getStartValue() {
-        final String input = editTextSearchRangeStart.getText().toString().trim();
-        if (input.length() > 0) {
-            return new BigInteger(input.replace(",", ""));
-        } else {
-            return BigInteger.ZERO;
-        }
+        return Utils.textToNumber(editTextSearchRangeStart.getText().toString());
     }
 
     private BigInteger getEndValue() {
         final String input = editTextSearchRangeEnd.getText().toString().trim();
-        if (input.length() > 0) {
-            if (input.equals("infinity")) {
-                return BigInteger.valueOf(FindPrimesTask.INFINITY);
-            }
-            return new BigInteger(input.replace(",", ""));
-        } else {
-            return BigInteger.ZERO;
+
+        //Check for infinity
+        if (input.equals("infinity")) {
+            return BigInteger.valueOf(FindPrimesTask.INFINITY);
         }
+
+        return Utils.textToNumber(editTextSearchRangeEnd.getText().toString());
     }
 
     public void addActionViewListener(final ActionViewListener actionViewListener) {

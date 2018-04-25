@@ -24,57 +24,7 @@
         android:padding="8dp">
 
         <!-- Top bar -->
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical">
-
-            <ProgressBar
-                android:id="@+id/progress_bar"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="@drawable/progress_background"
-                android:max="100"
-                android:padding="2dp"
-                android:progress="0"
-                android:progressDrawable="@drawable/circular" />
-
-            <TextView
-                android:id="@+id/textView_search_progress"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:gravity="center"
-                android:lines="1"
-                android:singleLine="true"
-                android:textColor="@color/primary_text"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_toEndOf="@id/progress_bar"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/primary_text"
-                    android:textSize="22sp" />
-
-                <!-- Time elapsed-->
-                <TextView
-                    android:id="@+id/textView_elapsed_time"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/secondary_text"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-        </RelativeLayout>
+        <include layout="@layout/progress_banner"/>
 
         <TextView
             android:id="@+id/subtitle"

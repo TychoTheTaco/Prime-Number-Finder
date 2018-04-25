@@ -196,10 +196,7 @@ public class PrimeFactorizationConfigurationActivity extends AppCompatActivity {
     }
 
     private BigInteger getNumberToFactor() {
-        if (editTextNumberToFactor.getText().length() > 0) {
-            return new BigInteger(editTextNumberToFactor.getText().toString().replace(",", ""));
-        }
-        return BigInteger.ZERO;
+        return Utils.textToNumber(editTextNumberToFactor.getText().toString());
     }
 
     private void applyConfig(final PrimeFactorizationTask.SearchOptions searchOptions) {

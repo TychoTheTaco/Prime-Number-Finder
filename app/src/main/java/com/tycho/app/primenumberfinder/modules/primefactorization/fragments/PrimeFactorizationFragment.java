@@ -47,6 +47,7 @@ import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactoriza
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.adapters.PrimeFactorizationTaskListAdapter;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
 import java.math.BigInteger;
@@ -201,10 +202,7 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
     }
 
     private BigInteger getNumberToFactor() {
-        if (editTextInput.getText().length() > 0){
-            return new BigInteger(editTextInput.getText().toString().replace(",", ""));
-        }
-        return BigInteger.ZERO;
+        return Utils.textToNumber(editTextInput.getText().toString());
     }
 
     public void addActionViewListener(final ActionViewListener actionViewListener) {

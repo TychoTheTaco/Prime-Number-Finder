@@ -90,3 +90,8 @@
 - Added "scroll to top" and "scroll to bottom" buttons when viewing large saved files
 - Added "Go to number" feature when viewing saved files
 - Improved file saving and loading speed
+
+04/25/2018 > Prime Number Finder version 1.3.1
+- Fixed a bug that sometimes caused the application to crash after resuming
+- Fixed a bug that caused the app to crash when arabic characters were used
+- Minor UI bug fix

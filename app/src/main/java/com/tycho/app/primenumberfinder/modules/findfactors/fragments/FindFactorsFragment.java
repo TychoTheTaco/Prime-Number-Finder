@@ -43,6 +43,7 @@ import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsT
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
 import java.math.BigInteger;
@@ -78,7 +79,6 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
      * All views
      */
     private ValidEditText editTextNumberToFactor;
-    private Button buttonFindFactors;
 
     private final FindFactorsTask.SearchOptions searchOptions = new FindFactorsTask.SearchOptions(0);
 
@@ -166,7 +166,7 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
         });
 
         //Set up start button
-        buttonFindFactors = rootView.findViewById(R.id.button_find_factors);
+        final Button buttonFindFactors = rootView.findViewById(R.id.button_find_factors);
         buttonFindFactors.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -291,10 +291,7 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
     }
 
     private BigInteger getNumberToFactor() {
-        if (editTextNumberToFactor.getText().length() > 0){
-            return new BigInteger(editTextNumberToFactor.getText().toString().replace(",", ""));
-        }
-        return BigInteger.valueOf(-1);
+        return Utils.textToNumber(editTextNumberToFactor.getText().toString());
     }
 
     public void addActionViewListener(final ActionViewListener actionViewListener){
