@@ -91,7 +91,7 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
                 taskListAdapter.addTask(task);
             }
         }
-        if (intent == null && taskListAdapter.getItemCount() > 0) {
+        if (intent == null || taskListAdapter.getItemCount() > 0) {
             taskListAdapter.setSelected(0);
         }else{
             taskListAdapter.setSelected(PrimeNumberFinder.getTaskManager().findTaskById((UUID) intent.getSerializableExtra("taskId")));

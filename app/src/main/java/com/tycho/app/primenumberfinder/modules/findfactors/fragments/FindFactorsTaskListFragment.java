@@ -87,7 +87,7 @@ public class FindFactorsTaskListFragment extends Fragment implements IntentRecei
                 taskListAdapter.addTask(task);
             }
         }
-        if (intent == null && taskListAdapter.getItemCount() > 0) {
+        if (intent == null || taskListAdapter.getItemCount() > 0) {
             taskListAdapter.setSelected(0);
         }else{
             taskListAdapter.setSelected(PrimeNumberFinder.getTaskManager().findTaskById((UUID) intent.getSerializableExtra("taskId")));

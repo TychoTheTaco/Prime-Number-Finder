@@ -212,15 +212,17 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
     }
 
     public void setSelected(int index) {
-        final int changed = selectedItemPosition;
-        selectedItemPosition = index;
-        notifyItemChanged(selectedItemPosition);
-        if (changed != -1) notifyItemChanged(changed);
+        if (index < getItemCount()){
+            final int changed = selectedItemPosition;
+            selectedItemPosition = index;
+            notifyItemChanged(selectedItemPosition);
+            if (changed != -1) notifyItemChanged(changed);
 
-        if (selectedItemPosition == -1) {
-            sendOnTaskSelected(null);
-        } else {
-            sendOnTaskSelected(tasks.get(selectedItemPosition));
+            if (selectedItemPosition == -1) {
+                sendOnTaskSelected(null);
+            } else {
+                sendOnTaskSelected(tasks.get(selectedItemPosition));
+            }
         }
     }
 
