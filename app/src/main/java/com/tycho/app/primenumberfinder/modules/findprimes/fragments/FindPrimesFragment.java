@@ -174,20 +174,15 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
             @Override
             public void afterTextChanged(Editable editable) {
-                //Check if the number is valid
-                if (Validator.isPrimalityInputValid(getPrimalityInput())) {
-                    editTextPrimalityInput.setValid(true);
-
-                    //Format the number
-                    final String formattedText = NUMBER_FORMAT.format(getPrimalityInput());
-                    if (!editable.toString().equals(formattedText)) {
-                        editTextPrimalityInput.setText(formattedText);
-                    }
-                    editTextPrimalityInput.setSelection(formattedText.length());
-
-                } else {
-                    editTextPrimalityInput.setValid(false);
+                //Format the number
+                final String formattedText = NUMBER_FORMAT.format(getPrimalityInput());
+                if (!editable.toString().equals(formattedText)) {
+                    editTextPrimalityInput.setText(formattedText);
                 }
+                editTextPrimalityInput.setSelection(formattedText.length());
+
+                //Check if the number is valid
+                editTextPrimalityInput.setValid(Validator.isPrimalityInputValid(getPrimalityInput()));
             }
         });
 

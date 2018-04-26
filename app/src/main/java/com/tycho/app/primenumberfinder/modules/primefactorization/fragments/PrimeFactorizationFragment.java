@@ -146,20 +146,15 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
 
             @Override
             public void afterTextChanged(Editable editable) {
+                //Format the number
+                final String formattedText = NUMBER_FORMAT.format(getNumberToFactor());
+                if (!editable.toString().equals(formattedText)) {
+                    editTextInput.setText(formattedText);
+                }
+                editTextInput.setSelection(formattedText.length());
 
                 //Check if the number is valid
-                if (Validator.isValidFactorInput(getNumberToFactor())) {
-                    editTextInput.setValid(true);
-
-                    final String formattedText = NUMBER_FORMAT.format(getNumberToFactor());
-                    if (!editable.toString().equals(formattedText)) {
-                        editTextInput.setText(formattedText);
-                    }
-                    editTextInput.setSelection(formattedText.length());
-
-                } else {
-                    editTextInput.setValid(false);
-                }
+                editTextInput.setValid(Validator.isValidFactorInput(getNumberToFactor()));
             }
         });
 
