@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
 import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
@@ -54,7 +55,7 @@ import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
  * @author Tycho Bellers
  * Date Created: 1/10/2016
  */
-public class MainActivity extends AppCompatActivity implements FloatingActionButtonHost {
+public class MainActivity extends AbstractActivity implements FloatingActionButtonHost {
 
     /**
      * Tag used for logging and debugging.
@@ -218,20 +219,6 @@ public class MainActivity extends AppCompatActivity implements FloatingActionBut
                 break;
         }
         return true;
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        PrimeNumberFinder.getTaskManager().resumeAllTasks();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (!PrimeNumberFinder.getPreferenceManager().isAllowBackgroundTasks()) {
-            PrimeNumberFinder.getTaskManager().pauseAllTasks();
-        }
     }
 
     @Override

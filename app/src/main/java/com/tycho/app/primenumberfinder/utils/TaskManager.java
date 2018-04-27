@@ -31,6 +31,12 @@ public class TaskManager {
         taskStates.remove(task);
     }
 
+    public void saveTaskStates(){
+        for (Task task : taskStates.keySet()){
+            taskStates.put(task, task.getState());
+        }
+    }
+
     /**
      * Pause all tasks.
      */

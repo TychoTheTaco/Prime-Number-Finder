@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener;
+import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.TreeView;
@@ -46,7 +47,7 @@ import simpletrees.Tree;
  * Created by tycho on 11/12/2017.
  */
 
-public class DisplayPrimeFactorizationActivity extends AppCompatActivity{
+public class DisplayPrimeFactorizationActivity extends AbstractActivity{
 
     /**
      * Tag used for logging and debugging.
@@ -79,7 +80,7 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity{
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        applyThemeColor(ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
+        Utils.applyTheme(this, ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
 
         //Get the intent
         final Intent intent = getIntent();
@@ -227,19 +228,6 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity{
         return string;
     }
 
-    private void setActionBarColor(final int color) {
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(color));
-    }
-
-    private void setStatusBarColor(final int color) {
-        getWindow().setStatusBarColor(color);
-    }
-
-    private void applyThemeColor(final int statusBarColor, final int actionBarColor) {
-        setStatusBarColor(statusBarColor);
-        setActionBarColor(actionBarColor);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.display_content_activity_menu, menu);
@@ -263,17 +251,5 @@ public class DisplayPrimeFactorizationActivity extends AppCompatActivity{
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        PrimeNumberFinder.getTaskManager().resumeAllTasks();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        PrimeNumberFinder.getTaskManager().pauseAllTasks();
     }
 }

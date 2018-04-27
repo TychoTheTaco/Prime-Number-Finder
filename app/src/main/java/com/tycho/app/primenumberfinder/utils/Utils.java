@@ -16,6 +16,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.inputmethod.InputMethodManager;
 
+import com.crashlytics.android.Crashlytics;
 import com.tycho.app.primenumberfinder.R;
 
 import java.io.File;
@@ -268,6 +269,7 @@ public final class Utils {
     }
 
     public static BigInteger textToNumber(String text){
+        Crashlytics.setString("textToNumber_raw", text);
         text = text.trim();
 
         //Remove commas
@@ -285,6 +287,7 @@ public final class Utils {
         }
 
         //Assume english
+        Crashlytics.setString("textToNumber_final", text);
         return new BigInteger(text);
     }
 }

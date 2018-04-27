@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.utils.FileType;
@@ -21,7 +22,7 @@ import com.tycho.app.primenumberfinder.utils.Utils;
  * @author Tycho Bellers
  *         Date Created: 11/5/2016
  */
-public class SavedFilesListActivity extends AppCompatActivity {
+public class SavedFilesListActivity extends AbstractActivity {
 
     /**
      * Tag used for logging and debugging.
@@ -52,15 +53,15 @@ public class SavedFilesListActivity extends AppCompatActivity {
 
         switch (fileType) {
             case PRIMES:
-                applyThemeColor(ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));
+                Utils.applyTheme(this, ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));
                 break;
 
             case FACTORS:
-                applyThemeColor(ContextCompat.getColor(this, R.color.orange_dark), ContextCompat.getColor(this, R.color.orange));
+                Utils.applyTheme(this, ContextCompat.getColor(this, R.color.orange_dark), ContextCompat.getColor(this, R.color.orange));
                 break;
 
             case TREE:
-                applyThemeColor(ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
+                Utils.applyTheme(this, ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
                 break;
         }
 
@@ -100,19 +101,6 @@ public class SavedFilesListActivity extends AppCompatActivity {
         menu.findItem(R.id.delete).setVisible(visible);
     }
 
-    private void setActionBarColor(final int color) {
-          getSupportActionBar().setBackgroundDrawable(new ColorDrawable(color));
-    }
-
-    private void setStatusBarColor(final int color) {
-        getWindow().setStatusBarColor(color);
-    }
-
-    private void applyThemeColor(final int statusBarColor, final int actionBarColor) {
-        setStatusBarColor(statusBarColor);
-        setActionBarColor(actionBarColor);
-    }
-
     @Override
     public void onBackPressed() {
         if (adapterSavedFilesList.isSelecting()) {
@@ -120,20 +108,6 @@ public class SavedFilesListActivity extends AppCompatActivity {
             adapterSavedFilesList.notifyDataSetChanged();
         } else {
             super.onBackPressed();
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        PrimeNumberFinder.getTaskManager().resumeAllTasks();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (!PrimeNumberFinder.getPreferenceManager().isAllowBackgroundTasks()) {
-            PrimeNumberFinder.getTaskManager().pauseAllTasks();
         }
     }
 }

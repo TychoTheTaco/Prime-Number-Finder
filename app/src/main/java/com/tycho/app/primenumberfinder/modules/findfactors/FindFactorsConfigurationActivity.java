@@ -28,6 +28,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.CustomRadioGroup;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
@@ -51,7 +52,7 @@ import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.
  * Created by tycho on 1/24/2018.
  */
 
-public class FindFactorsConfigurationActivity extends AppCompatActivity {
+public class FindFactorsConfigurationActivity extends AbstractActivity {
 
     /**
      * Tag used for logging and debugging.
@@ -222,19 +223,5 @@ public class FindFactorsConfigurationActivity extends AppCompatActivity {
             autoSaveCheckbox.setChecked(false);
         }
 
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        PrimeNumberFinder.getTaskManager().resumeAllTasks();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (!PrimeNumberFinder.getPreferenceManager().isAllowBackgroundTasks()) {
-            PrimeNumberFinder.getTaskManager().pauseAllTasks();
-        }
     }
 }

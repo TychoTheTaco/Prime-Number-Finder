@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jaredrummler.android.colorpicker.ColorPickerDialog;
+import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.TreeView;
 import com.tycho.app.primenumberfinder.utils.FileManager;
@@ -38,7 +39,7 @@ import simpletrees.Tree;
  * Created by tycho on 2/9/2018.
  */
 
-public class FactorTreeExportOptionsActivity extends AppCompatActivity implements ColorPickerListener {
+public class FactorTreeExportOptionsActivity extends AbstractActivity implements ColorPickerListener {
 
     /**
      * Tag used for logging and debugging.

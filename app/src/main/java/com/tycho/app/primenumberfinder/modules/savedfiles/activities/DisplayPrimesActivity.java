@@ -18,12 +18,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.ExportOptionsDialog;
 import com.tycho.app.primenumberfinder.modules.savedfiles.FindNthNumberDialog;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -36,7 +38,7 @@ import java.util.List;
  * Date Created: 11/5/2016
  */
 
-public class DisplayPrimesActivity extends AppCompatActivity {
+public class DisplayPrimesActivity extends AbstractActivity {
 
     /**
      * Tag used for logging and debugging.
@@ -72,7 +74,7 @@ public class DisplayPrimesActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        applyThemeColor(ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));
+        Utils.applyTheme(this, ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));
 
         //Get the intent
         final Intent intent = getIntent();
@@ -368,19 +370,6 @@ public class DisplayPrimesActivity extends AppCompatActivity {
         return string;
     }
 
-    private void setActionBarColor(final int color) {
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(color));
-    }
-
-    private void setStatusBarColor(final int color) {
-        getWindow().setStatusBarColor(color);
-    }
-
-    private void applyThemeColor(final int statusBarColor, final int actionBarColor) {
-        setStatusBarColor(statusBarColor);
-        setActionBarColor(actionBarColor);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.display_content_activity_menu, menu);
@@ -420,17 +409,5 @@ public class DisplayPrimesActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        PrimeNumberFinder.getTaskManager().resumeAllTasks();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        PrimeNumberFinder.getTaskManager().pauseAllTasks();
     }
 }
