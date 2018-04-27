@@ -26,6 +26,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.google.firebase:firebase-core:15.0.0'
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:cardview-v7:27.1.1'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
@@ -36,3 +37,5 @@ dependencies {
     implementation files('libs/Simple Trees 1.1.1.DEV.jar')
     implementation files('libs/Easy Tasks 1.2.9.DEV.jar')
 }
+
+apply plugin: 'com.google.gms.google-services'

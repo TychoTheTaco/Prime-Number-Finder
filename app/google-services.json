@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "88668641090",
+    "firebase_url": "https://prime-number-finder.firebaseio.com",
+    "project_id": "prime-number-finder",
+    "storage_bucket": "prime-number-finder.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:88668641090:android:d41793fa4a2ee8bc",
+        "android_client_info": {
+          "package_name": "com.tycho.app.primenumberfinder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "88668641090-bq3cos2epc71saiqqeicsgf47l5onurn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5tE5TirRazjD3_SX7aBp5tPnjZQ5Uszs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
