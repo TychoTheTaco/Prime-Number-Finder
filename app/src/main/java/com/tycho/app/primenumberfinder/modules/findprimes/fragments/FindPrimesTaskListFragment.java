@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.IntentReceiver;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
@@ -35,7 +36,7 @@ import easytasks.Task;
  * Created by tycho on 11/16/2017.
  */
 
-public class FindPrimesTaskListFragment extends Fragment implements IntentReceiver{
+public class FindPrimesTaskListFragment extends Fragment implements IntentReceiver {
 
     /**
      * Tag used for logging and debugging.
@@ -62,6 +63,7 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
         taskListAdapter = new FindPrimesTaskListAdapter(activity);
+        Crashlytics.setBool("onAttach", true);
         while (!eventListenerQueue.isEmpty()) {
             taskListAdapter.addEventListener(eventListenerQueue.poll());
         }
@@ -93,7 +95,7 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
         }
         if (intent == null || taskListAdapter.getItemCount() > 0) {
             taskListAdapter.setSelected(0);
-        }else{
+        } else {
             taskListAdapter.setSelected(PrimeNumberFinder.getTaskManager().findTaskById((UUID) intent.getSerializableExtra("taskId")));
         }
 
@@ -106,12 +108,25 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Crashlytics.setBool("onDestroyView", true);
+        if (taskListAdapter != null){
+            Crashlytics.setString("taskListAdapter", taskListAdapter.toString());
+        }
+    }
+
+    @Override
     public void giveIntent(final Intent intent) {
         this.intent = intent;
     }
 
     public void addTask(final Task task) {
-        //Log.d(TAG, "getView(): " + getView());
+        Crashlytics.setBool("isAdded", isAdded());
+        Crashlytics.setBool("isDetached", isDetached());
+        if (getView() != null) {
+            Crashlytics.setString("getView", getView().toString());
+        }
         taskListAdapter.addTask(task);
         recyclerView.scrollToPosition(taskListAdapter.getItemCount() - 1);
         update();
@@ -137,7 +152,7 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
         textViewNoTasks.setVisibility(taskListAdapter.getItemCount() > 0 ? View.GONE : View.VISIBLE);
     }
 
-    public void addActionViewListener(final ActionViewListener actionViewListener){
+    public void addActionViewListener(final ActionViewListener actionViewListener) {
         if (taskListAdapter == null) {
             actionViewListenerQueue.add(actionViewListener);
         } else {
