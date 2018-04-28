@@ -6,8 +6,12 @@
     <string name="app_version_name">Version %1$s</string>
 
     <!-- Preferences -->
+    <string name="general">General</string>
     <string name="preference_title_allow_background_threads">Allow background tasks</string>
     <string name="preference_summary_allow_background_threads">Allow the app to run tasks in the background (such as searching for prime numbers). Warning: this can cause significant battery loss if you are not careful.</string>
+    <string name="privacy">Privacy</string>
+    <string name="allow_analytics_title">Send crash logs</string>
+    <string name="allow_analytics_description">Allow the app to send anonymous crash logs to the developer to help improve the app.</string>
 
     <!-- Action bar items -->
     <string name="action_bar_item_title_delete">Delete</string>

@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 import java.util.HashMap;
 
+import static com.tycho.app.primenumberfinder.utils.PreferenceManager.Preference.ENABLE_ANALYTICS;
 import static com.tycho.app.primenumberfinder.utils.PreferenceManager.Preference.FILE_VERSION;
 
 /**
@@ -26,8 +27,8 @@ public class PreferenceManager extends HashMap{
     private final String name;
 
     private boolean allowBackgroundTasks;
-
     private int fileVersion;
+    private boolean allowAnalytics;
 
     public static final int CURRENT_VERSION = 1;
 
@@ -46,12 +47,14 @@ public class PreferenceManager extends HashMap{
     private void loadPreferences(){
         this.allowBackgroundTasks = sharedPreferences.getBoolean(Preference.ALLOW_BACKGROUND_TASKS.getKey(), (boolean) Preference.ALLOW_BACKGROUND_TASKS.getDefaultValue());
         this.fileVersion = sharedPreferences.getInt(FILE_VERSION.getKey(), (int) FILE_VERSION.getDefaultValue());
+        this.allowAnalytics =  sharedPreferences.getBoolean(ENABLE_ANALYTICS.getKey(), (boolean) ENABLE_ANALYTICS.getDefaultValue());
     }
 
     public void savePreferences(){
         sharedPreferences.edit()
                 .putBoolean(Preference.ALLOW_BACKGROUND_TASKS.getKey(), this.allowBackgroundTasks)
                 .putInt(FILE_VERSION.getKey(), this.fileVersion)
+                .putBoolean(ENABLE_ANALYTICS.getKey(), this.allowAnalytics)
                 .apply();
     }
 
@@ -73,11 +76,20 @@ public class PreferenceManager extends HashMap{
         return this.fileVersion;
     }
 
+    public boolean isAllowAnalytics() {
+        return allowAnalytics;
+    }
+
+    public void setAllowAnalytics(boolean allowAnalytics) {
+        this.allowAnalytics = allowAnalytics;
+    }
+
     //Options
 
     public enum Preference{
         ALLOW_BACKGROUND_TASKS("allowBackgroundTasks", false),
-        FILE_VERSION("fileVersion", 0);
+        FILE_VERSION("fileVersion", 0),
+        ENABLE_ANALYTICS("allowAnalytics", true);
 
         private final String key;
         private final Object defaultValue;

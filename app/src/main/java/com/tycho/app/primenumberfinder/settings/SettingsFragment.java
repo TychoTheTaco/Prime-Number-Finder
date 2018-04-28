@@ -6,6 +6,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
@@ -40,6 +41,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             case "allowBackgroundThreads":
                 PrimeNumberFinder.getPreferenceManager().setAllowBackgroundTasks(((CheckBoxPreference) preference).isChecked());
+                break;
+
+            case "allowAnalytics":
+                PrimeNumberFinder.getPreferenceManager().setAllowAnalytics(((CheckBoxPreference) preference).isChecked());
+                Toast.makeText(getActivity(), "You must restart the app for changes to take effect.", Toast.LENGTH_LONG).show();
                 break;
         }
         PrimeNumberFinder.getPreferenceManager().savePreferences();

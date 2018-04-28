@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
@@ -45,6 +46,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.fabric.sdk.android.Fabric;
 
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.REQUEST_CODE_FIND_FACTORS;
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.REQUEST_CODE_FIND_PRIMES;
@@ -183,6 +186,11 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
                     progressDialog.dismiss();
                 }
             }).start();
+        }
+
+        //Set up analytics
+        if (PrimeNumberFinder.getPreferenceManager().isAllowAnalytics()){
+            Fabric.with(this, new Crashlytics());
         }
     }
 
