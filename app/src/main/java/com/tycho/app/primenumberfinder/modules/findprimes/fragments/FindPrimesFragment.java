@@ -282,18 +282,32 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
                     //Format text
                     if (editable.length() > 0) {
-                        if (getEndValue().compareTo(BigInteger.valueOf(FindPrimesTask.INFINITY)) == 0) {
-                            if (!editable.toString().equals(getString(R.string.infinity_text))) {
-                                editTextSearchRangeEnd.setText(getString(R.string.infinity_text));
+
+                        //Check if infinity
+                        if (!editable.toString().equals(getString(R.string.infinity_text))) {
+
+                            //Replace infinity text
+                            String input = editable.toString();
+                            boolean replaced = false;
+                            for (char c : getString(R.string.infinity_text).toCharArray()) {
+                                if (input.contains(String.valueOf(c))) {
+                                    input = input.replace(c, ' ');
+                                    replaced = true;
+                                }
                             }
-                            editTextSearchRangeEnd.setSelection(editTextSearchRangeEnd.getText().length());
-                        } else {
-                            final String formattedText = NUMBER_FORMAT.format(getEndValue());
-                            if (!editable.toString().equals(formattedText)) {
-                                isDirty = false;
-                                editTextSearchRangeEnd.setText(formattedText);
+                            input = input.trim();
+
+                            if (replaced) {
+                                editTextSearchRangeEnd.setText(input);
+                                editTextSearchRangeEnd.setSelection(input.length());
+                            } else {
+                                final String formattedText = NumberFormat.getNumberInstance(Locale.getDefault()).format(getEndValue());
+                                if (!editable.toString().equals(formattedText)) {
+                                    isDirty = false;
+                                    editTextSearchRangeEnd.setText(formattedText);
+                                    editTextSearchRangeEnd.setSelection(formattedText.length());
+                                }
                             }
-                            editTextSearchRangeEnd.setSelection(formattedText.length());
                         }
                     }
 
@@ -316,6 +330,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             @Override
             public void onClick(View v) {
                 editTextSearchRangeEnd.setText(getString(R.string.infinity_text));
+                editTextSearchRangeEnd.setSelection(getString(R.string.infinity_text).length());
             }
         });
 

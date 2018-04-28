@@ -123,10 +123,10 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
                     }
 
                     //Check if the number is valid
-                    if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchMethod)){
+                    if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchMethod)) {
                         editTextSearchRangeStart.setValid(true);
                         editTextSearchRangeEnd.setValid(true);
-                    }else if (editTextSearchRangeStart.hasFocus()){
+                    } else if (editTextSearchRangeStart.hasFocus()) {
                         editTextSearchRangeStart.setValid(editTextSearchRangeEnd.getText().length() == 0);
                     }
 
@@ -159,18 +159,32 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
 
                     //Format text
                     if (editable.length() > 0) {
-                        if (getEndValue().compareTo(BigInteger.valueOf(FindPrimesTask.INFINITY)) == 0) {
-                            if (!editable.toString().equals(getString(R.string.infinity_text))) {
-                                editTextSearchRangeEnd.setText(getString(R.string.infinity_text));
+
+                        //Check if infinity
+                        if (!editable.toString().equals(getString(R.string.infinity_text))) {
+
+                            //Replace infinity text
+                            String input = editable.toString();
+                            boolean replaced = false;
+                            for (char c : getString(R.string.infinity_text).toCharArray()) {
+                                if (input.contains(String.valueOf(c))) {
+                                    input = input.replace(c, ' ');
+                                    replaced = true;
+                                }
                             }
-                            editTextSearchRangeEnd.setSelection(editTextSearchRangeEnd.getText().length());
-                        } else {
-                            final String formattedText = NumberFormat.getNumberInstance(Locale.getDefault()).format(getEndValue());
-                            if (!editable.toString().equals(formattedText)) {
-                                isDirty = false;
-                                editTextSearchRangeEnd.setText(formattedText);
+                            input = input.trim();
+
+                            if (replaced) {
+                                editTextSearchRangeEnd.setText(input);
+                                editTextSearchRangeEnd.setSelection(input.length());
+                            } else {
+                                final String formattedText = NumberFormat.getNumberInstance(Locale.getDefault()).format(getEndValue());
+                                if (!editable.toString().equals(formattedText)) {
+                                    isDirty = false;
+                                    editTextSearchRangeEnd.setText(formattedText);
+                                    editTextSearchRangeEnd.setSelection(formattedText.length());
+                                }
                             }
-                            editTextSearchRangeEnd.setSelection(formattedText.length());
                         }
                     }
 
@@ -178,10 +192,10 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
                     autoSaveCheckbox.setEnabled(getEndValue().compareTo(BigInteger.valueOf(FindPrimesTask.INFINITY)) != 0);
 
                     //Check if the number is valid
-                    if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchMethod)){
+                    if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchMethod)) {
                         editTextSearchRangeStart.setValid(true);
                         editTextSearchRangeEnd.setValid(true);
-                    }else if (editTextSearchRangeEnd.hasFocus()){
+                    } else if (editTextSearchRangeEnd.hasFocus()) {
                         editTextSearchRangeEnd.setValid(editTextSearchRangeStart.getText().length() == 0);
                     }
 
@@ -197,6 +211,7 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
             @Override
             public void onClick(View v) {
                 editTextSearchRangeEnd.setText(getString(R.string.infinity_text));
+                editTextSearchRangeEnd.setSelection(getString(R.string.infinity_text).length());
             }
         });
 
@@ -250,16 +265,16 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
             applyConfig(null);
         }
 
-        try{
+        try {
             task = (FindPrimesTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) getIntent().getExtras().get("taskId"));
-            if (task.getState() != Task.State.NOT_STARTED){
+            if (task.getState() != Task.State.NOT_STARTED) {
                 editTextSearchRangeStart.setEnabled(false);
 
-                if (task.getState() != Task.State.STOPPING && task.getState() != Task.State.STOPPED){
+                if (task.getState() != Task.State.STOPPING && task.getState() != Task.State.STOPPED) {
                     editTextSearchRangeEnd.setEnabled(false);
                     infinityButton.setEnabled(false);
                     threadCountSpinner.setEnabled(false);
-                }else{
+                } else {
                     editTextSearchRangeEnd.setEnabled(false);
                     infinityButton.setEnabled(false);
                     threadCountSpinner.setEnabled(false);
@@ -267,18 +282,18 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
 
                 radioGroupSearchMethod.setEnabled(false);
             }
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             Log.w(TAG, "Task not found.");
         }
     }
 
-    class ThreadCountAdapter extends ArrayAdapter<String>{
+    class ThreadCountAdapter extends ArrayAdapter<String> {
 
         private final LayoutInflater layoutInflater;
 
         private final String[] items;
 
-        public ThreadCountAdapter(final Context context, final String[] items){
+        public ThreadCountAdapter(final Context context, final String[] items) {
             super(context, R.layout.thread_count_list_item, R.id.text, items);
             layoutInflater = getLayoutInflater();
             this.items = items;
@@ -286,7 +301,7 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
 
         @Override
         public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            if (convertView == null){
+            if (convertView == null) {
                 convertView = layoutInflater.inflate(R.layout.thread_count_list_item, parent, false);
             }
             ((TextView) convertView.findViewById(R.id.text)).setText(items[position]);
@@ -298,7 +313,7 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.task_configuration_menu, menu);
 
-        if (task != null){
+        if (task != null) {
             menu.findItem(R.id.start).setIcon(R.drawable.ic_save_white_24dp);
         }
 
@@ -345,7 +360,7 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
             return BigInteger.valueOf(FindPrimesTask.INFINITY);
         }
 
-        return Utils.textToNumber(editTextSearchRangeEnd.getText().toString());
+        return Utils.textToNumber(input);
     }
 
     private void applyConfig(final FindPrimesTask.SearchOptions searchOptions) {
