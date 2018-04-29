@@ -1,9 +1,7 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +9,6 @@ import android.widget.LinearLayout;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
-
-import java.awt.font.TextAttribute;
 
 /**
  * Created by tycho on 12/12/2017.

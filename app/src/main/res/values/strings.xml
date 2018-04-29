@@ -26,6 +26,10 @@
     <string name="title_settings">Settings</string>
     <string name="title_about">About</string>
 
+    <!-- Tab titles -->
+    <string name="tasks_tab_title">Tasks</string>
+    <string name="results_tab_title">Results</string>
+
     <!-- Find Primes page -->
     <string name="check_primality_button">Check primality</string>
     <string name="input_number_description">Enter a number to check if it is prime.</string>

@@ -1,26 +1,20 @@
 package com.tycho.app.primenumberfinder.modules.about;
 
-import android.app.Fragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.modules.savedfiles.ExportOptionsDialog;
-import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayFactorsActivity;
-import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -28,7 +22,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class AboutPageFragment extends Fragment{
+public class AboutPageFragment extends Fragment {
 
     /**
      * Tag used for logging and debugging.

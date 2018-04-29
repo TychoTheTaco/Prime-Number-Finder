@@ -1,23 +1,19 @@
 package com.tycho.app.primenumberfinder.activities;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.res.ColorStateList;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,22 +25,20 @@ import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
 import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.IntentReceiver;
-import com.tycho.app.primenumberfinder.ProgressDialog;
-import com.tycho.app.primenumberfinder.modules.about.AboutPageFragment;
-import com.tycho.app.primenumberfinder.settings.SettingsFragment;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
+import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.modules.about.AboutPageFragment;
 import com.tycho.app.primenumberfinder.modules.findfactors.fragments.FindFactorsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesFragment;
 import com.tycho.app.primenumberfinder.modules.primefactorization.fragments.PrimeFactorizationFragment;
 import com.tycho.app.primenumberfinder.modules.savedfiles.SavedFilesFragment;
+import com.tycho.app.primenumberfinder.settings.SettingsFragment;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
-import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import io.fabric.sdk.android.Fabric;
@@ -279,7 +273,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
             }
         }
 
-        return getFragmentManager().findFragmentByTag(fragmentIds.get(id));
+        return getSupportFragmentManager().findFragmentByTag(fragmentIds.get(id));
     }
 
     private ActionViewListener getActionViewListener(final int index) {
@@ -299,7 +293,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
     private void selectDrawerItem(final MenuItem menuItem) {
 
         //Start the fragment transaction
-        final FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        final FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
         //Hide the existing fragment
         if (currentFragment != null) {

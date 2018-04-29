@@ -1,26 +1,25 @@
 
 package com.tycho.app.primenumberfinder.modules.savedfiles;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.tycho.app.primenumberfinder.utils.FileType;
-import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesCardAdapter;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.VerticalItemDecoration;
+import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesCardAdapter;
+import com.tycho.app.primenumberfinder.utils.FileType;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.util.Iterator;
 
-public class SavedFilesFragment extends Fragment{
+public class SavedFilesFragment extends Fragment {
 
     /**
      * Tag used for logging and debugging.

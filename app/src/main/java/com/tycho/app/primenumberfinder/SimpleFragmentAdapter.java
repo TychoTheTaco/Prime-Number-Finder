@@ -1,41 +1,60 @@
 package com.tycho.app.primenumberfinder;
 
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class SimpleFragmentAdapter extends FragmentPagerAdapter {
 
-    private final List<Fragment> fragments = new ArrayList<>();
+    private final List<AdapterItem> items = new ArrayList<>();
 
     public SimpleFragmentAdapter(final FragmentManager fragmentManager){
         super(fragmentManager);
     }
 
-    public SimpleFragmentAdapter(final FragmentManager fragmentManager, Fragment... fragments){
-        this(fragmentManager);
-        this.fragments.addAll(Arrays.asList(fragments));
-    }
-
     @Override
     public Fragment getItem(int position) {
-        return fragments.get(position);
+        return items.get(position).fragment;
     }
 
     @Override
     public int getCount() {
-        return fragments.size();
+        return items.size();
     }
 
-    public void addFragment(final Fragment fragment){
-        fragments.add(fragment);
+    @Nullable
+    @Override
+    public CharSequence getPageTitle(int position) {
+        return items.get(position).title;
     }
 
-    public boolean removeFragment(final Fragment fragment){
-        return fragments.remove(fragment);
+    public void add(final Fragment fragment, final String title){
+        items.add(new AdapterItem(fragment, title));
+    }
+
+    public void remove(final Fragment fragment){
+        for (AdapterItem adapterItem : items){
+            if (adapterItem.fragment == fragment){
+                items.remove(adapterItem);
+            }
+        }
+    }
+
+    public void remove(final int index){
+        items.remove(index);
+    }
+
+    private class AdapterItem{
+        private final Fragment fragment;
+        private final String title;
+
+        AdapterItem(Fragment fragment, String title) {
+            this.fragment = fragment;
+            this.title = title;
+        }
     }
 }

@@ -1,47 +1,33 @@
 package com.tycho.app.primenumberfinder.modules.findfactors.fragments;
 
-import android.app.Fragment;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
+import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FabAnimator;
 import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
 import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.IntentReceiver;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.ActionViewListener;
+import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
 import com.tycho.app.primenumberfinder.ValidEditText;
-import com.tycho.app.primenumberfinder.activities.MainActivity;
-import com.tycho.app.primenumberfinder.adapters.FragmentAdapter;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsTaskListAdapter;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfigurationActivity;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
@@ -50,11 +36,9 @@ import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import easytasks.Task;
 import easytasks.TaskAdapter;
-import easytasks.TaskListener;
 
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
@@ -105,9 +89,9 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
         final View rootView = inflater.inflate(R.layout.find_factors_fragment, viewGroup, false);
 
         //Set up tab layout for results and statistics
-        final FragmentAdapter fragmentAdapter = new FragmentAdapter(getChildFragmentManager());
+        final SimpleFragmentAdapter simpleFragmentAdapter = new SimpleFragmentAdapter(getChildFragmentManager());
         viewPager = rootView.findViewById(R.id.view_pager);
-        fragmentAdapter.add("Tasks", taskListFragment);
+        simpleFragmentAdapter.add(taskListFragment, getString(R.string.tasks_tab_title));
         taskListFragment.addEventListener(new FindFactorsTaskListAdapter.EventListener() {
             @Override
             public void onTaskSelected(Task task) {
@@ -136,8 +120,8 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
                 startActivityForResult(intent, 0);
             }
         });
-        fragmentAdapter.add("Results", resultsFragment);
-        viewPager.setAdapter(fragmentAdapter);
+        simpleFragmentAdapter.add(resultsFragment, getString(R.string.results_tab_title));
+        viewPager.setAdapter(simpleFragmentAdapter);
         fabAnimator = new FabAnimator(floatingActionButtonHost.getFab(0));
         viewPager.addOnPageChangeListener(fabAnimator);
         final TabLayout tabLayout = rootView.findViewById(R.id.tab_layout);
