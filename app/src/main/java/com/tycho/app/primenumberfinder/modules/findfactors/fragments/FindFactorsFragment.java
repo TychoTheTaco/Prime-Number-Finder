@@ -90,6 +90,16 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
 
     private Intent intent;
 
+    private FloatingActionButtonHost floatingActionButtonHost;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof FloatingActionButtonHost){
+            floatingActionButtonHost = (FloatingActionButtonHost) context;
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_factors_fragment, viewGroup, false);
@@ -128,7 +138,7 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
         });
         fragmentAdapter.add("Results", resultsFragment);
         viewPager.setAdapter(fragmentAdapter);
-        fabAnimator = new FabAnimator(((FloatingActionButtonHost) getActivity()).getFab(0));
+        fabAnimator = new FabAnimator(floatingActionButtonHost.getFab(0));
         viewPager.addOnPageChangeListener(fabAnimator);
         final TabLayout tabLayout = rootView.findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);

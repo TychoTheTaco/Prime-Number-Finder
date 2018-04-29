@@ -86,6 +86,16 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
 
     private Intent intent;
 
+    private FloatingActionButtonHost floatingActionButtonHost;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof FloatingActionButtonHost){
+            floatingActionButtonHost = (FloatingActionButtonHost) context;
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -126,7 +136,7 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
         });
         fragmentAdapter.add("Results", resultsFragment);
         viewPager.setAdapter(fragmentAdapter);
-        fabAnimator = new FabAnimator(((FloatingActionButtonHost) getActivity()).getFab(0));
+        fabAnimator = new FabAnimator(floatingActionButtonHost.getFab(0));
         viewPager.addOnPageChangeListener(fabAnimator);
         final TabLayout tabLayout = rootView.findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);

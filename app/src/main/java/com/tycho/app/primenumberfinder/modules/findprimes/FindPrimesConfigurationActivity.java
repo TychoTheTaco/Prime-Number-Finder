@@ -72,6 +72,11 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
 
     private FindPrimesTask.SearchMethod searchMethod = BRUTE_FORCE;
 
+    /**
+     * {@linkplain NumberFormat} instance used to format numbers with commas.
+     */
+    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
+
     private Spinner threadCountSpinner;
 
     private CheckBox notifyWhenFinishedCheckbox;
@@ -165,25 +170,18 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
 
                             //Replace infinity text
                             String input = editable.toString();
-                            boolean replaced = false;
-                            for (char c : getString(R.string.infinity_text).toCharArray()) {
-                                if (input.contains(String.valueOf(c))) {
-                                    input = input.replace(c, ' ');
-                                    replaced = true;
-                                }
-                            }
-                            input = input.trim();
+                            input = input.replaceAll("[infty]", "");
 
-                            if (replaced) {
-                                editTextSearchRangeEnd.setText(input);
-                                editTextSearchRangeEnd.setSelection(input.length());
-                            } else {
-                                final String formattedText = NumberFormat.getNumberInstance(Locale.getDefault()).format(getEndValue());
+                            if (editable.toString().equals(input)) {
+                                final String formattedText = NUMBER_FORMAT.format(getEndValue());
                                 if (!editable.toString().equals(formattedText)) {
                                     isDirty = false;
                                     editTextSearchRangeEnd.setText(formattedText);
                                     editTextSearchRangeEnd.setSelection(formattedText.length());
                                 }
+                            } else {
+                                editTextSearchRangeEnd.setText(input);
+                                editTextSearchRangeEnd.setSelection(input.length());
                             }
                         }
                     }

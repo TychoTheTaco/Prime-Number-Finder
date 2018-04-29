@@ -269,7 +269,7 @@ public final class Utils {
     }
 
     public static BigInteger textToNumber(String text){
-        Crashlytics.setString("textToNumber_raw", text);
+        Crashlytics.log("raw input: '" + text + "'");
         text = text.trim();
 
         //Remove commas
@@ -287,7 +287,7 @@ public final class Utils {
         }
 
         //Assume english
-        Crashlytics.setString("textToNumber_final", text);
+        Crashlytics.log("final: '" + text + "'");
         return new BigInteger(text);
     }
 }

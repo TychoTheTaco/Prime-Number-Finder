@@ -1,6 +1,7 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Build;
@@ -101,6 +102,16 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
     private Intent intent;
 
+    private FloatingActionButtonHost floatingActionButtonHost;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof FloatingActionButtonHost){
+            floatingActionButtonHost = (FloatingActionButtonHost) context;
+        }
+    }
+
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_primes_fragment, viewGroup, false);
@@ -155,7 +166,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         fragmentAdapter.add("Results", generalResultsFragment);
         generalResultsFragment.setContent(findPrimesResultsFragment);
         viewPager.setAdapter(fragmentAdapter);
-        fabAnimator = new FabAnimator(((FloatingActionButtonHost) getActivity()).getFab(0));
+        fabAnimator = new FabAnimator(floatingActionButtonHost.getFab(0));
         viewPager.addOnPageChangeListener(fabAnimator);
         final TabLayout tabLayout = rootView.findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
@@ -279,6 +290,9 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             @Override
             public void afterTextChanged(Editable editable) {
 
+                Crashlytics.log("Editable: '" + editable + "'");
+                Crashlytics.log("isDirty: " + isDirty);
+
                 if (isDirty) {
 
                     //Format text
@@ -289,28 +303,27 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
                             //Replace infinity text
                             String input = editable.toString();
-                            boolean replaced = false;
-                            for (char c : getString(R.string.infinity_text).toCharArray()) {
-                                if (input.contains(String.valueOf(c))) {
-                                    input = input.replace(c, ' ');
-                                    replaced = true;
-                                }
-                            }
-                            input = input.trim();
+                            input = input.replaceAll("[infty]", "");
 
-                            if (replaced) {
-                                editTextSearchRangeEnd.setText(input);
-                                editTextSearchRangeEnd.setSelection(input.length());
-                            } else {
-                                final String formattedText = NumberFormat.getNumberInstance(Locale.getDefault()).format(getEndValue());
+                            Crashlytics.log("replaceAll: '" + input + "'");
+
+                            if (editable.toString().equals(input)) {
+                                final String formattedText = NUMBER_FORMAT.format(getEndValue());
                                 if (!editable.toString().equals(formattedText)) {
                                     isDirty = false;
+                                    Crashlytics.log("Setting text: '" + formattedText + "'");
                                     editTextSearchRangeEnd.setText(formattedText);
                                     editTextSearchRangeEnd.setSelection(formattedText.length());
                                 }
+                            } else {
+                                Crashlytics.log("Setting text: '" + input + "'");
+                                editTextSearchRangeEnd.setText(input);
+                                editTextSearchRangeEnd.setSelection(input.length());
                             }
                         }
                     }
+
+                    Crashlytics.log("Checking valid...");
 
                     //Check if the number is valid
                     if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
@@ -376,7 +389,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         rootView.requestFocus();
 
         //Scroll to Results fragment if started from a notification
-        if (intent.getSerializableExtra("taskId") != null){
+        if (intent.getSerializableExtra("taskId") != null) {
             viewPager.setCurrentItem(1);
         }
 
@@ -511,7 +524,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             return BigInteger.valueOf(FindPrimesTask.INFINITY);
         }
 
-        return Utils.textToNumber(editTextSearchRangeEnd.getText().toString());
+        return Utils.textToNumber(input);
     }
 
     public void addActionViewListener(final ActionViewListener actionViewListener) {
