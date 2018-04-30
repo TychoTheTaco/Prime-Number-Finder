@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.Spinner;
@@ -35,10 +36,12 @@ import com.tycho.app.primenumberfinder.utils.Validator;
 import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Random;
 import java.util.UUID;
 
 import easytasks.Task;
 
+import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.INFINITY;
 import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchMethod.BRUTE_FORCE;
 import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES;
 
@@ -56,9 +59,9 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
     private ValidEditText editTextSearchRangeStart;
     private ValidEditText editTextSearchRangeEnd;
 
-    private CustomRadioGroup radioGroupSearchMethod;
+    private ImageButton infinityButton;
 
-    private FindPrimesTask.SearchMethod searchMethod = BRUTE_FORCE;
+    private CustomRadioGroup radioGroupSearchMethod;
 
     /**
      * {@linkplain NumberFormat} instance used to format numbers with commas.
@@ -71,6 +74,11 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
     private CheckBox autoSaveCheckbox;
 
     private FindPrimesTask task;
+
+    /**
+     * The search options currently representing the user's selection
+     */
+    private FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(0, 0, BRUTE_FORCE, 1, false, false);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -86,6 +94,7 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
 
         //Set up range start input
         editTextSearchRangeStart = findViewById(R.id.search_range_start);
+        editTextSearchRangeStart.setHint(NUMBER_FORMAT.format(0));
         editTextSearchRangeStart.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -106,30 +115,28 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
 
                     //Format text
                     final String formatted = NUMBER_FORMAT.format(getStartValue());
-                    if (!editable.toString().equals(formatted)) {
-                        editTextSearchRangeStart.setText(formatted);
-                        editTextSearchRangeStart.setSelection(formatted.length());
+                    if (editable.length() > 0 && !editable.toString().equals(formatted)) {
+                        editTextSearchRangeStart.setText(formatted, formatted.length() > 1);
+                        applyConfig(searchOptions);
                     }
                 }
 
+                searchOptions.setStartValue(getStartValue().longValue());
+
                 //Check if the number is valid
-                if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchMethod)) {
-                    editTextSearchRangeStart.setValid(true);
-                    editTextSearchRangeEnd.setValid(true);
-                } else if (editTextSearchRangeStart.hasFocus()) {
-                    editTextSearchRangeStart.setValid(editTextSearchRangeEnd.getText().length() == 0);
-                }
+                editTextSearchRangeStart.setValid(Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod()) && editTextSearchRangeStart.length() != 0);
+                editTextSearchRangeEnd.setValid(true);
             }
         });
         editTextSearchRangeStart.setClearOnTouch(false);
 
         //Set up range end input
         editTextSearchRangeEnd = findViewById(R.id.search_range_end);
+        editTextSearchRangeEnd.setHint(NUMBER_FORMAT.format(new Random().nextInt(1_000_000)));
         editTextSearchRangeEnd.addTextChangedListener(new TextWatcher() {
 
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
             }
 
             @Override
@@ -147,33 +154,33 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
 
                     //Format text
                     final String formatted = NUMBER_FORMAT.format(getEndValue());
-                    if (!editable.toString().equals(formatted)) {
+                    if (editable.length() > 0 && !editable.toString().equals(formatted)) {
                         Crashlytics.log("Setting text: '" + formatted + "'");
-                        editTextSearchRangeEnd.setText(formatted);
-                        editTextSearchRangeEnd.setSelection(formatted.length());
+                        editTextSearchRangeEnd.setText(formatted, formatted.length() > 1);
+                        applyConfig(searchOptions);
+                    } else if (editable.toString().equals(NUMBER_FORMAT.format(0))) {
+                        editTextSearchRangeEnd.getText().clear();
                     }
                 }
+
+                searchOptions.setEndValue(getEndValue().longValue());
 
                 Crashlytics.log("Checking valid...");
 
                 //Check if the number is valid
-                if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchMethod)) {
-                    editTextSearchRangeStart.setValid(true);
-                    editTextSearchRangeEnd.setValid(true);
-                } else if (editTextSearchRangeEnd.hasFocus()) {
-                    editTextSearchRangeEnd.setValid(editTextSearchRangeStart.getText().length() == 0);
-                }
+                editTextSearchRangeStart.setValid(true);
+                editTextSearchRangeEnd.setValid(Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod()) && editTextSearchRangeEnd.length() != 0);
             }
         });
         editTextSearchRangeEnd.setClearOnTouch(false);
 
         //Set up infinity button
-        final ImageButton infinityButton = findViewById(R.id.infinity_button);
+        infinityButton = findViewById(R.id.infinity_button);
         infinityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editTextSearchRangeEnd.setText(getString(R.string.infinity_text));
-                editTextSearchRangeEnd.setSelection(getString(R.string.infinity_text).length());
+                editTextSearchRangeEnd.setText(getString(R.string.infinity_text), false);
+                applyConfig(searchOptions);
             }
         });
 
@@ -185,26 +192,15 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
                 switch (radioButton.getId()) {
 
                     case R.id.brute_force:
-                        searchMethod = BRUTE_FORCE;
-                        editTextSearchRangeStart.setEnabled(true);
-                        infinityButton.setEnabled(true);
-                        infinityButton.setAlpha(1f);
-                        threadCountSpinner.setEnabled(true);
+                        searchOptions.setSearchMethod(BRUTE_FORCE);
                         break;
 
                     case R.id.sieve_of_eratosthenes:
-                        searchMethod = SIEVE_OF_ERATOSTHENES;
-                        editTextSearchRangeStart.setText("0");
-                        editTextSearchRangeStart.setEnabled(false);
-                        if (getEndValue().compareTo(getStartValue()) <= 0) {
-                            editTextSearchRangeEnd.getText().clear();
-                        }
-                        infinityButton.setEnabled(false);
-                        infinityButton.setAlpha(0.3f);
-                        threadCountSpinner.setEnabled(false);
+                        searchOptions.setSearchMethod(SIEVE_OF_ERATOSTHENES);
                         break;
 
                 }
+                applyConfig(searchOptions);
             }
         });
 
@@ -217,36 +213,39 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
         threadCountSpinner.setAdapter(new ThreadCountAdapter(this, items));
 
         notifyWhenFinishedCheckbox = findViewById(R.id.notify_when_finished);
-        autoSaveCheckbox = findViewById(R.id.auto_save);
-
-        try {
-            final FindPrimesTask.SearchOptions searchOptions = getIntent().getExtras().getParcelable("searchOptions");
-            applyConfig(searchOptions);
-        } catch (NullPointerException e) {
-            Log.w(TAG, "SearchOptions not found! Using defaults.");
-            applyConfig(null);
-        }
-
-        try {
-            task = (FindPrimesTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) getIntent().getExtras().get("taskId"));
-            if (task.getState() != Task.State.NOT_STARTED) {
-                editTextSearchRangeStart.setEnabled(false);
-
-                if (task.getState() != Task.State.STOPPING && task.getState() != Task.State.STOPPED) {
-                    editTextSearchRangeEnd.setEnabled(false);
-                    infinityButton.setEnabled(false);
-                    threadCountSpinner.setEnabled(false);
-                } else {
-                    editTextSearchRangeEnd.setEnabled(false);
-                    infinityButton.setEnabled(false);
-                    threadCountSpinner.setEnabled(false);
-                }
-
-                radioGroupSearchMethod.setEnabled(false);
+        notifyWhenFinishedCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                searchOptions.setNotifyWhenFinished(isChecked);
             }
-        } catch (NullPointerException e) {
-            Log.w(TAG, "Task not found.");
+        });
+        autoSaveCheckbox = findViewById(R.id.auto_save);
+        autoSaveCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                searchOptions.setAutoSave(isChecked);
+            }
+        });
+
+        //Get search options from intent
+        if (getIntent().getExtras() != null) {
+            if (getIntent().getExtras().getParcelable("searchOptions") != null) {
+                searchOptions = getIntent().getExtras().getParcelable("searchOptions");
+            }
+
+            try {
+                task = (FindPrimesTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) getIntent().getExtras().get("taskId"));
+                searchOptions = task.getSearchOptions();
+            } catch (NullPointerException e) {
+                Log.w(TAG, "Task not found.");
+            }
         }
+
+        //Apply config
+        applyConfig(searchOptions);
+
+        //Give the root view focus to prevent EditTexts from initially getting focus
+        findViewById(R.id.root).requestFocus();
     }
 
     class ThreadCountAdapter extends ArrayAdapter<String> {
@@ -291,13 +290,8 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
                 break;
 
             case R.id.start:
-                if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchMethod)) {
+                if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
                     final Intent intent = new Intent();
-                    final FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(getStartValue().longValue(), getEndValue().longValue());
-                    searchOptions.setSearchMethod(searchMethod);
-                    searchOptions.setThreadCount(Integer.valueOf((String) threadCountSpinner.getSelectedItem()));
-                    searchOptions.setNotifyWhenFinished(notifyWhenFinishedCheckbox.isChecked());
-                    searchOptions.setAutoSave(autoSaveCheckbox.isChecked());
                     intent.putExtra("searchOptions", searchOptions);
                     if (task != null) intent.putExtra("taskId", task.getId());
                     setResult(0, intent);
@@ -310,6 +304,14 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
         return true;
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        //Give the root view focus to prevent EditTexts from initially getting focus
+        findViewById(R.id.root).requestFocus();
+    }
+
     private BigInteger getStartValue() {
         return Utils.textToNumber(editTextSearchRangeStart.getText().toString());
     }
@@ -319,7 +321,7 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
 
         //Check for infinity
         if (input.equals(getString(R.string.infinity_text))) {
-            return BigInteger.valueOf(FindPrimesTask.INFINITY);
+            return BigInteger.valueOf(INFINITY);
         }
 
         return Utils.textToNumber(input);
@@ -327,40 +329,65 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
 
     private void applyConfig(final FindPrimesTask.SearchOptions searchOptions) {
 
-        if (searchOptions != null) {
-            editTextSearchRangeStart.setText(NumberFormat.getNumberInstance(Locale.getDefault()).format(searchOptions.getStartValue()));
-            editTextSearchRangeEnd.setText(NumberFormat.getNumberInstance(Locale.getDefault()).format(searchOptions.getEndValue()));
+        //Start and end values
+        editTextSearchRangeStart.setText(NUMBER_FORMAT.format(searchOptions.getStartValue()), true);
+        editTextSearchRangeEnd.setEnabled(true);
+        editTextSearchRangeEnd.setText(searchOptions.getEndValue() == INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(searchOptions.getEndValue()), true);
 
-            switch (searchOptions.getSearchMethod()) {
-                case BRUTE_FORCE:
-                    radioGroupSearchMethod.check(R.id.brute_force);
-                    editTextSearchRangeStart.setEnabled(true);
-                    break;
+        //Search method
+        switch (searchOptions.getSearchMethod()) {
+            case BRUTE_FORCE:
+                radioGroupSearchMethod.check(R.id.brute_force);
+                editTextSearchRangeStart.setEnabled(true);
+                infinityButton.setEnabled(true);
+                infinityButton.setAlpha(1f);
+                threadCountSpinner.setEnabled(true);
+                break;
 
-                case SIEVE_OF_ERATOSTHENES:
-                    radioGroupSearchMethod.check(R.id.sieve_of_eratosthenes);
-                    editTextSearchRangeStart.setText(NumberFormat.getNumberInstance(Locale.getDefault()).format(0));
-                    editTextSearchRangeStart.setEnabled(false);
-                    break;
-            }
-
-            threadCountSpinner.setSelection(searchOptions.getThreadCount() - 1);
-
-            notifyWhenFinishedCheckbox.setChecked(searchOptions.isNotifyWhenFinished());
-            autoSaveCheckbox.setChecked(searchOptions.isAutoSave());
-        } else {
-            editTextSearchRangeStart.setText(NumberFormat.getNumberInstance(Locale.getDefault()).format(0));
-            editTextSearchRangeStart.setEnabled(true);
-            editTextSearchRangeEnd.getText().clear();
-            editTextSearchRangeEnd.requestFocus();
-
-            radioGroupSearchMethod.check(R.id.brute_force);
-
-            threadCountSpinner.setSelection(0);
-
-            notifyWhenFinishedCheckbox.setChecked(false);
-            autoSaveCheckbox.setChecked(false);
+            case SIEVE_OF_ERATOSTHENES:
+                radioGroupSearchMethod.check(R.id.sieve_of_eratosthenes);
+                editTextSearchRangeStart.setEnabled(false);
+                editTextSearchRangeStart.setText(NUMBER_FORMAT.format(0), false);
+                if (getEndValue().compareTo(getStartValue()) <= 0) {
+                    editTextSearchRangeEnd.getText().clear();
+                }
+                infinityButton.setEnabled(false);
+                infinityButton.setAlpha(0.3f);
+                threadCountSpinner.setEnabled(false);
+                break;
         }
 
+        //Thread count
+        threadCountSpinner.setSelection(searchOptions.getThreadCount() - 1);
+
+        //Miscellaneous
+        notifyWhenFinishedCheckbox.setChecked(searchOptions.isNotifyWhenFinished());
+        autoSaveCheckbox.setChecked(searchOptions.isAutoSave());
+        if (searchOptions.getEndValue() == INFINITY) {
+            notifyWhenFinishedCheckbox.setEnabled(false);
+            autoSaveCheckbox.setEnabled(false);
+        } else {
+            notifyWhenFinishedCheckbox.setEnabled(true);
+            autoSaveCheckbox.setEnabled(true);
+        }
+
+        //Task state dependent
+        if (task != null) {
+            if (task.getState() != Task.State.NOT_STARTED) {
+                editTextSearchRangeStart.setEnabled(false);
+
+                if (task.getState() != Task.State.STOPPING && task.getState() != Task.State.STOPPED) {
+                    editTextSearchRangeEnd.setEnabled(false);
+                    infinityButton.setEnabled(false);
+                    threadCountSpinner.setEnabled(false);
+                } else {
+                    editTextSearchRangeEnd.setEnabled(false);
+                    infinityButton.setEnabled(false);
+                    threadCountSpinner.setEnabled(false);
+                }
+
+                radioGroupSearchMethod.setEnabled(false);
+            }
+        }
     }
 }

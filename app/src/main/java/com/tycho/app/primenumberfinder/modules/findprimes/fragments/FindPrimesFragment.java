@@ -237,19 +237,16 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
                     //Format text
                     final String formatted = NUMBER_FORMAT.format(getStartValue());
-                    if (!editable.toString().equals(formatted)) {
-                        editTextSearchRangeStart.setText(formatted);
-                        editTextSearchRangeStart.setSelection(formatted.length());
+                    if (editable.length() > 0 && !editable.toString().equals(formatted)) {
+                        editTextSearchRangeStart.setText(formatted, formatted.length() > 1);
                     }
                 }
 
+                searchOptions.setStartValue(getStartValue().longValue());
+
                 //Check if the number is valid
-                if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
-                    editTextSearchRangeStart.setValid(true);
-                    editTextSearchRangeEnd.setValid(true);
-                } else if (editTextSearchRangeStart.hasFocus()) {
-                    editTextSearchRangeStart.setValid(editTextSearchRangeEnd.getText().length() == 0);
-                }
+                editTextSearchRangeStart.setValid(Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod()) && editTextSearchRangeStart.length() != 0);
+                editTextSearchRangeEnd.setValid(true);
             }
         });
 
@@ -278,22 +275,21 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
                     //Format text
                     final String formatted = NUMBER_FORMAT.format(getEndValue());
-                    if (!editable.toString().equals(formatted)) {
+                    if (editable.length() > 0 && !editable.toString().equals(formatted)) {
                         Crashlytics.log("Setting text: '" + formatted + "'");
-                        editTextSearchRangeEnd.setText(formatted);
-                        editTextSearchRangeEnd.setSelection(formatted.length());
+                        editTextSearchRangeEnd.setText(formatted, formatted.length() > 1);
+                    } else if (editable.toString().equals(NUMBER_FORMAT.format(0))) {
+                        editTextSearchRangeEnd.getText().clear();
                     }
                 }
+
+                searchOptions.setEndValue(getEndValue().longValue());
 
                 Crashlytics.log("Checking valid...");
 
                 //Check if the number is valid
-                if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
-                    editTextSearchRangeStart.setValid(true);
-                    editTextSearchRangeEnd.setValid(true);
-                } else if (editTextSearchRangeEnd.hasFocus()) {
-                    editTextSearchRangeEnd.setValid(editTextSearchRangeStart.getText().length() == 0);
-                }
+                editTextSearchRangeStart.setValid(true);
+                editTextSearchRangeEnd.setValid(Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod()) && editTextSearchRangeEnd.length() != 0);
             }
         });
 
@@ -302,8 +298,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         infinityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editTextSearchRangeEnd.setText(getString(R.string.infinity_text));
-                editTextSearchRangeEnd.setSelection(getString(R.string.infinity_text).length());
+                editTextSearchRangeEnd.setText(getString(R.string.infinity_text), false);
             }
         });
 

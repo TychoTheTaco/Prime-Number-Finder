@@ -2,23 +2,22 @@ package com.tycho.app.primenumberfinder;
 
 
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.os.Looper;
-import android.support.annotation.Nullable;
-import android.text.method.DigitsKeyListener;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Handler;
 
 /**
  * Created by tycho on 2/16/2018.
  */
 
 public class ValidEditText extends android.support.v7.widget.AppCompatEditText {
+
+    /**
+     * Tag used for logging and debugging.
+     */
+    private static final String TAG = ValidEditText.class.getSimpleName();
 
     private static final int[] STATE_VALID = {R.attr.valid};
 
@@ -109,5 +108,17 @@ public class ValidEditText extends android.support.v7.widget.AppCompatEditText {
 
     public void setClearOnTouch(boolean clearOnTouch) {
         this.clearOnTouch = clearOnTouch;
+    }
+
+    public void setText(final String text, final boolean restoreCursorPosition){
+        final int oldCursorPosition = getSelectionStart();
+        final int oldLength = getText().length();
+        super.setText(text);
+        if (restoreCursorPosition){
+            final int newCursorPosition = oldCursorPosition + (text.length() - oldLength);
+            setSelection((newCursorPosition >= 0 && newCursorPosition <= length()) ? newCursorPosition : 0);
+        }else{
+            setSelection(length());
+        }
     }
 }
