@@ -252,7 +252,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
         //Set up range end input
         editTextSearchRangeEnd = rootView.findViewById(R.id.search_range_end);
-        editTextSearchRangeEnd.setHint(NUMBER_FORMAT.format(Utils.textToNumber(editTextSearchRangeStart.getText().toString()).longValue() + new Random().nextInt(1_000_000)));
+        editTextSearchRangeEnd.setHint(NUMBER_FORMAT.format(new Random().nextInt(1_000_000)));
         editTextSearchRangeEnd.addTextChangedListener(new TextWatcher() {
 
             @Override

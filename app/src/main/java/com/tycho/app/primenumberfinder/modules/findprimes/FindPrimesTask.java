@@ -137,7 +137,7 @@ public class FindPrimesTask extends MultithreadedTask {
 
         //Execute all tasks
 /*        final List<Thread> threads = new ArrayList<>();
-        for (Task task : getTaskStates()) {
+        for (Task task : getTasks()) {
             threads.add(task.startOnNewThread());
         }
 
@@ -145,10 +145,10 @@ public class FindPrimesTask extends MultithreadedTask {
 
         if (threadCount > 1){
             final List<Long> heads = new ArrayList<>();
-            for (int i = 0; i < getTaskStates().size(); i++) {
-                if (!(getTaskStates().get(i).getState() == State.STOPPED && ((BruteForceTask) getTaskStates().get(i)).queue.isEmpty())) {
+            for (int i = 0; i < getTasks().size(); i++) {
+                if (!(getTasks().get(i).getState() == State.STOPPED && ((BruteForceTask) getTasks().get(i)).queue.isEmpty())) {
                     try {
-                        heads.add(((BruteForceTask) getTaskStates().get(i)).queue.take());
+                        heads.add(((BruteForceTask) getTasks().get(i)).queue.take());
                     } catch (InterruptedException e) {
                         Log.wtf(TAG, "Sorting was interrupted!");
                     }
@@ -174,29 +174,29 @@ public class FindPrimesTask extends MultithreadedTask {
                     Log.w(TAG, "Head: " + number);
                 }
                 Log.d(TAG, "Lowest index was " + lowestIndex);
-                for (Task task : getTaskStates()){
+                for (Task task : getTasks()){
                     Log.w(TAG, "Queue: " + ((BruteForceTask) task).queue);
                 }*//*
 
                 sorted.add(heads.get(lowestIndex));
-                if (!(getTaskStates().get(lowestIndex).getState() == State.STOPPED && ((BruteForceTask) getTaskStates().get(lowestIndex)).queue.isEmpty())) {
+                if (!(getTasks().get(lowestIndex).getState() == State.STOPPED && ((BruteForceTask) getTasks().get(lowestIndex)).queue.isEmpty())) {
                     try {
-                        if (((BruteForceTask) getTaskStates().get(lowestIndex)).queue.isEmpty()){
+                        if (((BruteForceTask) getTasks().get(lowestIndex)).queue.isEmpty()){
                             //Wait until item added or task finished
-                            synchronized (((BruteForceTask) getTaskStates().get(lowestIndex)).QUEUE_LOCK){
-                                while (((BruteForceTask) getTaskStates().get(lowestIndex)).queue.isEmpty() && getTaskStates().get(lowestIndex).getState() != State.STOPPED){
+                            synchronized (((BruteForceTask) getTasks().get(lowestIndex)).QUEUE_LOCK){
+                                while (((BruteForceTask) getTasks().get(lowestIndex)).queue.isEmpty() && getTasks().get(lowestIndex).getState() != State.STOPPED){
                                     //Log.d(TAG, "Waiting...");
-                                    ((BruteForceTask) getTaskStates().get(lowestIndex)).QUEUE_LOCK.wait();
-                                    //Log.d(TAG, "Notified: " + ((BruteForceTask) getTaskStates().get(lowestIndex)).queue.size());
+                                    ((BruteForceTask) getTasks().get(lowestIndex)).QUEUE_LOCK.wait();
+                                    //Log.d(TAG, "Notified: " + ((BruteForceTask) getTasks().get(lowestIndex)).queue.size());
                                 }
                             }
                         }
-                        if (((BruteForceTask) getTaskStates().get(lowestIndex)).queue.isEmpty()){
-                            //Log.d(TAG, "Index " + lowestIndex + " still empty. state: " + getTaskStates().get(lowestIndex).getState());
+                        if (((BruteForceTask) getTasks().get(lowestIndex)).queue.isEmpty()){
+                            //Log.d(TAG, "Index " + lowestIndex + " still empty. state: " + getTasks().get(lowestIndex).getState());
                             heads.set(lowestIndex, -1L);
                         }else{
-                            //Log.d(TAG, "Taking from " + ((BruteForceTask) getTaskStates().get(lowestIndex)).queue);
-                            heads.set(lowestIndex, ((BruteForceTask) getTaskStates().get(lowestIndex)).queue.poll());
+                            //Log.d(TAG, "Taking from " + ((BruteForceTask) getTasks().get(lowestIndex)).queue);
+                            heads.set(lowestIndex, ((BruteForceTask) getTasks().get(lowestIndex)).queue.poll());
                             //Log.d(TAG, "Took " + heads.get(lowestIndex));
                             takeFlag = true;
                         }
@@ -209,7 +209,7 @@ public class FindPrimesTask extends MultithreadedTask {
                 }
             }
         }else{
-            sorted.addAll(((BruteForceTask) getTaskStates().get(0)).queue);
+            sorted.addAll(((BruteForceTask) getTasks().get(0)).queue);
         }
 
         Log.d(TAG, "Sorted: " + sorted);

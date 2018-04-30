@@ -1,6 +1,6 @@
 package com.tycho.app.primenumberfinder.modules.primefactorization.fragments;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -48,15 +48,10 @@ public class PrimeFactorizationTaskListFragment extends Fragment implements Inte
 
     private Intent intent;
 
-    /**
-     * This deprecated version of {@linkplain Fragment#onAttach(Activity)} is needed in API < 22.
-     *
-     * @param activity
-     */
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        taskListAdapter = new PrimeFactorizationTaskListAdapter(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        taskListAdapter = new PrimeFactorizationTaskListAdapter(context);
         while (!eventListenerQueue.isEmpty()) {
             taskListAdapter.addEventListener(eventListenerQueue.poll());
         }
@@ -81,11 +76,14 @@ public class PrimeFactorizationTaskListFragment extends Fragment implements Inte
         textViewNoTasks = rootView.findViewById(R.id.empty_message);
 
         //Restore tasks if fragment was destroyed
-        for (Task task : PrimeNumberFinder.getTaskManager().getTaskStates()) {
+        for (Task task : PrimeNumberFinder.getTaskManager().getTasks()) {
             if (task instanceof PrimeFactorizationTask) {
                 taskListAdapter.addTask(task);
             }
         }
+        taskListAdapter.sortByTimeCreated();
+
+        //Select correct task
         if (intent == null || taskListAdapter.getItemCount() > 0) {
             taskListAdapter.setSelected(0);
         }else{

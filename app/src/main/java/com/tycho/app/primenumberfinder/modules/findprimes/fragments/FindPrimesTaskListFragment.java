@@ -1,12 +1,13 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,19 +51,16 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
 
     private Intent intent;
 
-    /**
-     * This deprecated version of {@linkplain Fragment#onAttach(Activity)} is needed in API < 22.
-     *
-     * @param activity
-     */
     @Override
-    public void onAttach(final Activity activity) {
-        super.onAttach(activity);
-        taskListAdapter = new FindPrimesTaskListAdapter(activity);
-        Crashlytics.log("onAttach()");
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        taskListAdapter = new FindPrimesTaskListAdapter(context);
+        Crashlytics.log(Log.DEBUG, TAG, "onAttach()");
+        Crashlytics.log(Log.DEBUG, TAG, "Adding " + eventListenerQueue.size() + " event listeners.");
         while (!eventListenerQueue.isEmpty()) {
             taskListAdapter.addEventListener(eventListenerQueue.poll());
         }
+        Crashlytics.log(Log.DEBUG, TAG, "Adding " + actionViewListenerQueue.size() + " action view listeners.");
         while (!actionViewListenerQueue.isEmpty()) {
             taskListAdapter.addActionViewListener(actionViewListenerQueue.poll());
         }
@@ -73,7 +71,7 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_primes_task_list_fragment, container, false);
 
-        Crashlytics.log("onCreateView: " + taskListAdapter);
+        Crashlytics.log(Log.DEBUG, TAG, "onCreateView: " + taskListAdapter);
 
         //Set up the task list
         recyclerView = rootView.findViewById(R.id.task_list);
@@ -87,11 +85,14 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
         textViewNoTasks = rootView.findViewById(R.id.empty_message);
 
         //Restore tasks if fragment was destroyed
-        for (Task task : PrimeNumberFinder.getTaskManager().getTaskStates()) {
+        for (Task task : PrimeNumberFinder.getTaskManager().getTasks()) {
             if (task instanceof FindPrimesTask || task instanceof CheckPrimalityTask) {
                 taskListAdapter.addTask(task);
             }
         }
+        taskListAdapter.sortByTimeCreated();
+
+        //Select correct task
         if (intent == null || taskListAdapter.getItemCount() > 0) {
             taskListAdapter.setSelected(0);
         } else {
@@ -109,10 +110,22 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Crashlytics.setBool("onDestroyView", true);
+        Crashlytics.log(Log.DEBUG, TAG, "onDestroyView()");
         if (taskListAdapter != null){
             Crashlytics.setString("taskListAdapter", taskListAdapter.toString());
         }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Crashlytics.log(Log.DEBUG, TAG, "onDetach()");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Crashlytics.log(Log.DEBUG, TAG, "onDestroy()");
     }
 
     @Override
@@ -121,9 +134,9 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
     }
 
     public void addTask(final Task task) {
-        Crashlytics.log("isAdded: " + isAdded());
-        Crashlytics.log("isDetached: " + isDetached());
-        Crashlytics.log("getView: " + getView());
+        Crashlytics.log(Log.DEBUG, TAG, "isAdded: " + isAdded());
+        Crashlytics.log(Log.DEBUG, TAG, "isDetached: " + isDetached());
+        Crashlytics.log(Log.DEBUG, TAG, "getView: " + getView());
         taskListAdapter.addTask(task);
         recyclerView.scrollToPosition(taskListAdapter.getItemCount() - 1);
         update();

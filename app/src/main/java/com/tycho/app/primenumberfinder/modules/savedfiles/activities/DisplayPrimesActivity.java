@@ -2,13 +2,11 @@ package com.tycho.app.primenumberfinder.modules.savedfiles.activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -19,7 +17,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.AbstractActivity;
-import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.ExportOptionsDialog;
@@ -43,7 +40,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "DispFactListAct";
+    private static final String TAG = DisplayPrimesActivity.class.getSimpleName();
 
     private File file;
 

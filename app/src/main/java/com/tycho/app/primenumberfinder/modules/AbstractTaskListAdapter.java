@@ -3,7 +3,6 @@ package com.tycho.app.primenumberfinder.modules;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -16,6 +15,8 @@ import com.tycho.app.primenumberfinder.R;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -234,6 +235,16 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
         return selectedItemPosition;
     }
 
+    public void sortByTimeCreated(){
+        Collections.sort(tasks, new Comparator<Task>() {
+            @Override
+            public int compare(Task task0, Task task1) {
+                return Long.compare(task0.getStartTime(), task1.getStartTime());
+            }
+        });
+        notifyDataSetChanged();
+    }
+
     public interface EventListener {
         void onTaskSelected(final Task task);
 
@@ -415,8 +426,10 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
         }
     }
 
-    public boolean addActionViewListener(final ActionViewListener actionViewListener) {
-        return this.actionViewListeners.add(actionViewListener);
+    public void addActionViewListener(final ActionViewListener actionViewListener) {
+        if (!actionViewListeners.contains(actionViewListener)){
+            this.actionViewListeners.add(actionViewListener);
+        }
     }
 
     public boolean removeActionViewListener(final ActionViewListener actionViewListener) {

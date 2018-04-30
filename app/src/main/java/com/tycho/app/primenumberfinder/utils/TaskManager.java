@@ -1,7 +1,5 @@
 package com.tycho.app.primenumberfinder.utils;
 
-import android.util.Log;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -21,19 +19,19 @@ public class TaskManager {
      */
     private static final String TAG = TaskManager.class.getSimpleName();
 
-    private final Map<Task, Task.State> taskStates = new HashMap<>();
+    private final Map<Task, Task.State> tasks = new HashMap<>();
 
     public void registerTask(final Task task) {
-        taskStates.put(task, task.getState());
+        tasks.put(task, task.getState());
     }
 
     public void unregisterTask(final Task task) {
-        taskStates.remove(task);
+        tasks.remove(task);
     }
 
     public void saveTaskStates(){
-        for (Task task : taskStates.keySet()){
-            taskStates.put(task, task.getState());
+        for (Task task : tasks.keySet()){
+            tasks.put(task, task.getState());
         }
     }
 
@@ -41,8 +39,8 @@ public class TaskManager {
      * Pause all tasks.
      */
     public void pauseAllTasks() {
-        for (Task task : taskStates.keySet()) {
-            taskStates.put(task, task.getState());
+        for (Task task : tasks.keySet()) {
+            tasks.put(task, task.getState());
             task.pause(false);
         }
     }
@@ -51,19 +49,19 @@ public class TaskManager {
      * Resume all tasks.
      */
     public void resumeAllTasks() {
-        for (Task task : taskStates.keySet()) {
-            if (taskStates.get(task) != Task.State.PAUSED && taskStates.get(task) != Task.State.STOPPED) {
+        for (Task task : tasks.keySet()) {
+            if (tasks.get(task) != Task.State.PAUSED && tasks.get(task) != Task.State.STOPPED) {
                 task.resume(false);
             }
         }
     }
 
-    public Set<Task> getTaskStates() {
-        return taskStates.keySet();
+    public Set<Task> getTasks() {
+        return tasks.keySet();
     }
 
     public Task findTaskById(final UUID id) {
-        for (Task task : taskStates.keySet()) {
+        for (Task task : tasks.keySet()) {
             if (task.getId().equals(id)) {
                 return task;
             }
