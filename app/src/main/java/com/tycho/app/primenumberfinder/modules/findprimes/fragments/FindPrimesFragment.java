@@ -193,6 +193,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         buttonCheckPrimality.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 //Check if the number is valid
                 if (Validator.isPrimalityInputValid(getPrimalityInput())) {
 
@@ -456,13 +457,8 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         //Start the task
         task.startOnNewThread();
 
-        //Post to a handler because "java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState"
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                taskListFragment.setSelected(task);
-            }
-        });
+        //TODO: Post to a handler because rare "java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState"
+        taskListFragment.setSelected(task);
     }
 
     private BigInteger getPrimalityInput() {

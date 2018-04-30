@@ -3,6 +3,7 @@ package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -68,7 +69,7 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_primes_task_list_fragment, container, false);
 
         Crashlytics.log(Log.DEBUG, TAG, "onCreateView: " + taskListAdapter);
@@ -88,12 +89,13 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
         for (Task task : PrimeNumberFinder.getTaskManager().getTasks()) {
             if (task instanceof FindPrimesTask || task instanceof CheckPrimalityTask) {
                 taskListAdapter.addTask(task);
+                Log.d(TAG, "Added: " + task);
             }
         }
         taskListAdapter.sortByTimeCreated();
 
         //Select correct task
-        if (intent == null || taskListAdapter.getItemCount() > 0) {
+        if (intent == null || taskListAdapter.getItemCount() == 0) {
             taskListAdapter.setSelected(0);
         } else {
             taskListAdapter.setSelected(PrimeNumberFinder.getTaskManager().findTaskById((UUID) intent.getSerializableExtra("taskId")));
@@ -142,6 +144,10 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
         update();
     }
 
+    public void update() {
+        textViewNoTasks.setVisibility(taskListAdapter.getItemCount() > 0 ? View.GONE : View.VISIBLE);
+    }
+
     public void setSelected(final int index) {
         taskListAdapter.setSelected(index);
     }
@@ -156,10 +162,6 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
         } else {
             taskListAdapter.addEventListener(eventListener);
         }
-    }
-
-    public void update() {
-        textViewNoTasks.setVisibility(taskListAdapter.getItemCount() > 0 ? View.GONE : View.VISIBLE);
     }
 
     public void addActionViewListener(final ActionViewListener actionViewListener) {

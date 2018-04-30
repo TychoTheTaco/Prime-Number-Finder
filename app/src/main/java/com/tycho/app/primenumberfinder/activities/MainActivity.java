@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.core.CrashlyticsCore;
 import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
@@ -98,6 +99,13 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Set up analytics
+        if (PrimeNumberFinder.getPreferenceManager().isAllowAnalytics()) {
+            Fabric.with(this, new Crashlytics());
+        }else{
+            Fabric.with(this, new Crashlytics.Builder().core(new CrashlyticsCore.Builder().build()).build());
+        }
 
         //Set the actionbar to a custom toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);
@@ -180,11 +188,6 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
                     progressDialog.dismiss();
                 }
             }).start();
-        }
-
-        //Set up analytics
-        if (PrimeNumberFinder.getPreferenceManager().isAllowAnalytics()) {
-            Fabric.with(this, new Crashlytics());
         }
     }
 
