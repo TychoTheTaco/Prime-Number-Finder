@@ -96,7 +96,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof FloatingActionButtonHost){
+        if (context instanceof FloatingActionButtonHost) {
             floatingActionButtonHost = (FloatingActionButtonHost) context;
         }
     }
@@ -219,8 +219,6 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         editTextSearchRangeStart.setText(NUMBER_FORMAT.format(searchOptions.getStartValue()));
         editTextSearchRangeStart.addTextChangedListener(new TextWatcher() {
 
-            private boolean isDirty = true;
-
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -234,28 +232,24 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             @Override
             public void afterTextChanged(Editable editable) {
 
-                if (isDirty) {
+                //Check if infinity
+                if (!editable.toString().equals(getString(R.string.infinity_text))) {
 
                     //Format text
-                    if (editable.length() > 0) {
-                        final String formattedText = NUMBER_FORMAT.format(getStartValue());
-                        if (!editable.toString().equals(formattedText)) {
-                            isDirty = false;
-                            editTextSearchRangeStart.setText(formattedText);
-                        }
-                        editTextSearchRangeStart.setSelection(formattedText.length());
+                    final String formatted = NUMBER_FORMAT.format(getStartValue());
+                    if (!editable.toString().equals(formatted)) {
+                        editTextSearchRangeStart.setText(formatted);
+                        editTextSearchRangeStart.setSelection(formatted.length());
                     }
-
-                    //Check if the number is valid
-                    if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
-                        editTextSearchRangeStart.setValid(true);
-                        editTextSearchRangeEnd.setValid(true);
-                    } else if (editTextSearchRangeStart.hasFocus()) {
-                        editTextSearchRangeStart.setValid(editTextSearchRangeEnd.getText().length() == 0);
-                    }
-
                 }
-                isDirty = true;
+
+                //Check if the number is valid
+                if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
+                    editTextSearchRangeStart.setValid(true);
+                    editTextSearchRangeEnd.setValid(true);
+                } else if (editTextSearchRangeStart.hasFocus()) {
+                    editTextSearchRangeStart.setValid(editTextSearchRangeEnd.getText().length() == 0);
+                }
             }
         });
 
@@ -263,8 +257,6 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         editTextSearchRangeEnd = rootView.findViewById(R.id.search_range_end);
         editTextSearchRangeEnd.setHint(NUMBER_FORMAT.format(Integer.valueOf(editTextSearchRangeStart.getHint().toString().replace(",", "")) + new Random().nextInt(1_000_000)));
         editTextSearchRangeEnd.addTextChangedListener(new TextWatcher() {
-
-            private boolean isDirty = true;
 
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -280,50 +272,28 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             public void afterTextChanged(Editable editable) {
 
                 Crashlytics.log("Editable: '" + editable + "'");
-                Crashlytics.log("isDirty: " + isDirty);
 
-                if (isDirty) {
+                //Check if infinity
+                if (!editable.toString().equals(getString(R.string.infinity_text))) {
 
                     //Format text
-                    if (editable.length() > 0) {
-
-                        //Check if infinity
-                        if (!editable.toString().equals(getString(R.string.infinity_text))) {
-
-                            //Replace infinity text
-                            String input = editable.toString();
-                            input = input.replaceAll("[infty]", "");
-
-                            Crashlytics.log("replaceAll: '" + input + "'");
-
-                            if (editable.toString().equals(input)) {
-                                final String formattedText = NUMBER_FORMAT.format(getEndValue());
-                                if (!editable.toString().equals(formattedText)) {
-                                    isDirty = false;
-                                    Crashlytics.log("Setting text: '" + formattedText + "'");
-                                    editTextSearchRangeEnd.setText(formattedText);
-                                    editTextSearchRangeEnd.setSelection(formattedText.length());
-                                }
-                            } else {
-                                Crashlytics.log("Setting text: '" + input + "'");
-                                editTextSearchRangeEnd.setText(input);
-                                editTextSearchRangeEnd.setSelection(input.length());
-                            }
-                        }
+                    final String formatted = NUMBER_FORMAT.format(getEndValue());
+                    if (!editable.toString().equals(formatted)) {
+                        Crashlytics.log("Setting text: '" + formatted + "'");
+                        editTextSearchRangeEnd.setText(formatted);
+                        editTextSearchRangeEnd.setSelection(formatted.length());
                     }
-
-                    Crashlytics.log("Checking valid...");
-
-                    //Check if the number is valid
-                    if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
-                        editTextSearchRangeStart.setValid(true);
-                        editTextSearchRangeEnd.setValid(true);
-                    } else if (editTextSearchRangeEnd.hasFocus()) {
-                        editTextSearchRangeEnd.setValid(editTextSearchRangeStart.getText().length() == 0);
-                    }
-
                 }
-                isDirty = true;
+
+                Crashlytics.log("Checking valid...");
+
+                //Check if the number is valid
+                if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
+                    editTextSearchRangeStart.setValid(true);
+                    editTextSearchRangeEnd.setValid(true);
+                } else if (editTextSearchRangeEnd.hasFocus()) {
+                    editTextSearchRangeEnd.setValid(editTextSearchRangeStart.getText().length() == 0);
+                }
             }
         });
 
@@ -509,7 +479,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         final String input = editTextSearchRangeEnd.getText().toString().trim();
 
         //Check for infinity
-        if (input.equals("infinity")) {
+        if (input.equals(getString(R.string.infinity_text))) {
             return BigInteger.valueOf(FindPrimesTask.INFINITY);
         }
 

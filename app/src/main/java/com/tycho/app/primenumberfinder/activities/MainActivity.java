@@ -165,7 +165,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         }
 
         //Show a dialog while upgrading to the newest version
-        if (PrimeNumberFinder.getPreferenceManager().getFileVersion() < PreferenceManager.CURRENT_VERSION){
+        if (PrimeNumberFinder.getPreferenceManager().getFileVersion() < PreferenceManager.CURRENT_VERSION) {
             final ProgressDialog progressDialog = new ProgressDialog(this);
             progressDialog.setTitle("Updating...");
             progressDialog.show();
@@ -183,7 +183,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         }
 
         //Set up analytics
-        if (PrimeNumberFinder.getPreferenceManager().isAllowAnalytics()){
+        if (PrimeNumberFinder.getPreferenceManager().isAllowAnalytics()) {
             Fabric.with(this, new Crashlytics());
         }
     }

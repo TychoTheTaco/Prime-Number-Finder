@@ -2,16 +2,10 @@ package com.tycho.app.primenumberfinder.modules.findprimes;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.content.res.TypedArray;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -19,26 +13,22 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.CustomRadioGroup;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.ValidEditText;
-import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
@@ -51,8 +41,6 @@ import easytasks.Task;
 
 import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchMethod.BRUTE_FORCE;
 import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES;
-import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
-import static com.tycho.app.primenumberfinder.utils.Utils.sortByDate;
 
 /**
  * Created by tycho on 1/24/2018.
@@ -100,8 +88,6 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
         editTextSearchRangeStart = findViewById(R.id.search_range_start);
         editTextSearchRangeStart.addTextChangedListener(new TextWatcher() {
 
-            private boolean isDirty = true;
-
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -115,28 +101,24 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
             @Override
             public void afterTextChanged(Editable editable) {
 
-                if (isDirty) {
+                //Check if infinity
+                if (!editable.toString().equals(getString(R.string.infinity_text))) {
 
                     //Format text
-                    if (editable.length() > 0) {
-                        final String formattedText = NumberFormat.getNumberInstance(Locale.getDefault()).format(getStartValue());
-                        if (!editable.toString().equals(formattedText)) {
-                            isDirty = false;
-                            editTextSearchRangeStart.setText(formattedText);
-                        }
-                        editTextSearchRangeStart.setSelection(formattedText.length());
+                    final String formatted = NUMBER_FORMAT.format(getStartValue());
+                    if (!editable.toString().equals(formatted)) {
+                        editTextSearchRangeStart.setText(formatted);
+                        editTextSearchRangeStart.setSelection(formatted.length());
                     }
-
-                    //Check if the number is valid
-                    if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchMethod)) {
-                        editTextSearchRangeStart.setValid(true);
-                        editTextSearchRangeEnd.setValid(true);
-                    } else if (editTextSearchRangeStart.hasFocus()) {
-                        editTextSearchRangeStart.setValid(editTextSearchRangeEnd.getText().length() == 0);
-                    }
-
                 }
-                isDirty = true;
+
+                //Check if the number is valid
+                if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchMethod)) {
+                    editTextSearchRangeStart.setValid(true);
+                    editTextSearchRangeEnd.setValid(true);
+                } else if (editTextSearchRangeStart.hasFocus()) {
+                    editTextSearchRangeStart.setValid(editTextSearchRangeEnd.getText().length() == 0);
+                }
             }
         });
         editTextSearchRangeStart.setClearOnTouch(false);
@@ -145,8 +127,6 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
         editTextSearchRangeEnd = findViewById(R.id.search_range_end);
         editTextSearchRangeEnd.addTextChangedListener(new TextWatcher() {
 
-            private boolean isDirty = true;
-
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -160,45 +140,29 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
             @Override
             public void afterTextChanged(Editable editable) {
 
-                if (isDirty) {
+                Crashlytics.log("Editable: '" + editable + "'");
+
+                //Check if infinity
+                if (!editable.toString().equals(getString(R.string.infinity_text))) {
 
                     //Format text
-                    if (editable.length() > 0) {
-
-                        //Check if infinity
-                        if (!editable.toString().equals(getString(R.string.infinity_text))) {
-
-                            //Replace infinity text
-                            String input = editable.toString();
-                            input = input.replaceAll("[infty]", "");
-
-                            if (editable.toString().equals(input)) {
-                                final String formattedText = NUMBER_FORMAT.format(getEndValue());
-                                if (!editable.toString().equals(formattedText)) {
-                                    isDirty = false;
-                                    editTextSearchRangeEnd.setText(formattedText);
-                                    editTextSearchRangeEnd.setSelection(formattedText.length());
-                                }
-                            } else {
-                                editTextSearchRangeEnd.setText(input);
-                                editTextSearchRangeEnd.setSelection(input.length());
-                            }
-                        }
+                    final String formatted = NUMBER_FORMAT.format(getEndValue());
+                    if (!editable.toString().equals(formatted)) {
+                        Crashlytics.log("Setting text: '" + formatted + "'");
+                        editTextSearchRangeEnd.setText(formatted);
+                        editTextSearchRangeEnd.setSelection(formatted.length());
                     }
-
-                    notifyWhenFinishedCheckbox.setEnabled(getEndValue().compareTo(BigInteger.valueOf(FindPrimesTask.INFINITY)) != 0);
-                    autoSaveCheckbox.setEnabled(getEndValue().compareTo(BigInteger.valueOf(FindPrimesTask.INFINITY)) != 0);
-
-                    //Check if the number is valid
-                    if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchMethod)) {
-                        editTextSearchRangeStart.setValid(true);
-                        editTextSearchRangeEnd.setValid(true);
-                    } else if (editTextSearchRangeEnd.hasFocus()) {
-                        editTextSearchRangeEnd.setValid(editTextSearchRangeStart.getText().length() == 0);
-                    }
-
                 }
-                isDirty = true;
+
+                Crashlytics.log("Checking valid...");
+
+                //Check if the number is valid
+                if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchMethod)) {
+                    editTextSearchRangeStart.setValid(true);
+                    editTextSearchRangeEnd.setValid(true);
+                } else if (editTextSearchRangeEnd.hasFocus()) {
+                    editTextSearchRangeEnd.setValid(editTextSearchRangeStart.getText().length() == 0);
+                }
             }
         });
         editTextSearchRangeEnd.setClearOnTouch(false);
@@ -354,7 +318,7 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
         final String input = editTextSearchRangeEnd.getText().toString().trim();
 
         //Check for infinity
-        if (input.equals("infinity")) {
+        if (input.equals(getString(R.string.infinity_text))) {
             return BigInteger.valueOf(FindPrimesTask.INFINITY);
         }
 
