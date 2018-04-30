@@ -1,50 +1,29 @@
 package com.tycho.app.primenumberfinder.modules.findprimes;
 
-import android.app.ActivityManager;
 import android.content.Context;
-import android.content.res.TypedArray;
-import android.os.Debug;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
-import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.DataInputStream;
-import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.math.BigInteger;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import easytasks.MultithreadedTask;
 import easytasks.Task;
-import easytasks.TaskAdapter;
-import easytasks.TaskListener;
-import simpletrees.Tree;
-
-import static com.tycho.app.primenumberfinder.utils.FileManager.EXTENSION;
 
 public class FindPrimesTask extends MultithreadedTask {
 
@@ -660,7 +639,7 @@ public class FindPrimesTask extends MultithreadedTask {
             status = "counting";
 
             //Count primes
-            for (counter = 2; counter <= endValue; counter++) {
+            for (counter = (startValue > 2 ? startValue : 2); counter <= endValue; counter++) {
                 if (bitSet.get((int) counter)) {
                     primes.add(counter);
                     primeCount++;

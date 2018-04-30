@@ -330,6 +330,7 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
     private void applyConfig(final FindPrimesTask.SearchOptions searchOptions) {
 
         //Start and end values
+        editTextSearchRangeStart.setEnabled(true);
         editTextSearchRangeStart.setText(NUMBER_FORMAT.format(searchOptions.getStartValue()), true);
         editTextSearchRangeEnd.setEnabled(true);
         editTextSearchRangeEnd.setText(searchOptions.getEndValue() == INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(searchOptions.getEndValue()), true);
@@ -338,7 +339,6 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
         switch (searchOptions.getSearchMethod()) {
             case BRUTE_FORCE:
                 radioGroupSearchMethod.check(R.id.brute_force);
-                editTextSearchRangeStart.setEnabled(true);
                 infinityButton.setEnabled(true);
                 infinityButton.setAlpha(1f);
                 threadCountSpinner.setEnabled(true);
@@ -346,8 +346,6 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
 
             case SIEVE_OF_ERATOSTHENES:
                 radioGroupSearchMethod.check(R.id.sieve_of_eratosthenes);
-                editTextSearchRangeStart.setEnabled(false);
-                editTextSearchRangeStart.setText(NUMBER_FORMAT.format(0), false);
                 if (getEndValue().compareTo(getStartValue()) <= 0) {
                     editTextSearchRangeEnd.getText().clear();
                 }

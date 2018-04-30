@@ -252,7 +252,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
         //Set up range end input
         editTextSearchRangeEnd = rootView.findViewById(R.id.search_range_end);
-        editTextSearchRangeEnd.setHint(NUMBER_FORMAT.format(Integer.valueOf(editTextSearchRangeStart.getHint().toString().replace(",", "")) + new Random().nextInt(1_000_000)));
+        editTextSearchRangeEnd.setHint(NUMBER_FORMAT.format(Utils.textToNumber(editTextSearchRangeStart.getText().toString()).longValue() + new Random().nextInt(1_000_000)));
         editTextSearchRangeEnd.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -309,18 +309,12 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             public void onClick(View v) {
 
                 //Determine best search method
-                if (getStartValue().compareTo(BigInteger.ZERO) > 0 || getEndValue().longValue() == FindPrimesTask.INFINITY || getEndValue().compareTo(BigInteger.valueOf(Integer.MAX_VALUE - 1)) > 0) {
-                    searchOptions.setSearchMethod(FindPrimesTask.SearchMethod.BRUTE_FORCE);
-                } else {
-                    searchOptions.setSearchMethod(FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES);
-                }
+                searchOptions.setSearchMethod(determineBestSearchMethod());
 
                 //Check if the range is valid
                 if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
 
                     //Create a new task
-                    searchOptions.setStartValue(getStartValue().longValue());
-                    searchOptions.setEndValue(getEndValue().longValue());
                     searchOptions.setThreadCount(1);
                     try {
                         startTask((FindPrimesTask.SearchOptions) searchOptions.clone());
@@ -391,75 +385,84 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         taskListFragment.giveIntent(intent);
     }
 
+    private FindPrimesTask.SearchMethod determineBestSearchMethod() {
+
+        //Check if end value is infinity or is greater than int range
+        if (getEndValue().longValue() == FindPrimesTask.INFINITY || getEndValue().compareTo(BigInteger.valueOf(Integer.MAX_VALUE - 1)) > 0){
+            return FindPrimesTask.SearchMethod.BRUTE_FORCE;
+        }
+
+        //Make sure we have enough heap memory to use the sieve
+        if (getStartValue().compareTo(BigInteger.ZERO) >= 0 && hasEnoughMemoryForSieve()) {
+            return FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES;
+        }
+
+        return FindPrimesTask.SearchMethod.BRUTE_FORCE;
+    }
+
+    private boolean hasEnoughMemoryForSieve() {
+        final Runtime runtime = Runtime.getRuntime();
+        final long usedMemInMB = (runtime.totalMemory() - runtime.freeMemory()) / 1048576L;
+        final long maxHeapSizeInMB = runtime.maxMemory() / 1048576L;
+        final long availHeapSizeInMB = maxHeapSizeInMB - usedMemInMB;
+
+        final long bits = searchOptions.getEndValue() + 1;
+        final int longCount = (int) (bits / 8) + 1;
+        final int arraySize = longCount * 8;
+        final long estimatedPrimeCount = (long) ((searchOptions.getEndValue() / Math.log(searchOptions.getEndValue())) - (searchOptions.getStartValue() / Math.log(searchOptions.getStartValue())));
+        final long primesSize = estimatedPrimeCount * 8;
+        final long totalBytes = arraySize + primesSize;
+
+        //Add an extra 13% due to inaccurate estimate of prime count
+        final int requiredMB = (int) ((totalBytes * 1.13f) / (1024 * 1024));
+
+        Log.d(TAG, "RAM: " + usedMemInMB + " / " + maxHeapSizeInMB);
+        Log.d(TAG, "Avail: " + availHeapSizeInMB);
+        Log.d(TAG, "Req: " + requiredMB);
+
+        return requiredMB <= availHeapSizeInMB;
+    }
+
     private void startTask(final FindPrimesTask.SearchOptions searchOptions) {
+        final FindPrimesTask task = new FindPrimesTask(searchOptions, getActivity());
+        task.addTaskListener(new TaskAdapter() {
 
-        boolean valid;
+            @Override
+            public void onTaskStopped() {
+                if (task.getSearchOptions().isAutoSave()) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            final boolean success = FileManager.getInstance().savePrimes(task.getStartValue(), task.getEndValue(), task.getSortedPrimes());
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }).start();
+                }
 
-        //Make sure there is enough memory
-        if (searchOptions.getSearchMethod() == FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES) {
-
-            final Runtime runtime = Runtime.getRuntime();
-            final long usedMemInMB = (runtime.totalMemory() - runtime.freeMemory()) / 1048576L;
-            final long maxHeapSizeInMB = runtime.maxMemory() / 1048576L;
-            final long availHeapSizeInMB = maxHeapSizeInMB - usedMemInMB;
-
-            final long requiredMB = ((searchOptions.getEndValue() / 8) + (searchOptions.getEndValue() * 2)) / (1024 * 1024);
-
-            Log.d(TAG, "RAM: " + usedMemInMB + " / " + maxHeapSizeInMB);
-            Log.d(TAG, "Avail: " + availHeapSizeInMB);
-            Log.d(TAG, "Req: " + requiredMB);
-
-            if (requiredMB <= availHeapSizeInMB * 0.9f) {
-                valid = true;
-            } else {
-                valid = false;
-                Toast.makeText(getActivity(), "Not enough RAM to start task! Use Brute Force instead!", Toast.LENGTH_LONG).show();
+                if (task.getSearchOptions().isNotifyWhenFinished()) {
+                    com.tycho.app.primenumberfinder.utils.NotificationManager.displayNotification(getActivity(), "default", task, com.tycho.app.primenumberfinder.utils.NotificationManager.REQUEST_CODE_FIND_PRIMES, "Task \"Primes from " + NUMBER_FORMAT.format(task.getStartValue()) + " to " + NUMBER_FORMAT.format(task.getEndValue()) + "\" finished.");
+                }
+                task.removeTaskListener(this);
             }
-        } else {
-            valid = true;
-        }
+        });
+        taskListFragment.addTask(task);
+        PrimeNumberFinder.getTaskManager().registerTask(task);
 
-        if (valid) {
-            final FindPrimesTask task = new FindPrimesTask(searchOptions, getActivity());
-            task.addTaskListener(new TaskAdapter() {
+        //Start the task
+        task.startOnNewThread();
 
-                @Override
-                public void onTaskStopped() {
-                    if (task.getSearchOptions().isAutoSave()) {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                final boolean success = FileManager.getInstance().savePrimes(task.getStartValue(), task.getEndValue(), task.getSortedPrimes());
-                                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
-                        }).start();
-                    }
-
-                    if (task.getSearchOptions().isNotifyWhenFinished()) {
-                        com.tycho.app.primenumberfinder.utils.NotificationManager.displayNotification(getActivity(), "default", task, com.tycho.app.primenumberfinder.utils.NotificationManager.REQUEST_CODE_FIND_PRIMES, "Task \"Primes from " + NUMBER_FORMAT.format(task.getStartValue()) + " to " + NUMBER_FORMAT.format(task.getEndValue()) + "\" finished.");
-                    }
-                    task.removeTaskListener(this);
-                }
-            });
-            taskListFragment.addTask(task);
-            PrimeNumberFinder.getTaskManager().registerTask(task);
-
-            //Start the task
-            task.startOnNewThread();
-
-            //Post to a handler because "java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState"
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                    taskListFragment.setSelected(task);
-                }
-            });
-        }
+        //Post to a handler because "java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState"
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                taskListFragment.setSelected(task);
+            }
+        });
     }
 
     private BigInteger getPrimalityInput() {

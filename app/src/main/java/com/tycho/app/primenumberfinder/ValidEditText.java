@@ -30,7 +30,7 @@ public class ValidEditText extends android.support.v7.widget.AppCompatEditText {
      */
     private boolean clearOnTouch = true;
 
-    public ValidEditText(final Context context){
+    public ValidEditText(final Context context) {
         super(context);
         init();
     }
@@ -45,7 +45,7 @@ public class ValidEditText extends android.support.v7.widget.AppCompatEditText {
         init();
     }
 
-    private void init(){
+    private void init() {
         setBackgroundTintList(getResources().getColorStateList(R.color.valid_edittext_background));
         setOnTouchListener(new OnTouchListener() {
             @Override
@@ -54,7 +54,7 @@ public class ValidEditText extends android.support.v7.widget.AppCompatEditText {
                 performClick();
 
                 //Clear text
-                if (clearOnTouch){
+                if (clearOnTouch) {
                     getText().clear();
                 }
 
@@ -70,13 +70,13 @@ public class ValidEditText extends android.support.v7.widget.AppCompatEditText {
     @Override
     protected int[] onCreateDrawableState(int extraSpace) {
         final int[] drawableState = super.onCreateDrawableState(extraSpace + 1);
-        if (valid){
+        if (valid) {
             mergeDrawableStates(drawableState, STATE_VALID);
         }
         return drawableState;
     }
 
-    public void setValid(final boolean valid){
+    public void setValid(final boolean valid) {
         this.valid = valid;
         refreshDrawableState();
     }
@@ -86,18 +86,18 @@ public class ValidEditText extends android.support.v7.widget.AppCompatEditText {
         return super.performClick();
     }
 
-    public void addOnTouchListener(final OnTouchListener onTouchListener){
-        if (!onTouchListeners.contains(onTouchListener)){
+    public void addOnTouchListener(final OnTouchListener onTouchListener) {
+        if (!onTouchListeners.contains(onTouchListener)) {
             onTouchListeners.add(onTouchListener);
         }
     }
 
-    public boolean removeOnTouchListener(final OnTouchListener onTouchListener){
+    public boolean removeOnTouchListener(final OnTouchListener onTouchListener) {
         return onTouchListeners.remove(onTouchListener);
     }
 
-    private void sendOnTouch(View view, MotionEvent event){
-        for (OnTouchListener onTouchListener : onTouchListeners){
+    private void sendOnTouch(View view, MotionEvent event) {
+        for (OnTouchListener onTouchListener : onTouchListeners) {
             onTouchListener.onTouch(view, event);
         }
     }
@@ -110,14 +110,23 @@ public class ValidEditText extends android.support.v7.widget.AppCompatEditText {
         this.clearOnTouch = clearOnTouch;
     }
 
-    public void setText(final String text, final boolean restoreCursorPosition){
+    /**
+     * Set the text and optionally retain the cursor position. The normal
+     * {@linkplain #setText(CharSequence)} method places the cursor at the beginning of the text,
+     * which is not always desired.
+     *
+     * @param text                  The text to set.
+     * @param restoreCursorPosition {@code true} if the cursor position should be restored after the
+     *                              text has been set.
+     */
+    public void setText(final String text, final boolean restoreCursorPosition) {
         final int oldCursorPosition = getSelectionStart();
         final int oldLength = getText().length();
         super.setText(text);
-        if (restoreCursorPosition){
+        if (restoreCursorPosition) {
             final int newCursorPosition = oldCursorPosition + (text.length() - oldLength);
             setSelection((newCursorPosition >= 0 && newCursorPosition <= length()) ? newCursorPosition : 0);
-        }else{
+        } else {
             setSelection(length());
         }
     }

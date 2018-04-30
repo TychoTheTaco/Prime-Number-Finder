@@ -1,13 +1,12 @@
 package com.tycho.app.primenumberfinder.utils;
 
-import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 
 import java.math.BigInteger;
 
 public class Validator {
 
-    public static boolean isPrimalityInputValid(final BigInteger input){
+    public static boolean isPrimalityInputValid(final BigInteger input) {
 
         //Number must be less than or equal to max long value
         if (input.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) >= 0) {
@@ -22,7 +21,7 @@ public class Validator {
         return true;
     }
 
-    public static boolean isFindPrimesRangeValid(final BigInteger start, final BigInteger end, final FindPrimesTask.SearchMethod searchMethod){
+    public static boolean isFindPrimesRangeValid(final BigInteger start, final BigInteger end, final FindPrimesTask.SearchMethod searchMethod) {
 
         //Number must be less than or equal to max long value
         if (start.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) >= 0 || end.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) >= 0) {
@@ -46,13 +45,21 @@ public class Validator {
         switch (searchMethod) {
             case SIEVE_OF_ERATOSTHENES:
 
-                //The start value must equal to 0
-                if (start.compareTo(BigInteger.ZERO) != 0) {
+                /*
+                The start value must be less than the max int value. The test for start < max has
+                already been done.
+                 */
+                if (start.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) >= 0) {
                     return false;
                 }
 
                 //The end value cannot be infinity
                 if (end.compareTo(BigInteger.valueOf(FindPrimesTask.INFINITY)) == 0) {
+                    return false;
+                }
+
+                //The end value must be less than the max int value
+                if (end.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) >= 0) {
                     return false;
                 }
 
@@ -67,6 +74,7 @@ public class Validator {
 
     /**
      * Check if this is a valid number to factor
+     *
      * @param input
      * @return
      */
