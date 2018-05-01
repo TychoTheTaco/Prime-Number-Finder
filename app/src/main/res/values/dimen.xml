@@ -38,4 +38,7 @@
     <dimen name="button_padding_bottom">8dp</dimen>
     <dimen name="button_padding_end">8dp</dimen>
 
+
+    <dimen name="expanded_toolbar_height">110dp</dimen>
+
 </resources>

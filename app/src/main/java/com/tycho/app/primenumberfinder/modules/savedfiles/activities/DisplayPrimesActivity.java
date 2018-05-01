@@ -5,19 +5,23 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableStringBuilder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.ExportOptionsDialog;
 import com.tycho.app.primenumberfinder.modules.savedfiles.FindNthNumberDialog;
@@ -43,6 +47,8 @@ public class DisplayPrimesActivity extends AbstractActivity {
     private static final String TAG = DisplayPrimesActivity.class.getSimpleName();
 
     private File file;
+
+    private TextView headerTextView;
 
     private RecyclerView recyclerView;
 
@@ -97,6 +103,18 @@ public class DisplayPrimesActivity extends AbstractActivity {
                     recyclerView.setAdapter(primesAdapter);
                     recyclerView.setItemAnimator(null);
                     recyclerView.addOnScrollListener(scrollListener);
+
+                    //Header text
+                    headerTextView = findViewById(R.id.text);
+
+                    ((AppBarLayout) findViewById(R.id.app_bar)).addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+
+                        @Override
+                        public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                            final int height = appBarLayout.getTotalScrollRange();
+                            headerTextView.setAlpha(1.0f - ((float) -verticalOffset) / height);
+                        }
+                    });
 
                     loadFile(file);
 
@@ -303,10 +321,16 @@ public class DisplayPrimesActivity extends AbstractActivity {
 
                 final int totalNumbers = FileManager.countTotalNumbersQuick(file);
                 scrollListener.setTotalNumbers(totalNumbers);
-                primesAdapter.setTotalPrimes(totalNumbers);
 
                 final List<Long> numbers = FileManager.readNumbers(file, 0, 1000);
                 primesAdapter.getPrimes().addAll(numbers);
+
+                //Set header text
+                headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getString(R.string.find_primes_subtitle_result), new String[]{
+                        NUMBER_FORMAT.format(totalNumbers),
+                        NUMBER_FORMAT.format(numbers.get(0)),
+                        numbers.get(1) == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(numbers.get(1)),
+                }, ContextCompat.getColor(getBaseContext(), R.color.purple_dark)));
 
                 handler.post(new Runnable() {
                     @Override
