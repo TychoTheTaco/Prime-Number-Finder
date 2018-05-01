@@ -89,15 +89,17 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
         for (Task task : PrimeNumberFinder.getTaskManager().getTasks()) {
             if (task instanceof FindPrimesTask || task instanceof CheckPrimalityTask) {
                 taskListAdapter.addTask(task);
-                Log.d(TAG, "Added: " + task);
             }
         }
         taskListAdapter.sortByTimeCreated();
 
         //Select correct task
+        Log.d(TAG, "Intent: " + intent);
+        Log.d(TAG, "taskListAdapter: " + taskListAdapter.getItemCount());
         if (intent == null || taskListAdapter.getItemCount() == 0) {
             taskListAdapter.setSelected(0);
         } else {
+            Log.d(TAG, "Task: " + PrimeNumberFinder.getTaskManager().findTaskById((UUID) intent.getSerializableExtra("taskId")));
             taskListAdapter.setSelected(PrimeNumberFinder.getTaskManager().findTaskById((UUID) intent.getSerializableExtra("taskId")));
         }
 

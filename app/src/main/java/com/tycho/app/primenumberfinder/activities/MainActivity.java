@@ -100,7 +100,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Set up analytics
+        //Initialize analytics
         if (PrimeNumberFinder.getPreferenceManager().isAllowAnalytics()) {
             Fabric.with(this, new Crashlytics());
         }else{
@@ -189,6 +189,8 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
                 }
             }).start();
         }
+
+        //FileManager.saveDebugFile(1, 10_000, new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "debug"));
     }
 
     @Override

@@ -146,8 +146,6 @@ public class DisplayPrimesActivity extends AbstractActivity {
 
         private int totalItemCount, lastVisibleItem, visibleThreshold = 0;
 
-        private volatile boolean loading = false;
-
         private final int INCREMENT = 250;
         private int firstItemIndex;
 
@@ -159,11 +157,9 @@ public class DisplayPrimesActivity extends AbstractActivity {
             lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
 
             if (totalItemCount - 1 <= (lastVisibleItem + visibleThreshold)) {
-                //Log.d(TAG, "TRIGGERED DOWN");
                 loadDown();
             } else if (linearLayoutManager.findFirstVisibleItemPosition() <= visibleThreshold) {
                 if (firstItemIndex > 0) {
-                    //Log.d(TAG, "TRIGGERED DOWN");
                     loadUp();
                 }
             }
@@ -171,7 +167,6 @@ public class DisplayPrimesActivity extends AbstractActivity {
         }
 
         private void loadUp() {
-            loading = true;
             //Log.d(TAG, "Size before: " + primesAdapter.getPrimes().size());
 
             //Remove items from end
@@ -200,7 +195,6 @@ public class DisplayPrimesActivity extends AbstractActivity {
                 @Override
                 public void run() {
                     primesAdapter.notifyItemRangeInserted(0, numbers.size());
-                    loading = false;
                 }
             });
 
@@ -209,7 +203,6 @@ public class DisplayPrimesActivity extends AbstractActivity {
         }
 
         private void loadDown() {
-            loading = true;
             //Log.d(TAG, "Size before: " + primesAdapter.getPrimes().size());
 
             //Read new items
@@ -237,7 +230,6 @@ public class DisplayPrimesActivity extends AbstractActivity {
                 @Override
                 public void run() {
                     primesAdapter.notifyItemRangeInserted(primesAdapter.getItemCount(), numbers.size());
-                    loading = false;
                 }
             });
 
@@ -249,7 +241,6 @@ public class DisplayPrimesActivity extends AbstractActivity {
         }
 
         private void specialScrollToPosition(final int position) {
-            loading = true;
             Log.d(TAG, "specialScrollTo: " + position);
 
             //Scroll to correct position
@@ -284,7 +275,6 @@ public class DisplayPrimesActivity extends AbstractActivity {
                 public void run() {
                     primesAdapter.notifyItemRangeInserted(0, primesAdapter.getItemCount());
                     recyclerView.scrollToPosition(position - scrollListener.firstItemIndex);
-                    loading = false;
                 }
             });
         }
@@ -311,7 +301,10 @@ public class DisplayPrimesActivity extends AbstractActivity {
             @Override
             public void run() {
 
-                scrollListener.setTotalNumbers(FileManager.countTotalNumbersQuick(file));
+                final int totalNumbers = FileManager.countTotalNumbersQuick(file);
+                scrollListener.setTotalNumbers(totalNumbers);
+                primesAdapter.setTotalPrimes(totalNumbers);
+
                 final List<Long> numbers = FileManager.readNumbers(file, 0, 1000);
                 primesAdapter.getPrimes().addAll(numbers);
 

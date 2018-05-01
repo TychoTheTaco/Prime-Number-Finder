@@ -675,12 +675,13 @@ public class FindPrimesTask extends MultithreadedTask {
                 break;
 
             case SIEVE_OF_ERATOSTHENES:
-                return ((SieveTask) getTasks().get(0)).status;
+                if (getTasks().size() > 0){
+                    return ((SieveTask) getTasks().get(0)).status;
+                }
+                break;
         }
         return String.valueOf(getState());
     }
-
-    // Android
 
     public static class SearchOptions extends GeneralSearchOptions {
 
