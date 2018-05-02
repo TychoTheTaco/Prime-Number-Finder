@@ -160,6 +160,7 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
         });
         editTextSearchRangeEnd.setClearOnTouch(false);
         editTextSearchRangeEnd.overrideDefaultTextWatcher();
+        editTextSearchRangeEnd.requestFocus();
 
         //Set up infinity button
         infinityButton = findViewById(R.id.infinity_button);
@@ -230,9 +231,6 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
 
         //Apply config
         applyConfig(searchOptions);
-
-        //Give the root view focus to prevent EditTexts from initially getting focus
-        findViewById(R.id.root).requestFocus();
     }
 
     class ThreadCountAdapter extends ArrayAdapter<String> {

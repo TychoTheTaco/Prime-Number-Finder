@@ -58,6 +58,9 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity {
     private TextView bodyTextView;
     private TreeView treeView;
 
+    private boolean allowExport;
+    private boolean allowDelete;
+
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
     private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
@@ -94,6 +97,9 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity {
 
                 //Start loading the file
                 loadFile(file);
+
+                allowExport = intent.getBooleanExtra("allowExport", false);
+                allowDelete = intent.getBooleanExtra("allowDelete", false);
 
             } else {
                 Log.e(TAG, "Invalid file path!");
@@ -221,6 +227,8 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.display_content_activity_menu, menu);
         menu.findItem(R.id.find).setVisible(false);
+        menu.findItem(R.id.export).setVisible(allowExport);
+        menu.findItem(R.id.delete).setVisible(allowDelete);
         return true;
     }
 

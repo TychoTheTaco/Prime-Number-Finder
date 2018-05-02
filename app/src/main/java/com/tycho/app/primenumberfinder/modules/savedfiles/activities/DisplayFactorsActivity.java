@@ -51,6 +51,9 @@ public class DisplayFactorsActivity extends AbstractActivity {
 
     private FactorsListAdapter adapter;
 
+    private boolean allowExport;
+    private boolean allowDelete;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,6 +110,9 @@ public class DisplayFactorsActivity extends AbstractActivity {
                     }
                 });
 
+                allowExport = intent.getBooleanExtra("allowExport", false);
+                allowDelete = intent.getBooleanExtra("allowDelete", false);
+
             } else {
                 Log.e(TAG, "Invalid file path!");
                 Toast.makeText(this, "Error loading file!", Toast.LENGTH_SHORT).show();
@@ -122,10 +128,9 @@ public class DisplayFactorsActivity extends AbstractActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.display_content_activity_menu, menu);
-
-        //Hide the export option if this is a temp file
-        menu.findItem(R.id.export).setVisible(!file.getName().equals("temp"));
         menu.findItem(R.id.find).setVisible(false);
+        menu.findItem(R.id.export).setVisible(allowExport);
+        menu.findItem(R.id.delete).setVisible(allowDelete);
 
         return true;
     }

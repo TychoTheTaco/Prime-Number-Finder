@@ -646,8 +646,8 @@ public final class FileManager {
         return (int) (Math.pow(10, n) - Math.pow(10, n - 1));
     }
 
-    public static int[] getPrimesRangeFromTitle(final File file){
-        final int[] range = new int[2];
+    public static long[] getPrimesRangeFromTitle(final File file){
+        final long[] range = new long[2];
 
         final Pattern pattern = Pattern.compile("\\d+");
         final Matcher matcher = pattern.matcher(file.getName());

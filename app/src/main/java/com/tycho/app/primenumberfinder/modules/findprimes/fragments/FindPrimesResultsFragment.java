@@ -2,17 +2,12 @@ package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -209,6 +204,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                         final Intent intent = new Intent(getActivity(), DisplayPrimesActivity.class);
                         intent.putExtra("filePath", file.getAbsolutePath());
                         intent.putExtra("enableSearch", true);
+                        intent.putExtra("range", new long[]{getTask().getStartValue(), getTask().getState() == Task.State.STOPPED ? getTask().getEndValue() : getTask().getCurrentValue()});
                         intent.putExtra("title", false);
                         getActivity().startActivity(intent);
                     }

@@ -66,6 +66,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
 
     private boolean allowExport;
     private boolean enableSearch;
+    private boolean allowDelete;
 
     private FloatingActionButton scrollToTopFab;
     private FloatingActionButton scrollToBottomFab;
@@ -125,6 +126,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
 
                 allowExport = intent.getBooleanExtra("allowExport", false);
                 enableSearch = intent.getBooleanExtra("enableSearch", false);
+                allowDelete = intent.getBooleanExtra("allowDelete", false);
 
                 //Set up scroll to top button
                 scrollToTopFab = findViewById(R.id.scroll_to_top_fab);
@@ -322,7 +324,12 @@ public class DisplayPrimesActivity extends AbstractActivity {
                 final List<Long> numbers = FileManager.readNumbers(file, 0, 1000);
                 primesAdapter.getPrimes().addAll(numbers);
 
-                final int[] range = FileManager.getPrimesRangeFromTitle(file);
+                final long[] range;
+                if (getIntent().getLongArrayExtra("range") != null){
+                    range = getIntent().getLongArrayExtra("range");
+                }else{
+                    range = FileManager.getPrimesRangeFromTitle(file);
+                }
 
                 //Set header text
                 headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getString(R.string.find_primes_subtitle_result), new String[]{
@@ -403,6 +410,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
         findButton = menu.findItem(R.id.find);
         findButton.setVisible(enableSearch);
         menu.findItem(R.id.export).setVisible(allowExport);
+        menu.findItem(R.id.delete).setVisible(allowDelete);
         return true;
     }
 

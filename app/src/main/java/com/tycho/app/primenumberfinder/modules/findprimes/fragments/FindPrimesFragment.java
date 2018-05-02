@@ -210,6 +210,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         //Set up range start input
         editTextSearchRangeStart = rootView.findViewById(R.id.search_range_start);
         editTextSearchRangeStart.setHint(NUMBER_FORMAT.format(0));
+        editTextSearchRangeStart.setAllowZeroInput(true);
         editTextSearchRangeStart.setText(NUMBER_FORMAT.format(searchOptions.getStartValue()));
         editTextSearchRangeStart.addTextChangedListener(new TextWatcher() {
 
@@ -232,7 +233,6 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                 editTextSearchRangeEnd.setValid(true);
             }
         });
-        editTextSearchRangeStart.setAllowZeroInput(true);
 
         //Set up range end input
         editTextSearchRangeEnd = rootView.findViewById(R.id.search_range_end);

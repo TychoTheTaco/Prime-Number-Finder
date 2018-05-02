@@ -5,30 +5,24 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.utils.FileType;
-import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimeFactorizationActivity;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayFactorsActivity;
+import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimeFactorizationActivity;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimesActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.FileType;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-
-import easytasks.Task;
 
 /**
  * @author Tycho Bellers
@@ -91,6 +85,7 @@ public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesS
                         intent.putExtra("filePath", file.getAbsolutePath());
                         intent.putExtra("allowExport", true);
                         intent.putExtra("enableSearch", true);
+                        intent.putExtra("allowDelete", true);
                         intent.putExtra("title", true);
                         context.startActivity(intent);
                     }
@@ -107,6 +102,7 @@ public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesS
                         intent.putExtra("filePath", file.getAbsolutePath());
                         intent.putExtra("allowExport", true);
                         intent.putExtra("title", true);
+                        intent.putExtra("allowDelete", true);
                         context.startActivity(intent);
                     }
                 });
@@ -121,6 +117,8 @@ public class SavedFilesSmallListAdapter extends RecyclerView.Adapter<SavedFilesS
                         Intent intent = new Intent(context, DisplayPrimeFactorizationActivity.class);
                         intent.putExtra("filePath", file.getAbsolutePath());
                         intent.putExtra("title", true);
+                        intent.putExtra("allowExport", true);
+                        intent.putExtra("allowDelete", true);
                         context.startActivity(intent);
                     }
                 });

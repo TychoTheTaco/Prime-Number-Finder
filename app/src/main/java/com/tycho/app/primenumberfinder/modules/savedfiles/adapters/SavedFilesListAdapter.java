@@ -14,12 +14,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.utils.FileType;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayFactorsActivity;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimeFactorizationActivity;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimesActivity;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.SavedFilesListActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.FileType;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
@@ -27,8 +27,6 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -200,6 +198,7 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                             intent.putExtra("filePath", file.getAbsolutePath());
                             intent.putExtra("allowExport", true);
                             intent.putExtra("enableSearch", true);
+                            intent.putExtra("allowDelete", true);
                             intent.putExtra("title", true);
                             context.startActivity(intent);
                             break;
@@ -208,6 +207,7 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                             intent = new Intent(context, DisplayFactorsActivity.class);
                             intent.putExtra("filePath", file.getAbsolutePath());
                             intent.putExtra("allowExport", true);
+                            intent.putExtra("allowDelete", true);
                             intent.putExtra("title", true);
                             context.startActivity(intent);
                             break;
@@ -216,6 +216,7 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
                             intent = new Intent(context, DisplayPrimeFactorizationActivity.class);
                             intent.putExtra("filePath", file.getAbsolutePath());
                             intent.putExtra("allowExport", true);
+                            intent.putExtra("allowDelete", true);
                             intent.putExtra("title", true);
                             context.startActivity(intent);
                             break;
