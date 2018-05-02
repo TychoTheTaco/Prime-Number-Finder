@@ -138,13 +138,6 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
 
             @Override
             public void afterTextChanged(Editable editable) {
-                //Format the number
-                final String formattedText = NUMBER_FORMAT.format(getNumberToFactor());
-                if (!editable.toString().equals(formattedText)) {
-                    editTextInput.setText(formattedText);
-                }
-                editTextInput.setSelection(formattedText.length());
-
                 //Check if the number is valid
                 editTextInput.setValid(Validator.isValidFactorInput(getNumberToFactor()));
             }

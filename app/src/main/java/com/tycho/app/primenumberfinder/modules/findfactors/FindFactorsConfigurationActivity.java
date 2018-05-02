@@ -2,13 +2,9 @@ package com.tycho.app.primenumberfinder.modules.findfactors;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,24 +12,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.RadioButton;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.AbstractActivity;
-import com.tycho.app.primenumberfinder.CustomRadioGroup;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.ValidEditText;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
@@ -44,9 +33,6 @@ import java.util.Random;
 import java.util.UUID;
 
 import easytasks.Task;
-
-import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchMethod.BRUTE_FORCE;
-import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES;
 
 /**
  * Created by tycho on 1/24/2018.
@@ -80,8 +66,6 @@ public class FindFactorsConfigurationActivity extends AbstractActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Utils.applyTheme(this, ContextCompat.getColor(this, R.color.orange_dark), ContextCompat.getColor(this, R.color.orange));
-
         //Set up number input
         editTextNumberToFactor = findViewById(R.id.number_input);
         editTextNumberToFactor.setClearOnTouch(false);
@@ -99,13 +83,6 @@ public class FindFactorsConfigurationActivity extends AbstractActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                //Format the number
-                final String formattedText = NUMBER_FORMAT.format(getNumberToFactor());
-                if (!editable.toString().equals(formattedText)) {
-                    editTextNumberToFactor.setText(formattedText);
-                }
-                editTextNumberToFactor.setSelection(formattedText.length());
-
                 //Check if the number is valid
                 editTextNumberToFactor.setValid(Validator.isValidFactorInput(getNumberToFactor()));
             }

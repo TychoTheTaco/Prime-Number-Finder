@@ -176,13 +176,6 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
             @Override
             public void afterTextChanged(Editable editable) {
-                //Format the number
-                final String formattedText = NUMBER_FORMAT.format(getPrimalityInput());
-                if (!editable.toString().equals(formattedText)) {
-                    editTextPrimalityInput.setText(formattedText);
-                }
-                editTextPrimalityInput.setSelection(formattedText.length());
-
                 //Check if the number is valid
                 editTextPrimalityInput.setValid(Validator.isPrimalityInputValid(getPrimalityInput()));
             }
@@ -232,17 +225,6 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
             @Override
             public void afterTextChanged(Editable editable) {
-
-                //Check if infinity
-                if (!editable.toString().equals(getString(R.string.infinity_text))) {
-
-                    //Format text
-                    final String formatted = NUMBER_FORMAT.format(getStartValue());
-                    if (editable.length() > 0 && !editable.toString().equals(formatted)) {
-                        editTextSearchRangeStart.setText(formatted, formatted.length() > 1);
-                    }
-                }
-
                 searchOptions.setStartValue(getStartValue().longValue());
 
                 //Check if the number is valid
@@ -250,6 +232,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                 editTextSearchRangeEnd.setValid(true);
             }
         });
+        editTextSearchRangeStart.setAllowZeroInput(true);
 
         //Set up range end input
         editTextSearchRangeEnd = rootView.findViewById(R.id.search_range_end);
@@ -293,6 +276,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                 editTextSearchRangeEnd.setValid(Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod()) && editTextSearchRangeEnd.length() != 0);
             }
         });
+        editTextSearchRangeEnd.overrideDefaultTextWatcher();
 
         //Set up infinity button
         final ImageButton infinityButton = rootView.findViewById(R.id.infinity_button);
@@ -389,7 +373,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
     private FindPrimesTask.SearchMethod determineBestSearchMethod() {
 
         //Check if end value is infinity or is greater than int range
-        if (getEndValue().longValue() == FindPrimesTask.INFINITY || getEndValue().compareTo(BigInteger.valueOf(Integer.MAX_VALUE - 1)) > 0){
+        if (getEndValue().longValue() == FindPrimesTask.INFINITY || getEndValue().compareTo(BigInteger.valueOf(Integer.MAX_VALUE - 1)) > 0) {
             return FindPrimesTask.SearchMethod.BRUTE_FORCE;
         }
 

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -90,8 +89,6 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Utils.applyTheme(this, ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));
-
         //Set up range start input
         editTextSearchRangeStart = findViewById(R.id.search_range_start);
         editTextSearchRangeStart.setHint(NUMBER_FORMAT.format(0));
@@ -109,18 +106,6 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-
-                //Check if infinity
-                if (!editable.toString().equals(getString(R.string.infinity_text))) {
-
-                    //Format text
-                    final String formatted = NUMBER_FORMAT.format(getStartValue());
-                    if (editable.length() > 0 && !editable.toString().equals(formatted)) {
-                        editTextSearchRangeStart.setText(formatted, formatted.length() > 1);
-                        applyConfig(searchOptions);
-                    }
-                }
-
                 searchOptions.setStartValue(getStartValue().longValue());
 
                 //Check if the number is valid
@@ -129,6 +114,7 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
             }
         });
         editTextSearchRangeStart.setClearOnTouch(false);
+        editTextSearchRangeStart.setAllowZeroInput(true);
 
         //Set up range end input
         editTextSearchRangeEnd = findViewById(R.id.search_range_end);
@@ -173,6 +159,7 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
             }
         });
         editTextSearchRangeEnd.setClearOnTouch(false);
+        editTextSearchRangeEnd.overrideDefaultTextWatcher();
 
         //Set up infinity button
         infinityButton = findViewById(R.id.infinity_button);

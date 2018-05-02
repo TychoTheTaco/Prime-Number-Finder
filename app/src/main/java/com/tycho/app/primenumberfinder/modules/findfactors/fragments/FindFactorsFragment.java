@@ -142,13 +142,6 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
 
             @Override
             public void afterTextChanged(Editable editable) {
-                //Format the number
-                final String formattedText = NUMBER_FORMAT.format(getNumberToFactor());
-                if (!editable.toString().equals(formattedText)) {
-                    editTextNumberToFactor.setText(formattedText);
-                }
-                editTextNumberToFactor.setSelection(formattedText.length());
-
                 //Check if the number is valid
                 editTextNumberToFactor.setValid(Validator.isValidFactorInput(getNumberToFactor()));
             }

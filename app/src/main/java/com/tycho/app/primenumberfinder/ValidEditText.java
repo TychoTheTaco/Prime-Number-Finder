@@ -2,10 +2,16 @@ package com.tycho.app.primenumberfinder;
 
 
 import android.content.Context;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.tycho.app.primenumberfinder.utils.Utils;
+
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -26,9 +32,16 @@ public class ValidEditText extends android.support.v7.widget.AppCompatEditText {
     private final CopyOnWriteArrayList<OnTouchListener> onTouchListeners = new CopyOnWriteArrayList<>();
 
     /**
+     * {@linkplain NumberFormat} instance used to format numbers with commas.
+     */
+    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
+
+    /**
      * {@code true} if the text should be cleared on a touch event.
      */
     private boolean clearOnTouch = true;
+
+    private boolean allowZeroInput = false;
 
     public ValidEditText(final Context context) {
         super(context);
@@ -65,7 +78,35 @@ public class ValidEditText extends android.support.v7.widget.AppCompatEditText {
                 return false;
             }
         });
+        addTextChangedListener(textWatcher);
     }
+
+    public void overrideDefaultTextWatcher() {
+        removeTextChangedListener(textWatcher);
+    }
+
+    private final TextWatcher textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            //Format text
+            final String formatted = NUMBER_FORMAT.format(Utils.textToNumber(getText().toString()));
+            if (editable.length() > 0 && !editable.toString().equals(formatted)) {
+                setText(formatted, formatted.length() > 1);
+            } else if (!allowZeroInput && editable.toString().equals(NUMBER_FORMAT.format(0))) {
+                getText().clear();
+            }
+        }
+    };
 
     @Override
     protected int[] onCreateDrawableState(int extraSpace) {
@@ -79,6 +120,10 @@ public class ValidEditText extends android.support.v7.widget.AppCompatEditText {
     public void setValid(final boolean valid) {
         this.valid = valid;
         refreshDrawableState();
+    }
+
+    public void setAllowZeroInput(boolean allowZeroInput) {
+        this.allowZeroInput = allowZeroInput;
     }
 
     @Override
