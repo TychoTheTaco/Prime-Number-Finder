@@ -18,12 +18,14 @@
     <color name="purple_light">#9575CD</color> <!-- 300 -->
     <color name="purple">#673AB7</color> <!-- 500 -->
     <color name="purple_dark">#4527A0</color> <!-- 800 -->
+    <color name="purple_inverse">#BAD85F</color>
 
     <!-- Factors (Deep Orange) -->
     <color name="orange_very_light">#FBE9E7</color> <!-- 50 -->
     <color name="orange_light">#FF8A65</color> <!-- 300 -->
     <color name="orange">#FF5722</color> <!-- 500 -->
     <color name="orange_dark">#D84315</color> <!-- 800 -->
+    <color name="orange_inverse">#27BCEA</color>
 
     <!-- Prime factorization (Green) -->
     <color name="green_very_light">#E8F5E9</color> <!-- 50 -->

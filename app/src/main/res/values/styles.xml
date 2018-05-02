@@ -1,80 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Base application theme -->
+    <!-- Default themes -->
     <style name="Default" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="colorControlActivated">?attr/colorAccent</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="colorControlActivated">@color/accent</item>
+
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
-
-    <style name="Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
-
     <style name="Default.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@color/primary_dark</item>
-        <!--<item name="android:popupMenuStyle">@style/popupMenu</item>-->
     </style>
-
-    <style name="AppBarOverlay" parent="Default"/>
-
-    <!-- Find Primes Theme -->
-    <style name="FindPrimesActivity" parent="Default.NoActionBar">
-        <item name="colorPrimary">@color/purple</item>
-        <item name="colorPrimaryDark">@color/purple_dark</item>
-        <item name="colorAccent">@color/purple</item>
-        <item name="colorControlActivated">@color/purple</item>
-    </style>
-
-    <style name="FindPrimesDialog" parent="Base.Theme.AppCompat.Light.Dialog">
-        <item name="colorPrimary">@color/purple</item>
-        <item name="colorPrimaryDark">@color/purple_dark</item>
-        <item name="colorAccent">@color/purple</item>
-        <item name="colorControlActivated">@color/purple</item>
-    </style>
-
-    <!-- Find Factors Theme -->
-    <style name="FindFactorsActivity" parent="Default.NoActionBar">
-        <item name="colorPrimary">@color/orange</item>
-        <item name="colorPrimaryDark">@color/orange_dark</item>
-        <item name="colorAccent">@color/orange</item>
-        <item name="colorControlActivated">@color/orange</item>
-    </style>
-
-    <style name="FindFactorsDialog" parent="Base.Theme.AppCompat.Light.Dialog">
-        <item name="colorPrimary">@color/orange</item>
-        <item name="colorPrimaryDark">@color/orange_dark</item>
-        <item name="colorAccent">@color/orange</item>
-        <item name="colorControlActivated">@color/orange</item>
-    </style>
-
-    <!-- Prime Factorization Theme -->
-    <style name="PrimeFactorizationActivity" parent="Default.NoActionBar">
-        <item name="colorPrimary">@color/green</item>
-        <item name="colorPrimaryDark">@color/green_dark</item>
-        <item name="colorAccent">@color/green</item>
-        <item name="colorControlActivated">@color/green</item>
-    </style>
-
-    <style name="PrimeFactorizationDialog" parent="Base.Theme.AppCompat.Light.Dialog">
-        <item name="colorPrimary">@color/green</item>
-        <item name="colorPrimaryDark">@color/green_dark</item>
-        <item name="colorAccent">@color/green</item>
-        <item name="colorControlActivated">@color/green</item>
-    </style>
-
-
-    <!-- Toolbar popup menu -->
-    <style name="PopupOverlay" parent="Default">
+    <style name="Default.Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <style name="Default.Dialog" parent="Base.Theme.AppCompat.Light.Dialog"/>
+    <style name="Default.PopupOverlay">
         <item name="android:colorBackground">@color/primary_light</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
+
+    <!-- Find Primes Theme -->
+    <style name="FindPrimes" parent="Default.NoActionBar">
+        <item name="colorPrimary">@color/purple</item>
+        <item name="colorPrimaryDark">@color/purple_dark</item>
+        <item name="colorAccent">@color/purple</item>
+    </style>
+    <style name="FindPrimes.Activity">
+        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
+    </style>
+    <style name="FindPrimes.Dialog" parent="Default.Dialog">
+        <item name="colorPrimary">@color/purple</item>
+        <item name="colorPrimaryDark">@color/purple_dark</item>
+        <item name="colorAccent">@color/purple</item>
+    </style>
+    <style name="FindPrimes.PopupOverlay">
+        <item name="android:colorBackground">@color/purple_light</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <!-- Find Factors themes-->
+    <style name="FindFactors" parent="Default.NoActionBar">
+        <item name="colorPrimary">@color/orange</item>
+        <item name="colorPrimaryDark">@color/orange_dark</item>
+        <item name="colorAccent">@color/orange</item>
+    </style>
+    <style name="FindFactors.Activity">
+        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
+    </style>
+    <style name="FindFactors.Dialog" parent="Default.Dialog">
+        <item name="colorPrimary">@color/orange</item>
+        <item name="colorPrimaryDark">@color/orange_dark</item>
+        <item name="colorAccent">@color/orange</item>
+    </style>
+    <style name="FindFactors.PopupOverlay">
+        <item name="android:colorBackground">@color/orange_light</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <!-- Prime Factorization themes-->
+    <style name="PrimeFactorization" parent="Default.NoActionBar">
+        <item name="colorPrimary">@color/green</item>
+        <item name="colorPrimaryDark">@color/green_dark</item>
+        <item name="colorAccent">@color/green</item>
+    </style>
+    <style name="PrimeFactorization.Activity">
+        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
+    </style>
+    <style name="PrimeFactorization.Dialog" parent="Default.Dialog">
+        <item name="colorPrimary">@color/green</item>
+        <item name="colorPrimaryDark">@color/green_dark</item>
+        <item name="colorAccent">@color/green</item>
+    </style>
+    <style name="PrimeFactorization.PopupOverlay">
+        <item name="android:colorBackground">@color/green_light</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
 
     <style name="DefaultText">
         <item name="android:textSize">14sp</item>

@@ -3,11 +3,9 @@ package com.tycho.app.primenumberfinder.modules.savedfiles.activities;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -19,14 +17,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.RotateAnimation;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.jaredrummler.android.colorpicker.ColorPickerDialogListener;
 import com.tycho.app.primenumberfinder.AbstractActivity;
-import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.TreeView;
 import com.tycho.app.primenumberfinder.modules.savedfiles.FactorTreeExportOptionsActivity;
@@ -77,10 +71,9 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity{
 
         //Set up the toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setPopupTheme(R.style.PrimeFactorization_PopupOverlay);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        Utils.applyTheme(this, ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
 
         //Get the intent
         final Intent intent = getIntent();

@@ -1,31 +1,22 @@
 package com.tycho.app.primenumberfinder.modules.savedfiles.activities;
 
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
+import android.text.SpannableStringBuilder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.AbstractActivity;
-import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.ExportOptionsDialog;
@@ -36,7 +27,6 @@ import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * @author Tycho Bellers
@@ -52,6 +42,8 @@ public class DisplayFactorsActivity extends AbstractActivity{
 
     private File file;
 
+    private TextView headerTextView;
+
     private RecyclerView recyclerView;
 
     private FactorsListAdapter adapter;
@@ -63,10 +55,9 @@ public class DisplayFactorsActivity extends AbstractActivity{
 
         //Set up the toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setPopupTheme(R.style.FindFactors_PopupOverlay);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        Utils.applyTheme(this, ContextCompat.getColor(this, R.color.orange_dark), ContextCompat.getColor(this, R.color.orange));
 
         //Get the intent
         final Intent intent = getIntent();
@@ -94,6 +85,19 @@ public class DisplayFactorsActivity extends AbstractActivity{
                     if (number != 0){
                         adapter.setNumber(number);
                     }
+
+                    //Header text
+                    headerTextView = findViewById(R.id.text);
+
+                    //Set up toolbar animation
+                    ((AppBarLayout) findViewById(R.id.app_bar)).addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+
+                        @Override
+                        public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                            final int height = appBarLayout.getTotalScrollRange();
+                            headerTextView.setAlpha(1.0f - ((float) -verticalOffset) / height);
+                        }
+                    });
 
                     file = new File(filePath);
                     loadFile(file);
@@ -136,7 +140,7 @@ public class DisplayFactorsActivity extends AbstractActivity{
         switch (item.getItemId()){
 
             case R.id.export:
-                final ExportOptionsDialog exportOptionsDialog = new ExportOptionsDialog(this, file, R.style.FindFactorsDialog);
+                final ExportOptionsDialog exportOptionsDialog = new ExportOptionsDialog(this, file, R.style.FindFactors_Dialog);
                 exportOptionsDialog.show();
                 break;
 
@@ -158,6 +162,12 @@ public class DisplayFactorsActivity extends AbstractActivity{
 
                 final List<Long> numbers = FileManager.readNumbers(file);
                 adapter.getFactors().addAll(numbers);
+
+                //Set header text
+                headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.find_factors_subtitle_results, numbers.size()), new String[]{
+                        NUMBER_FORMAT.format(numbers.get(numbers.size() - 1)),
+                        NUMBER_FORMAT.format(numbers.size()),
+                }, ContextCompat.getColor(getBaseContext(), R.color.orange_inverse)));
 
                 new Handler(getMainLooper()).post(new Runnable(){
                     @Override

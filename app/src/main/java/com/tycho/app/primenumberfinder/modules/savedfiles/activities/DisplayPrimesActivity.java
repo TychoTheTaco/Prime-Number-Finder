@@ -74,10 +74,9 @@ public class DisplayPrimesActivity extends AbstractActivity {
 
         //Set up the toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setPopupTheme(R.style.FindPrimes_PopupOverlay);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        Utils.applyTheme(this, ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));
 
         //Get the intent
         final Intent intent = getIntent();
@@ -107,6 +106,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
                     //Header text
                     headerTextView = findViewById(R.id.text);
 
+                    //Set up toolbar animation
                     ((AppBarLayout) findViewById(R.id.app_bar)).addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
 
                         @Override
@@ -330,7 +330,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
                         NUMBER_FORMAT.format(totalNumbers),
                         NUMBER_FORMAT.format(numbers.get(0)),
                         numbers.get(1) == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(numbers.get(1)),
-                }, ContextCompat.getColor(getBaseContext(), R.color.purple_dark)));
+                }, ContextCompat.getColor(getBaseContext(), R.color.purple_inverse)));
 
                 handler.post(new Runnable() {
                     @Override
@@ -417,7 +417,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
                 break;
 
             case R.id.export:
-                final ExportOptionsDialog exportOptionsDialog = new ExportOptionsDialog(this, file, R.style.FindPrimesDialog);
+                final ExportOptionsDialog exportOptionsDialog = new ExportOptionsDialog(this, file, R.style.FindPrimes_Dialog);
                 exportOptionsDialog.show();
                 break;
         }

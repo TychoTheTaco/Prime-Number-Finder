@@ -1,50 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/coordinatorLayout_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context=".activities.MainActivity">
+    android:fitsSystemWindows="true">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/app_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/homeCollapseToolbar"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/expanded_toolbar_height"
-            app:titleEnabled="false"
-            android:animateLayoutChanges="true"
-            android:fitsSystemWindows="true"
-            app:contentScrim="?attr/colorPrimary"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:theme="@style/Toolbar"
-                app:layout_collapseMode="pin"
-                app:popupTheme="@style/PopupOverlay" />
-
-            <TextView
-                android:id="@+id/text"
-                style="@style/DefaultText"
-                android:textColor="@color/primary_text_light"
-                android:layout_width="wrap_content"
-                android:padding="8dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom" />
-
-        </android.support.design.widget.CollapsingToolbarLayout>
-
-    </android.support.design.widget.AppBarLayout>
+    <include layout="@layout/collapsing_app_bar"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"

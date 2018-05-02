@@ -29,34 +29,34 @@
             android:label="Saved Files"/>
 
         <activity
-            android:theme="@style/FindPrimesActivity"
+            android:theme="@style/FindPrimes.Activity"
             android:windowSoftInputMode="adjustPan"
             android:name=".modules.savedfiles.activities.DisplayPrimesActivity"
             android:label="Primes"/>
 
         <activity
-            android:theme="@style/FindPrimesActivity"
+            android:theme="@style/FindPrimes.Activity"
             android:name=".modules.findprimes.FindPrimesConfigurationActivity"
             android:label="Configure Task"/>
 
         <activity
-            android:theme="@style/FindFactorsActivity"
+            android:theme="@style/FindFactors.Activity"
             android:name=".modules.findfactors.FindFactorsConfigurationActivity"
             android:label="Configure Task"/>
 
         <activity
-            android:theme="@style/PrimeFactorizationActivity"
+            android:theme="@style/PrimeFactorization.Activity"
             android:name=".modules.primefactorization.PrimeFactorizationConfigurationActivity"
             android:label="Configure Task"/>
 
         <activity
-            android:theme="@style/FindFactorsActivity"
+            android:theme="@style/FindFactors.Activity"
             android:windowSoftInputMode="adjustPan"
             android:name=".modules.savedfiles.activities.DisplayFactorsActivity"
             android:label="Factors"/>
 
         <activity
-            android:theme="@style/PrimeFactorizationActivity"
+            android:theme="@style/PrimeFactorization.Activity"
             android:name=".modules.savedfiles.activities.DisplayPrimeFactorizationActivity"
             android:label="Prime Factorization"/>
 
