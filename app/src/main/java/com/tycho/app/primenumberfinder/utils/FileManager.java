@@ -30,6 +30,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import easytasks.Task;
 import simpletrees.Tokenizer;
@@ -642,5 +644,28 @@ public final class FileManager {
 
     public static int numbersWithNDigits(final int n){
         return (int) (Math.pow(10, n) - Math.pow(10, n - 1));
+    }
+
+    public static int[] getPrimesRangeFromTitle(final File file){
+        final int[] range = new int[2];
+
+        final Pattern pattern = Pattern.compile("\\d+");
+        final Matcher matcher = pattern.matcher(file.getName());
+        for (int i = 0; i < 2; i++){
+            if (matcher.find()){
+                range[i] = Integer.valueOf(matcher.group());
+            }
+        }
+
+        return range;
+    }
+
+    public static int getNumberFromTitle(final File file){
+        final Pattern pattern = Pattern.compile("\\d+");
+        final Matcher matcher = pattern.matcher(file.getName());
+        if (matcher.find()){
+            return Integer.valueOf(matcher.group());
+        }
+        return 0;
     }
 }

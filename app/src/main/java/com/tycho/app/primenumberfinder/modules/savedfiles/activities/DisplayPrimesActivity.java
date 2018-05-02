@@ -1,11 +1,14 @@
 package com.tycho.app.primenumberfinder.modules.savedfiles.activities;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -82,73 +85,67 @@ public class DisplayPrimesActivity extends AbstractActivity {
         final Intent intent = getIntent();
         if (intent != null) {
 
-            //Get extras from the intent
-            final Bundle extras = intent.getExtras();
-            if (extras != null) {
+            //Get the file path from the extras
+            final String filePath = intent.getStringExtra("filePath");
+            if (filePath != null) {
 
-                //Get the file path from the extras
-                final String filePath = extras.getString("filePath");
-                if (filePath != null) {
+                file = new File(filePath);
 
-                    file = new File(filePath);
-
-                    //Set up adapter
-                    primesAdapter = new PrimesAdapter(this);
-
-                    //Set up RecyclerView
-                    recyclerView = findViewById(R.id.recyclerView);
-                    recyclerView.setHasFixedSize(true);
-                    recyclerView.setLayoutManager(linearLayoutManager);
-                    recyclerView.setAdapter(primesAdapter);
-                    recyclerView.setItemAnimator(null);
-                    recyclerView.addOnScrollListener(scrollListener);
-
-                    //Header text
-                    headerTextView = findViewById(R.id.text);
-
-                    //Set up toolbar animation
-                    ((AppBarLayout) findViewById(R.id.app_bar)).addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-
-                        @Override
-                        public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                            final int height = appBarLayout.getTotalScrollRange();
-                            headerTextView.setAlpha(1.0f - ((float) -verticalOffset) / height);
-                        }
-                    });
-
-                    loadFile(file);
-
-                    if (extras.getBoolean("title", true)) {
-                        setTitle(formatTitle(file.getName().split("\\.")[0]));
-                    }
-
-                    allowExport = extras.getBoolean("allowExport", false);
-                    enableSearch = extras.getBoolean("enableSearch", false);
-
-                    //Set up floating action buttons
-                    scrollToTopFab = findViewById(R.id.scroll_to_top_fab);
-                    scrollToTopFab.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            scrollListener.specialScrollToPosition(0);
-                        }
-                    });
-
-                    scrollToBottomFab = findViewById(R.id.scroll_to_bottom_fab);
-                    scrollToBottomFab.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            scrollListener.specialScrollToPosition(scrollListener.totalNumbers - 1);
-                        }
-                    });
-
-                } else {
-                    Log.e(TAG, "Invalid file path!");
-                    Toast.makeText(this, "Error loading file!", Toast.LENGTH_SHORT).show();
-                    finish();
+                //Set a custom title if there is one
+                if (intent.getBooleanExtra("title", true)) {
+                    setTitle(formatTitle(file.getName().split("\\.")[0]));
                 }
+
+                //Set up adapter
+                primesAdapter = new PrimesAdapter(this);
+
+                //Set up RecyclerView
+                recyclerView = findViewById(R.id.recyclerView);
+                recyclerView.setHasFixedSize(true);
+                recyclerView.setLayoutManager(linearLayoutManager);
+                recyclerView.setAdapter(primesAdapter);
+                recyclerView.setItemAnimator(null);
+                recyclerView.addOnScrollListener(scrollListener);
+
+                //Header text
+                headerTextView = findViewById(R.id.text);
+
+                //Start loading the file
+                loadFile(file);
+
+                //Set up toolbar animation
+                ((AppBarLayout) findViewById(R.id.app_bar)).addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+
+                    @Override
+                    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                        final int height = appBarLayout.getTotalScrollRange();
+                        headerTextView.setAlpha(1.0f - ((float) -verticalOffset) / height);
+                    }
+                });
+
+                allowExport = intent.getBooleanExtra("allowExport", false);
+                enableSearch = intent.getBooleanExtra("enableSearch", false);
+
+                //Set up scroll to top button
+                scrollToTopFab = findViewById(R.id.scroll_to_top_fab);
+                scrollToTopFab.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        scrollListener.specialScrollToPosition(0);
+                    }
+                });
+
+                //Set up scroll to bottom button
+                scrollToBottomFab = findViewById(R.id.scroll_to_bottom_fab);
+                scrollToBottomFab.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        scrollListener.specialScrollToPosition(scrollListener.totalNumbers - 1);
+                    }
+                });
+
             } else {
-                Log.e(TAG, "Intent had no extras!");
+                Log.e(TAG, "Invalid file path!");
                 Toast.makeText(this, "Error loading file!", Toast.LENGTH_SHORT).show();
                 finish();
             }
@@ -217,7 +214,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
             });
 
             firstItemIndex -= numbers.size();
-           // Log.d(TAG, "Size after: " + primesAdapter.getPrimes().size());
+            // Log.d(TAG, "Size after: " + primesAdapter.getPrimes().size());
         }
 
         private void loadDown() {
@@ -227,7 +224,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
             final List<Long> numbers = new ArrayList<>();
             final boolean endOfFile = FileManager.readNumbers(file, numbers, firstItemIndex + totalItemCount, INCREMENT);
 
-            if (!endOfFile){
+            if (!endOfFile) {
                 //Remove items
                 final Iterator<Long> iterator = primesAdapter.getPrimes().iterator();
                 for (int i = 0; i < INCREMENT; i++) {
@@ -251,7 +248,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
                 }
             });
 
-            if (!endOfFile){
+            if (!endOfFile) {
                 firstItemIndex += numbers.size();
             }
 
@@ -267,12 +264,12 @@ public class DisplayPrimesActivity extends AbstractActivity {
 
             //Try to read from start
             startIndex -= INCREMENT;
-            if (startIndex < 0){
+            if (startIndex < 0) {
                 startIndex = 0;
             }
             final boolean endOfFile = FileManager.readNumbers(file, numbers, startIndex, primesAdapter.getItemCount());
 
-            if (endOfFile){
+            if (endOfFile) {
                 int previousSize = 0;
                 while (FileManager.readNumbers(file, numbers, startIndex, primesAdapter.getItemCount()) && previousSize != numbers.size()) {
                     //Log.d(TAG, "Read " + numbers.size());
@@ -325,12 +322,28 @@ public class DisplayPrimesActivity extends AbstractActivity {
                 final List<Long> numbers = FileManager.readNumbers(file, 0, 1000);
                 primesAdapter.getPrimes().addAll(numbers);
 
+                final int[] range = FileManager.getPrimesRangeFromTitle(file);
+
                 //Set header text
                 headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getString(R.string.find_primes_subtitle_result), new String[]{
                         NUMBER_FORMAT.format(totalNumbers),
-                        NUMBER_FORMAT.format(numbers.get(0)),
-                        numbers.get(1) == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(numbers.get(1)),
+                        NUMBER_FORMAT.format(range[0]),
+                        range[1] == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(range[1]),
                 }, ContextCompat.getColor(getBaseContext(), R.color.purple_inverse)));
+
+                //Set correct height based on the height of the header text view
+                headerTextView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        final int defaultHeight = getSupportActionBar().getHeight();
+                        final int textHeight = headerTextView.getHeight();
+
+                        final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.homeCollapseToolbar);
+                        final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
+                        layoutParams.height = (int) (defaultHeight + textHeight + Utils.dpToPx(getBaseContext(), 12.5f));
+                        collapsingToolbarLayout.setLayoutParams(layoutParams);
+                    }
+                });
 
                 handler.post(new Runnable() {
                     @Override
@@ -419,6 +432,27 @@ public class DisplayPrimesActivity extends AbstractActivity {
             case R.id.export:
                 final ExportOptionsDialog exportOptionsDialog = new ExportOptionsDialog(this, file, R.style.FindPrimes_Dialog);
                 exportOptionsDialog.show();
+                break;
+
+            case R.id.delete:
+                final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+                alertDialog.setTitle("Warning");
+                alertDialog.setMessage("Are you sure you want to delete this saved file?");
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Delete",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                file.delete();
+                                alertDialog.dismiss();
+                                finish();
+                            }
+                        });
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                alertDialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
                 break;
         }
 

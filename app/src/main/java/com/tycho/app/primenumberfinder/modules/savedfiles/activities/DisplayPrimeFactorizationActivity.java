@@ -1,6 +1,8 @@
 package com.tycho.app.primenumberfinder.modules.savedfiles.activities;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -41,7 +43,7 @@ import simpletrees.Tree;
  * Created by tycho on 11/12/2017.
  */
 
-public class DisplayPrimeFactorizationActivity extends AbstractActivity{
+public class DisplayPrimeFactorizationActivity extends AbstractActivity {
 
     /**
      * Tag used for logging and debugging.
@@ -77,35 +79,28 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity{
 
         //Get the intent
         final Intent intent = getIntent();
-        if (intent != null){
+        if (intent != null) {
 
-            //Get extras from the intent
-            final Bundle extras = intent.getExtras();
-            if (extras != null){
+            //Get the file path from the extras
+            final String filePath = intent.getStringExtra("filePath");
+            if (filePath != null) {
 
-                //Get the file path from the extras
-                final String filePath = extras.getString("filePath");
-                if (filePath != null){
+                file = new File(filePath);
 
-                    file = new File(filePath);
-                    loadFile(file);
-
-                    if (extras.getBoolean("title")){
-                        //setTitleTextView(formatTitle(file.getName().split("\\.")[0]));
-                        setTitle("Prime Factorization");
-                    }
-
-                }else{
-                    Log.e(TAG, "Invalid file path!");
-                    Toast.makeText(this, "Error loading file!", Toast.LENGTH_SHORT).show();
-                    finish();
+                //Set a custom title if there is one
+                if (intent.getBooleanExtra("title", true)) {
+                    setTitle(formatTitle(file.getName().split("\\.")[0]));
                 }
-            }else{
-                Log.e(TAG, "Intent had no extras!");
+
+                //Start loading the file
+                loadFile(file);
+
+            } else {
+                Log.e(TAG, "Invalid file path!");
                 Toast.makeText(this, "Error loading file!", Toast.LENGTH_SHORT).show();
                 finish();
             }
-        }else{
+        } else {
             Log.e(TAG, "Activity was started without an intent!");
             Toast.makeText(this, "Error loading file!", Toast.LENGTH_SHORT).show();
             finish();
@@ -113,13 +108,13 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity{
 
     }
 
-    private void loadFile(final File file){
+    private void loadFile(final File file) {
         final ProgressDialog progressDialog = ProgressDialog.show(this, "Loading...", "Loading file.");
 
         //Load file in another thread
-        new Thread(new Runnable(){
+        new Thread(new Runnable() {
             @Override
-            public void run(){
+            public void run() {
 
                 factorTree = FileManager.getInstance().readTree(file);
                 progressDialog.dismiss();
@@ -148,7 +143,7 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity{
                         int position = spannableStringBuilder.length();
                         spannableStringBuilder.append(" = ");
                         spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                        for (Object factor : map.keySet()){
+                        for (Object factor : map.keySet()) {
                             position = spannableStringBuilder.length();
                             String content = NUMBER_FORMAT.format(factor);
                             spannableStringBuilder.append(content);
@@ -176,24 +171,24 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity{
         }).start();
     }
 
-    private void getPrimeFactors(final Map<Long, Integer> map, final Tree<Long> tree){
-        if (tree.getChildren().size() > 0){
-            for (Tree child : tree.getChildren()){
+    private void getPrimeFactors(final Map<Long, Integer> map, final Tree<Long> tree) {
+        if (tree.getChildren().size() > 0) {
+            for (Tree child : tree.getChildren()) {
                 getPrimeFactors(map, child);
             }
-        }else{
-            if (map.get(tree.getValue()) == null){
-                map.put(tree.getValue(),  1);
-            }else{
+        } else {
+            if (map.get(tree.getValue()) == null) {
+                map.put(tree.getValue(), 1);
+            } else {
                 map.put(tree.getValue(), map.get(tree.getValue()) + 1);
             }
 
         }
     }
 
-    private String formatTitle(final String string){
+    private String formatTitle(final String string) {
 
-        try{
+        try {
             //Replace all the numbers
             String replaceNumbers = string.replaceAll("[0-9]+", "<number>");
 
@@ -203,20 +198,21 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity{
             //Get all numbers from the string
             String numbers[] = onlyNumbers.trim().split("<text>");
             final List<Long> formattedNumbers = new ArrayList<>();
-            for (String numberString : numbers){
-                if (!numberString.equals("")){
+            for (String numberString : numbers) {
+                if (!numberString.equals("")) {
                     formattedNumbers.add(Long.valueOf(numberString));
                 }
             }
 
             //Replace all place holders with formatted numbers
             String title = replaceNumbers;
-            for (int i = 0; i < formattedNumbers.size(); i++){
+            for (int i = 0; i < formattedNumbers.size(); i++) {
                 title = title.replaceFirst("<number>", NumberFormat.getInstance().format(formattedNumbers.get(i)));
             }
 
             return title;
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
 
         return string;
     }
@@ -231,7 +227,7 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity{
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
                 break;
@@ -240,6 +236,27 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity{
                 final Intent intent = new Intent(this, FactorTreeExportOptionsActivity.class);
                 intent.putExtra("filePath", file.getAbsolutePath());
                 startActivity(intent);
+                break;
+
+            case R.id.delete:
+                final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+                alertDialog.setTitle("Warning");
+                alertDialog.setMessage("Are you sure you want to delete this saved file?");
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Delete",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                file.delete();
+                                alertDialog.dismiss();
+                                finish();
+                            }
+                        });
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                alertDialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
                 break;
         }
 
