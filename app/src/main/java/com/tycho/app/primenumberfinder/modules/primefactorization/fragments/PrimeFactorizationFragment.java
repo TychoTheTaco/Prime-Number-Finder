@@ -171,7 +171,7 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
         rootView.requestFocus();
 
         //Scroll to Results fragment if started from a notification
-        if (intent.getSerializableExtra("taskId") != null){
+        if (intent != null && intent.getSerializableExtra("taskId") != null){
             viewPager.setCurrentItem(1);
         }
 

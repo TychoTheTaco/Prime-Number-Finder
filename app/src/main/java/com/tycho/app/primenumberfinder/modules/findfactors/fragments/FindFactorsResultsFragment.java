@@ -1,8 +1,7 @@
 package com.tycho.app.primenumberfinder.modules.findfactors.fragments;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,11 +10,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.TextUtils;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,11 +24,9 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesResultsFragment;
+import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayFactorsActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
@@ -104,9 +97,9 @@ public class FindFactorsResultsFragment extends ResultsFragment{
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        adapter = new FactorsListAdapter(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        adapter = new FactorsListAdapter(context);
 
         //Set up progress animation
         rotate.setDuration(3000);
@@ -203,6 +196,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
 
                         final Intent intent = new Intent(getActivity(), DisplayFactorsActivity.class);
                         intent.putExtra("filePath", file.getAbsolutePath());
+                        intent.putExtra("title", false);
                         intent.putExtra("number", getTask().getNumber());
                         getActivity().startActivity(intent);
                     }

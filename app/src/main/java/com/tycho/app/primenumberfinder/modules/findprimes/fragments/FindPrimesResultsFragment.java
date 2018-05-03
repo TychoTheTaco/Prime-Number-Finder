@@ -1,6 +1,6 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -97,8 +97,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
 
         //Set up progress animation
         rotate.setDuration(3000);

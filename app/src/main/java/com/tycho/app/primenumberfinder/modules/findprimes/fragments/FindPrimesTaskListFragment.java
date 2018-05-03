@@ -138,6 +138,7 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
         Crashlytics.log(Log.DEBUG, TAG, "isAdded: " + isAdded());
         Crashlytics.log(Log.DEBUG, TAG, "isDetached: " + isDetached());
         Crashlytics.log(Log.DEBUG, TAG, "getView: " + getView());
+        Crashlytics.log(Log.DEBUG, TAG, "taskListAdapter: " + taskListAdapter);
         taskListAdapter.addTask(task);
         recyclerView.scrollToPosition(taskListAdapter.getItemCount() - 1);
         update();

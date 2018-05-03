@@ -2,8 +2,6 @@ package com.tycho.app.primenumberfinder.activities;
 
 import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -35,11 +33,9 @@ import com.tycho.app.primenumberfinder.modules.primefactorization.fragments.Prim
 import com.tycho.app.primenumberfinder.modules.savedfiles.SavedFilesFragment;
 import com.tycho.app.primenumberfinder.settings.SettingsFragment;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.OneToOneMap;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -75,11 +71,6 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
     private Fragment currentFragment;
 
     /**
-     * This handler is used for posting to the UI thread.
-     */
-    private final Handler handler = new Handler(Looper.getMainLooper());
-
-    /**
      * This is the main {@linkplain FloatingActionButton} of the activity. It can be used by any
      * fragments that implement the {@linkplain FloatingActionButtonListener} interface.
      */
@@ -87,12 +78,9 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
 
     /**
      * Maps drawer item ids to the corresponding fragment tag. The ids and tags are used to find
-     * the corresponding fragment when a new drawer item is selected. This is a {@linkplain Map}
-     * instead of a {@linkplain android.util.SparseArray} because fragment ID's can be any integer
-     * value, meaning a {@linkplain android.util.SparseArray} would cause a lot of wasted space for
-     * fragments with large ID's.
+     * the corresponding fragment when a new drawer item is selected.
      */
-    private Map<Integer, String> fragmentIds = new HashMap<>();
+    private OneToOneMap<Integer, String> fragmentIds = new OneToOneMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,23 +139,29 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         });
 
         //Select the correct drawer item
-        final int taskType = getIntent().getIntExtra("taskType", 0);
-        switch (taskType) {
-            default:
-                selectDrawerItem(0);
-                break;
+        if (savedInstanceState != null){
+            //Restore fragment
+            final String currentFragmentTag = savedInstanceState.getString("currentFragmentTag");
+            currentFragment = getFragment(currentFragmentTag);
+            selectDrawerItem(navigationView.getMenu().findItem(fragmentIds.getKey(currentFragment.getTag())));
+        }else{
+            switch (getIntent().getIntExtra("taskType", -1)) {
+                default:
+                    selectDrawerItem(0);
+                    break;
 
-            case REQUEST_CODE_FIND_PRIMES:
-                selectDrawerItem(0);
-                break;
+                case REQUEST_CODE_FIND_PRIMES:
+                    selectDrawerItem(0);
+                    break;
 
-            case REQUEST_CODE_FIND_FACTORS:
-                selectDrawerItem(1);
-                break;
+                case REQUEST_CODE_FIND_FACTORS:
+                    selectDrawerItem(1);
+                    break;
 
-            case REQUEST_CODE_PRIME_FACTORIZATION:
-                selectDrawerItem(2);
-                break;
+                case REQUEST_CODE_PRIME_FACTORIZATION:
+                    selectDrawerItem(2);
+                    break;
+            }
         }
 
         //Show a dialog while upgrading to the newest version
@@ -187,8 +181,12 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
                 }
             }).start();
         }
+    }
 
-        //FileManager.saveDebugFile(1, 10_000, new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "debug"));
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("currentFragmentTag", currentFragment.getTag());
     }
 
     @Override
@@ -245,50 +243,58 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
     }
 
     /**
-     * Get the fragment with the specified ID. If the fragment has not been created yet, it will
-     * create it now.
-     *
-     * @param id The ID of the fragment.
-     * @return The fragment with the corresponding ID.
+     * Get the fragment with the corresponding tag. This will create a new instance of the fragment
+     * if it does not yet exist in the fragment transaction. Note this method will not add it to the
+     * fragment transaction meaning if it is called twice with the same tag before the returned
+     * fragment was added, it will return two different instances.
+     * @param tag The fragment tag.
+     * @return A fragment with the corresponding tag.
      */
-    private Fragment getFragment(int id) {
+    private Fragment getFragment(final String tag){
         //Check if fragment exists already
-        if (getFragmentManager().findFragmentByTag(fragmentIds.get(id)) == null) {
-            switch (id) {
-                case R.id.drawer_item_find_primes:
+        if (getSupportFragmentManager().findFragmentByTag(tag) == null) {
+            switch (tag) {
+                case "findPrimes":
                     final FindPrimesFragment findPrimesFragment = new FindPrimesFragment();
                     findPrimesFragment.addActionViewListener(getActionViewListener(0));
                     return findPrimesFragment;
-                case R.id.drawer_item_find_factors:
+
+                case "findFactors":
                     final FindFactorsFragment findFactorsFragment = new FindFactorsFragment();
                     findFactorsFragment.addActionViewListener(getActionViewListener(1));
                     return findFactorsFragment;
-                case R.id.drawer_item_factor_tree:
+
+                case "primeFactorization":
                     final PrimeFactorizationFragment primeFactorizationFragment = new PrimeFactorizationFragment();
                     primeFactorizationFragment.addActionViewListener(getActionViewListener(2));
                     return primeFactorizationFragment;
-                case R.id.drawer_item_saved_files:
+
+                case "savedFiles":
                     return new SavedFilesFragment();
-                case R.id.drawer_item_settings:
+
+                case "settings":
                     return new SettingsFragment();
-                case R.id.drawer_item_about:
+
+                case "about":
                     return new AboutPageFragment();
             }
         }
 
-        return getSupportFragmentManager().findFragmentByTag(fragmentIds.get(id));
+        return getSupportFragmentManager().findFragmentByTag(tag);
     }
 
     private ActionViewListener getActionViewListener(final int index) {
         return new ActionViewListener() {
             @Override
             public void onTaskStatesChanged(final boolean active) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        setActionViewVisibility(index, active ? View.VISIBLE : View.GONE);
-                    }
-                });
+                if (navigationView != null){
+                    navigationView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            setActionViewVisibility(index, active ? View.VISIBLE : View.GONE);
+                        }
+                    });
+                }
             }
         };
     }
@@ -304,10 +310,10 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         }
 
         //Get the new fragment
-        currentFragment = getFragment(menuItem.getItemId());
+        currentFragment = getFragment(fragmentIds.get(menuItem.getItemId()));
 
         //Add the new fragment if it doesn't exist yet
-        if (getFragmentManager().findFragmentByTag(fragmentIds.get(menuItem.getItemId())) == null) {
+        if (getSupportFragmentManager().findFragmentByTag(fragmentIds.get(menuItem.getItemId())) == null) {
             fragmentTransaction.add(R.id.main_content_frame, currentFragment, fragmentIds.get(menuItem.getItemId()));
         }
 
@@ -315,7 +321,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         fragmentTransaction.show(currentFragment);
 
         //Commit changes
-        fragmentTransaction.commit();
+        fragmentTransaction.commitNow();
         menuItem.setChecked(true);
 
         //Tell the fragment to initialize the floating action button
