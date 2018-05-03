@@ -51,7 +51,7 @@ public class GeneralResultsFragment extends ResultsFragment {
 
     private void updateContent(){
         if (content != null && container != null){
-            Log.w(TAG, "Replacing: " + content + "\nFragments: " + getChildFragmentManager().getFragments());
+            Log.w(TAG, "Set content: " + content + "\nFragments: " + getChildFragmentManager().getFragments());
             getChildFragmentManager().beginTransaction().replace(container.getId(), content).commit();
         }
     }

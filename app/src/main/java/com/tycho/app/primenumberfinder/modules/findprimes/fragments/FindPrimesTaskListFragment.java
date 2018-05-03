@@ -7,13 +7,11 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.crashlytics.android.Crashlytics;
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
@@ -37,7 +35,7 @@ public class FindPrimesTaskListFragment extends Fragment{
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "FindPrimesTaskListFgmnt";
+    private static final String TAG = FindPrimesTaskListFragment.class.getSimpleName();
 
     private FindPrimesTaskListAdapter taskListAdapter;
 
@@ -52,14 +50,9 @@ public class FindPrimesTaskListFragment extends Fragment{
     public void onAttach(Context context) {
         super.onAttach(context);
         taskListAdapter = new FindPrimesTaskListAdapter(context);
-        Crashlytics.log(Log.DEBUG, TAG, "onAttach(): " + context + " this: " + this);
-        Crashlytics.log(Log.DEBUG, TAG, "taskListAdapter: " + taskListAdapter);
-
-        Crashlytics.log(Log.DEBUG, TAG, "Adding " + eventListeners.size() + " event listeners.");
         for (AbstractTaskListAdapter.EventListener eventListener : eventListeners){
             taskListAdapter.addEventListener(eventListener);
         }
-        Crashlytics.log(Log.DEBUG, TAG, "Adding " + actionViewListeners.size() + " action view listeners.");
         for (ActionViewListener actionViewListener : actionViewListeners){
             taskListAdapter.addActionViewListener(actionViewListener);
         }
@@ -69,8 +62,6 @@ public class FindPrimesTaskListFragment extends Fragment{
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_primes_task_list_fragment, container, false);
-
-        Crashlytics.log(Log.DEBUG, TAG, "onCreateView: " + this);
 
         //Set up the task list
         recyclerView = rootView.findViewById(R.id.task_list);
@@ -108,32 +99,7 @@ public class FindPrimesTaskListFragment extends Fragment{
         outState.putInt("selectedItemPosition", taskListAdapter.getSelectedItemPosition());
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        Crashlytics.log(Log.DEBUG, TAG, "onDestroyView()");
-        if (taskListAdapter != null){
-            Crashlytics.setString("taskListAdapter", taskListAdapter.toString());
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Crashlytics.log(Log.DEBUG, TAG, "onDetach()");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Crashlytics.log(Log.DEBUG, TAG, "onDestroy()");
-    }
-
     public void addTask(final Task task) {
-        Crashlytics.log(Log.DEBUG, TAG, "isAdded: " + isAdded());
-        Crashlytics.log(Log.DEBUG, TAG, "isDetached: " + isDetached());
-        Crashlytics.log(Log.DEBUG, TAG, "getView: " + getView());
-        Crashlytics.log(Log.DEBUG, TAG, "taskListAdapter: " + taskListAdapter);
         taskListAdapter.addTask(task);
         recyclerView.scrollToPosition(taskListAdapter.getItemCount() - 1);
         update();
@@ -152,7 +118,6 @@ public class FindPrimesTaskListFragment extends Fragment{
     }
 
     public void addEventListener(final AbstractTaskListAdapter.EventListener eventListener) {
-        Crashlytics.log(Log.DEBUG, TAG, "Adding event listener: " + eventListener + " to " + taskListAdapter);
         if (taskListAdapter == null) {
             eventListeners.add(eventListener);
         } else {
@@ -161,7 +126,6 @@ public class FindPrimesTaskListFragment extends Fragment{
     }
 
     public void addActionViewListener(final ActionViewListener actionViewListener) {
-        Crashlytics.log(Log.DEBUG, TAG, "Adding action view listener: " + actionViewListener + " to " + taskListAdapter);
         if (taskListAdapter == null) {
             actionViewListeners.add(actionViewListener);
         } else {

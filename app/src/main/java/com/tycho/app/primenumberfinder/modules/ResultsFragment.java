@@ -119,6 +119,9 @@ public abstract class ResultsFragment extends TaskFragment {
         protected void run() {
             while (true) {
 
+                if (!isAdded() || isDetached()){
+                    Log.w(TAG, "Calling update even thought fragment isn't added!\nisAdded: " + isAdded() + "\nisDetached: " + isDetached());
+                }
                 updateUi();
 
                 try {

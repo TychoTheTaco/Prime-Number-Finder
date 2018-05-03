@@ -5,13 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -107,17 +105,10 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.e(TAG, "onCreate: " + getChildFragmentManager().getFragments());
-    }
-
-    @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_primes_fragment, viewGroup, false);
 
         //Set fragment adapter
-        Log.e(TAG, "Fragments: " + getChildFragmentManager().getFragments());
         final SimpleFragmentAdapter simpleFragmentAdapter = new SimpleFragmentAdapter(getChildFragmentManager(), getContext());
         viewPager = rootView.findViewById(R.id.view_pager);
 
@@ -319,8 +310,6 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         buttonFindPrimes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Log.d(TAG, "onClick(): " + taskListFragment);
 
                 //Determine best search method
                 searchOptions.setSearchMethod(determineBestSearchMethod());

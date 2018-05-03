@@ -34,7 +34,7 @@ public class FindFactorsTaskListFragment extends Fragment{
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "FindFactorsTskListFgmnt";
+    private static final String TAG = FindFactorsTaskListFragment.class.getSimpleName();
 
     private FindFactorsTaskListAdapter taskListAdapter;
 

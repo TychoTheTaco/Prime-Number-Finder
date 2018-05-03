@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -94,7 +93,6 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
         final View rootView = inflater.inflate(R.layout.find_factors_fragment, viewGroup, false);
 
         //Set fragment adapter
-        Log.e(TAG, "Fragments: " + getChildFragmentManager().getFragments());
         final SimpleFragmentAdapter simpleFragmentAdapter = new SimpleFragmentAdapter(getChildFragmentManager(), getContext());
         viewPager = rootView.findViewById(R.id.view_pager);
 
