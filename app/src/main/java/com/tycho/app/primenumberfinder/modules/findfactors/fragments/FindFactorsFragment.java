@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,6 @@ import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FabAnimator;
 import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
 import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
-import com.tycho.app.primenumberfinder.IntentReceiver;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
@@ -50,7 +50,7 @@ import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
  * @author Tycho Bellers
  *         Date Created: 11/12/2016
  */
-public class FindFactorsFragment extends Fragment implements FloatingActionButtonListener, IntentReceiver{
+public class FindFactorsFragment extends Fragment implements FloatingActionButtonListener{
 
     /**
      * Tag used for logging and debugging.
@@ -66,21 +66,26 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
 
     private final FindFactorsTask.SearchOptions searchOptions = new FindFactorsTask.SearchOptions(0);
 
-    private final FindFactorsTaskListFragment taskListFragment = new FindFactorsTaskListFragment();
-    private final FindFactorsResultsFragment resultsFragment = new FindFactorsResultsFragment();
+    private FindFactorsTaskListFragment taskListFragment;
+    private FindFactorsResultsFragment resultsFragment;
 
     private ViewPager viewPager;
     private FabAnimator fabAnimator;
 
-    private Intent intent;
-
     private FloatingActionButtonHost floatingActionButtonHost;
+
+    private ActionViewListener actionViewListener;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof FloatingActionButtonHost){
+
+        if (context instanceof FloatingActionButtonHost) {
             floatingActionButtonHost = (FloatingActionButtonHost) context;
+        }
+
+        if (context instanceof ActionViewListener){
+            actionViewListener = (ActionViewListener) context;
         }
     }
 
@@ -88,10 +93,23 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
     public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_factors_fragment, viewGroup, false);
 
-        //Set up tab layout for results and statistics
-        final SimpleFragmentAdapter simpleFragmentAdapter = new SimpleFragmentAdapter(getChildFragmentManager());
+        //Set fragment adapter
+        Log.e(TAG, "Fragments: " + getChildFragmentManager().getFragments());
+        final SimpleFragmentAdapter simpleFragmentAdapter = new SimpleFragmentAdapter(getChildFragmentManager(), getContext());
         viewPager = rootView.findViewById(R.id.view_pager);
-        simpleFragmentAdapter.add(taskListFragment, getString(R.string.tasks_tab_title));
+
+        //Add fragments to adapter
+        simpleFragmentAdapter.add(FindFactorsTaskListFragment.class.getName(), "Tasks");
+        simpleFragmentAdapter.add(FindFactorsResultsFragment.class.getName(), "Results");
+
+        //Instantiate fragments now to save a reference to them
+        simpleFragmentAdapter.startUpdate(viewPager);
+        taskListFragment = (FindFactorsTaskListFragment) simpleFragmentAdapter.instantiateItem(viewPager, 0);
+        resultsFragment = (FindFactorsResultsFragment) simpleFragmentAdapter.instantiateItem(viewPager, 1);
+        simpleFragmentAdapter.finishUpdate(viewPager);
+
+        //Set up Task list fragment
+        taskListFragment.addActionViewListener(actionViewListener);
         taskListFragment.addEventListener(new FindFactorsTaskListAdapter.EventListener() {
             @Override
             public void onTaskSelected(Task task) {
@@ -120,7 +138,8 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
                 startActivityForResult(intent, 0);
             }
         });
-        simpleFragmentAdapter.add(resultsFragment, getString(R.string.results_tab_title));
+
+        //Set up view pager
         viewPager.setAdapter(simpleFragmentAdapter);
         fabAnimator = new FabAnimator(floatingActionButtonHost.getFab(0));
         viewPager.addOnPageChangeListener(fabAnimator);
@@ -177,12 +196,9 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
         rootView.requestFocus();
 
         //Scroll to Results fragment if started from a notification
-        if (intent != null && intent.getSerializableExtra("taskId") != null){
+        if (getActivity().getIntent().getSerializableExtra("taskId") != null){
             viewPager.setCurrentItem(1);
         }
-
-        //Reset intent
-        this.intent = null;
 
         return rootView;
     }
@@ -200,12 +216,6 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
         if (fabAnimator != null){
             fabAnimator.onPageScrolled(viewPager.getCurrentItem(), 0, 0);
         }
-    }
-
-    @Override
-    public void giveIntent(Intent intent) {
-        this.intent = intent;
-        taskListFragment.giveIntent(intent);
     }
 
     @Override

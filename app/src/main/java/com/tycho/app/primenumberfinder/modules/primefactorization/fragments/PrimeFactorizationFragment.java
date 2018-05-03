@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,6 @@ import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FabAnimator;
 import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
 import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
-import com.tycho.app.primenumberfinder.IntentReceiver;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
@@ -47,7 +47,7 @@ import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
  * Date Created: 3/2/2017
  */
 
-public class PrimeFactorizationFragment extends Fragment implements FloatingActionButtonListener, IntentReceiver{
+public class PrimeFactorizationFragment extends Fragment implements FloatingActionButtonListener{
 
     /**
      * Tag used for logging and debugging.
@@ -58,23 +58,28 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
 
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
-    private final PrimeFactorizationTaskListFragment taskListFragment = new PrimeFactorizationTaskListFragment();
-    private final PrimeFactorizationResultsFragment resultsFragment = new PrimeFactorizationResultsFragment();
+    private PrimeFactorizationTaskListFragment taskListFragment;
+    private PrimeFactorizationResultsFragment resultsFragment;
 
     private final PrimeFactorizationTask.SearchOptions searchOptions = new PrimeFactorizationTask.SearchOptions(0);
 
     private ViewPager viewPager;
     private FabAnimator fabAnimator;
 
-    private Intent intent;
-
     private FloatingActionButtonHost floatingActionButtonHost;
+
+    private ActionViewListener actionViewListener;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof FloatingActionButtonHost){
+
+        if (context instanceof FloatingActionButtonHost) {
             floatingActionButtonHost = (FloatingActionButtonHost) context;
+        }
+
+        if (context instanceof ActionViewListener){
+            actionViewListener = (ActionViewListener) context;
         }
     }
 
@@ -83,10 +88,23 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.prime_factorization_fragment, container, false);
 
-        //Set up tab layout for results and statistics
-        final SimpleFragmentAdapter simpleFragmentAdapter = new SimpleFragmentAdapter(getChildFragmentManager());
+        //Set fragment adapter
+        Log.e(TAG, "Fragments: " + getChildFragmentManager().getFragments());
+        final SimpleFragmentAdapter simpleFragmentAdapter = new SimpleFragmentAdapter(getChildFragmentManager(), getContext());
         viewPager = rootView.findViewById(R.id.view_pager);
-        simpleFragmentAdapter.add(taskListFragment, getString(R.string.tasks_tab_title));
+
+        //Add fragments to adapter
+        simpleFragmentAdapter.add(PrimeFactorizationTaskListFragment.class.getName(), "Tasks");
+        simpleFragmentAdapter.add(PrimeFactorizationResultsFragment.class.getName(), "Results");
+
+        //Instantiate fragments now to save a reference to them
+        simpleFragmentAdapter.startUpdate(viewPager);
+        taskListFragment = (PrimeFactorizationTaskListFragment) simpleFragmentAdapter.instantiateItem(viewPager, 0);
+        resultsFragment = (PrimeFactorizationResultsFragment) simpleFragmentAdapter.instantiateItem(viewPager, 1);
+        simpleFragmentAdapter.finishUpdate(viewPager);
+
+        //Set up Task list fragment
+        taskListFragment.addActionViewListener(actionViewListener);
         taskListFragment.addEventListener(new PrimeFactorizationTaskListAdapter.EventListener() {
             @Override
             public void onTaskSelected(Task task) {
@@ -116,7 +134,8 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
                 startActivityForResult(intent, 0);
             }
         });
-        simpleFragmentAdapter.add(resultsFragment, getString(R.string.results_tab_title));
+
+        //Set up view pager
         viewPager.setAdapter(simpleFragmentAdapter);
         fabAnimator = new FabAnimator(floatingActionButtonHost.getFab(0));
         viewPager.addOnPageChangeListener(fabAnimator);
@@ -171,12 +190,9 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
         rootView.requestFocus();
 
         //Scroll to Results fragment if started from a notification
-        if (intent != null && intent.getSerializableExtra("taskId") != null){
+        if (getActivity().getIntent().getSerializableExtra("taskId") != null){
             viewPager.setCurrentItem(1);
         }
-
-        //Reset intent
-        this.intent = null;
 
         return rootView;
     }
@@ -202,12 +218,6 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
         if (fabAnimator != null){
             fabAnimator.onPageScrolled(viewPager.getCurrentItem(), 0, 0);
         }
-    }
-
-    @Override
-    public void giveIntent(Intent intent) {
-        this.intent = intent;
-        taskListFragment.giveIntent(intent);
     }
 
     @Override

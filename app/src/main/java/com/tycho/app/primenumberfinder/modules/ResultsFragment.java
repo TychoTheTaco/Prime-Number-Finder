@@ -1,6 +1,5 @@
 package com.tycho.app.primenumberfinder.modules;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -8,13 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.tycho.app.primenumberfinder.PrimeNumberFinder;
-import com.tycho.app.primenumberfinder.modules.TaskFragment;
-
-import java.text.DecimalFormat;
-
 import easytasks.Task;
-import easytasks.TaskAdapter;
 
 /**
  * Created by tycho on 11/19/2017.
@@ -25,7 +18,7 @@ public abstract class ResultsFragment extends TaskFragment {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "ResultsFragment";
+    private static final String TAG = ResultsFragment.class.getSimpleName();
 
     protected final UIUpdater uiUpdater = new UIUpdater();
 
@@ -114,7 +107,7 @@ public abstract class ResultsFragment extends TaskFragment {
                 }
             });
         }else{
-            Log.w(TAG, "Skipping UI update! Fragment wasn't added or was detached!");
+            Log.w(TAG, "Skipping UI update! Fragment wasn't added or was detached: " + this);
         }
     }
 

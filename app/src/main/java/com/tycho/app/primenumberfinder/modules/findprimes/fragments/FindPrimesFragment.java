@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -23,7 +24,6 @@ import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FabAnimator;
 import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
 import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
-import com.tycho.app.primenumberfinder.IntentReceiver;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
@@ -51,7 +51,7 @@ import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
  * @author Tycho Bellers
  * Date Created: 11/12/2016
  */
-public class FindPrimesFragment extends Fragment implements FloatingActionButtonListener, IntentReceiver {
+public class FindPrimesFragment extends Fragment implements FloatingActionButtonListener {
 
     /**
      * Tag used for logging and debugging.
@@ -64,8 +64,8 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
     private ValidEditText editTextSearchRangeEnd;
 
     //Fragments in the main adapter.
-    private final FindPrimesTaskListFragment taskListFragment = new FindPrimesTaskListFragment();
-    private final GeneralResultsFragment generalResultsFragment = new GeneralResultsFragment();
+    private FindPrimesTaskListFragment taskListFragment;
+    private GeneralResultsFragment generalResultsFragment;
 
     //Results fragments
     private final FindPrimesResultsFragment findPrimesResultsFragment = new FindPrimesResultsFragment();
@@ -89,26 +89,50 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
     private ViewPager viewPager;
     private FabAnimator fabAnimator;
 
-    private Intent intent;
-
     private FloatingActionButtonHost floatingActionButtonHost;
+
+    private ActionViewListener actionViewListener;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
         if (context instanceof FloatingActionButtonHost) {
             floatingActionButtonHost = (FloatingActionButtonHost) context;
         }
+
+        if (context instanceof ActionViewListener){
+            actionViewListener = (ActionViewListener) context;
+        }
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.e(TAG, "onCreate: " + getChildFragmentManager().getFragments());
     }
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_primes_fragment, viewGroup, false);
 
-        //Set up tab layout for results and statistics
-        final SimpleFragmentAdapter simpleFragmentAdapter = new SimpleFragmentAdapter(getChildFragmentManager());
+        //Set fragment adapter
+        Log.e(TAG, "Fragments: " + getChildFragmentManager().getFragments());
+        final SimpleFragmentAdapter simpleFragmentAdapter = new SimpleFragmentAdapter(getChildFragmentManager(), getContext());
         viewPager = rootView.findViewById(R.id.view_pager);
-        simpleFragmentAdapter.add(taskListFragment, "Tasks");
+
+        //Add fragments to adapter
+        simpleFragmentAdapter.add(FindPrimesTaskListFragment.class.getName(), "Tasks");
+        simpleFragmentAdapter.add(GeneralResultsFragment.class.getName(), "Results");
+
+        //Instantiate fragments now to save a reference to them
+        simpleFragmentAdapter.startUpdate(viewPager);
+        taskListFragment = (FindPrimesTaskListFragment) simpleFragmentAdapter.instantiateItem(viewPager, 0);
+        generalResultsFragment = (GeneralResultsFragment) simpleFragmentAdapter.instantiateItem(viewPager, 1);
+        simpleFragmentAdapter.finishUpdate(viewPager);
+
+        //Set up Task list fragment
+        taskListFragment.addActionViewListener(actionViewListener);
         taskListFragment.addEventListener(new FindPrimesTaskListAdapter.EventListener() {
             @Override
             public void onTaskSelected(Task task) {
@@ -152,8 +176,11 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                 startActivityForResult(intent, 0);
             }
         });
-        simpleFragmentAdapter.add(generalResultsFragment, "Results");
+
+        //Set up results fragment
         generalResultsFragment.setContent(findPrimesResultsFragment);
+
+        //Set up view pager
         viewPager.setAdapter(simpleFragmentAdapter);
         fabAnimator = new FabAnimator(floatingActionButtonHost.getFab(0));
         viewPager.addOnPageChangeListener(fabAnimator);
@@ -293,6 +320,8 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             @Override
             public void onClick(View v) {
 
+                Log.d(TAG, "onClick(): " + taskListFragment);
+
                 //Determine best search method
                 searchOptions.setSearchMethod(determineBestSearchMethod());
 
@@ -322,12 +351,9 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         rootView.requestFocus();
 
         //Scroll to Results fragment if started from a notification
-        if (intent != null && intent.getSerializableExtra("taskId") != null) {
+        if (getActivity().getIntent().getSerializableExtra("taskId") != null){
             viewPager.setCurrentItem(1);
         }
-
-        //Reset intent
-        this.intent = null;
 
         return rootView;
     }
@@ -364,12 +390,6 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         }
     }
 
-    @Override
-    public void giveIntent(Intent intent) {
-        this.intent = intent;
-        taskListFragment.giveIntent(intent);
-    }
-
     private FindPrimesTask.SearchMethod determineBestSearchMethod() {
 
         //Check if end value is infinity or is greater than int range
@@ -401,9 +421,11 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         //Add an extra 13% due to inaccurate estimate of prime count
         final int requiredMB = (int) ((totalBytes * 1.13f) / (1024 * 1024));
 
-        Log.d(TAG, "RAM: " + usedMemInMB + " / " + maxHeapSizeInMB);
-        Log.d(TAG, "Avail: " + availHeapSizeInMB);
-        Log.d(TAG, "Req: " + requiredMB);
+        //Log.d(TAG, "RAM: " + usedMemInMB + " / " + maxHeapSizeInMB);
+        //Log.d(TAG, "Avail: " + availHeapSizeInMB);
+        //Log.d(TAG, "Req: " + requiredMB);
+        Crashlytics.setLong("requiredMB", requiredMB);
+        Crashlytics.setLong("availableHeapMB", availHeapSizeInMB);
 
         return requiredMB <= availHeapSizeInMB;
     }
@@ -462,9 +484,5 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         }
 
         return Utils.textToNumber(input);
-    }
-
-    public void addActionViewListener(final ActionViewListener actionViewListener) {
-        taskListFragment.addActionViewListener(actionViewListener);
     }
 }

@@ -1,6 +1,7 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
@@ -15,10 +16,8 @@ import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import easytasks.Task;
 
@@ -39,8 +38,9 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<AbstractT
         this.context = context;
     }
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.find_primes_task_list_item, parent, false);
         return new ViewHolder(view);
     }

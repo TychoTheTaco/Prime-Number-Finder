@@ -2,6 +2,7 @@ package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +51,7 @@ public class GeneralResultsFragment extends ResultsFragment {
 
     private void updateContent(){
         if (content != null && container != null){
+            Log.w(TAG, "Replacing: " + content + "\nFragments: " + getChildFragmentManager().getFragments());
             getChildFragmentManager().beginTransaction().replace(container.getId(), content).commit();
         }
     }

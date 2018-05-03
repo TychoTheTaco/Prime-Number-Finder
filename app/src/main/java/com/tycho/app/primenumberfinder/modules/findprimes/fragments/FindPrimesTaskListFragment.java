@@ -1,7 +1,6 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,7 +15,6 @@ import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
 import com.tycho.app.primenumberfinder.ActionViewListener;
-import com.tycho.app.primenumberfinder.IntentReceiver;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
@@ -24,9 +22,9 @@ import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
 
-import java.util.Queue;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import easytasks.Task;
 
@@ -34,7 +32,7 @@ import easytasks.Task;
  * Created by tycho on 11/16/2017.
  */
 
-public class FindPrimesTaskListFragment extends Fragment implements IntentReceiver {
+public class FindPrimesTaskListFragment extends Fragment{
 
     /**
      * Tag used for logging and debugging.
@@ -47,23 +45,23 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
 
     private RecyclerView recyclerView;
 
-    private final Queue<AbstractTaskListAdapter.EventListener> eventListenerQueue = new LinkedBlockingQueue<>(5);
-    private final Queue<ActionViewListener> actionViewListenerQueue = new LinkedBlockingQueue<>(5);
-
-    private Intent intent;
+    private final List<AbstractTaskListAdapter.EventListener> eventListeners = new ArrayList<>();
+    private final List<ActionViewListener> actionViewListeners = new ArrayList<>();
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         taskListAdapter = new FindPrimesTaskListAdapter(context);
-        Crashlytics.log(Log.DEBUG, TAG, "onAttach()");
-        Crashlytics.log(Log.DEBUG, TAG, "Adding " + eventListenerQueue.size() + " event listeners.");
-        while (!eventListenerQueue.isEmpty()) {
-            taskListAdapter.addEventListener(eventListenerQueue.poll());
+        Crashlytics.log(Log.DEBUG, TAG, "onAttach(): " + context + " this: " + this);
+        Crashlytics.log(Log.DEBUG, TAG, "taskListAdapter: " + taskListAdapter);
+
+        Crashlytics.log(Log.DEBUG, TAG, "Adding " + eventListeners.size() + " event listeners.");
+        for (AbstractTaskListAdapter.EventListener eventListener : eventListeners){
+            taskListAdapter.addEventListener(eventListener);
         }
-        Crashlytics.log(Log.DEBUG, TAG, "Adding " + actionViewListenerQueue.size() + " action view listeners.");
-        while (!actionViewListenerQueue.isEmpty()) {
-            taskListAdapter.addActionViewListener(actionViewListenerQueue.poll());
+        Crashlytics.log(Log.DEBUG, TAG, "Adding " + actionViewListeners.size() + " action view listeners.");
+        for (ActionViewListener actionViewListener : actionViewListeners){
+            taskListAdapter.addActionViewListener(actionViewListener);
         }
     }
 
@@ -72,13 +70,12 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_primes_task_list_fragment, container, false);
 
-        Crashlytics.log(Log.DEBUG, TAG, "onCreateView: " + taskListAdapter);
+        Crashlytics.log(Log.DEBUG, TAG, "onCreateView: " + this);
 
         //Set up the task list
         recyclerView = rootView.findViewById(R.id.task_list);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        //taskListAdapter = new FindPrimesTaskListAdapter(getActivity());
         recyclerView.setAdapter(taskListAdapter);
         recyclerView.setItemAnimator(null);
 
@@ -94,18 +91,21 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
         taskListAdapter.sortByTimeCreated();
 
         //Select correct task
-        if (intent == null || intent.getSerializableExtra("taskId") == null || taskListAdapter.getItemCount() == 0) {
-            taskListAdapter.setSelected(0);
-        } else {
-            taskListAdapter.setSelected(PrimeNumberFinder.getTaskManager().findTaskById((UUID) intent.getSerializableExtra("taskId")));
+        if (savedInstanceState != null){
+            taskListAdapter.setSelected(savedInstanceState.getInt("selectedItemPosition"));
+        }else{
+            taskListAdapter.setSelected(PrimeNumberFinder.getTaskManager().findTaskById((UUID) getActivity().getIntent().getSerializableExtra("taskId")));
         }
 
         update();
 
-        //Reset intent
-        this.intent = null;
-
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("selectedItemPosition", taskListAdapter.getSelectedItemPosition());
     }
 
     @Override
@@ -127,11 +127,6 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
     public void onDestroy() {
         super.onDestroy();
         Crashlytics.log(Log.DEBUG, TAG, "onDestroy()");
-    }
-
-    @Override
-    public void giveIntent(final Intent intent) {
-        this.intent = intent;
     }
 
     public void addTask(final Task task) {
@@ -157,16 +152,18 @@ public class FindPrimesTaskListFragment extends Fragment implements IntentReceiv
     }
 
     public void addEventListener(final AbstractTaskListAdapter.EventListener eventListener) {
+        Crashlytics.log(Log.DEBUG, TAG, "Adding event listener: " + eventListener + " to " + taskListAdapter);
         if (taskListAdapter == null) {
-            eventListenerQueue.add(eventListener);
+            eventListeners.add(eventListener);
         } else {
             taskListAdapter.addEventListener(eventListener);
         }
     }
 
     public void addActionViewListener(final ActionViewListener actionViewListener) {
+        Crashlytics.log(Log.DEBUG, TAG, "Adding action view listener: " + actionViewListener + " to " + taskListAdapter);
         if (taskListAdapter == null) {
-            actionViewListenerQueue.add(actionViewListener);
+            actionViewListeners.add(actionViewListener);
         } else {
             taskListAdapter.addActionViewListener(actionViewListener);
         }

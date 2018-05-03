@@ -1,8 +1,8 @@
 package com.tycho.app.primenumberfinder.modules.primefactorization.fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
-import com.tycho.app.primenumberfinder.IntentReceiver;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
@@ -30,7 +29,7 @@ import easytasks.Task;
  * Created by tycho on 11/19/2017.
  */
 
-public class PrimeFactorizationTaskListFragment extends Fragment implements IntentReceiver{
+public class PrimeFactorizationTaskListFragment extends Fragment{
 
     /**
      * Tag used for logging and debugging.
@@ -45,8 +44,6 @@ public class PrimeFactorizationTaskListFragment extends Fragment implements Inte
 
     private final Queue<AbstractTaskListAdapter.EventListener> eventListenerQueue = new LinkedBlockingQueue<>(5);
     private final Queue<ActionViewListener> actionViewListenerQueue = new LinkedBlockingQueue<>(5);
-
-    private Intent intent;
 
     @Override
     public void onAttach(Context context) {
@@ -84,23 +81,21 @@ public class PrimeFactorizationTaskListFragment extends Fragment implements Inte
         taskListAdapter.sortByTimeCreated();
 
         //Select correct task
-        if (intent == null || intent.getSerializableExtra("taskId") == null || taskListAdapter.getItemCount() == 0) {
-            taskListAdapter.setSelected(0);
-        } else {
-            taskListAdapter.setSelected(PrimeNumberFinder.getTaskManager().findTaskById((UUID) intent.getSerializableExtra("taskId")));
+        if (savedInstanceState != null){
+            taskListAdapter.setSelected(savedInstanceState.getInt("selectedItemPosition"));
+        }else{
+            taskListAdapter.setSelected(PrimeNumberFinder.getTaskManager().findTaskById((UUID) getActivity().getIntent().getSerializableExtra("taskId")));
         }
 
         update();
-
-        //Reset intent
-        this.intent = null;
 
         return rootView;
     }
 
     @Override
-    public void giveIntent(Intent intent) {
-        this.intent = intent;
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("selectedItemPosition", taskListAdapter.getSelectedItemPosition());
     }
 
     public void addTask(final Task task) {

@@ -22,7 +22,6 @@ import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
 import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
-import com.tycho.app.primenumberfinder.IntentReceiver;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
@@ -48,7 +47,7 @@ import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
  * @author Tycho Bellers
  * Date Created: 1/10/2016
  */
-public class MainActivity extends AbstractActivity implements FloatingActionButtonHost {
+public class MainActivity extends AbstractActivity implements FloatingActionButtonHost, ActionViewListener {
 
     /**
      * Tag used for logging and debugging.
@@ -114,7 +113,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         ((TextView) navigationView.getHeaderView(0).findViewById(R.id.app_version)).setText(getString(R.string.app_version_name, PrimeNumberFinder.getVersionName(this)));
         for (int i = 0; i < navigationView.getMenu().size(); i++) {
             try {
-                setActionViewVisibility(i, View.GONE);
+                setActionViewVisibility(navigationView.getMenu().getItem(i).getItemId(), View.GONE);
             } catch (NullPointerException e) {
                 //Ignore NPE because there is no action view
             }
@@ -232,14 +231,26 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         return null;
     }
 
+    @Override
+    public void onTaskStatesChanged(final boolean active) {
+        if (navigationView != null){
+            navigationView.post(new Runnable() {
+                @Override
+                public void run() {
+                    setActionViewVisibility(fragmentIds.getKey(currentFragment.getTag()), active ? View.VISIBLE : View.GONE);
+                }
+            });
+        }
+    }
+
     /**
      * Change the visibility of a menu item's action view.
      *
-     * @param index      The index of the {@linkplain MenuItem}.
+     * @param id      The ID of the {@linkplain MenuItem}.
      * @param visibility The visibility to set.
      */
-    private void setActionViewVisibility(final int index, final int visibility) {
-        navigationView.getMenu().getItem(index).getActionView().setVisibility(visibility);
+    private void setActionViewVisibility(final int id, final int visibility) {
+        navigationView.getMenu().findItem(id).getActionView().setVisibility(visibility);
     }
 
     /**
@@ -255,19 +266,13 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         if (getSupportFragmentManager().findFragmentByTag(tag) == null) {
             switch (tag) {
                 case "findPrimes":
-                    final FindPrimesFragment findPrimesFragment = new FindPrimesFragment();
-                    findPrimesFragment.addActionViewListener(getActionViewListener(0));
-                    return findPrimesFragment;
+                    return new FindPrimesFragment();
 
                 case "findFactors":
-                    final FindFactorsFragment findFactorsFragment = new FindFactorsFragment();
-                    findFactorsFragment.addActionViewListener(getActionViewListener(1));
-                    return findFactorsFragment;
+                    return new FindFactorsFragment();
 
                 case "primeFactorization":
-                    final PrimeFactorizationFragment primeFactorizationFragment = new PrimeFactorizationFragment();
-                    primeFactorizationFragment.addActionViewListener(getActionViewListener(2));
-                    return primeFactorizationFragment;
+                    return new PrimeFactorizationFragment();
 
                 case "savedFiles":
                     return new SavedFilesFragment();
@@ -281,22 +286,6 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         }
 
         return getSupportFragmentManager().findFragmentByTag(tag);
-    }
-
-    private ActionViewListener getActionViewListener(final int index) {
-        return new ActionViewListener() {
-            @Override
-            public void onTaskStatesChanged(final boolean active) {
-                if (navigationView != null){
-                    navigationView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            setActionViewVisibility(index, active ? View.VISIBLE : View.GONE);
-                        }
-                    });
-                }
-            }
-        };
     }
 
     private void selectDrawerItem(final MenuItem menuItem) {
@@ -329,11 +318,6 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
             ((FloatingActionButtonListener) currentFragment).initFab(floatingActionButton);
         } else {
             floatingActionButton.setVisibility(View.GONE);
-        }
-
-        //Give Intent to the fragment
-        if (currentFragment instanceof IntentReceiver) {
-            ((IntentReceiver) currentFragment).giveIntent(getIntent());
         }
 
         //Apply theme to activity based on current fragment

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.text.SpannableStringBuilder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -111,6 +112,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_primes_results_fragment, container, false);
+
+        Log.d(TAG, "onCreateView: " + this);
 
         title = rootView.findViewById(R.id.title);
         subtitleTextView = rootView.findViewById(R.id.subtitle);
@@ -519,7 +522,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                     }
                     break;
             }
-            bodyTextView.setText(Utils.formatSpannable(spannableStringBuilder, text, content, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+            bodyTextView.setText(Utils.formatSpannable(spannableStringBuilder, text, content, ContextCompat.getColor(getContext(), R.color.purple_dark)));
 
             //Time remaining
             if (etaTextView.getVisibility() == View.VISIBLE){
@@ -605,8 +608,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             }
 
         } else {
-            resultsView.setVisibility(View.GONE);
             noTaskView.setVisibility(View.VISIBLE);
+            resultsView.setVisibility(View.GONE);
         }
     }
 }
