@@ -6,6 +6,6 @@ package com.tycho.app.primenumberfinder;
 
 public interface ActionViewListener {
 
-    void onTaskStatesChanged(final boolean active);
+    void onTaskStatesChanged(final int taskType, final boolean active);
 
 }

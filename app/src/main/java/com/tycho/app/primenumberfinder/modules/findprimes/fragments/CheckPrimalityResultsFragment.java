@@ -1,15 +1,10 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.app.Activity;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,13 +18,10 @@ import android.widget.TextView;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.text.NumberFormat;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import easytasks.Task;
 
@@ -115,11 +107,11 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     @Override
     public void onTaskStarted() {
         super.onTaskStarted();
-        if (isAdded() && !isDetached()) {
+        if (isAdded() && !isDetached() && getTask() != null) {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    onUiUpdate();
+                    updateUi();
 
                     //Title
                     title.setText(getString(R.string.status_searching));
@@ -136,11 +128,11 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     @Override
     public void onTaskPausing() {
         super.onTaskPausing();
-        if (isAdded() && !isDetached()) {
+        if (isAdded() && !isDetached() && getTask() != null) {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    onUiUpdate();
+                    updateUi();
 
                     //Title
                     title.setText(getString(R.string.state_pausing));
@@ -156,11 +148,11 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     @Override
     public void onTaskPaused() {
         super.onTaskPaused();
-        if (isAdded() && !isDetached()) {
+        if (isAdded() && !isDetached() && getTask() != null) {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    onUiUpdate();
+                    updateUi();
 
                     //Title
                     title.setText(getString(R.string.status_paused));
@@ -181,7 +173,7 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
             @Override
             public void run() {
                 if (isAdded() && !isDetached() && getTask() != null) {
-                    onUiUpdate();
+                    updateUi();
 
                     //Title
                     title.setText(getString(R.string.state_resuming));
@@ -202,12 +194,11 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        updateUi();
-        if (isAdded() && !isDetached()) {
+        if (isAdded() && !isDetached() && getTask() != null) {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    onUiUpdate();
+                    updateUi();
 
                     //Title
                     title.setText(getString(R.string.status_finished));

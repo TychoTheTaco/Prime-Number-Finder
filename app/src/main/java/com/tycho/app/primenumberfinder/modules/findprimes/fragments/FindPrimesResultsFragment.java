@@ -265,7 +265,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             @Override
             public void run() {
                 if (isAdded() && !isDetached() && getTask() != null) {
-                    onUiUpdate();
+                    updateUi();
 
                     //Title
                     title.setText(getString(R.string.status_searching));
@@ -310,7 +310,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             @Override
             public void run() {
                 if (isAdded() && !isDetached() && getTask() != null) {
-                    onUiUpdate();
+                    updateUi();
 
                     //Title
                     title.setText(getString(R.string.state_pausing));
@@ -352,7 +352,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             @Override
             public void run() {
                 if (isAdded() && !isDetached() && getTask() != null) {
-                    onUiUpdate();
+                    updateUi();
 
                     //Title
                     title.setText(getString(R.string.status_paused));
@@ -399,7 +399,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             @Override
             public void run() {
                 if (isAdded() && !isDetached() && getTask() != null) {
-                    onUiUpdate();
+                    updateUi();
 
                     //Title
                     title.setText(getString(R.string.state_resuming));
@@ -447,7 +447,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    onUiUpdate();
+                    updateUi();
 
                     //Title
                     title.setText(getString(R.string.status_finished));

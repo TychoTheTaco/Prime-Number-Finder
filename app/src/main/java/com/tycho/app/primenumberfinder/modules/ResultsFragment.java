@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesResultsFragment;
+
 import easytasks.Task;
 
 /**
@@ -22,8 +24,6 @@ public abstract class ResultsFragment extends TaskFragment {
 
     protected final UIUpdater uiUpdater = new UIUpdater();
 
-    private volatile int updateRequests = 0;
-
     @Nullable
     @Override
     public abstract View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState);
@@ -31,9 +31,10 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public void onTaskStarted() {
         super.onTaskStarted();
-        if (uiUpdater.getState() == Task.State.NOT_STARTED){
+        Log.e(TAG, "onTaskStarted()");
+        if (uiUpdater.getState() == Task.State.NOT_STARTED) {
             uiUpdater.startOnNewThread();
-        }else{
+        } else {
             uiUpdater.resume(false);
         }
     }
@@ -41,88 +42,81 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public void onTaskPausing() {
         super.onTaskPausing();
+        Log.e(TAG, "onTaskPausing()");
         uiUpdater.resume(false);
     }
 
     @Override
     public void onTaskPaused() {
         super.onTaskPaused();
+        Log.e(TAG, "onTaskPaused()");
         uiUpdater.pause(false);
     }
 
     @Override
     public void onTaskResuming() {
         super.onTaskResuming();
+        Log.e(TAG, "onTaskResuming()");
         uiUpdater.resume(false);
     }
 
     @Override
     public void onTaskResumed() {
         super.onTaskResumed();
+        Log.e(TAG, "onTaskResumed()");
         uiUpdater.resume(false);
     }
 
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
+        Log.e(TAG, "onTaskStopped()");
         uiUpdater.pause(false);
     }
 
     /**
      * Make sure the task isn't changed while the UI is updating.
+     *
      * @param task
      */
     @Override
     public void setTask(Task task) {
-        synchronized (LOCK){
-            try {
-                if (updateRequests > 0){
-                    LOCK.wait();
-                }
-            }catch (InterruptedException e){
-                e.printStackTrace();
+        synchronized (LOCK) {
+            if (task == null || task.getState() != Task.State.RUNNING) {
+                uiUpdater.pause(false);
             }
+            super.setTask(task);
         }
-        if (task == null){
-            uiUpdater.pause(false);
-        }
-        super.setTask(task);
     }
 
     private static final Object LOCK = new Object();
 
-    protected void updateUi(){
-        if (isAdded() && !isDetached()){
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    synchronized (LOCK){
-                        updateRequests++;
-                        onUiUpdate();
-                        updateRequests--;
-                        if (updateRequests == 0){
-                            LOCK.notify();
-                        }
-                    }
-                }
-            });
-        }else{
-            Log.w(TAG, "Skipping UI update! Fragment wasn't added or was detached: " + this);
+    protected synchronized void updateUi() {
+        if (isAdded() && !isDetached()) {
+            onUiUpdate();
+        } else {
+            Log.w(TAG, "Fragment not added or is detached! Dropping UI update: " + this  + (getTask() != null ? " (" + ((FindPrimesResultsFragment) this).getTask().getEndValue() + ")" : ""));
         }
     }
 
     protected abstract void onUiUpdate();
 
-    protected final class UIUpdater extends Task{
+    protected final class UIUpdater extends Task {
 
         @Override
         protected void run() {
             while (true) {
 
-                if (!isAdded() || isDetached()){
-                    Log.w(TAG, "Calling update even thought fragment isn't added!\nisAdded: " + isAdded() + "\nisDetached: " + isDetached());
+                if (!isAdded() || isDetached()) {
+                    Log.w(TAG, "Posting invalid update! isAdded: " + isAdded() + " isDetached: " + isDetached());
+                    Log.w(TAG, "Task is: " + getTask() + " with state " + getTask().getState());
                 }
-                updateUi();
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateUi();
+                    }
+                });
 
                 try {
                     Thread.sleep(1000 / 25);
@@ -132,7 +126,7 @@ public abstract class ResultsFragment extends TaskFragment {
                 }
 
                 tryPause();
-                if (shouldStop()){
+                if (shouldStop()) {
                     break;
                 }
             }
@@ -140,8 +134,43 @@ public abstract class ResultsFragment extends TaskFragment {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        Log.e(TAG, "onPause()");
+        uiUpdater.pause(false);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         updateUi();
+
+        if (getTask() != null) {
+            switch (getTask().getState()) {
+                case RUNNING:
+                    onTaskStarted();
+                    break;
+
+                case PAUSING:
+                    onTaskPausing();
+                    break;
+
+                case PAUSED:
+                    onTaskPaused();
+                    break;
+
+                case RESUMING:
+                    onTaskResuming();
+                    break;
+
+                case STOPPING:
+                    onTaskStopping();
+                    break;
+
+                case STOPPED:
+                    onTaskStopped();
+                    break;
+            }
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.tycho.app.primenumberfinder.modules;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -11,6 +12,10 @@ import android.widget.TextView;
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -209,6 +214,8 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
             this.tasks.add(task);
             notifyItemInserted(getItemCount());
             customEventListeners.put(task, customTaskEventListener);
+            Log.e(TAG, "Sending states!");
+            sendTaskStatesChanged();
         }
     }
 
@@ -438,7 +445,19 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
 
     private void sendTaskStatesChanged() {
         boolean active = false;
+        int taskType = -1;
         for (Task task : this.tasks) {
+
+            //Check task type
+            if (task instanceof FindPrimesTask || task instanceof CheckPrimalityTask){
+                taskType = 0;
+            }else if (task instanceof FindFactorsTask){
+                taskType = 1;
+            }else if (task instanceof PrimeFactorizationTask){
+                taskType = 2;
+            }
+
+            //Check if task is running
             if (task.getState() == Task.State.RUNNING) {
                 active = true;
                 break;
@@ -446,7 +465,7 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
         }
 
         for (ActionViewListener actionViewListener : this.actionViewListeners) {
-            actionViewListener.onTaskStatesChanged(active);
+            actionViewListener.onTaskStatesChanged(taskType, active);
         }
     }
 }

@@ -236,7 +236,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
     @Override
     public void onTaskStarted() {
         super.onTaskStarted();
-        if (isAdded() && !isDetached()){
+        if (isAdded() && !isDetached() && getTask() != null){
             handler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -268,7 +268,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
             @Override
             public void run() {
                 if (isAdded() && !isDetached() && getTask() != null) {
-                    onUiUpdate();
+                    updateUi();
 
                     //Title
                     title.setText(getString(R.string.state_pausing));
@@ -296,11 +296,11 @@ public class FindFactorsResultsFragment extends ResultsFragment{
     @Override
     public void onTaskPaused() {
         super.onTaskPaused();
-        if (isAdded() && !isDetached()){
+        if (isAdded() && !isDetached() && getTask() != null){
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    onUiUpdate();
+                    updateUi();
 
                     //Title
                     title.setText(getString(R.string.status_paused));
@@ -333,7 +333,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
             @Override
             public void run() {
                 if (isAdded() && !isDetached() && getTask() != null) {
-                    onUiUpdate();
+                    updateUi();
 
                     //Title
                     title.setText(getString(R.string.state_resuming));
@@ -371,7 +371,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    onUiUpdate();
+                    updateUi();
 
                     //Title
                     title.setText(getString(R.string.status_finished));

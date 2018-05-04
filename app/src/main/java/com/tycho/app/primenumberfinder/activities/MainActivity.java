@@ -11,6 +11,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -232,14 +233,20 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
     }
 
     @Override
-    public void onTaskStatesChanged(final boolean active) {
+    public void onTaskStatesChanged(final int taskType, final boolean active) {
         if (navigationView != null){
-            navigationView.post(new Runnable() {
-                @Override
-                public void run() {
-                    setActionViewVisibility(fragmentIds.getKey(currentFragment.getTag()), active ? View.VISIBLE : View.GONE);
-                }
-            });
+            final String tag = currentFragment.getTag();
+            if (taskType != -1){
+                navigationView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d(TAG, "Setting " + tag + " " + active);
+                        setActionViewVisibility(navigationView.getMenu().getItem(taskType).getItemId(), active ? View.VISIBLE : View.GONE);
+                    }
+                });
+            }
+        }else{
+            Log.w(TAG, "No navigation view!");
         }
     }
 
