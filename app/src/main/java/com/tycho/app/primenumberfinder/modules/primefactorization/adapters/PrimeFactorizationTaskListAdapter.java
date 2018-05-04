@@ -14,9 +14,10 @@ import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
+
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_PRIME_FACTORIZATION;
 
 /**
  * Created by tycho on 11/16/2017.
@@ -130,5 +131,10 @@ public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<A
     @Override
     public int getItemCount() {
         return tasks.size();
+    }
+
+    @Override
+    protected int getTaskType() {
+        return TASK_TYPE_PRIME_FACTORIZATION;
     }
 }

@@ -113,7 +113,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_primes_results_fragment, container, false);
 
-        Log.d(TAG, "onCreateView: " + this);
+        Log.d(TAG, "onCreateView(): " + this);
 
         title = rootView.findViewById(R.id.title);
         subtitleTextView = rootView.findViewById(R.id.subtitle);

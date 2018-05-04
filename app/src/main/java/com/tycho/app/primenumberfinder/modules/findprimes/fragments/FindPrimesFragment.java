@@ -441,7 +441,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                 }
 
                 if (task.getSearchOptions().isNotifyWhenFinished()) {
-                    com.tycho.app.primenumberfinder.utils.NotificationManager.displayNotification(getActivity(), "default", task, com.tycho.app.primenumberfinder.utils.NotificationManager.REQUEST_CODE_FIND_PRIMES, "Task \"Primes from " + NUMBER_FORMAT.format(task.getStartValue()) + " to " + NUMBER_FORMAT.format(task.getEndValue()) + "\" finished.");
+                    com.tycho.app.primenumberfinder.utils.NotificationManager.displayNotification(getActivity(), "default", task, com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_PRIMES, "Task \"Primes from " + NUMBER_FORMAT.format(task.getStartValue()) + " to " + NUMBER_FORMAT.format(task.getEndValue()) + "\" finished.");
                 }
                 task.removeTaskListener(this);
             }

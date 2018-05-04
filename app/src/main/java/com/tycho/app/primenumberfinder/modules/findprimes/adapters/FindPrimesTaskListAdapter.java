@@ -21,6 +21,8 @@ import java.util.Locale;
 
 import easytasks.Task;
 
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_PRIMES;
+
 /**
  * Created by tycho on 11/16/2017.
  */
@@ -30,7 +32,7 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<AbstractT
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "FindPrimesTaskListAdptr";
+    private static final String TAG = FindPrimesTaskListAdapter.class.getSimpleName();
 
     private final Context context;
 
@@ -147,5 +149,10 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<AbstractT
     @Override
     public int getItemCount() {
         return tasks.size();
+    }
+
+    @Override
+    protected int getTaskType() {
+        return TASK_TYPE_FIND_PRIMES;
     }
 }

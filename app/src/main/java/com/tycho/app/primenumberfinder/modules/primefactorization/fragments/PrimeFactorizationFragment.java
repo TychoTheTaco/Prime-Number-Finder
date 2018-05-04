@@ -262,7 +262,7 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
 
                 //Notify when finished
                 if (task.getSearchOptions().isNotifyWhenFinished()) {
-                    com.tycho.app.primenumberfinder.utils.NotificationManager.displayNotification(getActivity(), "default", task, com.tycho.app.primenumberfinder.utils.NotificationManager.REQUEST_CODE_PRIME_FACTORIZATION, "Task \"Prime factorization of " + NUMBER_FORMAT.format(task.getNumber()) + "\" finished.");
+                    com.tycho.app.primenumberfinder.utils.NotificationManager.displayNotification(getActivity(), "default", task, com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_PRIME_FACTORIZATION, "Task \"Prime factorization of " + NUMBER_FORMAT.format(task.getNumber()) + "\" finished.");
                 }
                 task.removeTaskListener(this);
             }

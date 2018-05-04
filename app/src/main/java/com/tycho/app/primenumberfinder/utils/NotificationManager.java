@@ -16,20 +16,20 @@ import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 
 public class NotificationManager {
 
-    public static final int REQUEST_CODE_FIND_PRIMES = 0;
-    public static final int REQUEST_CODE_FIND_FACTORS = 1;
-    public static final int REQUEST_CODE_PRIME_FACTORIZATION = 2;
+    public static final int TASK_TYPE_FIND_PRIMES = 0;
+    public static final int TASK_TYPE_FIND_FACTORS = 1;
+    public static final int TASK_TYPE_PRIME_FACTORIZATION = 2;
 
     private static int nextNotificationId = 0;
 
-    public static synchronized void displayNotification(final Context context, final String channelId, final Task task, final int requestCode, final String contentText){
+    public static synchronized void displayNotification(final Context context, final String channelId, final Task task, final int taskType, final String contentText){
 
         //Create notification
         final Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.putExtra("taskType", requestCode);
+        intent.putExtra("taskType", taskType);
         intent.putExtra("taskId", task.getId());
-        final PendingIntent pendingIntent = PendingIntent.getActivity(context, requestCode, intent, FLAG_UPDATE_CURRENT);
+        final PendingIntent pendingIntent = PendingIntent.getActivity(context, nextNotificationId, intent, FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(R.drawable.circle_white)

@@ -31,7 +31,7 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public void onTaskStarted() {
         super.onTaskStarted();
-        Log.e(TAG, "onTaskStarted()");
+        Log.e(TAG, "onTaskStarted(): " + this);
         if (uiUpdater.getState() == Task.State.NOT_STARTED) {
             uiUpdater.startOnNewThread();
         } else {
@@ -42,35 +42,35 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public void onTaskPausing() {
         super.onTaskPausing();
-        Log.e(TAG, "onTaskPausing()");
+        Log.e(TAG, "onTaskPausing(): " + this);
         uiUpdater.resume(false);
     }
 
     @Override
     public void onTaskPaused() {
         super.onTaskPaused();
-        Log.e(TAG, "onTaskPaused()");
+        Log.e(TAG, "onTaskPaused(): " + this);
         uiUpdater.pause(false);
     }
 
     @Override
     public void onTaskResuming() {
         super.onTaskResuming();
-        Log.e(TAG, "onTaskResuming()");
+        Log.e(TAG, "onTaskResuming(): " + this);
         uiUpdater.resume(false);
     }
 
     @Override
     public void onTaskResumed() {
         super.onTaskResumed();
-        Log.e(TAG, "onTaskResumed()");
+        Log.e(TAG, "onTaskResumed(): " + this);
         uiUpdater.resume(false);
     }
 
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        Log.e(TAG, "onTaskStopped()");
+        Log.e(TAG, "onTaskStopped(): " + this);
         uiUpdater.pause(false);
     }
 
@@ -108,8 +108,8 @@ public abstract class ResultsFragment extends TaskFragment {
             while (true) {
 
                 if (!isAdded() || isDetached()) {
-                    Log.w(TAG, "Posting invalid update! isAdded: " + isAdded() + " isDetached: " + isDetached());
-                    Log.w(TAG, "Task is: " + getTask() + " with state " + getTask().getState());
+                    Log.w(TAG, "Posting invalid update on fragment " + ResultsFragment.this + " isAdded: " + isAdded() + " isDetached: " + isDetached());
+                    Log.w(TAG, "Task is: " + getTask() + " with state " + getTask().getState() + (getTask() != null ? " (" + ((FindPrimesResultsFragment) ResultsFragment.this).getTask().getEndValue() + ")" : ""));
                 }
                 handler.post(new Runnable() {
                     @Override
@@ -136,13 +136,14 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public void onPause() {
         super.onPause();
-        Log.e(TAG, "onPause()");
+        Log.e(TAG, "onPause(): " + this);
         uiUpdater.pause(false);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        Log.e(TAG, "onResume(): " + this);
         updateUi();
 
         if (getTask() != null) {

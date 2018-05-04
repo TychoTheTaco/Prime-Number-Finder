@@ -11,7 +11,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,9 +38,9 @@ import com.tycho.app.primenumberfinder.utils.Utils;
 
 import io.fabric.sdk.android.Fabric;
 
-import static com.tycho.app.primenumberfinder.utils.NotificationManager.REQUEST_CODE_FIND_FACTORS;
-import static com.tycho.app.primenumberfinder.utils.NotificationManager.REQUEST_CODE_FIND_PRIMES;
-import static com.tycho.app.primenumberfinder.utils.NotificationManager.REQUEST_CODE_PRIME_FACTORIZATION;
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_FACTORS;
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_PRIMES;
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_PRIME_FACTORIZATION;
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
 /**
@@ -90,7 +89,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         //Initialize analytics
         if (PrimeNumberFinder.getPreferenceManager().isAllowAnalytics()) {
             Fabric.with(this, new Crashlytics());
-        }else{
+        } else {
             Fabric.with(this, new Crashlytics.Builder().core(new CrashlyticsCore.Builder().build()).build());
         }
 
@@ -139,26 +138,26 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         });
 
         //Select the correct drawer item
-        if (savedInstanceState != null){
+        if (savedInstanceState != null) {
             //Restore fragment
             final String currentFragmentTag = savedInstanceState.getString("currentFragmentTag");
             currentFragment = getFragment(currentFragmentTag);
             selectDrawerItem(navigationView.getMenu().findItem(fragmentIds.getKey(currentFragment.getTag())));
-        }else{
+        } else {
             switch (getIntent().getIntExtra("taskType", -1)) {
                 default:
                     selectDrawerItem(0);
                     break;
 
-                case REQUEST_CODE_FIND_PRIMES:
+                case TASK_TYPE_FIND_PRIMES:
                     selectDrawerItem(0);
                     break;
 
-                case REQUEST_CODE_FIND_FACTORS:
+                case TASK_TYPE_FIND_FACTORS:
                     selectDrawerItem(1);
                     break;
 
-                case REQUEST_CODE_PRIME_FACTORIZATION:
+                case TASK_TYPE_PRIME_FACTORIZATION:
                     selectDrawerItem(2);
                     break;
             }
@@ -234,26 +233,20 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
 
     @Override
     public void onTaskStatesChanged(final int taskType, final boolean active) {
-        if (navigationView != null){
-            final String tag = currentFragment.getTag();
-            if (taskType != -1){
-                navigationView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.d(TAG, "Setting " + tag + " " + active);
-                        setActionViewVisibility(navigationView.getMenu().getItem(taskType).getItemId(), active ? View.VISIBLE : View.GONE);
-                    }
-                });
-            }
-        }else{
-            Log.w(TAG, "No navigation view!");
+        if (navigationView != null) {
+            navigationView.post(new Runnable() {
+                @Override
+                public void run() {
+                    setActionViewVisibility(navigationView.getMenu().getItem(taskType).getItemId(), active ? View.VISIBLE : View.GONE);
+                }
+            });
         }
     }
 
     /**
      * Change the visibility of a menu item's action view.
      *
-     * @param id      The ID of the {@linkplain MenuItem}.
+     * @param id         The ID of the {@linkplain MenuItem}.
      * @param visibility The visibility to set.
      */
     private void setActionViewVisibility(final int id, final int visibility) {
@@ -265,10 +258,11 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
      * if it does not yet exist in the fragment transaction. Note this method will not add it to the
      * fragment transaction meaning if it is called twice with the same tag before the returned
      * fragment was added, it will return two different instances.
+     *
      * @param tag The fragment tag.
      * @return A fragment with the corresponding tag.
      */
-    private Fragment getFragment(final String tag){
+    private Fragment getFragment(final String tag) {
         //Check if fragment exists already
         if (getSupportFragmentManager().findFragmentByTag(tag) == null) {
             switch (tag) {

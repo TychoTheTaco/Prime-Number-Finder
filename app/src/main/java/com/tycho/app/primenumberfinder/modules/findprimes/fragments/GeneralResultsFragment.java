@@ -31,6 +31,8 @@ public class GeneralResultsFragment extends ResultsFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.general_results_fragment, container, false);
         this.container = (LinearLayout) rootView;
+        Log.e(TAG, "onCreateView(): " + this);
+        Log.w(TAG, "Fragment transaction contains " + getChildFragmentManager().getFragments());
         updateContent();
         return rootView;
     }

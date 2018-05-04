@@ -78,11 +78,9 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
         if (context instanceof FloatingActionButtonHost) {
             floatingActionButtonHost = (FloatingActionButtonHost) context;
         }
-
         if (context instanceof ActionViewListener){
             actionViewListener = (ActionViewListener) context;
         }
@@ -260,7 +258,7 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
 
                 //Notify when finished
                 if (task.getSearchOptions().isNotifyWhenFinished()) {
-                    com.tycho.app.primenumberfinder.utils.NotificationManager.displayNotification(getActivity(), "default", task, com.tycho.app.primenumberfinder.utils.NotificationManager.REQUEST_CODE_FIND_FACTORS, "Task \"Factors of " + NUMBER_FORMAT.format(task.getNumber()) + "\" finished.");
+                    com.tycho.app.primenumberfinder.utils.NotificationManager.displayNotification(getActivity(), "default", task, com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_FACTORS, "Task \"Factors of " + NUMBER_FORMAT.format(task.getNumber()) + "\" finished.");
                 }
                 task.removeTaskListener(this);
             }
