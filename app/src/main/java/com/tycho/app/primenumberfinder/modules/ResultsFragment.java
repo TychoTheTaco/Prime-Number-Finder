@@ -137,6 +137,12 @@ public abstract class ResultsFragment extends TaskFragment {
     public void onPause() {
         super.onPause();
         Log.e(TAG, "onPause(): " + this);
+
+        //Remove listener
+        if (getTask() != null){
+            getTask().removeTaskListener(this);
+        }
+
         uiUpdater.pause(false);
     }
 
@@ -144,6 +150,12 @@ public abstract class ResultsFragment extends TaskFragment {
     public void onResume() {
         super.onResume();
         Log.e(TAG, "onResume(): " + this);
+
+        //Add listeners
+        if (getTask() != null){
+            getTask().addTaskListener(this);
+        }
+
         updateUi();
 
         if (getTask() != null) {
