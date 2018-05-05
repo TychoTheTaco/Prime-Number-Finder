@@ -51,4 +51,34 @@ public class NotificationManager {
         nextNotificationId++;
 
     }
+
+    public static synchronized void displaySaveNotification(final Context context, final String channelId, final Task task, final int taskType, final String contentText){
+
+        //Create notification
+        final Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.putExtra("taskType", taskType);
+        intent.putExtra("taskId", task.getId());
+        final PendingIntent pendingIntent = PendingIntent.getActivity(context, nextNotificationId, intent, FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
+                .setSmallIcon(R.drawable.circle_white)
+                .setContentTitle("Task Finished")
+                .setContentText(contentText)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+
+        //Register notification channel
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            final NotificationChannel channel = new NotificationChannel(channelId, "Default", android.app.NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setDescription("Default notification channel.");
+            final android.app.NotificationManager notificationManager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        final android.app.NotificationManager notificationManager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(nextNotificationId, builder.build());
+        nextNotificationId++;
+
+    }
 }
