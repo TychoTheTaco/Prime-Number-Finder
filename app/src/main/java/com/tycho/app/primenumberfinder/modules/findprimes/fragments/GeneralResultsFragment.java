@@ -38,9 +38,7 @@ public class GeneralResultsFragment extends ResultsFragment {
     }
 
     @Override
-    protected void onUiUpdate() {
-
-    }
+    protected void onUiUpdate() {}
 
     public void setContent(final ResultsFragment fragment){
         this.content = fragment;
@@ -53,7 +51,7 @@ public class GeneralResultsFragment extends ResultsFragment {
 
     private void updateContent(){
         if (content != null && container != null){
-            Log.w(TAG, "Set content: " + content + (content.getTask() != null ? " (" + ((FindPrimesResultsFragment) content).getTask().getEndValue() + ")" : "") + "\nFragments: " + getChildFragmentManager().getFragments());
+            Log.w(TAG, "Set content: " + content + "\nFragments: " + getChildFragmentManager().getFragments());
             getChildFragmentManager().beginTransaction().replace(container.getId(), content).commit();
         }
     }

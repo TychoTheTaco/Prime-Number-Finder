@@ -247,8 +247,8 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                 searchOptions.setStartValue(getStartValue().longValue());
 
                 //Check if the number is valid
-                editTextSearchRangeStart.setValid(Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod()) && editTextSearchRangeStart.length() != 0);
-                editTextSearchRangeEnd.setValid(true);
+                editTextSearchRangeStart.setValid((Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod()) && editTextSearchRangeStart.length() > 0) || (editTextSearchRangeStart.length() != 0 && editTextSearchRangeEnd.length() == 0));
+                editTextSearchRangeEnd.setValid(editTextSearchRangeEnd.length() > 0);
             }
         });
 
@@ -290,7 +290,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
                 Crashlytics.log("Checking valid...");
 
                 //Check if the number is valid
-                editTextSearchRangeStart.setValid(true);
+                editTextSearchRangeStart.setValid(editTextSearchRangeStart.length() > 0);
                 editTextSearchRangeEnd.setValid(Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod()) && editTextSearchRangeEnd.length() != 0);
             }
         });
@@ -452,7 +452,6 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         //Start the task
         task.startOnNewThread();
 
-        //TODO: Post to a handler because rare "java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState"
         taskListFragment.setSelected(task);
     }
 

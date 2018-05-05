@@ -32,8 +32,6 @@ public abstract class TaskFragment extends Fragment implements TaskListener {
      */
     protected final Handler handler = new Handler(Looper.getMainLooper());
 
-    //Override methods
-
     @Override
     public void onTaskStarted() {
 
@@ -69,14 +67,11 @@ public abstract class TaskFragment extends Fragment implements TaskListener {
 
     }
 
-    //Getters and setters
-
     public Task getTask(){
         return task;
     }
 
     public void setTask(Task task){
-
         //Remove task listener from previous task
         if (this.task != null){
             if (!this.task.removeTaskListener(this)){

@@ -38,9 +38,6 @@ import com.tycho.app.primenumberfinder.utils.Utils;
 
 import io.fabric.sdk.android.Fabric;
 
-import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_FACTORS;
-import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_PRIMES;
-import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_PRIME_FACTORIZATION;
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
 /**
@@ -113,7 +110,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         ((TextView) navigationView.getHeaderView(0).findViewById(R.id.app_version)).setText(getString(R.string.app_version_name, PrimeNumberFinder.getVersionName(this)));
         for (int i = 0; i < navigationView.getMenu().size(); i++) {
             try {
-                setActionViewVisibility(navigationView.getMenu().getItem(i).getItemId(), View.GONE);
+                setActionViewVisibility(navigationView.getMenu().getItem(i), false);
             } catch (NullPointerException e) {
                 //Ignore NPE because there is no action view
             }
@@ -144,23 +141,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
             currentFragment = getFragment(currentFragmentTag);
             selectDrawerItem(navigationView.getMenu().findItem(fragmentIds.getKey(currentFragment.getTag())));
         } else {
-            switch (getIntent().getIntExtra("taskType", -1)) {
-                default:
-                    selectDrawerItem(0);
-                    break;
-
-                case TASK_TYPE_FIND_PRIMES:
-                    selectDrawerItem(0);
-                    break;
-
-                case TASK_TYPE_FIND_FACTORS:
-                    selectDrawerItem(1);
-                    break;
-
-                case TASK_TYPE_PRIME_FACTORIZATION:
-                    selectDrawerItem(2);
-                    break;
-            }
+            selectDrawerItem(getIntent().getIntExtra("taskType", 0));
         }
 
         //Show a dialog while upgrading to the newest version
@@ -237,20 +218,19 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
             navigationView.post(new Runnable() {
                 @Override
                 public void run() {
-                    setActionViewVisibility(navigationView.getMenu().getItem(taskType).getItemId(), active ? View.VISIBLE : View.GONE);
+                    setActionViewVisibility(navigationView.getMenu().getItem(taskType), active);
                 }
             });
         }
     }
 
     /**
-     * Change the visibility of a menu item's action view.
-     *
-     * @param id         The ID of the {@linkplain MenuItem}.
-     * @param visibility The visibility to set.
+     * Change the visibility of the navigation view's action view.
+     * @param menuItem The menu item with an action view.
+     * @param visible
      */
-    private void setActionViewVisibility(final int id, final int visibility) {
-        navigationView.getMenu().findItem(id).getActionView().setVisibility(visibility);
+    private void setActionViewVisibility(final MenuItem menuItem, final boolean visible){
+        menuItem.getActionView().setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     /**

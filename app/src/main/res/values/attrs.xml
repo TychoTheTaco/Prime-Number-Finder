@@ -13,4 +13,8 @@
     <declare-styleable name="ValidState">
         <attr name="valid" format="boolean"/>
     </declare-styleable>
+
+    <declare-styleable name="FormattedEditText">
+        <attr name="allowZeroInput" format="boolean"/>
+    </declare-styleable>
 </resources>

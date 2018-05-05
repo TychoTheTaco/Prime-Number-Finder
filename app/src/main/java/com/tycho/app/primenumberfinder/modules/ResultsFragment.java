@@ -7,8 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesResultsFragment;
-
 import easytasks.Task;
 
 /**
@@ -75,27 +73,26 @@ public abstract class ResultsFragment extends TaskFragment {
     }
 
     /**
-     * Make sure the task isn't changed while the UI is updating.
-     *
+     * This method is synchronized to ensure that the task is not changed during a call to {@linkplain #updateUi()}.
      * @param task
      */
     @Override
-    public void setTask(Task task) {
-        synchronized (LOCK) {
-            if (task == null || task.getState() != Task.State.RUNNING) {
-                uiUpdater.pause(false);
-            }
-            super.setTask(task);
+    public synchronized void setTask(Task task) {
+        if (task == null || task.getState() != Task.State.RUNNING) {
+            uiUpdater.pause(false);
         }
+        super.setTask(task);
     }
 
-    private static final Object LOCK = new Object();
-
+    /**
+     * Update the UI immediately if the fragment is added and not detached from it's context (typically an Activity).
+     * This method is synchronized to ensure that {@linkplain #getTask()} returns the same task throughout the method.
+     */
     protected synchronized void updateUi() {
         if (isAdded() && !isDetached()) {
             onUiUpdate();
         } else {
-            Log.w(TAG, "Fragment not added or is detached! Dropping UI update: " + this  + (getTask() != null ? " (" + ((FindPrimesResultsFragment) this).getTask().getEndValue() + ")" : ""));
+            Log.w(TAG, "Fragment not added or is detached! Dropping UI update: " + this);
         }
     }
 
@@ -107,10 +104,6 @@ public abstract class ResultsFragment extends TaskFragment {
         protected void run() {
             while (true) {
 
-                if (!isAdded() || isDetached()) {
-                    Log.w(TAG, "Posting invalid update on fragment " + ResultsFragment.this + " isAdded: " + isAdded() + " isDetached: " + isDetached());
-                    Log.w(TAG, "Task is: " + getTask() + " with state " + getTask().getState() + (getTask() != null ? " (" + ((FindPrimesResultsFragment) ResultsFragment.this).getTask().getEndValue() + ")" : ""));
-                }
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -138,8 +131,8 @@ public abstract class ResultsFragment extends TaskFragment {
         super.onPause();
         Log.e(TAG, "onPause(): " + this);
 
-        //Remove listener
-        if (getTask() != null){
+        //Remove task listener
+        if (getTask() != null) {
             getTask().removeTaskListener(this);
         }
 
@@ -151,8 +144,8 @@ public abstract class ResultsFragment extends TaskFragment {
         super.onResume();
         Log.e(TAG, "onResume(): " + this);
 
-        //Add listeners
-        if (getTask() != null){
+        //Add task listener
+        if (getTask() != null) {
             getTask().addTaskListener(this);
         }
 

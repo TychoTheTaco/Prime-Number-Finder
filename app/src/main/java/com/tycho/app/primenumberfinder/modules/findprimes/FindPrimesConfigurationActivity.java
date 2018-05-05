@@ -53,7 +53,7 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "FindPrimesConfigAct";
+    private static final String TAG = FindPrimesConfigurationActivity.class.getSimpleName();
 
     private ValidEditText editTextSearchRangeStart;
     private ValidEditText editTextSearchRangeEnd;
@@ -109,8 +109,8 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
                 searchOptions.setStartValue(getStartValue().longValue());
 
                 //Check if the number is valid
-                editTextSearchRangeStart.setValid(Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod()) && editTextSearchRangeStart.length() != 0);
-                editTextSearchRangeEnd.setValid(true);
+                editTextSearchRangeStart.setValid((Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod()) && editTextSearchRangeStart.length() > 0) || (editTextSearchRangeStart.length() != 0 && editTextSearchRangeEnd.length() == 0));
+                editTextSearchRangeEnd.setValid(editTextSearchRangeEnd.length() > 0);
             }
         });
         editTextSearchRangeStart.setClearOnTouch(false);
@@ -154,7 +154,7 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
                 Crashlytics.log("Checking valid...");
 
                 //Check if the number is valid
-                editTextSearchRangeStart.setValid(true);
+                editTextSearchRangeStart.setValid(editTextSearchRangeStart.length() > 0);
                 editTextSearchRangeEnd.setValid(Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod()) && editTextSearchRangeEnd.length() != 0);
             }
         });

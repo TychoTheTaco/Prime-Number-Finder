@@ -1,6 +1,5 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -97,17 +96,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         private long finalPrimesPerSecond;
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        //Set up progress animation
-        rotate.setDuration(3000);
-        rotate.setRepeatCount(Animation.INFINITE);
-        rotate.setRepeatMode(Animation.INFINITE);
-        rotate.setInterpolator(new LinearInterpolator());
-    }
-
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -122,6 +110,12 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         noTaskView = rootView.findViewById(R.id.empty_message);
         progress = rootView.findViewById(R.id.textView_search_progress);
         bodyTextView = rootView.findViewById(R.id.text);
+
+        //Set up progress animation
+        rotate.setDuration(3000);
+        rotate.setRepeatCount(Animation.INFINITE);
+        rotate.setRepeatMode(Animation.INFINITE);
+        rotate.setInterpolator(new LinearInterpolator());
 
         //Statistics
         statisticsLayout = rootView.findViewById(R.id.statistics_layout);

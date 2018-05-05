@@ -149,5 +149,6 @@
     <string name="error_saving_file">Error saving file!</string>
     <string name="general_error">An error occurred!</string>
     <string name="loading">Loading&#8230;</string>
+    <string name="hex">0x%1$s</string>
 
 </resources>
