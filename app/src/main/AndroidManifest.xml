@@ -66,7 +66,7 @@
             android:label="Changelog"/>
 
         <activity
-            android:theme="@style/Default.NoActionBar"
+            android:theme="@style/PrimeFactorization.Activity"
             android:name=".modules.savedfiles.FactorTreeExportOptionsActivity"
             android:windowSoftInputMode="adjustPan"
             android:label="Export Options"/>

@@ -10,6 +10,8 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,10 +24,12 @@ import android.widget.Toast;
 
 import com.jaredrummler.android.colorpicker.ColorPickerDialog;
 import com.tycho.app.primenumberfinder.AbstractActivity;
-import com.tycho.app.primenumberfinder.FormattedEditText;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.RangedSeekBar;
 import com.tycho.app.primenumberfinder.TreeView;
+import com.tycho.app.primenumberfinder.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -65,15 +69,15 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
 
     private int selectedItemIndex = -1;
 
-    private FormattedEditText verticalItemSpacing;
-    private FormattedEditText itemTextSize;
-    private FormattedEditText branchWidth;
-    private FormattedEditText itemBorderWidth;
+    private ValidEditText verticalItemSpacing;
+    private ValidEditText itemTextSize;
+    private ValidEditText branchWidth;
+    private ValidEditText itemBorderWidth;
 
-    private SeekBar verticalItemSpacingSeekBar;
-    private SeekBar itemTextSizeSeekBar;
-    private SeekBar branchWidthSeekBar;
-    private SeekBar itemBorderWidthSeekBar;
+    private RangedSeekBar verticalItemSpacingSeekBar;
+    private RangedSeekBar itemTextSizeSeekBar;
+    private RangedSeekBar branchWidthSeekBar;
+    private RangedSeekBar itemBorderWidthSeekBar;
 
     private TextView imageSizeTextView;
 
@@ -96,10 +100,46 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
                 final EditText fileNameInput = findViewById(R.id.file_name);
-
                 treeView = findViewById(R.id.factor_tree_preview);
-
                 exportOptions = treeView.getDefaultExportOptions();
+
+                //Vertical item spacing
+                verticalItemSpacing = findViewById(R.id.vertical_item_spacing);
+                verticalItemSpacing.setHint(exportOptions.verticalSpacing);
+                verticalItemSpacing.setNumber(exportOptions.verticalSpacing);
+                verticalItemSpacing.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        final int value = verticalItemSpacing.getIntValue();
+                        verticalItemSpacing.setValid(verticalItemSpacing.length() > 0 && value >= 0 && value <= 400);
+
+                        verticalItemSpacingSeekBar.setValue(value);
+                    }
+                });
+                verticalItemSpacingSeekBar = findViewById(R.id.vertical_item_spacing_seekbar);
+                verticalItemSpacingSeekBar.setRange(0, 400);
+                verticalItemSpacingSeekBar.setValue(exportOptions.verticalSpacing);
+                verticalItemSpacingSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangedAdapter() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        exportOptions.verticalSpacing = verticalItemSpacingSeekBar.getFloatValue();
+                        if (fromUser) {
+                            verticalItemSpacing.setNumber(exportOptions.verticalSpacing);
+                        }
+                        treeView.recalculate();
+                        waitAndUpdateDimensions();
+                    }
+                });
 
                 //Image background color
                 imageBackgroundColorTextView = findViewById(R.id.image_background_color);
@@ -108,6 +148,7 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                 imageBackgroundColorTextView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
                         ColorPickerDialog.newBuilder().setColor(exportOptions.imageBackgroundColor).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
                         selectedItemIndex = 0;
                     }
@@ -120,6 +161,7 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                 itemTextColorTextView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
                         ColorPickerDialog.newBuilder().setColor(exportOptions.itemTextColor).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
                         selectedItemIndex = 1;
                     }
@@ -132,6 +174,7 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                 itemBackgroundColorTextView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
                         ColorPickerDialog.newBuilder().setColor(exportOptions.itemBackgroundColor).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
                         selectedItemIndex = 2;
                     }
@@ -144,6 +187,7 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                 primeFactorTextColorTextView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
                         ColorPickerDialog.newBuilder().setColor(exportOptions.primeFactorTextColor).setShowAlphaSlider(true).show((FactorTreeExportOptionsActivity.this));
                         selectedItemIndex = 3;
                     }
@@ -156,6 +200,7 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                 branchColorTextView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
                         ColorPickerDialog.newBuilder().setColor(exportOptions.branchColor).setShowAlphaSlider(true).show((FactorTreeExportOptionsActivity.this));
                         selectedItemIndex = 4;
                     }
@@ -168,6 +213,7 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                 itemBorderColorTextView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
                         ColorPickerDialog.newBuilder().setColor(exportOptions.itemBorderColor).setShowAlphaSlider(true).show((FactorTreeExportOptionsActivity.this));
                         selectedItemIndex = 5;
                     }
@@ -183,106 +229,119 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                     }
                 });
 
-                //Vertical item spacing
-                verticalItemSpacing = findViewById(R.id.vertical_item_spacing);
-                verticalItemSpacing.setText(exportOptions.verticalSpacing);
-                verticalItemSpacingSeekBar = findViewById(R.id.vertical_item_spacing_seekbar);
-                verticalItemSpacingSeekBar.setMax(400); // (max - min) / step
-                verticalItemSpacingSeekBar.setProgress((int) exportOptions.verticalSpacing);
-                verticalItemSpacingSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                //Item text size
+                itemTextSize = findViewById(R.id.item_text_size);
+                itemTextSize.setHintNumber(exportOptions.itemTextSize);
+                itemTextSize.setNumber(exportOptions.itemTextSize);
+                itemTextSize.addTextChangedListener(new TextWatcher() {
                     @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        exportOptions.verticalSpacing = 0 + (progress * 1);
-                        verticalItemSpacing.setText(exportOptions.verticalSpacing);
-                        treeView.recalculate();
-                        waitAndUpdateDimensions();
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
                     }
 
                     @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
 
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        final int value = itemTextSize.getIntValue();
+                        itemTextSize.setValid(itemTextSize.length() > 0 && value >= 0 && value <= 100);
+
+                        itemTextSizeSeekBar.setValue(value);
                     }
                 });
-
-                itemTextSize = findViewById(R.id.item_text_size);
-                itemTextSize.setText(String.valueOf((int) exportOptions.itemTextSize));
-
                 itemTextSizeSeekBar = findViewById(R.id.item_text_size_seekbar);
-                itemTextSizeSeekBar.setMax(100 - 8); // (max - min) / step
-                itemTextSizeSeekBar.setProgress((int) exportOptions.itemTextSize - 8);
-                itemTextSizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                itemTextSizeSeekBar.setRange(8, 100);
+                itemTextSizeSeekBar.setSteps(10);
+                itemTextSizeSeekBar.setValue(exportOptions.itemTextSize);
+                itemTextSizeSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangedAdapter() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        exportOptions.itemTextSize = 8 + (progress * 1);
-                        itemTextSize.setText(String.valueOf((int) exportOptions.itemTextSize));
+                        exportOptions.itemTextSize = itemTextSizeSeekBar.getIntValue();
+                        if (fromUser) {
+                            itemTextSize.setNumber(exportOptions.itemTextSize);
+                        }
+
                         treeView.recalculate();
                         waitAndUpdateDimensions();
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-
                     }
                 });
 
                 branchWidth = findViewById(R.id.branch_width);
-                branchWidth.setText(String.valueOf((int) exportOptions.branchWidth));
+                branchWidth.setHintNumber(exportOptions.branchWidth);
+                branchWidth.setNumber(exportOptions.branchWidth);
+                branchWidth.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        final float value = branchWidth.getFloatValue();
+                        branchWidth.setValid(branchWidth.length() > 0 && value >= 0 && value <= 5);
+
+                        branchWidthSeekBar.setValue(value);
+                    }
+                });
                 branchWidthSeekBar = findViewById(R.id.branch_width_seekbar);
-                branchWidthSeekBar.setMax(5 - 1); // (max - min) / step
-                branchWidthSeekBar.setProgress((int) exportOptions.branchWidth - 1);
-                branchWidthSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                branchWidthSeekBar.setRange(1, 5);
+                branchWidthSeekBar.setSteps(10);
+                branchWidthSeekBar.setValue(exportOptions.branchWidth);
+                branchWidthSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangedAdapter() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        exportOptions.branchWidth = 1 + (progress * 1);
-                        branchWidth.setText(String.valueOf((int) exportOptions.branchWidth));
+                        exportOptions.branchWidth = branchWidthSeekBar.getFloatValue();
+                        if (fromUser) {
+                            branchWidth.setNumber(exportOptions.branchWidth);
+                        }
                         treeView.redraw();
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-
                     }
                 });
 
+                //Item border width
                 itemBorderWidth = findViewById(R.id.item_border_width);
-                itemBorderWidth.setText(String.valueOf((int) exportOptions.itemBorderWidth));
+                itemBorderWidth.setHintNumber(exportOptions.itemBorderWidth);
+                itemBorderWidth.setNumber(exportOptions.itemBorderWidth);
+                itemBorderWidth.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        final float value = itemBorderWidth.getFloatValue();
+                        itemBorderWidth.setValid(itemBorderWidth.length() > 0 && value >= 0 && value <= 5);
+
+                        itemBorderWidthSeekBar.setValue(value);
+                    }
+                });
                 itemBorderWidthSeekBar = findViewById(R.id.item_border_width_seekbar);
-                itemBorderWidthSeekBar.setMax(5 - 1); // (max - min) / step
-                itemBorderWidthSeekBar.setProgress((int) exportOptions.itemBorderWidth - 1);
-                itemBorderWidthSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                itemBorderWidthSeekBar.setRange(1, 5);
+                itemBorderWidthSeekBar.setSteps(10);
+                itemBorderWidthSeekBar.setValue(exportOptions.branchWidth);
+                itemBorderWidthSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangedAdapter() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        exportOptions.itemBorderWidth = 1 + (progress * 1);
-                        itemBorderWidth.setText(String.valueOf((int) exportOptions.itemBorderWidth));
+                        exportOptions.itemBorderWidth = itemBorderWidthSeekBar.getFloatValue();
+                        if (fromUser) {
+                            itemBorderWidth.setNumber(exportOptions.itemBorderWidth);
+                        }
                         treeView.redraw();
                         //waitAndUpdateDimensions();
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-
                     }
                 });
 
@@ -307,35 +366,38 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                 exportButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        if (checkInputs()) {
+                            final com.tycho.app.primenumberfinder.ProgressDialog progressDialog = new com.tycho.app.primenumberfinder.ProgressDialog(FactorTreeExportOptionsActivity.this);
+                            progressDialog.setTitle("Exporting...");
+                            progressDialog.show();
 
-                        final com.tycho.app.primenumberfinder.ProgressDialog progressDialog = new com.tycho.app.primenumberfinder.ProgressDialog(FactorTreeExportOptionsActivity.this);
-                        progressDialog.setTitle("Exporting...");
-                        progressDialog.show();
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
 
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
+                                    //Convert the file to the requested format
+                                    final File image = new File(FileManager.getInstance().getExportCacheDirectory() + File.separator + fileNameInput.getText().toString().trim() + ".png");
+                                    try {
+                                        final OutputStream stream = new FileOutputStream(image);
+                                        treeView.drawToBitmap(exportOptions).compress(Bitmap.CompressFormat.PNG, 100, stream);
+                                        stream.close();
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
 
-                                //Convert the file to the requested format
-                                final File image = new File(FileManager.getInstance().getExportCacheDirectory() + File.separator + fileNameInput.getText().toString().trim() + ".png");
-                                try {
-                                    final OutputStream stream = new FileOutputStream(image);
-                                    treeView.drawToBitmap(exportOptions).compress(Bitmap.CompressFormat.PNG, 100, stream);
-                                    stream.close();
-                                } catch (Exception e) {
-                                    e.printStackTrace();
+                                    progressDialog.dismiss();
+
+                                    final Uri path = FileProvider.getUriForFile(FactorTreeExportOptionsActivity.this, "com.tycho.app.primenumberfinder", image);
+                                    final Intent intent = new Intent(Intent.ACTION_SEND);
+                                    intent.putExtra(Intent.EXTRA_STREAM, path);
+                                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                    intent.setType("image/*");
+                                    startActivity(intent);
                                 }
-
-                                progressDialog.dismiss();
-
-                                final Uri path = FileProvider.getUriForFile(FactorTreeExportOptionsActivity.this, "com.tycho.app.primenumberfinder", image);
-                                final Intent intent = new Intent(Intent.ACTION_SEND);
-                                intent.putExtra(Intent.EXTRA_STREAM, path);
-                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                intent.setType("image/*");
-                                startActivity(intent);
-                            }
-                        }).start();
+                            }).start();
+                        } else {
+                            Toast.makeText(getBaseContext(), "Invalid inputs!", Toast.LENGTH_LONG).show();
+                        }
                     }
                 });
 
@@ -375,11 +437,11 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG, "Waiting...");
+                //Log.d(TAG, "Waiting...");
                 while (!treeView.isGenerated()) {
                     //TODO: This is bad
                 }
-                Log.d(TAG, "Done waiting.");
+                //Log.d(TAG, "Done waiting.");
                 new Handler(getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
@@ -486,5 +548,32 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
 
     @Override
     public void onDialogDismissed(int dialogId) {
+    }
+
+    private class OnSeekBarChangedAdapter implements SeekBar.OnSeekBarChangeListener {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+            findViewById(R.id.root).requestFocus();
+            Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    }
+
+    private boolean checkInputs() {
+        final EditText[] editTexts = new EditText[]{verticalItemSpacing, branchWidth, itemTextSize, itemBorderWidth};
+        for (EditText editText : editTexts) {
+            if (editText.length() == 0) {
+                return false;
+            }
+        }
+        return true;
     }
 }

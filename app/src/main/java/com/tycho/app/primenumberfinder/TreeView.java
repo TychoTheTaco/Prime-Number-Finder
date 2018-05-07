@@ -6,11 +6,9 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -643,12 +641,12 @@ public class TreeView extends View {
         public boolean itemBackgrounds;
         public int itemBackgroundColor;
         public int itemBorderColor;
-        public int itemBorderWidth;
+        public float itemBorderWidth;
 
         public int primeFactorTextColor;
 
         public int branchColor;
-        public int branchWidth;
+        public float branchWidth;
 
         public float verticalSpacing;
 

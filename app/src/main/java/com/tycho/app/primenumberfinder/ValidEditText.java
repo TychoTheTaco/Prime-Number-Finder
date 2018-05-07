@@ -2,23 +2,18 @@ package com.tycho.app.primenumberfinder;
 
 
 import android.content.Context;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.content.res.ColorStateList;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.tycho.app.primenumberfinder.utils.Utils;
-
-import java.text.NumberFormat;
-import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by tycho on 2/16/2018.
  */
 
-public class ValidEditText extends android.support.v7.widget.AppCompatEditText {
+public class ValidEditText extends FormattedEditText {
 
     /**
      * Tag used for logging and debugging.
@@ -32,16 +27,9 @@ public class ValidEditText extends android.support.v7.widget.AppCompatEditText {
     private final CopyOnWriteArrayList<OnTouchListener> onTouchListeners = new CopyOnWriteArrayList<>();
 
     /**
-     * {@linkplain NumberFormat} instance used to format numbers with commas.
-     */
-    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
-
-    /**
      * {@code true} if the text should be cleared on a touch event.
      */
     private boolean clearOnTouch = true;
-
-    private boolean allowZeroInput = false;
 
     public ValidEditText(final Context context) {
         super(context);
@@ -60,6 +48,13 @@ public class ValidEditText extends android.support.v7.widget.AppCompatEditText {
 
     private void init() {
         setBackgroundTintList(getResources().getColorStateList(R.color.valid_edittext_background));
+        //Log.d(TAG, "Color: " + Integer.toHexString(getTextColors().getColorForState(new int[]{android.R.attr.state_selected}, -1)));
+        /*setBackgroundTintList(createColorStateList(
+                ContextCompat.getColor(getContext(), R.color.gray),
+                ContextCompat.getColor(getContext(), R.color.orange_inverse),
+                ContextCompat.getColor(getContext(), R.color.item_disabled),
+                ContextCompat.getColor(getContext(), R.color.red)
+                ));*/
         setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -78,35 +73,7 @@ public class ValidEditText extends android.support.v7.widget.AppCompatEditText {
                 return false;
             }
         });
-        addTextChangedListener(textWatcher);
     }
-
-    public void overrideDefaultTextWatcher() {
-        removeTextChangedListener(textWatcher);
-    }
-
-    private final TextWatcher textWatcher = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        }
-
-        @Override
-        public void afterTextChanged(Editable editable) {
-            //Format text
-            final String formatted = NUMBER_FORMAT.format(Utils.textToNumber(getText().toString()));
-            if (editable.length() > 0 && !editable.toString().equals(formatted)) {
-                setText(formatted, formatted.length() > 1);
-            } else if (!allowZeroInput && editable.toString().equals(NUMBER_FORMAT.format(0))) {
-                getText().clear();
-            }
-        }
-    };
 
     @Override
     protected int[] onCreateDrawableState(int extraSpace) {
@@ -120,10 +87,6 @@ public class ValidEditText extends android.support.v7.widget.AppCompatEditText {
     public void setValid(final boolean valid) {
         this.valid = valid;
         refreshDrawableState();
-    }
-
-    public void setAllowZeroInput(boolean allowZeroInput) {
-        this.allowZeroInput = allowZeroInput;
     }
 
     @Override
@@ -155,24 +118,18 @@ public class ValidEditText extends android.support.v7.widget.AppCompatEditText {
         this.clearOnTouch = clearOnTouch;
     }
 
-    /**
-     * Set the text and optionally retain the cursor position. The normal
-     * {@linkplain #setText(CharSequence)} method places the cursor at the beginning of the text,
-     * which is not always desired.
-     *
-     * @param text                  The text to set.
-     * @param restoreCursorPosition {@code true} if the cursor position should be restored after the
-     *                              text has been set.
-     */
-    public void setText(final String text, final boolean restoreCursorPosition) {
-        final int oldCursorPosition = getSelectionStart();
-        final int oldLength = getText().length();
-        super.setText(text);
-        if (restoreCursorPosition) {
-            final int newCursorPosition = oldCursorPosition + (text.length() - oldLength);
-            setSelection((newCursorPosition >= 0 && newCursorPosition <= length()) ? newCursorPosition : 0);
-        } else {
-            setSelection(length());
-        }
+    private ColorStateList createColorStateList(final int defaultColor, final int focusedColor, final int disabledColor, final int invalidColor) {
+        return new ColorStateList(
+                new int[][]{
+                        new int[]{}, //Default
+                        new int[]{android.R.attr.state_focused}, //Focused
+                        new int[]{-android.R.attr.state_enabled}, //Disabled
+                        new int[]{-R.attr.valid}}, //Invalid
+                new int[]{
+                        defaultColor,
+                        focusedColor,
+                        disabledColor,
+                        invalidColor
+                });
     }
 }

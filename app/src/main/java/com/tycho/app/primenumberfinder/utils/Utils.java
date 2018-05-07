@@ -15,6 +15,7 @@ import android.view.inputmethod.InputMethodManager;
 import com.crashlytics.android.Crashlytics;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.Collections;
@@ -259,5 +260,15 @@ public final class Utils {
         }
 
         return BigInteger.ZERO;
+    }
+
+    public static BigDecimal textToDecimal(String text){
+        Crashlytics.log("Raw input: '" + text + "'");
+
+        if (text.length() == 0){
+            return BigDecimal.ZERO;
+        }
+
+        return new BigDecimal(text);
     }
 }

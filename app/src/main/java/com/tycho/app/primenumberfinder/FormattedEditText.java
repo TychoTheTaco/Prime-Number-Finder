@@ -3,15 +3,19 @@ package com.tycho.app.primenumberfinder;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 
 import com.tycho.app.primenumberfinder.utils.Utils;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class FormattedEditText extends android.support.v7.widget.AppCompatEditText{
+public class FormattedEditText extends android.support.v7.widget.AppCompatEditText {
 
     /**
      * Tag used for logging and debugging.
@@ -21,8 +25,18 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
     /**
      * {@linkplain NumberFormat} instance used to format numbers with commas.
      */
-    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
+    protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
+    /**
+     * {@linkplain DecimalFormat} instance used to format numbers with a decimal point.
+     */
+    protected static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.#");
+
+    /**
+     * If this is set to {@code true}, then this view will allow the user to enter the number '0'.
+     * If this is set to {@code false}, then this view will prevent the user from entering '0', and
+     * will instead just leave the view empty.
+     */
     private boolean allowZeroInput;
 
     public FormattedEditText(Context context) {
@@ -40,7 +54,7 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
         init(attrs);
     }
 
-    private void init(final AttributeSet attributeSet){
+    private void init(final AttributeSet attributeSet) {
         //Get xml attributes
         TypedArray typedArray = getContext().obtainStyledAttributes(
                 attributeSet,
@@ -70,11 +84,28 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
         @Override
         public void afterTextChanged(Editable editable) {
             //Format text
-            final String formatted = NUMBER_FORMAT.format(Utils.textToNumber(getText().toString()));
-            if (editable.length() > 0 && !editable.toString().equals(formatted)) {
-                setText(formatted, formatted.length() > 1);
-            } else if (!allowZeroInput && editable.toString().equals(NUMBER_FORMAT.format(0))) {
-                getText().clear();
+            if (isDecimalInput()) {
+
+                //If the text ends with a decimal, don't modify it
+                final Pattern pattern = Pattern.compile("[^\\d]$");
+                final Matcher matcher = pattern.matcher(editable);
+                if (matcher.find()) {
+                    return;
+                }
+
+                final String formatted = DECIMAL_FORMAT.format(Utils.textToDecimal(getText().toString()));
+                if (editable.length() > 0 && !editable.toString().equals(formatted)) {
+                    setText(formatted, formatted.length() > 1);
+                } else if (!allowZeroInput && editable.toString().equals(DECIMAL_FORMAT.format(0))) {
+                    getText().clear();
+                }
+            } else {
+                final String formatted = NUMBER_FORMAT.format(Utils.textToNumber(getText().toString()));
+                if (editable.length() > 0 && !editable.toString().equals(formatted)) {
+                    setText(formatted, formatted.length() > 1);
+                } else if (!allowZeroInput && editable.toString().equals(NUMBER_FORMAT.format(0))) {
+                    getText().clear();
+                }
             }
         }
     };
@@ -100,8 +131,28 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
         }
     }
 
-    public void setText(final Number number){
-        setText(NUMBER_FORMAT.format(number));
+    public void setHint(final Number number) {
+        if (isDecimalInput()) {
+            setHint(DECIMAL_FORMAT.format(number));
+        } else {
+            setHint(NUMBER_FORMAT.format(number));
+        }
+    }
+
+    public void setHintNumber(final Number number) {
+        setHint(number);
+    }
+
+    public void setText(final Number number) {
+        if (isDecimalInput()) {
+            setText(DECIMAL_FORMAT.format(number));
+        } else {
+            setText(NUMBER_FORMAT.format(number));
+        }
+    }
+
+    public void setNumber(final Number number) {
+        setText(number);
     }
 
     public boolean isAllowZeroInput() {
@@ -110,5 +161,33 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
 
     public void setAllowZeroInput(boolean allowZeroInput) {
         this.allowZeroInput = allowZeroInput;
+    }
+
+    public void overrideDefaultTextWatcher() {
+        removeTextChangedListener(textWatcher);
+    }
+
+    public Number getNumberValue() {
+        return Utils.textToNumber(getText().toString());
+    }
+
+    public Number getDecimalValue() {
+        return Utils.textToDecimal(getText().toString());
+    }
+
+    public int getIntValue() {
+        return getNumberValue().intValue();
+    }
+
+    public float getFloatValue() {
+        return getDecimalValue().floatValue();
+    }
+
+    public long getLongValue() {
+        return getNumberValue().longValue();
+    }
+
+    private boolean isDecimalInput() {
+        return getInputType() == (InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
     }
 }

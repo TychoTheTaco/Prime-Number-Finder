@@ -43,7 +43,6 @@
                         android:id="@+id/file_name"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
                         android:layout_weight="1"
                         android:imeOptions="actionDone"
                         android:includeFontPadding="false"
@@ -73,7 +72,6 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     android:layout_marginTop="4dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -97,7 +95,6 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     android:orientation="horizontal">
 
                     <TextView
@@ -106,7 +103,7 @@
                         android:layout_height="wrap_content"
                         android:text="Vertical item spacing:" />
 
-                    <com.tycho.app.primenumberfinder.FormattedEditText
+                    <com.tycho.app.primenumberfinder.ValidEditText
                         android:id="@+id/vertical_item_spacing"
                         android:layout_width="48dp"
                         android:layout_height="wrap_content"
@@ -125,19 +122,25 @@
                         android:textColor="@color/secondary_text"
                         android:textSize="14sp" />
 
-                    <SeekBar
+                    <com.tycho.app.primenumberfinder.RangedSeekBar
                         android:id="@+id/vertical_item_spacing_seekbar"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="8dp" />
+                        android:layout_height="match_parent" />
 
                 </LinearLayout>
+
+                <!-- Branch style -->
+                <TextView
+                    style="@style/Label.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Branch Style" />
 
                 <!-- Branch color -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     android:layout_marginTop="4dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -146,7 +149,7 @@
                         style="@style/DefaultText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Branch color:" />
+                        android:text="Color:" />
 
                     <TextView
                         android:id="@+id/branch_color"
@@ -161,23 +164,22 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     android:orientation="horizontal">
 
                     <TextView
                         style="@style/DefaultText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Branch width:" />
+                        android:text="Width:" />
 
-                    <com.tycho.app.primenumberfinder.FormattedEditText
+                    <com.tycho.app.primenumberfinder.ValidEditText
                         android:id="@+id/branch_width"
                         android:layout_width="48dp"
                         android:layout_height="wrap_content"
                         android:gravity="center_horizontal"
                         android:imeOptions="actionDone"
                         android:includeFontPadding="false"
-                        android:inputType="number"
+                        android:inputType="numberDecimal"
                         android:textSize="14sp" />
 
                     <TextView
@@ -188,11 +190,10 @@
                         android:textColor="@color/secondary_text"
                         android:textSize="14sp" />
 
-                    <SeekBar
+                    <com.tycho.app.primenumberfinder.RangedSeekBar
                         android:id="@+id/branch_width_seekbar"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="8dp" />
+                        android:layout_height="match_parent" />
 
                 </LinearLayout>
 
@@ -202,13 +203,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Item Style" />
+                    android:text="Text Style" />
 
                 <!-- Item text color-->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     android:layout_marginTop="4dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -217,10 +217,33 @@
                         style="@style/DefaultText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Item text color:" />
+                        android:text="Text color:" />
 
                     <TextView
                         android:id="@+id/item_text_color"
+                        style="@style/ColorPicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp" />
+
+                </LinearLayout>
+
+                <!-- Prime factor text color-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/DefaultText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Prime factor text color:" />
+
+                    <TextView
+                        android:id="@+id/prime_factor_text_color"
                         style="@style/ColorPicker"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -232,16 +255,15 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     android:orientation="horizontal">
 
                     <TextView
                         style="@style/DefaultText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Item text size:" />
+                        android:text="Text size:" />
 
-                    <com.tycho.app.primenumberfinder.FormattedEditText
+                    <com.tycho.app.primenumberfinder.ValidEditText
                         android:id="@+id/item_text_size"
                         android:layout_width="48dp"
                         android:layout_height="wrap_content"
@@ -259,26 +281,32 @@
                         android:textColor="@color/secondary_text"
                         android:textSize="14sp" />
 
-                    <SeekBar
+                    <com.tycho.app.primenumberfinder.RangedSeekBar
                         android:id="@+id/item_text_size_seekbar"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="8dp" />
+                        android:layout_height="match_parent" />
 
                 </LinearLayout>
+
+                <!-- Image style -->
+                <TextView
+                    style="@style/Label.Bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Item Background Style" />
 
                 <CheckBox
                     android:id="@+id/item_background_checkbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
                     android:text="Item backgrounds" />
 
                 <!-- Item background color -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="42dp"
+                    android:layout_marginStart="6dp"
                     android:layout_marginTop="4dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -288,7 +316,7 @@
                         style="@style/DefaultText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Item background color:" />
+                        android:text="Background color:" />
 
                     <TextView
                         android:id="@+id/item_background_color"
@@ -303,7 +331,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="42dp"
+                    android:layout_marginStart="6dp"
                     android:layout_marginTop="4dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -313,7 +341,7 @@
                         style="@style/DefaultText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Item border color:" />
+                        android:text="Border color:" />
 
                     <TextView
                         android:id="@+id/item_border_color"
@@ -328,23 +356,23 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="42dp"
+                    android:layout_marginStart="6dp"
                     android:orientation="horizontal">
 
                     <TextView
                         style="@style/DefaultText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Item border width:" />
+                        android:text="Border width:" />
 
-                    <com.tycho.app.primenumberfinder.FormattedEditText
+                    <com.tycho.app.primenumberfinder.ValidEditText
                         android:id="@+id/item_border_width"
                         android:layout_width="48dp"
                         android:layout_height="wrap_content"
                         android:gravity="center_horizontal"
                         android:imeOptions="actionDone"
                         android:includeFontPadding="false"
-                        android:inputType="number"
+                        android:inputType="numberDecimal"
                         android:textSize="14sp" />
 
                     <TextView
@@ -355,35 +383,10 @@
                         android:textColor="@color/secondary_text"
                         android:textSize="14sp" />
 
-                    <SeekBar
+                    <com.tycho.app.primenumberfinder.RangedSeekBar
                         android:id="@+id/item_border_width_seekbar"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="8dp" />
-
-                </LinearLayout>
-
-                <!-- Prime factor text color-->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="4dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        style="@style/DefaultText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Prime factor text color:" />
-
-                    <TextView
-                        android:id="@+id/prime_factor_text_color"
-                        style="@style/ColorPicker"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp" />
+                        android:layout_height="match_parent" />
 
                 </LinearLayout>
 
