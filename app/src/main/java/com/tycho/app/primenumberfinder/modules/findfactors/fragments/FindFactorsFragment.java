@@ -2,6 +2,7 @@ package com.tycho.app.primenumberfinder.modules.findfactors.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -89,6 +90,17 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_factors_fragment, viewGroup, false);
+
+        //Apply action button color
+        if (floatingActionButtonHost != null){
+            floatingActionButtonHost.getFab(0).setBackgroundTintList(new ColorStateList(
+                    new int[][]{
+                            new int[]{}
+                    },
+                    new int[]{
+                            Utils.getAccentColor(rootView.getContext())
+                    }));
+        }
 
         //Set fragment adapter
         final SimpleFragmentAdapter simpleFragmentAdapter = new SimpleFragmentAdapter(getChildFragmentManager(), getContext());
@@ -211,6 +223,17 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
     public void initFab(View view) {
         if (fabAnimator != null){
             fabAnimator.onPageScrolled(viewPager.getCurrentItem(), 0, 0);
+
+            if (getView() != null){
+                floatingActionButtonHost.getFab(0).setBackgroundTintList(new ColorStateList(
+                        new int[][]{
+                                new int[]{}
+                        },
+                        new int[]{
+                                Utils.getAccentColor(getView().getContext())
+                        })
+                );
+            }
         }
     }
 

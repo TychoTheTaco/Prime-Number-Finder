@@ -3,9 +3,12 @@ package com.tycho.app.primenumberfinder;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+
+import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -33,28 +36,27 @@ public class ValidEditText extends FormattedEditText {
 
     public ValidEditText(final Context context) {
         super(context);
-        init();
+        init(context, null);
     }
 
     public ValidEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context, attrs);
     }
 
     public ValidEditText(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context, attrs);
     }
 
-    private void init() {
-        setBackgroundTintList(getResources().getColorStateList(R.color.valid_edittext_background));
-        //Log.d(TAG, "Color: " + Integer.toHexString(getTextColors().getColorForState(new int[]{android.R.attr.state_selected}, -1)));
-        /*setBackgroundTintList(createColorStateList(
-                ContextCompat.getColor(getContext(), R.color.gray),
-                ContextCompat.getColor(getContext(), R.color.orange_inverse),
-                ContextCompat.getColor(getContext(), R.color.item_disabled),
-                ContextCompat.getColor(getContext(), R.color.red)
-                ));*/
+    private void init(final Context context, final AttributeSet attributeSet) {
+        setBackgroundTintList(createColorStateList(
+                Color.GRAY,
+                Utils.getAccentColor(context),
+                Color.GRAY,
+                Color.RED
+        ));
+
         setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -121,15 +123,16 @@ public class ValidEditText extends FormattedEditText {
     private ColorStateList createColorStateList(final int defaultColor, final int focusedColor, final int disabledColor, final int invalidColor) {
         return new ColorStateList(
                 new int[][]{
-                        new int[]{}, //Default
-                        new int[]{android.R.attr.state_focused}, //Focused
                         new int[]{-android.R.attr.state_enabled}, //Disabled
-                        new int[]{-R.attr.valid}}, //Invalid
+                        new int[]{-R.attr.valid}, //Invalid
+                        new int[]{android.R.attr.state_focused}, //Focused
+                        new int[]{} //Default
+                        },
                 new int[]{
-                        defaultColor,
-                        focusedColor,
                         disabledColor,
-                        invalidColor
+                        invalidColor,
+                        focusedColor,
+                        defaultColor
                 });
     }
 }

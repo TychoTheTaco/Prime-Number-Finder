@@ -2,6 +2,7 @@ package com.tycho.app.primenumberfinder.modules.primefactorization.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -86,6 +87,17 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.prime_factorization_fragment, container, false);
+
+        //Apply action button color
+        if (floatingActionButtonHost != null){
+            floatingActionButtonHost.getFab(0).setBackgroundTintList(new ColorStateList(
+                    new int[][]{
+                            new int[]{}
+                    },
+                    new int[]{
+                            Utils.getAccentColor(rootView.getContext())
+                    }));
+        }
 
         //Set fragment adapter
         final SimpleFragmentAdapter simpleFragmentAdapter = new SimpleFragmentAdapter(getChildFragmentManager(), getContext());
@@ -215,6 +227,17 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
     public void initFab(View view) {
         if (fabAnimator != null){
             fabAnimator.onPageScrolled(viewPager.getCurrentItem(), 0, 0);
+
+            if (getView() != null){
+                floatingActionButtonHost.getFab(0).setBackgroundTintList(new ColorStateList(
+                        new int[][]{
+                                new int[]{}
+                        },
+                        new int[]{
+                                Utils.getAccentColor(getView().getContext())
+                        })
+                );
+            }
         }
     }
 

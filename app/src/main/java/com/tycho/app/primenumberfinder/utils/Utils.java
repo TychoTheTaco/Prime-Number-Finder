@@ -2,6 +2,7 @@ package com.tycho.app.primenumberfinder.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
@@ -270,5 +271,16 @@ public final class Utils {
         }
 
         return new BigDecimal(text);
+    }
+
+    public static int getAccentColor(final Context context) {
+        TypedValue typedValue = new TypedValue();
+
+        TypedArray a = context.obtainStyledAttributes(typedValue.data, new int[] { android.R.attr.colorAccent });
+        int color = a.getColor(0, 0);
+
+        a.recycle();
+
+        return color;
     }
 }

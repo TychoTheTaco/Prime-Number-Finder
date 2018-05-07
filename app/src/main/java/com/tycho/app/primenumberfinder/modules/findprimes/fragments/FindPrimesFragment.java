@@ -2,6 +2,7 @@ package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -99,7 +100,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             floatingActionButtonHost = (FloatingActionButtonHost) context;
         }
 
-        if (context instanceof ActionViewListener){
+        if (context instanceof ActionViewListener) {
             actionViewListener = (ActionViewListener) context;
         }
     }
@@ -107,6 +108,17 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_primes_fragment, viewGroup, false);
+
+        //Apply action button color
+        if (floatingActionButtonHost != null){
+            floatingActionButtonHost.getFab(0).setBackgroundTintList(new ColorStateList(
+                    new int[][]{
+                            new int[]{}
+                    },
+                    new int[]{
+                            Utils.getAccentColor(rootView.getContext())
+                    }));
+        }
 
         //Set fragment adapter
         final SimpleFragmentAdapter simpleFragmentAdapter = new SimpleFragmentAdapter(getChildFragmentManager(), getContext());
@@ -340,7 +352,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         rootView.requestFocus();
 
         //Scroll to Results fragment if started from a notification
-        if (getActivity().getIntent().getSerializableExtra("taskId") != null){
+        if (getActivity().getIntent().getSerializableExtra("taskId") != null) {
             viewPager.setCurrentItem(1);
         }
 
@@ -376,6 +388,17 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
     public void initFab(View view) {
         if (fabAnimator != null) {
             fabAnimator.onPageScrolled(viewPager.getCurrentItem(), 0, 0);
+
+            if (getView() != null){
+                floatingActionButtonHost.getFab(0).setBackgroundTintList(new ColorStateList(
+                        new int[][]{
+                                new int[]{}
+                        },
+                        new int[]{
+                                Utils.getAccentColor(getView().getContext())
+                        })
+                );
+            }
         }
     }
 
