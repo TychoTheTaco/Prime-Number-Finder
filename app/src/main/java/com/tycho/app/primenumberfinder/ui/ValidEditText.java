@@ -1,4 +1,4 @@
-package com.tycho.app.primenumberfinder;
+package com.tycho.app.primenumberfinder.ui;
 
 
 import android.content.Context;
@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.util.concurrent.CopyOnWriteArrayList;

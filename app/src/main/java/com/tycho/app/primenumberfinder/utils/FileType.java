@@ -8,6 +8,7 @@ import android.content.res.Resources;
  */
 
 public enum FileType{
+    UNKNOWN(-1),
     PRIMES(0),
     FACTORS(1),
     TREE(2);

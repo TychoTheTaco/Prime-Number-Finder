@@ -19,13 +19,6 @@
             android:paddingTop="8dp"
             android:paddingBottom="8dp">
 
-            <!--<ImageView
-                android:layout_width="match_parent"
-                android:layout_height="120dp"
-                android:adjustViewBounds="true"
-                android:scaleType="centerCrop"
-                android:src="@drawable/feature_graphic" />-->
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

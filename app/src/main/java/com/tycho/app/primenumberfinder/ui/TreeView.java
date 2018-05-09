@@ -1,4 +1,4 @@
-package com.tycho.app.primenumberfinder;
+package com.tycho.app.primenumberfinder.ui;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -12,6 +12,8 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
+
+import com.tycho.app.primenumberfinder.R;
 
 import simpletrees.Tree;
 

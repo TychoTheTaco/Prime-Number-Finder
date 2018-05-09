@@ -2,34 +2,44 @@ package com.tycho.app.primenumberfinder.modules.savedfiles;
 
 import android.content.Context;
 
-import com.tycho.app.primenumberfinder.utils.FileType;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesSmallListAdapter;
+
+import java.io.File;
 
 /**
  * @author Tycho Bellers
  *         Date Created: 11/4/2016
  */
-//l
 public class SavedFilesCard {
 
+    /**
+     * Title of the card
+     */
     private String title;
-    private String subTitle;
+
+    /**
+     * The directory that this card is showing files from.
+     */
+    private final File directory;
+
+    /**
+     * The background color.
+     */
     private int backgroundColor;
 
+    /**
+     * A user-assigned tag used to identify this card.
+     */
     private final String tag;
 
     private SavedFilesSmallListAdapter savedFilesAdapter;
 
-    public SavedFilesCard(final String tag){
-        this.tag = tag;
-    }
-
-    public SavedFilesCard(final Context context, String tag, String title, String subTitle, int backgroundColor, final FileType fileType){
+    public SavedFilesCard(final Context context, String tag, String title, int backgroundColor, final File directory){
         this.title = title;
-        this.subTitle = subTitle;
         this.tag = tag;
         this.backgroundColor = backgroundColor;
-        this.savedFilesAdapter = new SavedFilesSmallListAdapter(context, fileType);
+        this.directory = directory;
+        this.savedFilesAdapter = new SavedFilesSmallListAdapter(context, directory);
     }
 
     public SavedFilesSmallListAdapter getSavedFilesAdapter(){
@@ -53,15 +63,15 @@ public class SavedFilesCard {
         return savedFilesAdapter.getItemCount() + " saved files";
     }
 
-    public void setSubTitle(String subTitle){
-        this.subTitle = subTitle;
-    }
-
     public String getTitle(){
         return title;
     }
 
     public void setTitle(String title){
         this.title = title;
+    }
+
+    public File getDirectory() {
+        return directory;
     }
 }

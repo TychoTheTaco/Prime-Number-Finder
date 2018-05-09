@@ -668,4 +668,15 @@ public final class FileManager {
         }
         return 0;
     }
+
+    public static FileType getFileType(final File directory){
+        if (directory.equals(getInstance().getSavedPrimesDirectory())){
+            return FileType.PRIMES;
+        } else if (directory.equals(getInstance().getSavedFactorsDirectory())){
+            return FileType.FACTORS;
+        } else if (directory.equals(getInstance().getSavedTreesDirectory())){
+            return FileType.TREE;
+        }
+        return FileType.UNKNOWN;
+    }
 }

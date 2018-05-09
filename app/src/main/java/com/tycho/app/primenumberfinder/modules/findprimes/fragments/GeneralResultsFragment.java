@@ -2,7 +2,6 @@ package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,8 +30,6 @@ public class GeneralResultsFragment extends ResultsFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.general_results_fragment, container, false);
         this.container = (LinearLayout) rootView;
-        Log.e(TAG, "onCreateView(): " + this);
-        Log.w(TAG, "Fragment transaction contains " + getChildFragmentManager().getFragments());
         updateContent();
         return rootView;
     }
@@ -51,7 +48,6 @@ public class GeneralResultsFragment extends ResultsFragment {
 
     private void updateContent(){
         if (content != null && container != null){
-            Log.w(TAG, "Set content: " + content + "\nFragments: " + getChildFragmentManager().getFragments());
             getChildFragmentManager().beginTransaction().replace(container.getId(), content).commit();
         }
     }

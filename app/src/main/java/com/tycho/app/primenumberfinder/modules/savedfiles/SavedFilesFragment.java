@@ -1,11 +1,12 @@
 
 package com.tycho.app.primenumberfinder.modules.savedfiles;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,7 @@ import android.widget.TextView;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.VerticalItemDecoration;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesCardAdapter;
-import com.tycho.app.primenumberfinder.utils.FileType;
+import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.util.Iterator;
@@ -40,12 +41,12 @@ public class SavedFilesFragment extends Fragment {
     private SavedFilesCard[] cards;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         cards = new SavedFilesCard[]{
-                new SavedFilesCard(getActivity(), "primeNumbers", "Prime Numbers", "subTitle", R.color.purple, FileType.PRIMES),
-                new SavedFilesCard(getActivity(), "factors", "Factors", "subTitle", R.color.orange, FileType.FACTORS),
-                new SavedFilesCard(getActivity(), "factorTree", "Factor Trees", "subTitle", R.color.green, FileType.TREE)
+                new SavedFilesCard(context, "primeNumbers", "Prime Numbers", R.color.purple, FileManager.getInstance().getSavedPrimesDirectory()),
+                new SavedFilesCard(context, "factors", "Factors", R.color.orange, FileManager.getInstance().getSavedFactorsDirectory()),
+                new SavedFilesCard(context, "factorTree", "Factor Trees", R.color.green, FileManager.getInstance().getSavedTreesDirectory())
         };
     }
 
@@ -73,6 +74,7 @@ public class SavedFilesFragment extends Fragment {
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
+        Log.w(TAG, "onHiddenChanged(" + hidden + ")");
         if (!hidden){
             update();
         }

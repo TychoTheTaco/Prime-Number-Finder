@@ -35,7 +35,7 @@
             android:paddingEnd="8dp"
             android:paddingStart="8dp">
 
-            <com.tycho.app.primenumberfinder.ValidEditText
+            <com.tycho.app.primenumberfinder.ui.ValidEditText
                 android:id="@id/primality_input"
                 style="@style/NumberInput"
                 android:layout_width="0dp"
@@ -83,7 +83,7 @@
                 android:orientation="horizontal"
                 android:weightSum="2">
 
-                <com.tycho.app.primenumberfinder.ValidEditText
+                <com.tycho.app.primenumberfinder.ui.ValidEditText
                     android:id="@+id/search_range_start"
                     style="@style/NumberInput"
                     android:imeOptions="actionDone"
@@ -97,7 +97,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/to" />
 
-                <com.tycho.app.primenumberfinder.ValidEditText
+                <com.tycho.app.primenumberfinder.ui.ValidEditText
                     android:id="@+id/search_range_end"
                     style="@style/NumberInput"
                     android:imeOptions="actionDone"

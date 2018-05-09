@@ -1,4 +1,4 @@
-package com.tycho.app.primenumberfinder;
+package com.tycho.app.primenumberfinder.ui;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -9,6 +9,8 @@ import android.graphics.Path;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+
+import com.tycho.app.primenumberfinder.R;
 
 import java.text.NumberFormat;
 import java.util.Locale;

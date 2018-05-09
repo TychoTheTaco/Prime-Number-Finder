@@ -25,10 +25,10 @@ import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.tycho.app.primenumberfinder.AbstractActivity;
-import com.tycho.app.primenumberfinder.CustomRadioGroup;
+import com.tycho.app.primenumberfinder.ui.CustomRadioGroup;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.ValidEditText;
+import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 

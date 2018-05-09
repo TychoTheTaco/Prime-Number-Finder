@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp" />
 
-    <com.tycho.app.primenumberfinder.TreeView
+    <com.tycho.app.primenumberfinder.ui.TreeView
         android:id="@+id/factor_tree"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

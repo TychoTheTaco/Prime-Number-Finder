@@ -103,7 +103,7 @@
                         android:layout_height="wrap_content"
                         android:text="Vertical item spacing:" />
 
-                    <com.tycho.app.primenumberfinder.ValidEditText
+                    <com.tycho.app.primenumberfinder.ui.ValidEditText
                         android:id="@+id/vertical_item_spacing"
                         android:layout_width="48dp"
                         android:layout_height="wrap_content"
@@ -122,7 +122,7 @@
                         android:textColor="@color/secondary_text"
                         android:textSize="14sp" />
 
-                    <com.tycho.app.primenumberfinder.RangedSeekBar
+                    <com.tycho.app.primenumberfinder.ui.RangedSeekBar
                         android:id="@+id/vertical_item_spacing_seekbar"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
@@ -172,7 +172,7 @@
                         android:layout_height="wrap_content"
                         android:text="Width:" />
 
-                    <com.tycho.app.primenumberfinder.ValidEditText
+                    <com.tycho.app.primenumberfinder.ui.ValidEditText
                         android:id="@+id/branch_width"
                         android:layout_width="48dp"
                         android:layout_height="wrap_content"
@@ -190,7 +190,7 @@
                         android:textColor="@color/secondary_text"
                         android:textSize="14sp" />
 
-                    <com.tycho.app.primenumberfinder.RangedSeekBar
+                    <com.tycho.app.primenumberfinder.ui.RangedSeekBar
                         android:id="@+id/branch_width_seekbar"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
@@ -263,7 +263,7 @@
                         android:layout_height="wrap_content"
                         android:text="Text size:" />
 
-                    <com.tycho.app.primenumberfinder.ValidEditText
+                    <com.tycho.app.primenumberfinder.ui.ValidEditText
                         android:id="@+id/item_text_size"
                         android:layout_width="48dp"
                         android:layout_height="wrap_content"
@@ -281,7 +281,7 @@
                         android:textColor="@color/secondary_text"
                         android:textSize="14sp" />
 
-                    <com.tycho.app.primenumberfinder.RangedSeekBar
+                    <com.tycho.app.primenumberfinder.ui.RangedSeekBar
                         android:id="@+id/item_text_size_seekbar"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
@@ -365,7 +365,7 @@
                         android:layout_height="wrap_content"
                         android:text="Border width:" />
 
-                    <com.tycho.app.primenumberfinder.ValidEditText
+                    <com.tycho.app.primenumberfinder.ui.ValidEditText
                         android:id="@+id/item_border_width"
                         android:layout_width="48dp"
                         android:layout_height="wrap_content"
@@ -383,7 +383,7 @@
                         android:textColor="@color/secondary_text"
                         android:textSize="14sp" />
 
-                    <com.tycho.app.primenumberfinder.RangedSeekBar
+                    <com.tycho.app.primenumberfinder.ui.RangedSeekBar
                         android:id="@+id/item_border_width_seekbar"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
@@ -421,7 +421,7 @@
 
     </LinearLayout>
 
-    <com.tycho.app.primenumberfinder.TreeView
+    <com.tycho.app.primenumberfinder.ui.TreeView
         android:id="@+id/factor_tree_preview"
         android:layout_width="wrap_content"
         android:layout_height="150dp"

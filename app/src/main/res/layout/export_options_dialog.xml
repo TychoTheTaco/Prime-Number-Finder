@@ -68,7 +68,7 @@
             android:textColor="@color/secondary_text"
             android:textSize="12sp"/>
 
-        <com.tycho.app.primenumberfinder.CustomRadioGroup
+        <com.tycho.app.primenumberfinder.ui.CustomRadioGroup
             android:id="@+id/item_separator_radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -103,7 +103,7 @@
                     android:layout_height="wrap_content" />
 
             </LinearLayout>
-        </com.tycho.app.primenumberfinder.CustomRadioGroup>
+        </com.tycho.app.primenumberfinder.ui.CustomRadioGroup>
     </LinearLayout>
 
     <TextView

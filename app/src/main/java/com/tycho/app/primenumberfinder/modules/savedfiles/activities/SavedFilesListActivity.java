@@ -1,22 +1,20 @@
 package com.tycho.app.primenumberfinder.modules.savedfiles.activities;
 
-import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+import android.support.design.widget.AppBarLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.AbstractActivity;
-import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.utils.FileType;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesListAdapter;
-import com.tycho.app.primenumberfinder.utils.Utils;
+import com.tycho.app.primenumberfinder.utils.FileManager;
+
+import java.io.File;
 
 /**
  * @author Tycho Bellers
@@ -27,7 +25,7 @@ public class SavedFilesListActivity extends AbstractActivity {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "SavedFilesListActivity";
+    private static final String TAG = SavedFilesListActivity.class.getSimpleName();
 
     SavedFilesListAdapter adapterSavedFilesList;
 
@@ -36,32 +34,59 @@ public class SavedFilesListActivity extends AbstractActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Apply custom theme depending on directory
+        final File directory = (File) getIntent().getSerializableExtra("directory");
+        switch (FileManager.getFileType(directory)){
+            case PRIMES:
+                setTheme(R.style.FindPrimes_Activity);
+                break;
+
+            case FACTORS:
+                setTheme(R.style.FindFactors_Activity);
+                break;
+
+            case TREE:
+                setTheme(R.style.PrimeFactorization_Activity);
+                break;
+        }
+
+        //Set content
         setContentView(R.layout.saved_files_list_activity);
 
-        Intent intent = getIntent();
-
-        int savedFileTypeId = intent.getExtras().getInt("fileType");
-
-        final FileType fileType = FileType.findById(savedFileTypeId);
-
-        adapterSavedFilesList = new SavedFilesListAdapter(this, fileType);
+        //Set up adapter
+        adapterSavedFilesList = new SavedFilesListAdapter(this, directory);
 
         //Set the actionbar to a custom toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        switch (fileType) {
+        //Set up subtitle
+        final TextView subTitleTextView = findViewById(R.id.text);
+        subTitleTextView.setText("You have " + adapterSavedFilesList.getItemCount() + " saved files.");
+
+        //Set up toolbar animation
+        ((AppBarLayout) findViewById(R.id.app_bar)).addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                final int height = appBarLayout.getTotalScrollRange();
+                subTitleTextView.setAlpha(1.0f - ((float) -verticalOffset) / height);
+            }
+        });
+
+        switch (FileManager.getFileType(directory)) {
             case PRIMES:
-                Utils.applyTheme(this, ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));
+                setTitle("Prime Numbers");
                 break;
 
             case FACTORS:
-                Utils.applyTheme(this, ContextCompat.getColor(this, R.color.orange_dark), ContextCompat.getColor(this, R.color.orange));
+                setTitle("Factors");
                 break;
 
             case TREE:
-                Utils.applyTheme(this, ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
+                setTitle("Factor Trees");
                 break;
         }
 

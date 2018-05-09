@@ -78,7 +78,7 @@ public class SavedFilesCardAdapter extends RecyclerView.Adapter<SavedFilesCardAd
         return cards;
     }
 
-    protected class ViewHolderSavedFilesCard extends RecyclerView.ViewHolder{
+    class ViewHolderSavedFilesCard extends RecyclerView.ViewHolder{
 
         private final View headerLayout;
         private final TextView title;
@@ -107,7 +107,7 @@ public class SavedFilesCardAdapter extends RecyclerView.Adapter<SavedFilesCardAd
                 @Override
                 public void onClick(View view){
                     final Intent intent = new Intent(context, SavedFilesListActivity.class);
-                    intent.putExtra("fileType", cards.get(getAdapterPosition()).getSavedFilesAdapter().getFileType().getId());
+                    intent.putExtra("directory", cards.get(getAdapterPosition()).getDirectory());
                     context.startActivity(intent);
                 }
             });

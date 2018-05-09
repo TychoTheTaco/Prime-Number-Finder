@@ -29,7 +29,6 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public void onTaskStarted() {
         super.onTaskStarted();
-        Log.e(TAG, "onTaskStarted(): " + this);
         if (uiUpdater.getState() == Task.State.NOT_STARTED) {
             uiUpdater.startOnNewThread();
         } else {
@@ -40,35 +39,30 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public void onTaskPausing() {
         super.onTaskPausing();
-        Log.e(TAG, "onTaskPausing(): " + this);
         uiUpdater.resume(false);
     }
 
     @Override
     public void onTaskPaused() {
         super.onTaskPaused();
-        Log.e(TAG, "onTaskPaused(): " + this);
         uiUpdater.pause(false);
     }
 
     @Override
     public void onTaskResuming() {
         super.onTaskResuming();
-        Log.e(TAG, "onTaskResuming(): " + this);
         uiUpdater.resume(false);
     }
 
     @Override
     public void onTaskResumed() {
         super.onTaskResumed();
-        Log.e(TAG, "onTaskResumed(): " + this);
         uiUpdater.resume(false);
     }
 
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        Log.e(TAG, "onTaskStopped(): " + this);
         uiUpdater.pause(false);
     }
 
@@ -129,7 +123,6 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public void onPause() {
         super.onPause();
-        Log.e(TAG, "onPause(): " + this);
 
         //Remove task listener
         if (getTask() != null) {
@@ -142,7 +135,6 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.e(TAG, "onResume(): " + this);
 
         //Add task listener
         if (getTask() != null) {

@@ -50,6 +50,7 @@ public class ChangelogListAdapter extends RecyclerView.Adapter<ChangelogListAdap
 
     public void setChangelog(Changelog changelog) {
         this.changelog = changelog;
+        notifyDataSetChanged();
     }
 
     class ViewHolderNumberList extends RecyclerView.ViewHolder{
