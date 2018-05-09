@@ -109,3 +109,5 @@
 - Stability improvements
 - Minor performance improvements
 - Bug fixes
+
+05/??/2018 > Prime Number Finder version 1.3.5
