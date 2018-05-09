@@ -30,7 +30,10 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
     /**
      * {@linkplain DecimalFormat} instance used to format numbers with a decimal point.
      */
-    protected static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.#");
+    protected static final DecimalFormat DECIMAL_FORMAT = (DecimalFormat) DecimalFormat.getInstance(Locale.getDefault());
+    static {
+        DECIMAL_FORMAT.setMaximumFractionDigits(1);
+    }
 
     /**
      * If this is set to {@code true}, then this view will allow the user to enter the number '0'.
@@ -83,8 +86,11 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
 
         @Override
         public void afterTextChanged(Editable editable) {
+
             //Format text
             if (isDecimalInput()) {
+
+                //Log.d(TAG, "Decimal separator is '" + DECIMAL_FORMAT.getDecimalFormatSymbols().getDecimalSeparator() + "'");
 
                 //If the text ends with a decimal, don't modify it
                 final Pattern pattern = Pattern.compile("[^\\d]$");
@@ -93,7 +99,7 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
                     return;
                 }
 
-                final String formatted = DECIMAL_FORMAT.format(Utils.textToDecimal(getText().toString()));
+                final String formatted = DECIMAL_FORMAT.format(Utils.textToDecimal(getText().toString(), DECIMAL_FORMAT.getDecimalFormatSymbols().getDecimalSeparator()));
                 if (editable.length() > 0 && !editable.toString().equals(formatted)) {
                     setText(formatted, formatted.length() > 1);
                 } else if (!allowZeroInput && editable.toString().equals(DECIMAL_FORMAT.format(0))) {
@@ -143,16 +149,13 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
         setHint(number);
     }
 
-    public void setText(final Number number) {
+    public void setNumber(final Number number) {
         if (isDecimalInput()) {
             setText(DECIMAL_FORMAT.format(number));
         } else {
-            setText(NUMBER_FORMAT.format(number));
+            //TODO: Temporary fix
+            setText(NUMBER_FORMAT.format(number.longValue()));
         }
-    }
-
-    public void setNumber(final Number number) {
-        setText(number);
     }
 
     public boolean isAllowZeroInput() {
@@ -172,7 +175,7 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
     }
 
     public Number getDecimalValue() {
-        return Utils.textToDecimal(getText().toString());
+        return Utils.textToDecimal(getText().toString(), DECIMAL_FORMAT.getDecimalFormatSymbols().getDecimalSeparator());
     }
 
     public int getIntValue() {
@@ -180,7 +183,10 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
     }
 
     public float getFloatValue() {
-        return getDecimalValue().floatValue();
+        if (isDecimalInput()){
+            return getDecimalValue().floatValue();
+        }
+        return getNumberValue().floatValue();
     }
 
     public long getLongValue() {

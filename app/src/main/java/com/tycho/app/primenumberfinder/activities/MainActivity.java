@@ -11,6 +11,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,6 +36,10 @@ import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.OneToOneMap;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
+
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.util.Locale;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -161,6 +166,31 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
                 }
             }).start();
         }
+
+        //TODO: TEST STUFF
+        final DecimalFormat DECIMAL_FORMAT = (DecimalFormat) DecimalFormat.getInstance(Locale.getDefault());
+        DECIMAL_FORMAT.setMaximumFractionDigits(1);
+        DECIMAL_FORMAT.setParseBigDecimal(true);
+
+        //final DecimalFormat decimalFormat = new DecimalFormat("##.##", new DecimalFormatSymbols(Locale.getDefault()));
+        //decimalFormat.setParseBigDecimal(true);
+
+        String[] inputs = new String[]{
+                DECIMAL_FORMAT.format(0),
+                DECIMAL_FORMAT.format(0.3),
+                DECIMAL_FORMAT.format(.3),
+                DECIMAL_FORMAT.format(0.9),
+                DECIMAL_FORMAT.format(.9)
+        };
+
+        for (String string : inputs){
+            try {
+                Log.d(TAG, "Input: " + string + " Parse: " + DECIMAL_FORMAT.parse(string));
+            }catch (ParseException e){
+                Log.e(TAG, "Failed to parse '" + string + "'");
+            }
+        }
+
     }
 
     @Override

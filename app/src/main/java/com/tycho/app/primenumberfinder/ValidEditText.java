@@ -86,6 +86,10 @@ public class ValidEditText extends FormattedEditText {
         return drawableState;
     }
 
+    public boolean isValid() {
+        return valid;
+    }
+
     public void setValid(final boolean valid) {
         this.valid = valid;
         refreshDrawableState();

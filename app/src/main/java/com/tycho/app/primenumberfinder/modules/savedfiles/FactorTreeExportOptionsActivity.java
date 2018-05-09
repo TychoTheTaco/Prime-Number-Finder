@@ -247,7 +247,7 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                     @Override
                     public void afterTextChanged(Editable s) {
                         final int value = itemTextSize.getIntValue();
-                        itemTextSize.setValid(itemTextSize.length() > 0 && value >= 0 && value <= 100);
+                        itemTextSize.setValid(itemTextSize.length() > 0 && value >= 8 && value <= 100);
 
                         itemTextSizeSeekBar.setValue(value);
                     }
@@ -286,14 +286,14 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                     @Override
                     public void afterTextChanged(Editable s) {
                         final float value = branchWidth.getFloatValue();
-                        branchWidth.setValid(branchWidth.length() > 0 && value >= 0 && value <= 5);
+                        branchWidth.setValid(branchWidth.length() > 0 && value >= 1 && value <= 5);
 
                         branchWidthSeekBar.setValue(value);
                     }
                 });
                 branchWidthSeekBar = findViewById(R.id.branch_width_seekbar);
                 branchWidthSeekBar.setRange(1, 5);
-                branchWidthSeekBar.setSteps(10);
+                branchWidthSeekBar.setSteps(1);
                 branchWidthSeekBar.setValue(exportOptions.branchWidth);
                 branchWidthSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangedAdapter() {
                     @Override
@@ -324,14 +324,14 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                     @Override
                     public void afterTextChanged(Editable s) {
                         final float value = itemBorderWidth.getFloatValue();
-                        itemBorderWidth.setValid(itemBorderWidth.length() > 0 && value >= 0 && value <= 5);
+                        itemBorderWidth.setValid(itemBorderWidth.length() > 0 && value >= 1 && value <= 5);
 
                         itemBorderWidthSeekBar.setValue(value);
                     }
                 });
                 itemBorderWidthSeekBar = findViewById(R.id.item_border_width_seekbar);
                 itemBorderWidthSeekBar.setRange(1, 5);
-                itemBorderWidthSeekBar.setSteps(10);
+                itemBorderWidthSeekBar.setSteps(1);
                 itemBorderWidthSeekBar.setValue(exportOptions.branchWidth);
                 itemBorderWidthSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangedAdapter() {
                     @Override
@@ -568,9 +568,9 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
     }
 
     private boolean checkInputs() {
-        final EditText[] editTexts = new EditText[]{verticalItemSpacing, branchWidth, itemTextSize, itemBorderWidth};
-        for (EditText editText : editTexts) {
-            if (editText.length() == 0) {
+        final ValidEditText[] editTexts = new ValidEditText[]{verticalItemSpacing, branchWidth, itemTextSize, itemBorderWidth};
+        for (ValidEditText editText : editTexts) {
+            if (!editText.isValid()) {
                 return false;
             }
         }

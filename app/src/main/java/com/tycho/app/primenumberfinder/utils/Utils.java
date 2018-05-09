@@ -10,6 +10,7 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.inputmethod.InputMethodManager;
 
@@ -18,6 +19,7 @@ import com.crashlytics.android.Crashlytics;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.Comparator;
@@ -43,8 +45,6 @@ public final class Utils {
      * Tag used for logging and debugging.
      */
     private static final String TAG = Utils.class.getSimpleName();
-
-    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
     /**
      * Convert a DP value to its pixel value.
@@ -263,14 +263,61 @@ public final class Utils {
         return BigInteger.ZERO;
     }
 
-    public static BigDecimal textToDecimal(String text){
+    public static BigDecimal textToDecimal(String text, final char decimalSeparator){
         Crashlytics.log("Raw input: '" + text + "'");
+        Log.d(TAG, "Raw input: '" + text + "'");
 
         if (text.length() == 0){
             return BigDecimal.ZERO;
         }
 
-        return new BigDecimal(text);
+        Pattern pattern;
+        Matcher matcher;
+
+        //Make sure the string contains digits
+        /*pattern = Pattern.compile("\\d+");
+        matcher = pattern.matcher(text);
+        if (!matcher.find()){
+            return BigDecimal.ZERO;
+        }*/
+
+        //Find the last non-digit character. Assume this is the decimal point
+        pattern = Pattern.compile("[^\\d]");
+        matcher = pattern.matcher(text);
+        int matchIndex = -1;
+        while (matcher.find()){
+            matchIndex = matcher.start();
+        }
+
+        final StringBuilder numberString = new StringBuilder();
+        if (matchIndex != -1){
+            final int posFromEnd = text.length() - 1 - matchIndex;
+            Log.d(TAG, "Last Index: " + posFromEnd);
+
+            //Extract all digits from the input
+            pattern = Pattern.compile("\\d+");
+            matcher = pattern.matcher(text);
+            while (matcher.find()){
+                numberString.append(matcher.group());
+            }
+
+            //Put the decimal point back
+            numberString.insert(numberString.length() - posFromEnd, '.');
+            Log.w(TAG, "After insert: " + numberString);
+        }else{
+            numberString.append(text);
+        }
+
+        DecimalFormat decimalFormat = (DecimalFormat) DecimalFormat.getInstance(Locale.ENGLISH);
+        decimalFormat.setParseBigDecimal(true);
+
+        return new BigDecimal(numberString.toString());
+        /*try {
+            return (BigDecimal) decimalFormat.parse(numberString.toString());
+        }catch (ParseException e){
+            e.printStackTrace();
+            throw new RuntimeException("Failed to parse string '" + text + "'");
+        }*/
     }
 
     public static int getAccentColor(final Context context) {
