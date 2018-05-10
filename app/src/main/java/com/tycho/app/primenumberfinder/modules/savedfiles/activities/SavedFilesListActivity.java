@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesListAdapter;
+import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SelectableAdapter;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;
@@ -27,9 +28,11 @@ public class SavedFilesListActivity extends AbstractActivity {
      */
     private static final String TAG = SavedFilesListActivity.class.getSimpleName();
 
+    private TextView subTitleTextView;
+
     SavedFilesListAdapter adapterSavedFilesList;
 
-    private static Menu menu;
+    private Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +59,28 @@ public class SavedFilesListActivity extends AbstractActivity {
 
         //Set up adapter
         adapterSavedFilesList = new SavedFilesListAdapter(this, directory);
+        adapterSavedFilesList.addOnSelectionStateChangedListener(new SelectableAdapter.OnSelectionStateChangedListener() {
+            @Override
+            public void onStartSelection() {
+                menu.findItem(R.id.delete).setVisible(true);
+            }
+
+            @Override
+            public void onItemSelected() {
+                updateSubtitle();
+            }
+
+            @Override
+            public void onItemDeselected() {
+                updateSubtitle();
+            }
+
+            @Override
+            public void onStopSelection() {
+                menu.findItem(R.id.delete).setVisible(false);
+                updateSubtitle();
+            }
+        });
 
         //Set the actionbar to a custom toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);
@@ -63,8 +88,8 @@ public class SavedFilesListActivity extends AbstractActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Set up subtitle
-        final TextView subTitleTextView = findViewById(R.id.text);
-        subTitleTextView.setText("You have " + adapterSavedFilesList.getItemCount() + " saved files.");
+        subTitleTextView = findViewById(R.id.text);
+        updateSubtitle();
 
         //Set up toolbar animation
         ((AppBarLayout) findViewById(R.id.app_bar)).addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
@@ -101,7 +126,7 @@ public class SavedFilesListActivity extends AbstractActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.saved_files_activity_menu, menu);
-        SavedFilesListActivity.menu = menu;
+        this.menu = menu;
         return true;
     }
 
@@ -111,7 +136,7 @@ public class SavedFilesListActivity extends AbstractActivity {
         switch (item.getItemId()){
 
             case R.id.delete:
-                adapterSavedFilesList.deleteSelected();
+                //adapterSavedFilesList.deleteSelected();
                 break;
 
             case android.R.id.home:
@@ -122,17 +147,20 @@ public class SavedFilesListActivity extends AbstractActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public static void setDeleteVisibility(final boolean visible){
-        menu.findItem(R.id.delete).setVisible(visible);
-    }
-
     @Override
     public void onBackPressed() {
-        if (adapterSavedFilesList.isSelecting()) {
-            adapterSavedFilesList.setSelecting(false);
-            adapterSavedFilesList.notifyDataSetChanged();
+        if (adapterSavedFilesList.isSelectionMode()) {
+            adapterSavedFilesList.setSelectionMode(false);
         } else {
             super.onBackPressed();
         }
+    }
+
+    private void updateSubtitle(){
+        String subtitle = getResources().getQuantityString(R.plurals.saved_files_count, adapterSavedFilesList.getItemCount(), NUMBER_FORMAT.format( adapterSavedFilesList.getItemCount()));
+        if  (adapterSavedFilesList.isSelectionMode()){
+            subtitle += ' ' + getResources().getQuantityString(R.plurals.selected_item_count, adapterSavedFilesList.getSelectedItemCount(), NUMBER_FORMAT.format( adapterSavedFilesList.getSelectedItemCount()));
+        }
+        subTitleTextView.setText(subtitle);
     }
 }

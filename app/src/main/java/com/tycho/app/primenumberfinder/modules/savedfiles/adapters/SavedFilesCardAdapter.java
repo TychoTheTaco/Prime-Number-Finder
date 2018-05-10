@@ -50,13 +50,13 @@ public class SavedFilesCardAdapter extends RecyclerView.Adapter<SavedFilesCardAd
         //Get the card at this position
         final SavedFilesCard card = cards.get(position);
 
-        holder.recyclerView.setAdapter(card.getSavedFilesAdapter());
-        card.getSavedFilesAdapter().refresh();
+        holder.recyclerView.setAdapter(card.getFilesListAdapter());
+        card.getFilesListAdapter().refresh();
        // holder.listView.setAdapter(card.getAdapterSavedFilesTest());
 
         final ViewGroup.LayoutParams layoutParams = holder.recyclerView.getLayoutParams();
         //final ViewGroup.LayoutParams layoutParams = holder.listView.getLayoutParams();
-        float height = card.getSavedFilesAdapter().getItemCount() * Utils.dpToPx(context, 32) + Utils.dpToPx(context, 8);
+        float height = card.getFilesListAdapter().getItemCount() * Utils.dpToPx(context, 32) + Utils.dpToPx(context, 8);
         float maxHeight = Utils.dpToPx(context, 32 * 3) + Utils.dpToPx(context, 8);
         layoutParams.height = (int) Math.min(height, maxHeight);
 

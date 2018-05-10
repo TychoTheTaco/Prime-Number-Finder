@@ -2,7 +2,7 @@ package com.tycho.app.primenumberfinder.modules.savedfiles;
 
 import android.content.Context;
 
-import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesSmallListAdapter;
+import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.FilesListAdapter;
 
 import java.io.File;
 
@@ -32,18 +32,18 @@ public class SavedFilesCard {
      */
     private final String tag;
 
-    private SavedFilesSmallListAdapter savedFilesAdapter;
+    private FilesListAdapter filesListAdapter;
 
     public SavedFilesCard(final Context context, String tag, String title, int backgroundColor, final File directory){
         this.title = title;
         this.tag = tag;
         this.backgroundColor = backgroundColor;
         this.directory = directory;
-        this.savedFilesAdapter = new SavedFilesSmallListAdapter(context, directory);
+        this.filesListAdapter = new FilesListAdapter(directory, context);
     }
 
-    public SavedFilesSmallListAdapter getSavedFilesAdapter(){
-        return savedFilesAdapter;
+    public FilesListAdapter getFilesListAdapter() {
+        return filesListAdapter;
     }
 
     public String getTag(){
@@ -60,7 +60,7 @@ public class SavedFilesCard {
     }
 
     public String getSubTitle(){
-        return savedFilesAdapter.getItemCount() + " saved files";
+        return filesListAdapter.getItemCount() + " saved files";
     }
 
     public String getTitle(){

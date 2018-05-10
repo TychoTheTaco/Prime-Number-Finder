@@ -6,20 +6,14 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayFactorsActivity;
-import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimeFactorizationActivity;
-import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimesActivity;
-import com.tycho.app.primenumberfinder.modules.savedfiles.activities.SavedFilesListActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.FileType;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
@@ -27,7 +21,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -36,7 +29,7 @@ import java.util.Locale;
  *         Date Created: 11/8/2016
  */
 
-public class SavedFilesListAdapter extends RecyclerView.Adapter<SavedFilesListAdapter.ViewHolder> {
+public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapter.ViewHolder> {
 
     /**
      * Tag used for logging and debugging.
@@ -44,9 +37,6 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<SavedFilesListAd
     private static final String TAG = SavedFilesListAdapter.class.getSimpleName();
 
     private final List<File> files = new ArrayList<>();
-    private final SparseBooleanArray selectedPositions = new SparseBooleanArray();
-    private int selectedCount = 0;
-    private boolean isSelecting = false;
 
     private Context context;
 
@@ -93,7 +83,7 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<SavedFilesListAd
                 break;
         }
 
-        if (selectedPositions.get(position)){
+        if (holder.isSelected()){
             holder.icon.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.accent)));
             holder.icon.setText("");
             holder.fileSize.setTextColor(ContextCompat.getColor(context, R.color.secondary_text));
@@ -103,9 +93,9 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<SavedFilesListAd
 
         holder.dateCreated.setText(simpleDateFormat.format(new Date(file.lastModified())));
 
-        holder.fileSize.setText(humanReadableByteCount(file.length(), true));
+        holder.fileSize.setText(Utils.humanReadableByteCount(file.length(), true));
 
-        holder.itemView.setSelected(selectedPositions.get(holder.getAdapterPosition(), false));
+        holder.itemView.setSelected(holder.isSelected());
     }
 
     public void refresh(){
@@ -115,21 +105,9 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<SavedFilesListAd
         notifyDataSetChanged();
     }
 
-    public void setSelecting(boolean selecting) {
-        isSelecting = selecting;
-        if (!selecting) {
-            selectedPositions.clear();
-            selectedCount = 0;
-        }
-        SavedFilesListActivity.setDeleteVisibility(selecting);
-    }
-
-    public boolean isSelecting() {
-        return isSelecting;
-    }
-
+   /*
     public void deleteSelected(){
-        if (isSelecting){
+        if (isSelectionMode){
             final Iterator<File> iterator = files.iterator();
             int index = 1;
             while (iterator.hasNext()){
@@ -142,17 +120,17 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<SavedFilesListAd
                 }
                 index++;
             }
-            setSelecting(false);
+            setSelectionMode(false);
             notifyDataSetChanged();
         }
-    }
+    }*/
 
     @Override
     public int getItemCount() {
         return files.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends SelectableAdapter.ViewHolder {
 
         private final TextView fileName;
         private final TextView dateCreated;
@@ -165,106 +143,22 @@ public class SavedFilesListAdapter extends RecyclerView.Adapter<SavedFilesListAd
             fileName = itemView.findViewById(R.id.file_name);
             dateCreated =  itemView.findViewById(R.id.textView_dateCreated);
             fileSize = itemView.findViewById(R.id.file_size);
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (isSelecting) {
-                        selectedPositions.put(getAdapterPosition(), !selectedPositions.get(getAdapterPosition(), false));
-                        if (selectedPositions.get(getAdapterPosition(), false)) {
-                            itemView.setSelected(true);
-                            selectedCount++;
-                        } else {
-                            itemView.setSelected(false);
-                            selectedCount--;
-                        }
-                        if (selectedCount == 0) {
-                            setSelecting(false);
-                        }
-                        notifyItemChanged(0);
-                        notifyItemChanged(getAdapterPosition());
-                    } else {
-                        Intent intent;
-                        switch (FileManager.getFileType(directory)) {
-                            case PRIMES:
-                                intent = new Intent(context, DisplayPrimesActivity.class);
-                                intent.putExtra("filePath", files.get(getAdapterPosition()).getAbsolutePath());
-                                intent.putExtra("allowExport", true);
-                                intent.putExtra("enableSearch", true);
-                                intent.putExtra("allowDelete", true);
-                                intent.putExtra("title", true);
-                                context.startActivity(intent);
-                                break;
-
-                            case FACTORS:
-                                intent = new Intent(context, DisplayFactorsActivity.class);
-                                intent.putExtra("filePath", files.get(getAdapterPosition()).getAbsolutePath());
-                                intent.putExtra("allowExport", true);
-                                intent.putExtra("allowDelete", true);
-                                intent.putExtra("title", true);
-                                context.startActivity(intent);
-                                break;
-
-                            case TREE:
-                                intent = new Intent(context, DisplayPrimeFactorizationActivity.class);
-                                intent.putExtra("filePath", files.get(getAdapterPosition()).getAbsolutePath());
-                                intent.putExtra("allowExport", true);
-                                intent.putExtra("allowDelete", true);
-                                intent.putExtra("title", true);
-                                context.startActivity(intent);
-                                break;
-                        }
-                    }
-
-                }
-            });
-
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    if (!isSelecting) {
-                        selectedPositions.put(getAdapterPosition(), true);
-                        itemView.setSelected(true);
-                        selectedCount++;
-                        notifyItemChanged(0);
-                        notifyItemChanged(getAdapterPosition());
-                        setSelecting(true);
-                        return true;
-                    }
-                    return false;
-                }
-            });
         }
-    }
 
-    private static String humanReadableByteCount(long bytes, boolean si) {
-        int unit = si ? 1000 : 1024;
-        if (bytes < unit) return bytes + " B";
-        int exp = (int) (Math.log(bytes) / Math.log(unit));
-        String pre = (si ? "KMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
-        return String.format(Locale.getDefault(), "%.1f %sB", bytes / Math.pow(unit, exp), pre);
-    }
-
-    public interface OnSelectionStateChangedListener{
-
-        /**
-         * Called when the user has started to select multiple items.
-         */
-        void onStartSelection();
-
-        /**
-         * Called when an item is selected.
-         */
-        void onItemSelected();
-
-        /**
-         * Called when an item is deselected.
-         */
-        void onItemDeselected();
-
-        /**
-         * Called when the user has stopped selecting items.
-         */
-        void onStopSelection();
+        @Override
+        protected void onClick(View view) {
+            if (!isSelectionMode()){
+                final FileType fileType = FileManager.getFileType(directory);
+                if (fileType.getOpeningClass() != null){
+                    final Intent intent = new Intent(context, fileType.getOpeningClass());
+                    intent.putExtra("filePath", files.get(getAdapterPosition()).getAbsolutePath());
+                    intent.putExtra("allowExport", true);
+                    intent.putExtra("enableSearch", true);
+                    intent.putExtra("allowDelete", true);
+                    intent.putExtra("title", true);
+                    context.startActivity(intent);
+                }
+            }
+        }
     }
 }

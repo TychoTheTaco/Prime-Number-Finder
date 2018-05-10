@@ -3,10 +3,11 @@ package com.tycho.app.primenumberfinder.modules.savedfiles;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,15 +49,15 @@ public class SavedFilesFragment extends Fragment {
                 new SavedFilesCard(context, "factors", "Factors", R.color.orange, FileManager.getInstance().getSavedFactorsDirectory()),
                 new SavedFilesCard(context, "factorTree", "Factor Trees", R.color.green, FileManager.getInstance().getSavedTreesDirectory())
         };
+        cardAdapter = new SavedFilesCardAdapter(context);
     }
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState){
-        final View rootView = inflater.inflate(R.layout.fragment_saved_files, viewGroup, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        final View rootView = inflater.inflate(R.layout.fragment_saved_files, container, false);
 
         textViewNoFiles = rootView.findViewById(R.id.textView_no_files);
-
-        cardAdapter = new SavedFilesCardAdapter(getActivity());
 
         //RecyclerView
         recyclerViewCards = rootView.findViewById(R.id.recyclerView_savedFiles);
@@ -74,7 +75,6 @@ public class SavedFilesFragment extends Fragment {
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        Log.w(TAG, "onHiddenChanged(" + hidden + ")");
         if (!hidden){
             update();
         }
@@ -91,13 +91,13 @@ public class SavedFilesFragment extends Fragment {
         //Remove all cards
         final Iterator<SavedFilesCard> iterator = cardAdapter.getCards().iterator();
         while (iterator.hasNext()){
-            iterator.next().getSavedFilesAdapter().refresh();
+            iterator.next().getFilesListAdapter().refresh();
             iterator.remove();
         }
 
         for (SavedFilesCard card : cards){
-            card.getSavedFilesAdapter().refresh();
-            if (!cardAdapter.getCards().contains(card) && card.getSavedFilesAdapter().getItemCount() > 0){
+            card.getFilesListAdapter().refresh();
+            if (!cardAdapter.getCards().contains(card) && card.getFilesListAdapter().getItemCount() > 0){
                 cardAdapter.getCards().add(card);
             }
         }
