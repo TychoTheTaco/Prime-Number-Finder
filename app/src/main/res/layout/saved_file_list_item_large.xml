@@ -3,6 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="48dp"
     android:background="@drawable/selected_item_background"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     android:orientation="horizontal"
     android:padding="8dp">
 
@@ -16,6 +18,15 @@
         android:gravity="center"
         android:textColor="@color/white"
         android:textSize="12sp" />
+
+    <ImageView
+        android:layout_alignStart="@id/icon"
+        android:layout_alignTop="@id/icon"
+        android:tint="@color/white"
+        android:id="@+id/icon_image"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:gravity="center" />
 
     <TextView
         android:id="@+id/file_name"

@@ -9,6 +9,9 @@ import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.R;
@@ -88,6 +91,7 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
         //Format icon
         holder.icon.setText(iconText);
         holder.icon.setBackgroundTintList(iconBackgroundTintList);
+        holder.iconImage.setVisibility(holder.isSelected() ? View.VISIBLE : View.GONE);
 
         //Set file name
         holder.fileName.setText(file.getName());
@@ -117,26 +121,6 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
         return files;
     }
 
-    /*
-    public void deleteSelected(){
-        if (isSelectionMode){
-            final Iterator<File> iterator = files.iterator();
-            int index = 1;
-            while (iterator.hasNext()){
-                final File file = iterator.next();
-                if (selectedPositions.get(index)){
-                    if (!file.delete()){
-                        Log.w(TAG, "Failed to delete file: " + file);
-                    }
-                    iterator.remove();
-                }
-                index++;
-            }
-            setSelectionMode(false);
-            notifyDataSetChanged();
-        }
-    }*/
-
     @Override
     public int getItemCount() {
         return files.size();
@@ -148,13 +132,32 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
         private final TextView dateCreated;
         private final TextView fileSize;
         protected final TextView icon;
+        private final ImageView iconImage;
+
+        private final ScaleAnimation scaleAnimation = new ScaleAnimation(1.0f, 1.25f, 1.0f, 1.25f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
 
         ViewHolder(final View itemView) {
             super(itemView);
             icon = itemView.findViewById(R.id.icon);
+            iconImage = itemView.findViewById(R.id.icon_image);
             fileName = itemView.findViewById(R.id.file_name);
             dateCreated =  itemView.findViewById(R.id.textView_dateCreated);
             fileSize = itemView.findViewById(R.id.file_size);
+
+            iconImage.setImageResource(R.drawable.round_check_24);
+            iconImage.setVisibility(View.GONE);
+
+            scaleAnimation.setDuration(75);
+            scaleAnimation.setRepeatCount(1);
+            scaleAnimation.setRepeatMode(Animation.REVERSE);
+
+            icon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    icon.startAnimation(scaleAnimation);
+                    iconImage.setVisibility(addToSelection(true) ? View.VISIBLE : View.GONE);
+                }
+            });
         }
 
         @Override

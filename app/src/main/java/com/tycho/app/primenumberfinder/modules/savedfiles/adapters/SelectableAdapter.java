@@ -73,10 +73,10 @@ public abstract class SelectableAdapter<H extends SelectableAdapter.ViewHolder> 
 
         if (!prevState && selectionMode) {
             sendOnStartSelection();
-        }else if (prevState && !selectionMode){
+        } else if (prevState && !selectionMode) {
             //Update all selected items
-            for (int i = 0; i < getItemCount(); i++){
-                if (selectedItemIndexes.get(i)){
+            for (int i = 0; i < getItemCount(); i++) {
+                if (selectedItemIndexes.get(i)) {
                     selectedItemIndexes.put(i, false);
                     notifyItemChanged(i);
                 }
@@ -90,11 +90,11 @@ public abstract class SelectableAdapter<H extends SelectableAdapter.ViewHolder> 
         return selectionMode;
     }
 
-    public int[] getSelectedItemIndexes(){
+    public int[] getSelectedItemIndexes() {
         final int[] indexes = new int[selectedItemCount];
         int position = 0;
-        for (int i = 0; i < getItemCount(); i++){
-            if (selectedItemIndexes.get(i)){
+        for (int i = 0; i < getItemCount(); i++) {
+            if (selectedItemIndexes.get(i)) {
                 indexes[position++] = i;
             }
         }
@@ -109,31 +109,41 @@ public abstract class SelectableAdapter<H extends SelectableAdapter.ViewHolder> 
                 @Override
                 public void onClick(View v) {
                     ViewHolder.this.onClick(v);
-                    if (selectionMode) {
-                        setSelected(!isSelected());
-                        if (selectedItemCount == 0) {
-                            setSelectionMode(false);
-                        }
-                    }
+                    addToSelection(false);
                 }
             });
 
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    if (!selectionMode) {
-                        setSelectionMode(true);
-                        setSelected(true);
-                        return true;
-                    }
-                    return ViewHolder.this.onLongClick(v);
+                    return addToSelection(true)|| ViewHolder.this.onLongClick(v);
                 }
             });
         }
 
-        protected void onClick(View view){}
+        /**
+         * Add this item to the current selection. This will call set selected on the current item.
+         *
+         * @param startSelection {@code true} if selection mode should be enabled if this is the
+         *                       first item.
+         */
+        protected boolean addToSelection(final boolean startSelection) {
+            if (selectionMode) {
+                setSelected(!isSelected());
+                if (selectedItemCount == 0) {
+                    setSelectionMode(false);
+                }
+            } else if (startSelection){
+                setSelectionMode(true);
+                setSelected(true);
+            }
+            return isSelected();
+        }
 
-        protected boolean onLongClick(View view){
+        protected void onClick(View view) {
+        }
+
+        protected boolean onLongClick(View view) {
             return false;
         }
 
@@ -154,32 +164,32 @@ public abstract class SelectableAdapter<H extends SelectableAdapter.ViewHolder> 
         }
     }
 
-    public void addOnSelectionStateChangedListener(final OnSelectionStateChangedListener listener){
-        if (!onSelectionStateChangedListeners.contains(listener)){
+    public void addOnSelectionStateChangedListener(final OnSelectionStateChangedListener listener) {
+        if (!onSelectionStateChangedListeners.contains(listener)) {
             onSelectionStateChangedListeners.add(listener);
         }
     }
 
-    private void sendOnStartSelection(){
-        for (OnSelectionStateChangedListener listener : onSelectionStateChangedListeners){
+    private void sendOnStartSelection() {
+        for (OnSelectionStateChangedListener listener : onSelectionStateChangedListeners) {
             listener.onStartSelection();
         }
     }
 
-    private void sendOnItemSelected(){
-        for (OnSelectionStateChangedListener listener : onSelectionStateChangedListeners){
+    private void sendOnItemSelected() {
+        for (OnSelectionStateChangedListener listener : onSelectionStateChangedListeners) {
             listener.onItemSelected();
         }
     }
 
-    private void sendOnItemDeselected(){
-        for (OnSelectionStateChangedListener listener : onSelectionStateChangedListeners){
+    private void sendOnItemDeselected() {
+        for (OnSelectionStateChangedListener listener : onSelectionStateChangedListeners) {
             listener.onItemDeselected();
         }
     }
 
-    private void sendOnStopSelection(){
-        for (OnSelectionStateChangedListener listener : onSelectionStateChangedListeners){
+    private void sendOnStopSelection() {
+        for (OnSelectionStateChangedListener listener : onSelectionStateChangedListeners) {
             listener.onStopSelection();
         }
     }

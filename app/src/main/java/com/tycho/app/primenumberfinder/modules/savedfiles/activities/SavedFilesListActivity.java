@@ -1,5 +1,7 @@
 package com.tycho.app.primenumberfinder.modules.savedfiles.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -137,27 +139,47 @@ public class SavedFilesListActivity extends AbstractActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
-
             case R.id.delete:
-                //Get the files to be deleted
-                final int[] selectedItemIndexes = adapterSavedFilesList.getSelectedItemIndexes();
-                final List<File> files = new ArrayList<>();
-                for (int i : selectedItemIndexes){
-                    files.add(adapterSavedFilesList.getFiles().get(i));
-                }
 
-                final Iterator<File> iterator = files.iterator();
-                int position = 0;
-                while (iterator.hasNext()){
-                    final File file = iterator.next();
+                //Show warning dialog
+                final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+                alertDialog.setTitle("Warning");
+                alertDialog.setMessage(getResources().getQuantityString(R.plurals.delete_warning, adapterSavedFilesList.getSelectedItemCount(), adapterSavedFilesList.getSelectedItemCount()));
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Delete",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
 
-                    //Delete the file
-                    file.delete();
-                    adapterSavedFilesList.getFiles().remove(file);
-                    adapterSavedFilesList.notifyItemRemoved(selectedItemIndexes[position] - position);
-                    position++;
-                }
-                adapterSavedFilesList.setSelectionMode(false);
+                                //Get the files to be deleted
+                                final int[] selectedItemIndexes = adapterSavedFilesList.getSelectedItemIndexes();
+                                final List<File> files = new ArrayList<>();
+                                for (int i : selectedItemIndexes){
+                                    files.add(adapterSavedFilesList.getFiles().get(i));
+                                }
+
+                                final Iterator<File> iterator = files.iterator();
+                                int position = 0;
+                                while (iterator.hasNext()){
+                                    final File file = iterator.next();
+
+                                    //Delete the file
+                                    file.delete();
+                                    adapterSavedFilesList.getFiles().remove(file);
+                                    adapterSavedFilesList.notifyItemRemoved(selectedItemIndexes[position] - position);
+                                    position++;
+                                }
+                                adapterSavedFilesList.setSelectionMode(false);
+
+                                alertDialog.dismiss();
+                                finish();
+                            }
+                        });
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                alertDialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
                 break;
 
             case android.R.id.home:
