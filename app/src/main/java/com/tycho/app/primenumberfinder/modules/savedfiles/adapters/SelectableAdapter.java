@@ -67,7 +67,7 @@ public abstract class SelectableAdapter<H extends SelectableAdapter.ViewHolder> 
         return selectedItemCount;
     }
 
-    public void setSelectionMode(boolean selectionMode) {
+    public synchronized void setSelectionMode(boolean selectionMode) {
         final boolean prevState = this.selectionMode;
         this.selectionMode = selectionMode;
 
@@ -81,12 +81,24 @@ public abstract class SelectableAdapter<H extends SelectableAdapter.ViewHolder> 
                     notifyItemChanged(i);
                 }
             }
+            selectedItemCount = 0;
             sendOnStopSelection();
         }
     }
 
     public boolean isSelectionMode() {
         return selectionMode;
+    }
+
+    public int[] getSelectedItemIndexes(){
+        final int[] indexes = new int[selectedItemCount];
+        int position = 0;
+        for (int i = 0; i < getItemCount(); i++){
+            if (selectedItemIndexes.get(i)){
+                indexes[position++] = i;
+            }
+        }
+        return indexes;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

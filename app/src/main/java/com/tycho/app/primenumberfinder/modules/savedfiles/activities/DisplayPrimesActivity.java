@@ -361,7 +361,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
                         recyclerView.post(new Runnable() {
                             @Override
                             public void run() {
-                                final int visibility = ((linearLayoutManager.findLastVisibleItemPosition() - linearLayoutManager.findFirstVisibleItemPosition()) == scrollListener.totalNumbers - 1) ? View.GONE : View.VISIBLE;
+                                final int visibility = ((numbers.size() == 0 || (linearLayoutManager.findLastVisibleItemPosition() - linearLayoutManager.findFirstVisibleItemPosition()) == scrollListener.totalNumbers - 1)) ? View.GONE : View.VISIBLE;
                                 scrollToTopFab.setVisibility(visibility);
                                 scrollToBottomFab.setVisibility(visibility);
                                 findButton.setVisible(enableSearch && visibility == View.VISIBLE);

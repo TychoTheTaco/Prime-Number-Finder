@@ -50,13 +50,8 @@ public class SavedFilesCard {
         return tag;
     }
 
-
     public int getBackgroundColor(){
         return backgroundColor;
-    }
-
-    public void setBackgroundColor(int backgroundColor){
-        this.backgroundColor = backgroundColor;
     }
 
     public String getSubTitle(){

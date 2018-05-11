@@ -16,10 +16,13 @@ import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SelectableAda
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Tycho Bellers
- *         Date Created: 11/5/2016
+ * Date Created: 11/5/2016
  */
 public class SavedFilesListActivity extends AbstractActivity {
 
@@ -40,7 +43,7 @@ public class SavedFilesListActivity extends AbstractActivity {
 
         //Apply custom theme depending on directory
         final File directory = (File) getIntent().getSerializableExtra("directory");
-        switch (FileManager.getFileType(directory)){
+        switch (FileManager.getFileType(directory)) {
             case PRIMES:
                 setTheme(R.style.FindPrimes_Activity);
                 break;
@@ -133,10 +136,28 @@ public class SavedFilesListActivity extends AbstractActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
 
             case R.id.delete:
-                //adapterSavedFilesList.deleteSelected();
+                //Get the files to be deleted
+                final int[] selectedItemIndexes = adapterSavedFilesList.getSelectedItemIndexes();
+                final List<File> files = new ArrayList<>();
+                for (int i : selectedItemIndexes){
+                    files.add(adapterSavedFilesList.getFiles().get(i));
+                }
+
+                final Iterator<File> iterator = files.iterator();
+                int position = 0;
+                while (iterator.hasNext()){
+                    final File file = iterator.next();
+
+                    //Delete the file
+                    file.delete();
+                    adapterSavedFilesList.getFiles().remove(file);
+                    adapterSavedFilesList.notifyItemRemoved(selectedItemIndexes[position] - position);
+                    position++;
+                }
+                adapterSavedFilesList.setSelectionMode(false);
                 break;
 
             case android.R.id.home:
@@ -156,10 +177,10 @@ public class SavedFilesListActivity extends AbstractActivity {
         }
     }
 
-    private void updateSubtitle(){
-        String subtitle = getResources().getQuantityString(R.plurals.saved_files_count, adapterSavedFilesList.getItemCount(), NUMBER_FORMAT.format( adapterSavedFilesList.getItemCount()));
-        if  (adapterSavedFilesList.isSelectionMode()){
-            subtitle += ' ' + getResources().getQuantityString(R.plurals.selected_item_count, adapterSavedFilesList.getSelectedItemCount(), NUMBER_FORMAT.format( adapterSavedFilesList.getSelectedItemCount()));
+    private void updateSubtitle() {
+        String subtitle = getResources().getQuantityString(R.plurals.saved_files_count, adapterSavedFilesList.getItemCount(), NUMBER_FORMAT.format(adapterSavedFilesList.getItemCount()));
+        if (adapterSavedFilesList.isSelectionMode()) {
+            subtitle += ' ' + getResources().getQuantityString(R.plurals.selected_item_count, adapterSavedFilesList.getSelectedItemCount(), NUMBER_FORMAT.format(adapterSavedFilesList.getSelectedItemCount()));
         }
         subTitleTextView.setText(subtitle);
     }

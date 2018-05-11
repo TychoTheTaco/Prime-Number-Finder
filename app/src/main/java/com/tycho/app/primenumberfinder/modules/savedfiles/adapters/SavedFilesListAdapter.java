@@ -44,9 +44,34 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
 
     private final File directory;
 
+    private ColorStateList iconBackgroundTintList;
+    private String iconText;
+
     public SavedFilesListAdapter(final Context context, final File directory) {
         this.context = context;
         this.directory = directory;
+
+        switch (FileManager.getFileType(directory)) {
+            default:
+                iconText = "?";
+                break;
+
+            case PRIMES:
+                iconBackgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.purple));
+                iconText = "P";
+                break;
+
+            case FACTORS:
+                iconBackgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.orange));
+                iconText = "F";
+                break;
+
+            case TREE:
+                iconBackgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.green));
+                iconText = "T";
+                break;
+        }
+
         refresh();
     }
 
@@ -60,28 +85,12 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final File file = files.get(position);
 
+        //Format icon
+        holder.icon.setText(iconText);
+        holder.icon.setBackgroundTintList(iconBackgroundTintList);
+
+        //Set file name
         holder.fileName.setText(file.getName());
-
-        switch (FileManager.getFileType(directory)) {
-            default:
-                holder.icon.setText("?");
-                break;
-
-            case PRIMES:
-                holder.icon.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.purple)));
-                holder.icon.setText("P");
-                break;
-
-            case FACTORS:
-                holder.icon.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.orange)));
-                holder.icon.setText("F");
-                break;
-
-            case TREE:
-                holder.icon.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.green)));
-                holder.icon.setText("T");
-                break;
-        }
 
         if (holder.isSelected()){
             holder.icon.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.accent)));
@@ -92,7 +101,6 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
         }
 
         holder.dateCreated.setText(simpleDateFormat.format(new Date(file.lastModified())));
-
         holder.fileSize.setText(Utils.humanReadableByteCount(file.length(), true));
 
         holder.itemView.setSelected(holder.isSelected());
@@ -105,7 +113,11 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
         notifyDataSetChanged();
     }
 
-   /*
+    public List<File> getFiles() {
+        return files;
+    }
+
+    /*
     public void deleteSelected(){
         if (isSelectionMode){
             final Iterator<File> iterator = files.iterator();
