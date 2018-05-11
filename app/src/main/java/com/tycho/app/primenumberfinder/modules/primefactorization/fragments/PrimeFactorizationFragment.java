@@ -143,6 +143,11 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
                 intent.putExtra("taskId", task.getId());
                 startActivityForResult(intent, 0);
             }
+
+            @Override
+            public void onSavePressed(Task task) {
+                resultsFragment.saveTask();
+            }
         });
 
         //Set up view pager

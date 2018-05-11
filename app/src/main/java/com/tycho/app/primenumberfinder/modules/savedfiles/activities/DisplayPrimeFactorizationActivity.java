@@ -48,7 +48,7 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "DispPrimeFacAct";
+    private static final String TAG = DisplayPrimeFactorizationActivity.class.getSimpleName();
 
     private File file;
 

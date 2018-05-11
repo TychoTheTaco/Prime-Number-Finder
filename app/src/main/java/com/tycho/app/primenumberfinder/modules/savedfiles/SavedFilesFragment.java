@@ -26,17 +26,10 @@ public class SavedFilesFragment extends Fragment {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "SavedFilesFragment";
+    private static final String TAG = SavedFilesFragment.class.getSimpleName();
 
-    /**
-     * All views
-     */
-    private RecyclerView recyclerViewCards;
     private TextView textViewNoFiles;
 
-    /**
-     * The adapter for {@link #recyclerViewCards}.
-     */
     private SavedFilesCardAdapter cardAdapter;
 
     private SavedFilesCard[] cards;
@@ -60,7 +53,7 @@ public class SavedFilesFragment extends Fragment {
         textViewNoFiles = rootView.findViewById(R.id.textView_no_files);
 
         //RecyclerView
-        recyclerViewCards = rootView.findViewById(R.id.recyclerView_savedFiles);
+        final RecyclerView recyclerViewCards = rootView.findViewById(R.id.recyclerView_savedFiles);
         recyclerViewCards.setHasFixedSize(true);
         recyclerViewCards.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerViewCards.addItemDecoration(new VerticalItemDecoration((int) Utils.dpToPx(getActivity(), 8)));

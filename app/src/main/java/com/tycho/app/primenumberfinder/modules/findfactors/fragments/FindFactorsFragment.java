@@ -145,6 +145,11 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
                 intent.putExtra("taskId", task.getId());
                 startActivityForResult(intent, 0);
             }
+
+            @Override
+            public void onSavePressed(Task task) {
+                resultsFragment.saveTask();
+            }
         });
 
         //Set up view pager

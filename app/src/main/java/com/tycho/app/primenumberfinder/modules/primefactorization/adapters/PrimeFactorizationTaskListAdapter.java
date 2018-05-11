@@ -1,8 +1,8 @@
 package com.tycho.app.primenumberfinder.modules.primefactorization.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -14,55 +14,51 @@ import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 
-import java.text.NumberFormat;
-import java.util.Locale;
-
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_PRIME_FACTORIZATION;
 
 /**
  * Created by tycho on 11/16/2017.
  */
 
-public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<AbstractTaskListAdapter.ViewHolder> {
+public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<PrimeFactorizationTaskListAdapter.Dummy> {
 
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "PrmFctrztnTskListAdptr";
-
-    private final Context context;
+    private static final String TAG = PrimeFactorizationTaskListAdapter.class.getSimpleName();
 
     public PrimeFactorizationTaskListAdapter(final Context context) {
-        this.context = context;
+       super(context);
     }
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public Dummy onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.prime_factorization_task_list_item, parent, false);
-        return new ViewHolder(view);
+        return new PrimeFactorizationTaskListAdapter.Dummy(view);
     }
 
     @Override
-    protected void doOnBindViewHolder(RecyclerView.ViewHolder h, int position) {
-
-        final ViewHolder holder = (ViewHolder) h;
+    protected void doOnBindViewHolder(PrimeFactorizationTaskListAdapter.Dummy holder, int position) {
 
         //Get the current task
         final PrimeFactorizationTask task = (PrimeFactorizationTask) tasks.get(holder.getAdapterPosition());
 
         //Set title
-        holder.title.setText(context.getString(R.string.prime_factorization_task_list_item_title, NumberFormat.getInstance(Locale.getDefault()).format(task.getNumber())));
+        holder.title.setText(context.getString(R.string.prime_factorization_task_list_item_title, NUMBER_FORMAT.format(task.getNumber())));
+
+        manageStandardViews(task, holder);
 
         //Set state and buttons
         switch (task.getState()) {
             case RUNNING:
-                holder.state.setText(context.getString(R.string.status_searching));
+                /*holder.state.setText(context.getString(R.string.status_searching));
                 holder.pauseButton.setEnabled(true);
                 holder.pauseButton.setVisibility(View.VISIBLE);
                 holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
                 holder.editButton.setVisibility(View.VISIBLE);
                 holder.editButton.setEnabled(false);
-                holder.deleteButton.setEnabled(false);
+                holder.deleteButton.setEnabled(false);*/
 
                 //Progress
                 holder.progress.setVisibility(View.VISIBLE);
@@ -70,12 +66,12 @@ public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<A
                 break;
 
             case PAUSING:
-                holder.state.setText(context.getString(R.string.state_pausing));
+                /*holder.state.setText(context.getString(R.string.state_pausing));
                 holder.pauseButton.setEnabled(false);
                 holder.pauseButton.setVisibility(View.VISIBLE);
                 holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
                 holder.editButton.setEnabled(false);
-                holder.deleteButton.setEnabled(false);
+                holder.deleteButton.setEnabled(false);*/
 
                 //Progress
                 holder.progress.setVisibility(View.VISIBLE);
@@ -83,12 +79,12 @@ public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<A
                 break;
 
             case PAUSED:
-                holder.state.setText(context.getString(R.string.status_paused));
+                /*holder.state.setText(context.getString(R.string.status_paused));
                 holder.pauseButton.setEnabled(true);
                 holder.pauseButton.setVisibility(View.VISIBLE);
                 holder.pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
                 holder.editButton.setEnabled(true);
-                holder.deleteButton.setEnabled(true);
+                holder.deleteButton.setEnabled(true);*/
 
                 //Progress
                 holder.progress.setVisibility(View.VISIBLE);
@@ -96,12 +92,12 @@ public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<A
                 break;
 
             case RESUMING:
-                holder.state.setText(context.getString(R.string.state_resuming));
+                /*holder.state.setText(context.getString(R.string.state_resuming));
                 holder.pauseButton.setEnabled(false);
                 holder.pauseButton.setVisibility(View.VISIBLE);
                 holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
                 holder.editButton.setEnabled(false);
-                holder.deleteButton.setEnabled(false);
+                holder.deleteButton.setEnabled(false);*/
 
                 //Progress
                 holder.progress.setVisibility(View.VISIBLE);
@@ -109,23 +105,20 @@ public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<A
                 break;
 
             case STOPPED:
-                holder.state.setText(context.getString(R.string.status_finished));
                 final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
                 spannableStringBuilder.append(context.getString(R.string.status_finished));
                 spannableStringBuilder.append(": ");
                 spannableStringBuilder.append(context.getString(R.string.prime_factorization_result, NUMBER_FORMAT.format((task.getPrimeFactors().size()))));
                 spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accent_dark)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                 holder.state.setText(spannableStringBuilder);
-                holder.pauseButton.setVisibility(View.GONE);
+                /*holder.pauseButton.setVisibility(View.GONE);
                 holder.editButton.setVisibility(View.GONE);
-                holder.deleteButton.setEnabled(true);
+                holder.deleteButton.setEnabled(true);*/
 
                 //Progress
                 holder.progress.setVisibility(View.GONE);
                 break;
         }
-
-        holder.root.setSelected(holder.getAdapterPosition() == getSelectedItemPosition());
     }
 
     @Override
@@ -136,5 +129,11 @@ public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<A
     @Override
     protected int getTaskType() {
         return TASK_TYPE_PRIME_FACTORIZATION;
+    }
+
+    class Dummy extends AbstractTaskListAdapter.ViewHolder{
+        Dummy(View itemView){
+            super(itemView);
+        }
     }
 }

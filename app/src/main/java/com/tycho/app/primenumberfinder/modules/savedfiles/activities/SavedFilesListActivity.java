@@ -168,9 +168,7 @@ public class SavedFilesListActivity extends AbstractActivity {
                                     position++;
                                 }
                                 adapterSavedFilesList.setSelectionMode(false);
-
                                 alertDialog.dismiss();
-                                finish();
                             }
                         });
                 alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",

@@ -207,30 +207,33 @@ public class FindFactorsResultsFragment extends ResultsFragment{
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                progressDialog.setTitle("Saving...");
-                progressDialog.show();
-
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        final boolean success = FileManager.getInstance().saveFactors(getTask().getFactors(), getTask().getNumber());
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                        progressDialog.dismiss();
-                    }
-                }).start();
+                saveTask();
             }
         });
 
         init();
 
         return rootView;
+    }
+
+    public void saveTask(){
+        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setTitle("Saving...");
+        progressDialog.show();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final boolean success = FileManager.getInstance().saveFactors(getTask().getFactors(), getTask().getNumber());
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                progressDialog.dismiss();
+            }
+        }).start();
     }
 
     @Override
