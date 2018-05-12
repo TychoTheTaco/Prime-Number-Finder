@@ -51,7 +51,7 @@ import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
  * @author Tycho Bellers
  * Date Created: 11/12/2016
  */
-public class FindPrimesFragment extends Fragment implements FloatingActionButtonListener {
+public class FindPrimesFragment extends Fragment implements FloatingActionButtonListener{
 
     /**
      * Tag used for logging and debugging.
@@ -182,7 +182,9 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
             @Override
             public void onSavePressed(Task task) {
-                findPrimesResultsFragment.saveTask();
+                if (task instanceof FindPrimesTask){
+                    findPrimesResultsFragment.saveTask((FindPrimesTask) task);
+                }
             }
         });
 

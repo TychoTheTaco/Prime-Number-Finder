@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsTaskListAdapter;
@@ -106,7 +107,18 @@ public class FindFactorsTaskListFragment extends Fragment{
         }
     }
 
-    public void addTask(final Task task) {
+    public void addTask(final FindFactorsTask task) {
+        task.addSavableCallbacks(new Savable.SavableCallbacks() {
+            @Override
+            public void onSaved() {
+                taskListAdapter.setSaved(task);
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        });
         taskListAdapter.addTask(task);
         update();
     }

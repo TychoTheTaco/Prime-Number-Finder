@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimesActivity;
@@ -28,15 +29,12 @@ import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 import easytasks.Task;
-
-import static com.tycho.app.primenumberfinder.utils.FileManager.EXTENSION;
 
 /**
  * Created by tycho on 11/16/2017.
@@ -212,7 +210,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               saveTask();
+               saveTask(getTask());
             }
         });
 
@@ -221,36 +219,38 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         return rootView;
     }
 
-    public void saveTask(){
+    public void saveTask(final FindPrimesTask task){
         final ProgressDialog progressDialog = new ProgressDialog(getActivity());
         progressDialog.setTitle("Saving...");
         progressDialog.show();
 
-        new Thread(new Runnable() {
+        task.addSavableCallbacks(new Savable.SavableCallbacks() {
             @Override
-            public void run() {
-
-                try {
-                    FileManager.copy(getTask().saveToFile(), new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getTask().getStartValue() + " to " + (getTask().getEndValue() == FindPrimesTask.INFINITY ? getTask().getCurrentValue() : getTask().getEndValue()) + EXTENSION));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getActivity(), "Error saving file!", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-
+            public void onSaved() {
                 progressDialog.dismiss();
-
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
                         Toast.makeText(getActivity(), getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
                     }
                 });
+            }
 
+            @Override
+            public void onError() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getActivity(), "Error saving file!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                task.save();
             }
         }).start();
     }

@@ -3,12 +3,13 @@ package com.tycho.app.primenumberfinder.modules.findfactors;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.Savable;
+import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import easytasks.Task;
 
@@ -17,7 +18,7 @@ import easytasks.Task;
  *         Date Created: 3/3/2017
  */
 
-public class FindFactorsTask extends Task {
+public class FindFactorsTask extends Task implements Savable{
 
     /**
      * Tag used for logging and debugging.
@@ -47,6 +48,8 @@ public class FindFactorsTask extends Task {
     public boolean didFinish = false;
 
     private SearchOptions searchOptions;
+
+    private final CopyOnWriteArrayList<SavableCallbacks> savableCallbacks = new CopyOnWriteArrayList<>();
 
     private long i;
 
@@ -168,5 +171,36 @@ public class FindFactorsTask extends Task {
 
     public long getNumber() {
         return number;
+    }
+
+    @Override
+    public void save() {
+        if (FileManager.getInstance().saveFactors(getFactors(), getNumber())){
+            sendOnSaved();
+        }else{
+            sendOnError();
+        }
+    }
+
+    public void addSavableCallbacks(final SavableCallbacks callbacks){
+        if (!savableCallbacks.contains(callbacks)){
+            savableCallbacks.add(callbacks);
+        }
+    }
+
+    public void removeSavableCallbacks(final SavableCallbacks callbacks){
+        savableCallbacks.remove(callbacks);
+    }
+
+    private void sendOnSaved(){
+        for (SavableCallbacks callbacks : savableCallbacks){
+            callbacks.onSaved();
+        }
+    }
+
+    private void sendOnError(){
+        for (SavableCallbacks callbacks : savableCallbacks){
+            callbacks.onError();
+        }
     }
 }

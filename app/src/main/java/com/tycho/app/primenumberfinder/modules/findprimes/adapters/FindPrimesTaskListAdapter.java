@@ -85,6 +85,13 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
             holder.progress.setVisibility(View.VISIBLE);
             holder.progress.setText(context.getString(R.string.task_progress, DECIMAL_FORMAT.format(task.getProgress() * 100)));
         }
+
+        //Show saved
+        if (holder.isSaved()){
+            holder.saveButton.setVisibility(View.GONE);
+            holder.progress.setVisibility(View.VISIBLE);
+            holder.progress.setText("Saved");
+        }
     }
 
     @Override

@@ -23,11 +23,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.ui.TreeView;
+import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
-import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.ui.TreeView;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.text.NumberFormat;
@@ -123,7 +124,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveTask();
+                saveTask(getTask());
             }
         });
 
@@ -132,17 +133,38 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         return rootView;
     }
 
-    public void saveTask(){
-        new Thread(new Runnable() {
+    public void saveTask(final PrimeFactorizationTask task){
+        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setTitle("Saving...");
+        progressDialog.show();
+
+        task.addSavableCallbacks(new Savable.SavableCallbacks() {
             @Override
-            public void run() {
-                final boolean success = FileManager.getInstance().saveTree(getTask().getFactorTree());
+            public void onSaved() {
+                progressDialog.dismiss();
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
                     }
                 });
+            }
+
+            @Override
+            public void onError() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getActivity(), "Error saving file!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                task.save();
             }
         }).start();
     }

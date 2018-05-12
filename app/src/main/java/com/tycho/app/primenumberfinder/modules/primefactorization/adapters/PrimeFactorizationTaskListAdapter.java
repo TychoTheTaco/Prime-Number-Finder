@@ -119,6 +119,13 @@ public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<P
                 holder.progress.setVisibility(View.GONE);
                 break;
         }
+
+        //Show saved
+        if (holder.isSaved()){
+            holder.saveButton.setVisibility(View.GONE);
+            holder.progress.setVisibility(View.VISIBLE);
+            holder.progress.setText("Saved");
+        }
     }
 
     @Override

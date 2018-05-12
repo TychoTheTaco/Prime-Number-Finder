@@ -96,6 +96,8 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
 
     protected final Context context;
 
+    private final List<Task> savedItems = new ArrayList<>();
+
     public AbstractTaskListAdapter(final Context context){
         this.context = context;
     }
@@ -214,6 +216,7 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
                 holder.deleteButton.setEnabled(true);
 
                 //Save button
+                holder.saveButton.setEnabled(true);
                 holder.saveButton.setVisibility(View.VISIBLE);
                 break;
         }
@@ -492,6 +495,7 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
 
                     //Remove the task from the list
                     final Task task = tasks.get(getAdapterPosition());
+                    savedItems.remove(task);
                     customEventListeners.remove(task);
                     tasks.remove(task);
                     notifyItemRemoved(getAdapterPosition());
@@ -507,10 +511,23 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
             saveButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    saveButton.setEnabled(false);
                     sendOnSavePressed(tasks.get(getAdapterPosition()));
                 }
             });
         }
+
+        public boolean isSaved(){
+            return savedItems.contains(tasks.get(getAdapterPosition()));
+        }
+    }
+
+    public void setSaved(final Task task){
+        final int index = tasks.indexOf(task);
+        if (!savedItems.contains(task)){
+            savedItems.add(task);
+        }
+        notifyItemChanged(index);
     }
 
     protected void onUpdate(final ViewHolder viewHolder) {

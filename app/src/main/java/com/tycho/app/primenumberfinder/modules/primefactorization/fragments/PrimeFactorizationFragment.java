@@ -146,7 +146,7 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
 
             @Override
             public void onSavePressed(Task task) {
-                resultsFragment.saveTask();
+                resultsFragment.saveTask((PrimeFactorizationTask) task);
             }
         });
 
