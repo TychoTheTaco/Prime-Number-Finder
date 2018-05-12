@@ -49,7 +49,7 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.View
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final File file = files.get(position);
 
-        holder.fileName.setText(file.getName());
+        holder.fileName.setText(Utils.formatTitle(file));
 
         switch (FileManager.getFileType(directory)){
             default:

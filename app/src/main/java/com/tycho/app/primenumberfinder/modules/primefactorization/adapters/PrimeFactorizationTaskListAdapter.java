@@ -52,53 +52,24 @@ public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<P
         //Set state and buttons
         switch (task.getState()) {
             case RUNNING:
-                /*holder.state.setText(context.getString(R.string.status_searching));
-                holder.pauseButton.setEnabled(true);
-                holder.pauseButton.setVisibility(View.VISIBLE);
-                holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                holder.editButton.setVisibility(View.VISIBLE);
-                holder.editButton.setEnabled(false);
-                holder.deleteButton.setEnabled(false);*/
-
                 //Progress
                 holder.progress.setVisibility(View.VISIBLE);
                 holder.progress.setText(context.getString(R.string.task_progress, DECIMAL_FORMAT.format(task.getProgress() * 100)));
                 break;
 
             case PAUSING:
-                /*holder.state.setText(context.getString(R.string.state_pausing));
-                holder.pauseButton.setEnabled(false);
-                holder.pauseButton.setVisibility(View.VISIBLE);
-                holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                holder.editButton.setEnabled(false);
-                holder.deleteButton.setEnabled(false);*/
-
                 //Progress
                 holder.progress.setVisibility(View.VISIBLE);
                 holder.progress.setText(context.getString(R.string.task_progress, DECIMAL_FORMAT.format(task.getProgress() * 100)));
                 break;
 
             case PAUSED:
-                /*holder.state.setText(context.getString(R.string.status_paused));
-                holder.pauseButton.setEnabled(true);
-                holder.pauseButton.setVisibility(View.VISIBLE);
-                holder.pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                holder.editButton.setEnabled(true);
-                holder.deleteButton.setEnabled(true);*/
-
                 //Progress
                 holder.progress.setVisibility(View.VISIBLE);
                 holder.progress.setText(context.getString(R.string.task_progress, DECIMAL_FORMAT.format(task.getProgress() * 100)));
                 break;
 
             case RESUMING:
-                /*holder.state.setText(context.getString(R.string.state_resuming));
-                holder.pauseButton.setEnabled(false);
-                holder.pauseButton.setVisibility(View.VISIBLE);
-                holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                holder.editButton.setEnabled(false);
-                holder.deleteButton.setEnabled(false);*/
-
                 //Progress
                 holder.progress.setVisibility(View.VISIBLE);
                 holder.progress.setText(context.getString(R.string.task_progress, DECIMAL_FORMAT.format(task.getProgress() * 100)));
@@ -111,9 +82,6 @@ public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<P
                 spannableStringBuilder.append(context.getString(R.string.prime_factorization_result, NUMBER_FORMAT.format((task.getPrimeFactors().size()))));
                 spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accent_dark)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                 holder.state.setText(spannableStringBuilder);
-                /*holder.pauseButton.setVisibility(View.GONE);
-                holder.editButton.setVisibility(View.GONE);
-                holder.deleteButton.setEnabled(true);*/
 
                 //Progress
                 holder.progress.setVisibility(View.GONE);

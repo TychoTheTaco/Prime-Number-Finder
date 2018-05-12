@@ -94,7 +94,7 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
         holder.iconImage.setVisibility(holder.isSelected() ? View.VISIBLE : View.GONE);
 
         //Set file name
-        holder.fileName.setText(file.getName());
+        holder.fileName.setText(Utils.formatTitle(file));
 
         if (holder.isSelected()){
             holder.icon.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.accent)));
