@@ -4,7 +4,8 @@
     android:layout_height="match_parent"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:theme="@style/PrimeFactorization">
 
     <!-- Message to display when no active task -->
     <TextView
@@ -24,7 +25,7 @@
         android:padding="8dp">
 
         <!-- Top bar -->
-        <include layout="@layout/progress_banner"/>
+        <include layout="@layout/progress_banner" />
 
         <TextView
             android:id="@+id/subtitle"
@@ -122,10 +123,10 @@
             android:layout_margin="4dp"
             android:background="@drawable/circle_white"
             android:backgroundTint="@color/button_color"
-            android:tooltipText="Pause / Resume"
             android:contentDescription="Pause / Resume"
             android:elevation="2dp"
-            android:src="@drawable/ic_pause_white_24dp" />
+            android:src="@drawable/ic_pause_white_24dp"
+            android:tooltipText="Pause / Resume" />
 
         <ImageButton
             android:id="@+id/save_button"
@@ -134,12 +135,12 @@
             android:layout_alignParentBottom="true"
             android:layout_margin="2dp"
             android:layout_toEndOf="@id/center"
-            android:tooltipText="@string/save"
             android:background="@drawable/circle_white"
             android:backgroundTint="@color/button_color"
             android:contentDescription="@string/save"
             android:elevation="2dp"
-            android:src="@drawable/ic_save_white_24dp" />
+            android:src="@drawable/ic_save_white_24dp"
+            android:tooltipText="@string/save" />
 
     </RelativeLayout>
 

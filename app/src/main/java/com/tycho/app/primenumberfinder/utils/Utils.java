@@ -275,13 +275,6 @@ public final class Utils {
         Pattern pattern;
         Matcher matcher;
 
-        //Make sure the string contains digits
-        /*pattern = Pattern.compile("\\d+");
-        matcher = pattern.matcher(text);
-        if (!matcher.find()){
-            return BigDecimal.ZERO;
-        }*/
-
         //Find the last non-digit character. Assume this is the decimal point
         pattern = Pattern.compile("[^\\d]");
         matcher = pattern.matcher(text);

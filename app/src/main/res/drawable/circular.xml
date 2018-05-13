@@ -4,5 +4,5 @@
     android:shape="ring"
     android:thickness="2dp"
     android:useLevel="true">
-    <solid android:color="@color/accent" />
+    <solid android:color="?android:attr/colorAccent" />
 </shape>
