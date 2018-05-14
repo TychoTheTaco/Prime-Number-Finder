@@ -26,7 +26,7 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "ChkPrimalityRsltsFgmnt";
+    private static final String TAG = CheckPrimalityResultsFragment.class.getSimpleName();
 
     //Views
     private TextView subtitle;

@@ -222,7 +222,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                             NUMBER_FORMAT.format(getTask().getStartValue()),
                             getTask().getEndValue() == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),
                             getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE ? "brute force" : "the sieve of Eratosthenes"
-                    }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                    }, ContextCompat.getColor(getContext(), R.color.purple_dark)));
 
                     //Statistics
                     etaTextView.setVisibility((getTask().getEndValue() == FindPrimesTask.INFINITY) ? View.GONE : View.VISIBLE);

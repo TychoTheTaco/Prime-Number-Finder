@@ -40,7 +40,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "PrimeFctriztnRsltsFgmnt";
+    private static final String TAG = PrimeFactorizationResultsFragment.class.getSimpleName();
 
     //Views
     private TextView subtitle;
