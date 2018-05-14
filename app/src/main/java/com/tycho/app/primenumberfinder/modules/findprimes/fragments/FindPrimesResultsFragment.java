@@ -1,19 +1,19 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.text.SpannableStringBuilder;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -23,15 +23,13 @@ import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.DisplayPrimesActivity;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
-import java.text.NumberFormat;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import easytasks.Task;
@@ -69,9 +67,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     private TextView numbersPerSecondTextView;
     private TextView primesPerSecondTextView;
 
-    private final RotateAnimation rotate = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
-
     private boolean showStatistics = true;
 
     final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
@@ -96,10 +91,10 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
     @Nullable
     @Override
-    public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_primes_results_fragment, container, false);
 
-        Log.d(TAG, "onCreateView(): " + this);
+        //initStandardViews(rootView);
 
         title = rootView.findViewById(R.id.title);
         subtitleTextView = rootView.findViewById(R.id.subtitle);
@@ -126,17 +121,17 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
             for (Drawable drawable : etaTextView.getCompoundDrawables()){
                 if (drawable != null){
-                    drawable.mutate().setTint(ContextCompat.getColor(getActivity(), R.color.black));
+                    drawable.mutate().setTint(ContextCompat.getColor(getContext(), R.color.black));
                 }
             }
             for (Drawable drawable : numbersPerSecondTextView.getCompoundDrawables()){
                 if (drawable != null){
-                    drawable.mutate().setTint(ContextCompat.getColor(getActivity(), R.color.black));
+                    drawable.mutate().setTint(ContextCompat.getColor(getContext(), R.color.black));
                 }
             }
             for (Drawable drawable : primesPerSecondTextView.getCompoundDrawables()){
                 if (drawable != null){
-                    drawable.mutate().setTint(ContextCompat.getColor(getActivity(), R.color.black));
+                    drawable.mutate().setTint(ContextCompat.getColor(getContext(), R.color.black));
                 }
             }
         }
@@ -146,6 +141,15 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         viewAllButton = rootView.findViewById(R.id.view_all_button);
         saveButton = rootView.findViewById(R.id.save_button);
         centerView = rootView.findViewById(R.id.center);
+
+        //Fix button tint for API <22
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
+            final ColorStateList colorStateList = generateSimpleColorStateList(ContextCompat.getColor(getContext(), R.color.purple), ContextCompat.getColor(getContext(), R.color.gray));
+            pauseButton.setBackgroundTintList(colorStateList);
+            viewAllButton.setBackgroundTintList(colorStateList);
+            saveButton.setBackgroundTintList(colorStateList);
+            centerView.setBackgroundTintList(colorStateList);
+        }
 
         pauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
