@@ -28,7 +28,7 @@ import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
-import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayFactorsActivity;
+import com.tycho.app.primenumberfinder.modules.findfactors.DisplayFactorsActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 

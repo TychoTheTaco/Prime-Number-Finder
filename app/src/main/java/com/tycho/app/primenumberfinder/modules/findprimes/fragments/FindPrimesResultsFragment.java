@@ -24,7 +24,7 @@ import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
-import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimesActivity;
+import com.tycho.app.primenumberfinder.modules.findprimes.DisplayPrimesActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 

@@ -2,9 +2,9 @@ package com.tycho.app.primenumberfinder.utils;
 
 import android.content.res.Resources;
 
-import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayFactorsActivity;
-import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimeFactorizationActivity;
-import com.tycho.app.primenumberfinder.modules.savedfiles.activities.DisplayPrimesActivity;
+import com.tycho.app.primenumberfinder.modules.findfactors.DisplayFactorsActivity;
+import com.tycho.app.primenumberfinder.modules.primefactorization.DisplayPrimeFactorizationActivity;
+import com.tycho.app.primenumberfinder.modules.findprimes.DisplayPrimesActivity;
 
 /**
  * @author Tycho Bellers
