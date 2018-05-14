@@ -3,6 +3,7 @@ package com.tycho.app.primenumberfinder.modules.primefactorization.fragments;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.text.SpannableStringBuilder;
@@ -14,11 +15,6 @@ import android.text.style.SuperscriptSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
-import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,8 +27,6 @@ import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactoriza
 import com.tycho.app.primenumberfinder.ui.TreeView;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
-import java.text.NumberFormat;
-import java.util.Locale;
 import java.util.Map;
 
 import easytasks.Task;
@@ -49,77 +43,35 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     private static final String TAG = "PrimeFctriztnRsltsFgmnt";
 
     //Views
-    private ViewGroup resultsView;
-    private TextView noTaskView;
-    private TextView title;
     private TextView subtitle;
     private TextView bodyTextView;
-    private ProgressBar progressBar;
-    private TextView progress;
-
-    //Buttons
-    private ImageButton pauseButton;
-    //private ImageButton viewAllButton;
-    private ImageButton saveButton;
-    private View centerView;
 
     //Statistics
     private ViewGroup statisticsLayout;
-    private TextView timeElapsedTextView;
     private TextView etaTextView;
 
     private TreeView treeView;
 
-    private final RotateAnimation rotate = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
-        //Set up progress animation
-        rotate.setDuration(3000);
-        rotate.setRepeatCount(Animation.INFINITE);
-        rotate.setRepeatMode(Animation.INFINITE);
-        rotate.setInterpolator(new LinearInterpolator());
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.prime_factorization_results_fragment, container, false);
 
-        title = rootView.findViewById(R.id.title);
+        initStandardViews(rootView);
+
         subtitle = rootView.findViewById(R.id.subtitle);
         bodyTextView = rootView.findViewById(R.id.prime_factorization);
-        progressBar = rootView.findViewById(R.id.progress_bar);
-        resultsView = rootView.findViewById(R.id.results_view);
-        noTaskView = rootView.findViewById(R.id.empty_message);
-        progress = rootView.findViewById(R.id.textView_search_progress);
         treeView = rootView.findViewById(R.id.factor_tree);
 
         //Statistics
         statisticsLayout = rootView.findViewById(R.id.statistics_layout);
         statisticsLayout.setVisibility(View.GONE);
-        timeElapsedTextView = rootView.findViewById(R.id.textView_elapsed_time);
         etaTextView = rootView.findViewById(R.id.textView_eta);
-
-        //Buttons
-        pauseButton = rootView.findViewById(R.id.pause_button);
-        //viewAllButton = rootView.findViewById(R.id.view_all_button);
-        saveButton = rootView.findViewById(R.id.save_button);
-        centerView = rootView.findViewById(R.id.center);
-
-        pauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (getTask().getState() == Task.State.RUNNING) {
-                    getTask().pause(false);
-                } else if (getTask().getState() == Task.State.PAUSED) {
-                    getTask().resume(false);
-                }
-            }
-        });
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -391,44 +343,10 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         }
     }
 
-    private void init(){
-        if (getTask() != null){
-
-            //Reset view states
-            resultsView.setVisibility(View.VISIBLE);
-            noTaskView.setVisibility(View.GONE);
-            bodyTextView.setVisibility(View.GONE);
-            treeView.setVisibility(View.GONE);
-
-            switch (getTask().getState()) {
-                case RUNNING:
-                    onTaskStarted();
-                    break;
-
-                case PAUSING:
-                    onTaskPausing();
-                    break;
-
-                case PAUSED:
-                    onTaskPaused();
-                    break;
-
-                case RESUMING:
-                    onTaskResuming();
-                    break;
-
-                case STOPPING:
-                    onTaskStopping();
-                    break;
-
-                case STOPPED:
-                    onTaskStopped();
-                    break;
-            }
-
-        }else{
-            resultsView.setVisibility(View.GONE);
-            noTaskView.setVisibility(View.VISIBLE);
-        }
+    @Override
+    protected void onResetViews() {
+        super.onResetViews();
+        bodyTextView.setVisibility(View.GONE);
+        treeView.setVisibility(View.GONE);
     }
 }

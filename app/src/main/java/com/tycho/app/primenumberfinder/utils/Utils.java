@@ -309,13 +309,10 @@ public final class Utils {
     }
 
     public static int getAccentColor(final Context context) {
-        TypedValue typedValue = new TypedValue();
-
-        TypedArray a = context.obtainStyledAttributes(typedValue.data, new int[]{android.R.attr.colorAccent});
-        int color = a.getColor(0, 0);
-
+        final TypedValue typedValue = new TypedValue();
+        final TypedArray a = context.obtainStyledAttributes(typedValue.data, new int[]{android.R.attr.colorAccent});
+        final int color = a.getColor(0, 0);
         a.recycle();
-
         return color;
     }
 

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,11 +15,6 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
-import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,16 +22,14 @@ import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
+import com.tycho.app.primenumberfinder.modules.findfactors.DisplayFactorsActivity;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
-import com.tycho.app.primenumberfinder.modules.findfactors.DisplayFactorsActivity;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
-import java.text.NumberFormat;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import easytasks.Task;
@@ -52,32 +46,18 @@ public class FindFactorsResultsFragment extends ResultsFragment{
     private static final String TAG = "FindFactorsResultsFgmnt";
 
     //Views
-    private ViewGroup resultsView;
-    private TextView noTaskView;
-    private TextView title;
     private TextView subtitleTextView;
-    private ProgressBar progressBar;
-    private TextView progress;
     private RecyclerView recyclerView;
-    private ImageButton viewAllButton;
-    private ImageButton saveButton;
-    private ImageButton pauseButton;
-
-    private View centerView;
     private TextView bodyTextView;
 
     //Statistics
     private ViewGroup statisticsLayout;
-    private TextView timeElapsedTextView;
     private TextView etaTextView;
     private TextView numbersPerSecondTextView;
 
     private FactorsListAdapter adapter;
 
     private int lastAdapterSize = 0;
-
-    private final RotateAnimation rotate = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
     private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
@@ -101,18 +81,14 @@ public class FindFactorsResultsFragment extends ResultsFragment{
     public void onAttach(Context context) {
         super.onAttach(context);
         adapter = new FactorsListAdapter(context);
-
-        //Set up progress animation
-        rotate.setDuration(3000);
-        rotate.setRepeatCount(Animation.INFINITE);
-        rotate.setRepeatMode(Animation.INFINITE);
-        rotate.setInterpolator(new LinearInterpolator());
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_factors_results_fragment, container, false);
+
+        initStandardViews(rootView);
 
         //Set up recycler view
         recyclerView = rootView.findViewById(R.id.recyclerView);
@@ -121,20 +97,11 @@ public class FindFactorsResultsFragment extends ResultsFragment{
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(null);
 
-        title = rootView.findViewById(R.id.title);
         subtitleTextView = rootView.findViewById(R.id.subtitle);
-        progressBar = rootView.findViewById(R.id.progress_bar);
-        resultsView = rootView.findViewById(R.id.results_view);
-        noTaskView = rootView.findViewById(R.id.empty_message);
-        progress = rootView.findViewById(R.id.textView_search_progress);
-        viewAllButton = rootView.findViewById(R.id.view_all_button);
-        saveButton = rootView.findViewById(R.id.save_button);
-        centerView = rootView.findViewById(R.id.center);
         bodyTextView = rootView.findViewById(R.id.text);
 
         //Statistics
         statisticsLayout = rootView.findViewById(R.id.statistics_layout);
-        timeElapsedTextView = rootView.findViewById(R.id.textView_elapsed_time);
         etaTextView = rootView.findViewById(R.id.textView_eta);
         numbersPerSecondTextView = rootView.findViewById(R.id.textView_numbers_per_second);
 
@@ -151,18 +118,6 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                 }
             }
         }
-
-        pauseButton = rootView.findViewById(R.id.pause_button);
-        pauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (getTask().getState() == Task.State.RUNNING) {
-                    getTask().pause(false);
-                } else if (getTask().getState() == Task.State.PAUSED) {
-                    getTask().resume(false);
-                }
-            }
-        });
 
         viewAllButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -488,51 +443,16 @@ public class FindFactorsResultsFragment extends ResultsFragment{
         }
     }
 
-    private void init(){
-        if (getTask() != null){
+    @Override
+    protected void onResetViews() {
+        super.onResetViews();
 
-            //Reset view states
-            resultsView.setVisibility(View.VISIBLE);
-            noTaskView.setVisibility(View.GONE);
-            bodyTextView.setVisibility(View.VISIBLE);
-            pauseButton.setVisibility(View.VISIBLE);
-            saveButton.setVisibility(View.VISIBLE);
-            etaTextView.setVisibility(View.VISIBLE);
+        bodyTextView.setVisibility(View.VISIBLE);
+        etaTextView.setVisibility(View.VISIBLE);
 
-            //Add factors to the adapter
-            adapter.setTask(getTask());
-            adapter.notifyDataSetChanged();
-            recyclerView.scrollToPosition(adapter.getItemCount() - 1);
-
-            switch (getTask().getState()) {
-                case RUNNING:
-                    onTaskStarted();
-                    break;
-
-                case PAUSING:
-                    onTaskPausing();
-                    break;
-
-                case PAUSED:
-                    onTaskPaused();
-                    break;
-
-                case RESUMING:
-                    onTaskResuming();
-                    break;
-
-                case STOPPING:
-                    onTaskStopping();
-                    break;
-
-                case STOPPED:
-                    onTaskStopped();
-                    break;
-            }
-
-        }else{
-            resultsView.setVisibility(View.GONE);
-            noTaskView.setVisibility(View.VISIBLE);
-        }
+        //Add factors to the adapter
+        adapter.setTask(getTask());
+        adapter.notifyDataSetChanged();
+        recyclerView.scrollToPosition(adapter.getItemCount() - 1);
     }
 }

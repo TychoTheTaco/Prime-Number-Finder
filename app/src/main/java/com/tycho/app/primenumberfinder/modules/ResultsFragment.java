@@ -18,6 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -45,8 +46,6 @@ public abstract class ResultsFragment extends TaskFragment {
     protected ViewGroup resultsView;
     protected TextView noTaskView;
     protected TextView title;
-    protected TextView subtitleTextView;
-    protected TextView bodyTextView;
     protected ProgressBar progressBar;
     protected TextView progress;
 
@@ -238,13 +237,13 @@ public abstract class ResultsFragment extends TaskFragment {
 
         //Fix button tint for API <22
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            final ColorStateList colorStateList = generateSimpleColorStateList(ContextCompat.getColor(getContext(), R.color.purple), ContextCompat.getColor(getContext(), R.color.gray));
+            final ColorStateList colorStateList = generateSimpleColorStateList(Utils.getAccentColor(rootView.getContext()), ContextCompat.getColor(getContext(), R.color.gray));
             pauseButton.setBackgroundTintList(colorStateList);
-            viewAllButton.setBackgroundTintList(colorStateList);
-            saveButton.setBackgroundTintList(colorStateList);
-            centerView.setBackgroundTintList(colorStateList);
+            if (viewAllButton != null) viewAllButton.setBackgroundTintList(colorStateList);
+            if (saveButton != null) saveButton.setBackgroundTintList(colorStateList);
         }
 
+        //Set up pause button
         pauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -255,6 +254,52 @@ public abstract class ResultsFragment extends TaskFragment {
                 }
             }
         });
+    }
+
+    protected final void init(){
+        if (getTask() != null) {
+
+            //Reset view states
+            onResetViews();
+
+            switch (getTask().getState()) {
+                case RUNNING:
+                    onTaskStarted();
+                    break;
+
+                case PAUSING:
+                    onTaskPausing();
+                    break;
+
+                case PAUSED:
+                    onTaskPaused();
+                    break;
+
+                case RESUMING:
+                    onTaskResuming();
+                    break;
+
+                case STOPPING:
+                    onTaskStopping();
+                    break;
+
+                case STOPPED:
+                    onTaskStopped();
+                    break;
+            }
+
+        } else {
+            noTaskView.setVisibility(View.VISIBLE);
+            resultsView.setVisibility(View.GONE);
+        }
+    }
+
+    protected void onResetViews(){
+        resultsView.setVisibility(View.VISIBLE);
+        noTaskView.setVisibility(View.GONE);
+        progress.setVisibility(View.VISIBLE);
+        pauseButton.setVisibility(View.VISIBLE);
+        if (saveButton != null) saveButton.setVisibility(View.VISIBLE);
     }
 
     protected ColorStateList generateSimpleColorStateList(final int defaultColor, final int disabledColor) {

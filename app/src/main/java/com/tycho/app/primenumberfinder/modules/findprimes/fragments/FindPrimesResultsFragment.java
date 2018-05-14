@@ -1,7 +1,6 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,10 +11,6 @@ import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.LinearInterpolator;
-import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,23 +41,11 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     private static final String TAG = FindPrimesResultsFragment.class.getSimpleName();
 
     //Views
-    private ViewGroup resultsView;
-    private TextView noTaskView;
-    private TextView title;
     private TextView subtitleTextView;
     private TextView bodyTextView;
-    private ProgressBar progressBar;
-    private TextView progress;
-
-    //Buttons
-    private ImageButton pauseButton;
-    private ImageButton viewAllButton;
-    private ImageButton saveButton;
-    private View centerView;
 
     //Statistics
     private ViewGroup statisticsLayout;
-    private TextView timeElapsedTextView;
     private TextView etaTextView;
     private TextView numbersPerSecondTextView;
     private TextView primesPerSecondTextView;
@@ -94,25 +77,13 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_primes_results_fragment, container, false);
 
-        //initStandardViews(rootView);
+        initStandardViews(rootView);
 
-        title = rootView.findViewById(R.id.title);
         subtitleTextView = rootView.findViewById(R.id.subtitle);
-        progressBar = rootView.findViewById(R.id.progress_bar);
-        resultsView = rootView.findViewById(R.id.results_view);
-        noTaskView = rootView.findViewById(R.id.empty_message);
-        progress = rootView.findViewById(R.id.textView_search_progress);
         bodyTextView = rootView.findViewById(R.id.text);
-
-        //Set up progress animation
-        rotate.setDuration(3000);
-        rotate.setRepeatCount(Animation.INFINITE);
-        rotate.setRepeatMode(Animation.INFINITE);
-        rotate.setInterpolator(new LinearInterpolator());
 
         //Statistics
         statisticsLayout = rootView.findViewById(R.id.statistics_layout);
-        timeElapsedTextView = rootView.findViewById(R.id.textView_elapsed_time);
         etaTextView = rootView.findViewById(R.id.textView_eta);
         numbersPerSecondTextView = rootView.findViewById(R.id.textView_numbers_per_second);
         primesPerSecondTextView = rootView.findViewById(R.id.textView_primes_per_second);
@@ -135,32 +106,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                 }
             }
         }
-
-        //Buttons
-        pauseButton = rootView.findViewById(R.id.pause_button);
-        viewAllButton = rootView.findViewById(R.id.view_all_button);
-        saveButton = rootView.findViewById(R.id.save_button);
-        centerView = rootView.findViewById(R.id.center);
-
-        //Fix button tint for API <22
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
-            final ColorStateList colorStateList = generateSimpleColorStateList(ContextCompat.getColor(getContext(), R.color.purple), ContextCompat.getColor(getContext(), R.color.gray));
-            pauseButton.setBackgroundTintList(colorStateList);
-            viewAllButton.setBackgroundTintList(colorStateList);
-            saveButton.setBackgroundTintList(colorStateList);
-            centerView.setBackgroundTintList(colorStateList);
-        }
-
-        pauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (getTask().getState() == Task.State.RUNNING) {
-                    getTask().pause(false);
-                } else if (getTask().getState() == Task.State.PAUSED) {
-                    getTask().resume(false);
-                }
-            }
-        });
 
         viewAllButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -568,49 +513,13 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         }
     }
 
-    private void init() {
-        if (getTask() != null) {
-            showStatistics = getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE;
-
-            //Reset view states
-            resultsView.setVisibility(View.VISIBLE);
-            noTaskView.setVisibility(View.GONE);
-            progress.setVisibility(getTask().getEndValue() == FindPrimesTask.INFINITY ? View.GONE : View.VISIBLE);
-            bodyTextView.setVisibility(View.VISIBLE);
-            pauseButton.setVisibility(View.VISIBLE);
-            saveButton.setVisibility(View.VISIBLE);
-            etaTextView.setVisibility(View.VISIBLE);
-            statisticsLayout.setVisibility(showStatistics ? View.VISIBLE : View.GONE);
-
-            switch (getTask().getState()) {
-                case RUNNING:
-                    onTaskStarted();
-                    break;
-
-                case PAUSING:
-                    onTaskPausing();
-                    break;
-
-                case PAUSED:
-                    onTaskPaused();
-                    break;
-
-                case RESUMING:
-                    onTaskResuming();
-                    break;
-
-                case STOPPING:
-                    onTaskStopping();
-                    break;
-
-                case STOPPED:
-                    onTaskStopped();
-                    break;
-            }
-
-        } else {
-            noTaskView.setVisibility(View.VISIBLE);
-            resultsView.setVisibility(View.GONE);
-        }
+    @Override
+    protected void onResetViews() {
+        super.onResetViews();
+        showStatistics = getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE;
+        progress.setVisibility(getTask().getEndValue() == FindPrimesTask.INFINITY ? View.GONE : View.VISIBLE);
+        bodyTextView.setVisibility(View.VISIBLE);
+        etaTextView.setVisibility(View.VISIBLE);
+        statisticsLayout.setVisibility(showStatistics ? View.VISIBLE : View.GONE);
     }
 }
