@@ -43,7 +43,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "FindFactorsResultsFgmnt";
+    private static final String TAG = FindFactorsResultsFragment.class.getSimpleName();
 
     //Views
     private TextView subtitleTextView;

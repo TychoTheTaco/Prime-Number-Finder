@@ -237,7 +237,7 @@ public abstract class ResultsFragment extends TaskFragment {
 
         //Fix button tint for API <22
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            final ColorStateList colorStateList = generateSimpleColorStateList(Utils.getAccentColor(rootView.getContext()), ContextCompat.getColor(getContext(), R.color.gray));
+            final ColorStateList colorStateList = createSimpleColorStateList(Utils.getAccentColor(rootView.getContext()), ContextCompat.getColor(getContext(), R.color.gray));
             pauseButton.setBackgroundTintList(colorStateList);
             if (viewAllButton != null) viewAllButton.setBackgroundTintList(colorStateList);
             if (saveButton != null) saveButton.setBackgroundTintList(colorStateList);
@@ -302,7 +302,7 @@ public abstract class ResultsFragment extends TaskFragment {
         if (saveButton != null) saveButton.setVisibility(View.VISIBLE);
     }
 
-    protected ColorStateList generateSimpleColorStateList(final int defaultColor, final int disabledColor) {
+    protected ColorStateList createSimpleColorStateList(final int defaultColor, final int disabledColor) {
         return new ColorStateList(
                 new int[][]{
                         new int[]{-android.R.attr.state_enabled}, //Disabled
