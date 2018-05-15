@@ -121,7 +121,11 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
                         //Pause the task
                         final Task.State state = getTask().getState();
-                        getTask().pause(true);
+                        try {
+                            getTask().pauseAndWait();
+                        }catch (InterruptedException e){
+                            e.printStackTrace();
+                        }
 
                         final File file;
 
@@ -135,7 +139,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
                         //Resume the task
                         if (state == Task.State.RUNNING) {
-                            getTask().resume(false);
+                            getTask().resume();
                         }
 
                         handler.post(new Runnable() {

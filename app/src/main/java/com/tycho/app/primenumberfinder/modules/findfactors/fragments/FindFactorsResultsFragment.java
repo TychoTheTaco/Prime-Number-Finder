@@ -135,7 +135,11 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                         });
 
                         final Task.State state = getTask().getState();
-                        getTask().pause(true);
+                        try {
+                            getTask().pauseAndWait();
+                        }catch (InterruptedException e){
+                            e.printStackTrace();
+                        }
                         final File file = new File(getActivity().getFilesDir() + File.separator + "temp");
                         final boolean success = FileManager.getInstance().saveFactors(getTask().getFactors(), file);
                         if (!success){
@@ -147,7 +151,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                             });
                         }
                         if (state == Task.State.RUNNING){
-                            getTask().resume(false);
+                            getTask().resume();
                         }
 
                         final Intent intent = new Intent(getActivity(), DisplayFactorsActivity.class);

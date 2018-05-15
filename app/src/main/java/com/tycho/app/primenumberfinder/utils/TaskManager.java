@@ -41,7 +41,7 @@ public class TaskManager {
     public void pauseAllTasks() {
         for (Task task : tasks.keySet()) {
             tasks.put(task, task.getState());
-            task.pause(false);
+            task.pause();
         }
     }
 
@@ -51,7 +51,7 @@ public class TaskManager {
     public void resumeAllTasks() {
         for (Task task : tasks.keySet()) {
             if (tasks.get(task) != Task.State.PAUSED && tasks.get(task) != Task.State.STOPPED) {
-                task.resume(false);
+                task.resume();
             }
         }
     }

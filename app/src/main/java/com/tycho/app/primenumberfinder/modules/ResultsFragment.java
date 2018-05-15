@@ -71,38 +71,38 @@ public abstract class ResultsFragment extends TaskFragment {
         if (uiUpdater.getState() == Task.State.NOT_STARTED) {
             uiUpdater.startOnNewThread();
         } else {
-            uiUpdater.resume(false);
+            uiUpdater.resume();
         }
     }
 
     @Override
     public void onTaskPausing() {
         super.onTaskPausing();
-        uiUpdater.resume(false);
+        uiUpdater.resume();
     }
 
     @Override
     public void onTaskPaused() {
         super.onTaskPaused();
-        uiUpdater.pause(false);
+        uiUpdater.pause();
     }
 
     @Override
     public void onTaskResuming() {
         super.onTaskResuming();
-        uiUpdater.resume(false);
+        uiUpdater.resume();
     }
 
     @Override
     public void onTaskResumed() {
         super.onTaskResumed();
-        uiUpdater.resume(false);
+        uiUpdater.resume();
     }
 
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        uiUpdater.pause(false);
+        uiUpdater.pause();
     }
 
     /**
@@ -113,7 +113,7 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public synchronized void setTask(Task task) {
         if (task == null || task.getState() != Task.State.RUNNING) {
-            uiUpdater.pause(false);
+            uiUpdater.pause();
         }
         super.setTask(task);
     }
@@ -127,7 +127,7 @@ public abstract class ResultsFragment extends TaskFragment {
             getTask().removeTaskListener(this);
         }
 
-        uiUpdater.pause(false);
+        uiUpdater.pause();
     }
 
     @Override
@@ -248,9 +248,9 @@ public abstract class ResultsFragment extends TaskFragment {
             @Override
             public void onClick(View v) {
                 if (getTask().getState() == Task.State.RUNNING) {
-                    getTask().pause(false);
+                    getTask().pause();
                 } else if (getTask().getState() == Task.State.PAUSED) {
-                    getTask().resume(false);
+                    getTask().resume();
                 }
             }
         });

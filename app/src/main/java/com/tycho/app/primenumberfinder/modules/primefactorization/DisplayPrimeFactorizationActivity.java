@@ -148,7 +148,7 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity {
                         int position = spannableStringBuilder.length();
                         spannableStringBuilder.append(" = ");
                         spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                        for (Object factor : map.keySet()) {
+                        for (Long factor : map.keySet()) {
                             position = spannableStringBuilder.length();
                             String content = NUMBER_FORMAT.format(factor);
                             spannableStringBuilder.append(content);
@@ -178,7 +178,7 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity {
 
     private void getPrimeFactors(final Map<Long, Integer> map, final Tree<Long> tree) {
         if (tree.getChildren().size() > 0) {
-            for (Tree child : tree.getChildren()) {
+            for (Tree<Long> child : tree.getChildren()) {
                 getPrimeFactors(map, child);
             }
         } else {

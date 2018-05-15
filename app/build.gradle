@@ -11,8 +11,8 @@ android {
         applicationId "com.tycho.app.primenumberfinder"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 21
-        versionName "1.3.5.DEV"
+        versionCode 22
+        versionName "1.3.5"
     }
     buildTypes {
         release {

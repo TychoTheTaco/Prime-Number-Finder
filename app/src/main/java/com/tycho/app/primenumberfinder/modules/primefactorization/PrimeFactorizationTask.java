@@ -78,25 +78,33 @@ public class PrimeFactorizationTask extends Task implements Savable{
     }
 
     @Override
-    public void pause(boolean wait) {
+    public void pause() {
         synchronized (STATE_LOCK){
             if (findFactorsTask.getState() != State.STOPPED){
-                findFactorsTask.pause(true);
+                try {
+                    findFactorsTask.pauseAndWait();
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                }
                 dispatchPaused();
             }else{
-                super.pause(wait);
+                super.pause();
             }
         }
     }
 
     @Override
-    public void resume(boolean wait) {
+    public void resume() {
         synchronized (STATE_LOCK){
             if (findFactorsTask.getState() == State.PAUSED){
-                findFactorsTask.resume(true);
+                try {
+                    findFactorsTask.resumeAndWait();
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                }
                 dispatchResumed();
             }else{
-                super.resume(wait);
+                super.resume();
             }
         }
     }
