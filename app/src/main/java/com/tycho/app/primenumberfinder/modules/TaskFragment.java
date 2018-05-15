@@ -20,7 +20,7 @@ public abstract class TaskFragment extends Fragment implements TaskListener {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "TaskFragment";
+    private static final String TAG = TaskFragment.class.getSimpleName();
 
     /**
      * The {@link Task} that belongs to this fragment.

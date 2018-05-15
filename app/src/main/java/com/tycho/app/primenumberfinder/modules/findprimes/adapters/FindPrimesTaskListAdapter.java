@@ -78,12 +78,20 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
             holder.state.setText(spannableStringBuilder);
         }
 
+        onUpdate(holder);
+    }
+
+    @Override
+    protected void onUpdate(AbstractTaskListAdapter.ViewHolder holder) {
         //Set progress
-        if (task.getState() == Task.State.STOPPED || task instanceof FindPrimesTask && ((FindPrimesTask) task).getEndValue() == FindPrimesTask.INFINITY){
-            holder.progress.setVisibility(View.GONE);
-        }else if (task.getState() != Task.State.STOPPED){
-            holder.progress.setVisibility(View.VISIBLE);
-            holder.progress.setText(context.getString(R.string.task_progress, DECIMAL_FORMAT.format(task.getProgress() * 100)));
+        if (holder.getAdapterPosition() != -1){
+            final Task task = tasks.get(holder.getAdapterPosition());
+            if (task.getState() == Task.State.STOPPED || task instanceof FindPrimesTask && ((FindPrimesTask) task).getEndValue() == FindPrimesTask.INFINITY){
+                holder.progress.setVisibility(View.GONE);
+            }else if (task.getState() != Task.State.STOPPED){
+                holder.progress.setVisibility(View.VISIBLE);
+                holder.progress.setText(context.getString(R.string.task_progress, DECIMAL_FORMAT.format(task.getProgress() * 100)));
+            }
         }
 
         //Show saved
@@ -91,20 +99,6 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
             holder.saveButton.setVisibility(View.GONE);
             holder.progress.setVisibility(View.VISIBLE);
             holder.progress.setText("Saved");
-        }
-    }
-
-    @Override
-    protected void onUpdate(AbstractTaskListAdapter.ViewHolder viewHolder) {
-        //Set progress
-        if (viewHolder.getAdapterPosition() != -1){
-            final Task task = tasks.get(viewHolder.getAdapterPosition());
-            if (task.getState() == Task.State.STOPPED || task instanceof FindPrimesTask && ((FindPrimesTask) task).getEndValue() == FindPrimesTask.INFINITY){
-                viewHolder.progress.setVisibility(View.GONE);
-            }else if (task.getState() != Task.State.STOPPED){
-                viewHolder.progress.setVisibility(View.VISIBLE);
-                viewHolder.progress.setText(context.getString(R.string.task_progress, DECIMAL_FORMAT.format(task.getProgress() * 100)));
-            }
         }
     }
 

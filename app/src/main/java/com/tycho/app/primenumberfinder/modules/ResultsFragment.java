@@ -18,7 +18,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesResultsFragment;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.text.NumberFormat;
@@ -70,7 +69,6 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public void onTaskStarted() {
         super.onTaskStarted();
-        Log.d(TAG, "onTaskStarted()");
         if (uiUpdater.getState() == Task.State.NOT_STARTED) {
             uiUpdater.startOnNewThread();
             uiUpdater.addTaskListener(new TaskListener() {
@@ -117,35 +115,30 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public void onTaskPausing() {
         super.onTaskPausing();
-        Log.d(TAG, "onTaskPausing()");
         uiUpdater.resume(false);
     }
 
     @Override
     public void onTaskPaused() {
         super.onTaskPaused();
-        Log.d(TAG, "onTaskPaused(): " + uiUpdater.getState());
         uiUpdater.pause(false);
     }
 
     @Override
     public void onTaskResuming() {
         super.onTaskResuming();
-        Log.d(TAG, "onTaskResuming()");
         uiUpdater.resume(false);
     }
 
     @Override
     public void onTaskResumed() {
         super.onTaskResumed();
-        Log.d(TAG, "onTaskResumed()");
         uiUpdater.resume(false);
     }
 
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        Log.d(TAG, "onTaskStopped(): " + uiUpdater.getState());
         uiUpdater.pause(false);
     }
 
@@ -156,7 +149,6 @@ public abstract class ResultsFragment extends TaskFragment {
      */
     @Override
     public synchronized void setTask(Task task) {
-        if (this instanceof FindPrimesResultsFragment) Log.w(TAG, "setTask(): " + task + (task != null ? " state: " + task.getState() : ""));
         if (task == null || task.getState() != Task.State.RUNNING) {
             uiUpdater.pause(false);
         }
@@ -166,7 +158,6 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public void onPause() {
         super.onPause();
-        if (this instanceof FindPrimesResultsFragment) Log.w(TAG, "onPause(): " + uiUpdater.getState());
 
         //Remove task listener
         if (getTask() != null) {
@@ -179,7 +170,6 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (this instanceof FindPrimesResultsFragment) Log.w(TAG, "onResume()");
 
         //Add task listener
         if (getTask() != null) {
@@ -304,13 +294,10 @@ public abstract class ResultsFragment extends TaskFragment {
     }
 
     protected final void init(){
-        Log.w(TAG, "init(): " + getTask());
         if (getTask() != null) {
 
             //Reset view states
             onResetViews();
-
-            Log.w(TAG, "init state: " + getTask().getState());
 
             switch (getTask().getState()) {
                 case RUNNING:
