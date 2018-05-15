@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -26,6 +27,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import easytasks.Task;
 import easytasks.TaskAdapter;
+import easytasks.TaskListener;
 
 
 /**
@@ -107,10 +109,13 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
         final Task task = tasks.get(position);
         customEventListeners.get(task).setViewHolder(holder);
 
+        Log.d(TAG, "onBindViewHolder(): " + position + " " + holder.uiUpdater.getState() + " " + task.getState());
+
         //Start the UI updater if it hasn't been started yet
         if (holder.uiUpdater.getState() == Task.State.NOT_STARTED) {
             holder.uiUpdater.startOnNewThread();
             if (task.getState() == Task.State.PAUSED || task.getState() == Task.State.NOT_STARTED || task.getState() == Task.State.STOPPED){
+                Log.d(TAG, "Calling pause " + position);
                 holder.uiUpdater.pause(false);
             }
         }
@@ -232,6 +237,7 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
+                            Log.d(TAG, "onTaskStarted: " + holder);
                             if (holder != null) {
                                 holder.uiUpdater.resume(false);
                                 notifyItemChanged(holder.getAdapterPosition());
@@ -246,6 +252,7 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
+                            Log.d(TAG, "onTaskPausing");
                             if (holder != null) {
                                 notifyItemChanged(holder.getAdapterPosition());
                             }
@@ -259,6 +266,7 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
+                            Log.d(TAG, "onTaskPaused");
                             if (holder != null) {
                                 holder.uiUpdater.pause(false);
                                 notifyItemChanged(holder.getAdapterPosition());
@@ -272,6 +280,7 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
+                            Log.d(TAG, "onTaskResuming");
                             if (holder != null) {
                                 notifyItemChanged(holder.getAdapterPosition());
                             }
@@ -285,6 +294,7 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
+                            Log.d(TAG, "onTaskResumed");
                             if (holder != null) {
                                 holder.uiUpdater.resume(false);
                                 notifyItemChanged(holder.getAdapterPosition());
@@ -298,6 +308,7 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
+                            Log.d(TAG, "onTaskStopping");
                             if (holder != null) {
                                 notifyItemChanged(holder.getAdapterPosition());
                             }
@@ -311,6 +322,7 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
+                            Log.d(TAG, "onTaskStopped: " + holder);
                             if (holder != null) {
                                 holder.uiUpdater.pause(false);
                                 notifyItemChanged(holder.getAdapterPosition());
@@ -433,6 +445,43 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
 
         public ViewHolder(View itemView) {
             super(itemView);
+
+            uiUpdater.addTaskListener(new TaskListener() {
+                @Override
+                public void onTaskStarted() {
+                    Log.e(TAG, "UiUpdater " + getAdapterPosition() + " started");
+                }
+
+                @Override
+                public void onTaskPausing() {
+                    Log.e(TAG, "UiUpdater " + getAdapterPosition() + " pausing");
+                }
+
+                @Override
+                public void onTaskPaused() {
+                    Log.e(TAG, "UiUpdater " + getAdapterPosition() + " paused");
+                }
+
+                @Override
+                public void onTaskResuming() {
+                    Log.e(TAG, "UiUpdater " + getAdapterPosition() + " resuming");
+                }
+
+                @Override
+                public void onTaskResumed() {
+                    Log.e(TAG, "UiUpdater " + getAdapterPosition() + " resumed");
+                }
+
+                @Override
+                public void onTaskStopping() {
+                    Log.e(TAG, "UiUpdater " + getAdapterPosition() + " stopping");
+                }
+
+                @Override
+                public void onTaskStopped() {
+                    Log.e(TAG, "UiUpdater " + getAdapterPosition() + " stopped");
+                }
+            });
 
             title = itemView.findViewById(R.id.title);
             state = itemView.findViewById(R.id.state);
