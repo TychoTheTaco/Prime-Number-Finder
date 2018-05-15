@@ -109,3 +109,8 @@
 - Stability improvements
 - Minor performance improvements
 - Bug fixes
+
+05/15/2018 > Prime Number Finder version 1.3.5
+- You can now save tasks directly from the task list
+- Minor UI improvements
+- Bug fixes

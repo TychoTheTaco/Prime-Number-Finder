@@ -1,4 +1,4 @@
-package com.tycho.app.primenumberfinder;
+package com.tycho.app.primenumberfinder.ui;
 
 import android.content.Context;
 import android.support.annotation.Nullable;

@@ -24,7 +24,7 @@ import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
-import com.tycho.app.primenumberfinder.ValidEditText;
+import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsTaskListAdapter;
@@ -144,6 +144,11 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
                 intent.putExtra("searchOptions", ((FindFactorsTask) task).getSearchOptions());
                 intent.putExtra("taskId", task.getId());
                 startActivityForResult(intent, 0);
+            }
+
+            @Override
+            public void onSavePressed(Task task) {
+                resultsFragment.saveTask((FindFactorsTask) task);
             }
         });
 

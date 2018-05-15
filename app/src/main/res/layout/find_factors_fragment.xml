@@ -34,7 +34,7 @@
             android:clipToPadding="false"
             android:paddingStart="8dp">
 
-            <com.tycho.app.primenumberfinder.ValidEditText
+            <com.tycho.app.primenumberfinder.ui.ValidEditText
                 android:id="@id/editText_input_number"
                 style="@style/NumberInput"
                 android:layout_width="0dp"

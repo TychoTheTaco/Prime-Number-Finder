@@ -2,59 +2,60 @@ package com.tycho.app.primenumberfinder.modules.savedfiles;
 
 import android.content.Context;
 
-import com.tycho.app.primenumberfinder.utils.FileType;
-import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesSmallListAdapter;
+import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.FilesListAdapter;
+
+import java.io.File;
 
 /**
  * @author Tycho Bellers
  *         Date Created: 11/4/2016
  */
-//l
 public class SavedFilesCard {
 
+    /**
+     * Title of the card
+     */
     private String title;
-    private String subTitle;
+
+    /**
+     * The directory that this card is showing files from.
+     */
+    private final File directory;
+
+    /**
+     * The background color.
+     */
     private int backgroundColor;
 
+    /**
+     * A user-assigned tag used to identify this card.
+     */
     private final String tag;
 
-    private SavedFilesSmallListAdapter savedFilesAdapter;
+    private FilesListAdapter filesListAdapter;
 
-    public SavedFilesCard(final String tag){
-        this.tag = tag;
-    }
-
-    public SavedFilesCard(final Context context, String tag, String title, String subTitle, int backgroundColor, final FileType fileType){
+    public SavedFilesCard(final Context context, String tag, String title, int backgroundColor, final File directory){
         this.title = title;
-        this.subTitle = subTitle;
         this.tag = tag;
         this.backgroundColor = backgroundColor;
-        this.savedFilesAdapter = new SavedFilesSmallListAdapter(context, fileType);
+        this.directory = directory;
+        this.filesListAdapter = new FilesListAdapter(directory, context);
     }
 
-    public SavedFilesSmallListAdapter getSavedFilesAdapter(){
-        return savedFilesAdapter;
+    public FilesListAdapter getFilesListAdapter() {
+        return filesListAdapter;
     }
 
     public String getTag(){
         return tag;
     }
 
-
     public int getBackgroundColor(){
         return backgroundColor;
     }
 
-    public void setBackgroundColor(int backgroundColor){
-        this.backgroundColor = backgroundColor;
-    }
-
     public String getSubTitle(){
-        return savedFilesAdapter.getItemCount() + " saved files";
-    }
-
-    public void setSubTitle(String subTitle){
-        this.subTitle = subTitle;
+        return filesListAdapter.getItemCount() + " saved files";
     }
 
     public String getTitle(){
@@ -63,5 +64,9 @@ public class SavedFilesCard {
 
     public void setTitle(String title){
         this.title = title;
+    }
+
+    public File getDirectory() {
+        return directory;
     }
 }

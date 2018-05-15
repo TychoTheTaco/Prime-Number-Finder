@@ -27,7 +27,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <com.tycho.app.primenumberfinder.ValidEditText
+        <com.tycho.app.primenumberfinder.ui.ValidEditText
             android:id="@+id/search_range_start"
             style="@style/NumberInput"
             android:layout_width="wrap_content"
@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:text="@string/to" />
 
-        <com.tycho.app.primenumberfinder.ValidEditText
+        <com.tycho.app.primenumberfinder.ui.ValidEditText
             android:id="@+id/search_range_end"
             style="@style/NumberInput"
             android:layout_width="wrap_content"
@@ -76,7 +76,7 @@
             android:text="@string/find_primes_search_method_label"
             android:textSize="14sp"/>
 
-        <com.tycho.app.primenumberfinder.CustomRadioGroup
+        <com.tycho.app.primenumberfinder.ui.CustomRadioGroup
             android:id="@+id/radio_group_search_method"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -95,7 +95,7 @@
                 android:text="@string/find_primes_search_method_sieve_of_eratosthenes"
                 android:textSize="14sp"/>
 
-        </com.tycho.app.primenumberfinder.CustomRadioGroup>
+        </com.tycho.app.primenumberfinder.ui.CustomRadioGroup>
 
     </LinearLayout>
 

@@ -1,8 +1,8 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +20,7 @@ public class GeneralResultsFragment extends ResultsFragment {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "GeneralResultsFragment";
+    private static final String TAG = GeneralResultsFragment.class.getSimpleName();
 
     private ResultsFragment content;
 
@@ -28,11 +28,9 @@ public class GeneralResultsFragment extends ResultsFragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.general_results_fragment, container, false);
         this.container = (LinearLayout) rootView;
-        Log.e(TAG, "onCreateView(): " + this);
-        Log.w(TAG, "Fragment transaction contains " + getChildFragmentManager().getFragments());
         updateContent();
         return rootView;
     }
@@ -51,7 +49,6 @@ public class GeneralResultsFragment extends ResultsFragment {
 
     private void updateContent(){
         if (content != null && container != null){
-            Log.w(TAG, "Set content: " + content + "\nFragments: " + getChildFragmentManager().getFragments());
             getChildFragmentManager().beginTransaction().replace(container.getId(), content).commit();
         }
     }

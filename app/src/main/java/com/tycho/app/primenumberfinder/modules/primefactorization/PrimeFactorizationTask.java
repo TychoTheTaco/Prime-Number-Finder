@@ -3,16 +3,16 @@ package com.tycho.app.primenumberfinder.modules.primefactorization;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
+import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import easytasks.Task;
 import simpletrees.Tree;
@@ -22,7 +22,7 @@ import simpletrees.Tree;
  *         Date Created: 3/3/2017
  */
 
-public class PrimeFactorizationTask extends Task {
+public class PrimeFactorizationTask extends Task implements Savable{
 
     /**
      * Tag used for logging and debugging.
@@ -42,6 +42,8 @@ public class PrimeFactorizationTask extends Task {
     private SearchOptions searchOptions;
 
     final FindFactorsTask findFactorsTask;
+
+    private final CopyOnWriteArrayList<SavableCallbacks> savableCallbacks = new CopyOnWriteArrayList<>();
 
     public PrimeFactorizationTask(final SearchOptions searchOptions){
         this.number = searchOptions.getNumber();
@@ -76,25 +78,33 @@ public class PrimeFactorizationTask extends Task {
     }
 
     @Override
-    public void pause(boolean wait) {
+    public void pause() {
         synchronized (STATE_LOCK){
             if (findFactorsTask.getState() != State.STOPPED){
-                findFactorsTask.pause(true);
+                try {
+                    findFactorsTask.pauseAndWait();
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                }
                 dispatchPaused();
             }else{
-                super.pause(wait);
+                super.pause();
             }
         }
     }
 
     @Override
-    public void resume(boolean wait) {
+    public void resume() {
         synchronized (STATE_LOCK){
             if (findFactorsTask.getState() == State.PAUSED){
-                findFactorsTask.resume(true);
+                try {
+                    findFactorsTask.resumeAndWait();
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                }
                 dispatchResumed();
             }else{
-                super.resume(wait);
+                super.resume();
             }
         }
     }
@@ -239,6 +249,37 @@ public class PrimeFactorizationTask extends Task {
 
         public long getNumber() {
             return number;
+        }
+    }
+
+    @Override
+    public void save() {
+        if (FileManager.getInstance().saveTree(getFactorTree())){
+            sendOnSaved();
+        }else{
+            sendOnError();
+        }
+    }
+
+    public void addSavableCallbacks(final SavableCallbacks callbacks){
+        if (!savableCallbacks.contains(callbacks)){
+            savableCallbacks.add(callbacks);
+        }
+    }
+
+    public void removeSavableCallbacks(final SavableCallbacks callbacks){
+        savableCallbacks.remove(callbacks);
+    }
+
+    private void sendOnSaved(){
+        for (SavableCallbacks callbacks : savableCallbacks){
+            callbacks.onSaved();
+        }
+    }
+
+    private void sendOnError(){
+        for (SavableCallbacks callbacks : savableCallbacks){
+            callbacks.onError();
         }
     }
 }

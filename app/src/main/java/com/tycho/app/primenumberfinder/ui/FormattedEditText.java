@@ -1,4 +1,4 @@
-package com.tycho.app.primenumberfinder;
+package com.tycho.app.primenumberfinder.ui;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -7,6 +7,7 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 
+import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.text.DecimalFormat;

@@ -1,12 +1,10 @@
-package com.tycho.app.primenumberfinder.modules.savedfiles.activities;
+package com.tycho.app.primenumberfinder.modules.findprimes;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -24,7 +22,6 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.ExportOptionsDialog;
 import com.tycho.app.primenumberfinder.modules.savedfiles.FindNthNumberDialog;
@@ -32,7 +29,6 @@ import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -58,8 +54,6 @@ public class DisplayPrimesActivity extends AbstractActivity {
     private PrimesAdapter primesAdapter;
 
     private MenuItem findButton;
-
-    private final Handler handler = new Handler(Looper.getMainLooper());
 
     final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
     private final CustomScrollListener scrollListener = new CustomScrollListener();
@@ -94,7 +88,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
 
                 //Set a custom title if there is one
                 if (intent.getBooleanExtra("title", true)) {
-                    setTitle(formatTitle(file.getName().split("\\.")[0]));
+                    setTitle(Utils.formatTitle(file));
                 }
 
                 //Set up adapter
@@ -133,7 +127,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
                 scrollToTopFab.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        scrollListener.specialScrollToPosition(0);
+                        scrollListener.specialScrollToPosition(0, false);
                     }
                 });
 
@@ -142,7 +136,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
                 scrollToBottomFab.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        scrollListener.specialScrollToPosition(scrollListener.totalNumbers - 1);
+                        scrollListener.specialScrollToPosition(scrollListener.totalNumbers - 1, false);
                     }
                 });
 
@@ -257,9 +251,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
             //Log.d(TAG, "Size after: " + primesAdapter.getPrimes().size());
         }
 
-        private void specialScrollToPosition(final int position) {
-            Log.d(TAG, "specialScrollTo: " + position);
-
+        private void specialScrollToPosition(final int position, final boolean animate) {
             //Scroll to correct position
             int startIndex = (position / scrollListener.INCREMENT) * (scrollListener.INCREMENT);
             final List<Long> numbers = new ArrayList<>();
@@ -287,11 +279,15 @@ public class DisplayPrimesActivity extends AbstractActivity {
             primesAdapter.getPrimes().clear();
             primesAdapter.getPrimes().addAll(numbers);
             scrollListener.setFirstItemIndex(startIndex);
-            handler.post(new Runnable() {
+            runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     primesAdapter.notifyItemRangeInserted(0, primesAdapter.getItemCount());
-                    recyclerView.scrollToPosition(position - scrollListener.firstItemIndex);
+                    final int pos = position - scrollListener.firstItemIndex;
+                    recyclerView.scrollToPosition(pos);
+                    if (animate) {
+                        primesAdapter.animate(pos);
+                    }
                 }
             });
         }
@@ -325,12 +321,13 @@ public class DisplayPrimesActivity extends AbstractActivity {
                 primesAdapter.getPrimes().addAll(numbers);
 
                 final long[] range;
-                if (getIntent().getLongArrayExtra("range") != null){
+                if (getIntent().getLongArrayExtra("range") != null) {
                     range = getIntent().getLongArrayExtra("range");
-                }else{
+                } else {
                     range = FileManager.getPrimesRangeFromTitle(file);
                 }
 
+                //TODO: I don't know why this works in a non-UI thread, but it breaks if i run it on the UI thread.
                 //Set header text
                 headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getString(R.string.find_primes_subtitle_result), new String[]{
                         NUMBER_FORMAT.format(totalNumbers),
@@ -338,26 +335,22 @@ public class DisplayPrimesActivity extends AbstractActivity {
                         range[1] == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(range[1]),
                 }, ContextCompat.getColor(getBaseContext(), R.color.purple_inverse)));
 
-                //Set correct height based on the height of the header text view
-                headerTextView.post(new Runnable() {
+                //Update UI
+                runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+
+                        //Set correct height based on the height of the header text view
                         final int defaultHeight = getSupportActionBar().getHeight();
                         final int textHeight = headerTextView.getHeight();
-
                         final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.homeCollapseToolbar);
                         final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
                         layoutParams.height = (int) (defaultHeight + textHeight + Utils.dpToPx(getBaseContext(), 12.5f));
                         collapsingToolbarLayout.setLayoutParams(layoutParams);
-                    }
-                });
 
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
+                        //Update adapter
                         primesAdapter.notifyItemRangeInserted(0, primesAdapter.getItemCount());
                         progressDialog.dismiss();
-
                         recyclerView.post(new Runnable() {
                             @Override
                             public void run() {
@@ -371,37 +364,6 @@ public class DisplayPrimesActivity extends AbstractActivity {
                 });
             }
         }).start();
-    }
-
-    private String formatTitle(final String string) {
-
-        try {
-            //Replace all the numbers
-            String replaceNumbers = string.replaceAll("[0-9]+", "<number>");
-
-            //Replace all the text
-            String onlyNumbers = string.replaceAll("[^0-9]+", "<text>");
-
-            //Get all numbers from the string
-            String numbers[] = onlyNumbers.trim().split("<text>");
-            final List<Long> formattedNumbers = new ArrayList<>();
-            for (String numberString : numbers) {
-                if (!numberString.equals("")) {
-                    formattedNumbers.add(Long.valueOf(numberString));
-                }
-            }
-
-            //Replace all place holders with formatted numbers
-            String title = replaceNumbers;
-            for (int i = 0; i < formattedNumbers.size(); i++) {
-                title = title.replaceFirst("<number>", NumberFormat.getInstance().format(formattedNumbers.get(i)));
-            }
-
-            return title;
-        } catch (Exception e) {
-        }
-
-        return string;
     }
 
     @Override
@@ -428,7 +390,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
                     @Override
                     public void onFindClicked(final int number) {
                         if (number > 0 && number < scrollListener.getTotalNumbers()) {
-                            scrollListener.specialScrollToPosition(number - 1);
+                            scrollListener.specialScrollToPosition(number - 1, true);
                         } else {
                             Toast.makeText(DisplayPrimesActivity.this, "Invalid number", Toast.LENGTH_SHORT).show();
                         }

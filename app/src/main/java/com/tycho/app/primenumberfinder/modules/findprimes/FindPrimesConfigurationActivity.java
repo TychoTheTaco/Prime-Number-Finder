@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -25,10 +26,10 @@ import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.tycho.app.primenumberfinder.AbstractActivity;
-import com.tycho.app.primenumberfinder.CustomRadioGroup;
+import com.tycho.app.primenumberfinder.ui.CustomRadioGroup;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.ValidEditText;
+import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
@@ -199,6 +200,17 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
             items[i] = String.valueOf(i + 1);
         }
         threadCountSpinner.setAdapter(new ThreadCountAdapter(this, items));
+        threadCountSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                searchOptions.setThreadCount(position + 1);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         notifyWhenFinishedCheckbox = findViewById(R.id.notify_when_finished);
         notifyWhenFinishedCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -320,6 +332,9 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
         editTextSearchRangeEnd.setEnabled(true);
         editTextSearchRangeEnd.setText(searchOptions.getEndValue() == INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(searchOptions.getEndValue()), true);
 
+        //Thread count
+        threadCountSpinner.setSelection(searchOptions.getThreadCount() - 1);
+
         //Search method
         switch (searchOptions.getSearchMethod()) {
             case BRUTE_FORCE:
@@ -337,11 +352,9 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
                 infinityButton.setEnabled(false);
                 infinityButton.setAlpha(0.3f);
                 threadCountSpinner.setEnabled(false);
+                threadCountSpinner.setSelection(0);
                 break;
         }
-
-        //Thread count
-        threadCountSpinner.setSelection(searchOptions.getThreadCount() - 1);
 
         //Miscellaneous
         notifyWhenFinishedCheckbox.setChecked(searchOptions.isNotifyWhenFinished());

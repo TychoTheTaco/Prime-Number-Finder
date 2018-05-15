@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -108,7 +109,7 @@ public final class Utils {
             return "infinite";
         }
 
-        if (precision < 1){
+        if (precision < 1) {
             return "";
         }
 
@@ -123,23 +124,23 @@ public final class Utils {
 
         final StringBuilder stringBuilder = new StringBuilder();
         int count = 0;
-        for (int i = times.length - 1; i >= 0; i--){
-            if (times[i] > 0){
+        for (int i = times.length - 1; i >= 0; i--) {
+            if (times[i] > 0) {
                 stringBuilder.append(parts[i]);
-                if (i != 0 && times[i] != 1){
+                if (i != 0 && times[i] != 1) {
                     stringBuilder.append('s');
                 }
                 stringBuilder.append(' ');
                 count++;
-                if (count == precision){
+                if (count == precision) {
                     break;
                 }
-            }else if (stringBuilder.length() > 0){
+            } else if (stringBuilder.length() > 0) {
                 break;
             }
         }
 
-        if (stringBuilder.length() == 0){
+        if (stringBuilder.length() == 0) {
             stringBuilder.append(parts[0]);
         }
 
@@ -204,31 +205,31 @@ public final class Utils {
         });
     }
 
-    public static SpannableStringBuilder formatSpannable(final SpannableStringBuilder spannableStringBuilder, final String raw, final String[] content, final int color){
+    public static SpannableStringBuilder formatSpannable(final SpannableStringBuilder spannableStringBuilder, final String raw, final String[] content, final int color) {
         final int[] spanPositions = getSpanPositions(spannableStringBuilder, raw, content);
-        for (int i = 0; i < spanPositions.length; i += 2){
+        for (int i = 0; i < spanPositions.length; i += 2) {
             spannableStringBuilder.setSpan(new ForegroundColorSpan(color), spanPositions[i], spanPositions[i + 1], Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
             spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), spanPositions[i], spanPositions[i + 1], Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         }
         return spannableStringBuilder;
     }
 
-    public static SpannableStringBuilder formatSpannableColor(final SpannableStringBuilder spannableStringBuilder, final String raw, final String[] content, final int color){
+    public static SpannableStringBuilder formatSpannableColor(final SpannableStringBuilder spannableStringBuilder, final String raw, final String[] content, final int color) {
         final int[] spanPositions = getSpanPositions(spannableStringBuilder, raw, content);
-        for (int i = 0; i < spanPositions.length; i += 2){
+        for (int i = 0; i < spanPositions.length; i += 2) {
             spannableStringBuilder.setSpan(new ForegroundColorSpan(color), spanPositions[i], spanPositions[i + 1], Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         }
         return spannableStringBuilder;
     }
 
-    private static int[] getSpanPositions(final SpannableStringBuilder spannableStringBuilder, final String raw, final String[] content){
+    private static int[] getSpanPositions(final SpannableStringBuilder spannableStringBuilder, final String raw, final String[] content) {
         spannableStringBuilder.clear();
         spannableStringBuilder.clearSpans();
         final String[] split = raw.split("%\\d\\$s");
         final int[] spanPositions = new int[content.length * 2];
-        for (int i = 0; i < split.length; i++){
+        for (int i = 0; i < split.length; i++) {
             spannableStringBuilder.append(split[i]);
-            if (i < content.length){
+            if (i < content.length) {
                 final int position = spannableStringBuilder.length();
                 spannableStringBuilder.append(content[i]);
                 spanPositions[i * 2] = position;
@@ -238,73 +239,66 @@ public final class Utils {
         return spanPositions;
     }
 
-    public static void applyTheme(final AppCompatActivity appCompatActivity, final int statusBarColor, final int actionBarColor){
+    public static void applyTheme(final AppCompatActivity appCompatActivity, final int statusBarColor, final int actionBarColor) {
         appCompatActivity.getWindow().setStatusBarColor(statusBarColor);
         appCompatActivity.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(actionBarColor));
     }
 
-    public static BigInteger textToNumber(String text){
+    public static BigInteger textToNumber(String text) {
         Crashlytics.log("raw input: '" + text + "'");
 
         //Extract all digits from the input
         final Pattern pattern = Pattern.compile("\\d+");
         final Matcher matcher = pattern.matcher(text);
         final StringBuilder numberString = new StringBuilder();
-        while (matcher.find()){
+        while (matcher.find()) {
             numberString.append(matcher.group());
         }
 
         Crashlytics.log("number: '" + numberString + "'");
 
-        if (numberString.length() > 0){
+        if (numberString.length() > 0) {
             return new BigInteger(numberString.toString());
         }
 
         return BigInteger.ZERO;
     }
 
-    public static BigDecimal textToDecimal(String text, final char decimalSeparator){
+    public static BigDecimal textToDecimal(String text, final char decimalSeparator) {
         Crashlytics.log("Raw input: '" + text + "'");
         Log.d(TAG, "Raw input: '" + text + "'");
 
-        if (text.length() == 0){
+        if (text.length() == 0) {
             return BigDecimal.ZERO;
         }
 
         Pattern pattern;
         Matcher matcher;
 
-        //Make sure the string contains digits
-        /*pattern = Pattern.compile("\\d+");
-        matcher = pattern.matcher(text);
-        if (!matcher.find()){
-            return BigDecimal.ZERO;
-        }*/
-
         //Find the last non-digit character. Assume this is the decimal point
         pattern = Pattern.compile("[^\\d]");
         matcher = pattern.matcher(text);
         int matchIndex = -1;
-        while (matcher.find()){
+        while (matcher.find()) {
             matchIndex = matcher.start();
         }
 
         final StringBuilder numberString = new StringBuilder();
-        if (matchIndex != -1){
+        if (matchIndex != -1) {
             final int posFromEnd = text.length() - 1 - matchIndex;
             Log.d(TAG, "Last Index: " + posFromEnd);
 
             //Extract all digits from the input
             pattern = Pattern.compile("\\d+");
             matcher = pattern.matcher(text);
-            while (matcher.find()){
+            while (matcher.find()) {
                 numberString.append(matcher.group());
             }
 
             //Put the decimal point back
             numberString.insert(numberString.length() - posFromEnd, '.');
             Log.w(TAG, "After insert: " + numberString);
-        }else{
+        } else {
             numberString.append(text);
         }
 
@@ -312,22 +306,63 @@ public final class Utils {
         decimalFormat.setParseBigDecimal(true);
 
         return new BigDecimal(numberString.toString());
-        /*try {
-            return (BigDecimal) decimalFormat.parse(numberString.toString());
-        }catch (ParseException e){
-            e.printStackTrace();
-            throw new RuntimeException("Failed to parse string '" + text + "'");
-        }*/
     }
 
     public static int getAccentColor(final Context context) {
-        TypedValue typedValue = new TypedValue();
-
-        TypedArray a = context.obtainStyledAttributes(typedValue.data, new int[] { android.R.attr.colorAccent });
-        int color = a.getColor(0, 0);
-
+        final TypedValue typedValue = new TypedValue();
+        final TypedArray a = context.obtainStyledAttributes(typedValue.data, new int[]{android.R.attr.colorAccent});
+        final int color = a.getColor(0, 0);
         a.recycle();
-
         return color;
+    }
+
+    public static String humanReadableByteCount(long bytes, boolean si) {
+        int unit = si ? 1000 : 1024;
+        if (bytes < unit) return bytes + " B";
+        int exp = (int) (Math.log(bytes) / Math.log(unit));
+        String pre = (si ? "KMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
+        return String.format(Locale.getDefault(), "%.1f %sB", bytes / Math.pow(unit, exp), pre);
+    }
+
+    public static String formatTitle(final File file) {
+
+        final Pattern pattern = Pattern.compile("(.+)\\.");
+        final Matcher matcher = pattern.matcher(file.getName());
+
+        final String input;
+        if (matcher.find()) {
+            input = matcher.group(1);
+        } else {
+            input = file.getName();
+        }
+
+        //Replace all the numbers
+        String replaceNumbers = input.replaceAll("[0-9]+", "<number>");
+
+        //Replace all the text
+        String onlyNumbers = input.replaceAll("[^0-9]+", "<text>");
+
+        //Get all numbers from the string
+        try {
+            String numbers[] = onlyNumbers.trim().split("<text>");
+            final List<Long> formattedNumbers = new ArrayList<>();
+            for (String numberString : numbers) {
+                if (!numberString.equals("")) {
+                    formattedNumbers.add(Long.valueOf(numberString));
+                }
+            }
+
+            //Replace all place holders with formatted numbers
+            String title = replaceNumbers;
+            for (int i = 0; i < formattedNumbers.size(); i++) {
+                title = title.replaceFirst("<number>", NumberFormat.getInstance(Locale.getDefault()).format(formattedNumbers.get(i)));
+            }
+            return title;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return input;
     }
 }

@@ -1,7 +1,9 @@
 
 package com.tycho.app.primenumberfinder.modules.savedfiles;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,7 +16,7 @@ import android.widget.TextView;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.VerticalItemDecoration;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesCardAdapter;
-import com.tycho.app.primenumberfinder.utils.FileType;
+import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.util.Iterator;
@@ -24,41 +26,34 @@ public class SavedFilesFragment extends Fragment {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "SavedFilesFragment";
+    private static final String TAG = SavedFilesFragment.class.getSimpleName();
 
-    /**
-     * All views
-     */
-    private RecyclerView recyclerViewCards;
     private TextView textViewNoFiles;
 
-    /**
-     * The adapter for {@link #recyclerViewCards}.
-     */
     private SavedFilesCardAdapter cardAdapter;
 
     private SavedFilesCard[] cards;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         cards = new SavedFilesCard[]{
-                new SavedFilesCard(getActivity(), "primeNumbers", "Prime Numbers", "subTitle", R.color.purple, FileType.PRIMES),
-                new SavedFilesCard(getActivity(), "factors", "Factors", "subTitle", R.color.orange, FileType.FACTORS),
-                new SavedFilesCard(getActivity(), "factorTree", "Factor Trees", "subTitle", R.color.green, FileType.TREE)
+                new SavedFilesCard(context, "primeNumbers", "Prime Numbers", R.color.purple, FileManager.getInstance().getSavedPrimesDirectory()),
+                new SavedFilesCard(context, "factors", "Factors", R.color.orange, FileManager.getInstance().getSavedFactorsDirectory()),
+                new SavedFilesCard(context, "factorTree", "Factor Trees", R.color.green, FileManager.getInstance().getSavedTreesDirectory())
         };
+        cardAdapter = new SavedFilesCardAdapter(context);
     }
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState){
-        final View rootView = inflater.inflate(R.layout.fragment_saved_files, viewGroup, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        final View rootView = inflater.inflate(R.layout.fragment_saved_files, container, false);
 
         textViewNoFiles = rootView.findViewById(R.id.textView_no_files);
 
-        cardAdapter = new SavedFilesCardAdapter(getActivity());
-
         //RecyclerView
-        recyclerViewCards = rootView.findViewById(R.id.recyclerView_savedFiles);
+        final RecyclerView recyclerViewCards = rootView.findViewById(R.id.recyclerView_savedFiles);
         recyclerViewCards.setHasFixedSize(true);
         recyclerViewCards.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerViewCards.addItemDecoration(new VerticalItemDecoration((int) Utils.dpToPx(getActivity(), 8)));
@@ -89,13 +84,13 @@ public class SavedFilesFragment extends Fragment {
         //Remove all cards
         final Iterator<SavedFilesCard> iterator = cardAdapter.getCards().iterator();
         while (iterator.hasNext()){
-            iterator.next().getSavedFilesAdapter().refresh();
+            iterator.next().getFilesListAdapter().refresh();
             iterator.remove();
         }
 
         for (SavedFilesCard card : cards){
-            card.getSavedFilesAdapter().refresh();
-            if (!cardAdapter.getCards().contains(card) && card.getSavedFilesAdapter().getItemCount() > 0){
+            card.getFilesListAdapter().refresh();
+            if (!cardAdapter.getCards().contains(card) && card.getFilesListAdapter().getItemCount() > 0){
                 cardAdapter.getCards().add(card);
             }
         }

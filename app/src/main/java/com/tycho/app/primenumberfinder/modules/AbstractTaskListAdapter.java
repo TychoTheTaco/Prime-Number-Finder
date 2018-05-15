@@ -1,10 +1,11 @@
 package com.tycho.app.primenumberfinder.modules;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -31,12 +32,12 @@ import easytasks.TaskAdapter;
  * Created by tycho on 12/12/2017.
  */
 
-public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.ViewHolder> extends RecyclerView.Adapter<T> {
+public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.ViewHolder> extends RecyclerView.Adapter<H> {
 
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "AbstractTaskListAdapter";
+    private static final String TAG = AbstractTaskListAdapter.class.getSimpleName();
 
     /**
      * List of tasks in the adapter.
@@ -93,21 +94,135 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
         }
     };
 
+    protected final Context context;
+
+    private final List<Task> savedItems = new ArrayList<>();
+
+    public AbstractTaskListAdapter(final Context context){
+        this.context = context;
+    }
+
     @Override
-    public void onBindViewHolder(final AbstractTaskListAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull H holder, int position) {
         final Task task = tasks.get(position);
         customEventListeners.get(task).setViewHolder(holder);
+
+        //Start the UI updater if it hasn't been started yet
         if (holder.uiUpdater.getState() == Task.State.NOT_STARTED) {
             holder.uiUpdater.startOnNewThread();
-
             if (task.getState() == Task.State.PAUSED || task.getState() == Task.State.NOT_STARTED || task.getState() == Task.State.STOPPED){
-                holder.uiUpdater.pause(false);
+                holder.uiUpdater.pause();
             }
         }
+
         doOnBindViewHolder(holder, position);
     }
 
-    protected abstract void doOnBindViewHolder(RecyclerView.ViewHolder holder, int position);
+    protected void manageStandardViews(final Task task, final H holder){
+
+        //Check if this item should be selected
+        holder.itemView.setSelected(holder.getAdapterPosition() == getSelectedItemPosition());
+
+        //Manage button visibility
+        switch (task.getState()) {
+            case RUNNING:
+                //State
+                holder.state.setText(context.getString(R.string.status_searching));
+
+                //Pause button
+                holder.pauseButton.setEnabled(true);
+                holder.pauseButton.setVisibility(View.VISIBLE);
+                holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+
+                //Edit button
+                holder.editButton.setVisibility(View.VISIBLE);
+                holder.editButton.setEnabled(false);
+
+                //Delete button
+                holder.deleteButton.setEnabled(false);
+
+                //Save button
+                holder.saveButton.setVisibility(View.GONE);
+                break;
+
+            case PAUSING:
+                //State
+                holder.state.setText(context.getString(R.string.state_pausing));
+
+                //Pause button
+                holder.pauseButton.setEnabled(false);
+                holder.pauseButton.setVisibility(View.VISIBLE);
+                holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+
+                //Edit button
+                holder.editButton.setEnabled(false);
+
+                //Delete button
+                holder.deleteButton.setEnabled(false);
+
+                //Save button
+                holder.saveButton.setVisibility(View.GONE);
+                break;
+
+            case PAUSED:
+                //State
+                holder.state.setText(context.getString(R.string.status_paused));
+
+                //Pause button
+                holder.pauseButton.setEnabled(true);
+                holder.pauseButton.setVisibility(View.VISIBLE);
+                holder.pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+
+                //Edit button
+                holder.editButton.setEnabled(true);
+
+                //Delete button
+                holder.deleteButton.setEnabled(true);
+
+                //Save button
+                holder.saveButton.setVisibility(View.GONE);
+                break;
+
+            case RESUMING:
+                //State
+                holder.state.setText(context.getString(R.string.state_resuming));
+
+                //Pause button
+                holder.pauseButton.setEnabled(false);
+                holder.pauseButton.setVisibility(View.VISIBLE);
+                holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+
+                //Edit button
+                holder.editButton.setEnabled(false);
+
+                //Delete button
+                holder.deleteButton.setEnabled(false);
+
+                //Save button
+                holder.saveButton.setVisibility(View.GONE);
+                break;
+
+            case STOPPED:
+                //State
+                holder.state.setText(context.getString(R.string.status_finished));
+
+                //Pause button
+                holder.pauseButton.setVisibility(View.GONE);
+
+                //Edit button
+                holder.editButton.setVisibility(View.GONE);
+
+                //Delete button
+                holder.deleteButton.setEnabled(true);
+
+                //Save button
+                holder.saveButton.setEnabled(true);
+                holder.saveButton.setVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
+    protected abstract void doOnBindViewHolder(H holder, int position);
 
     public void addTask(final Task task) {
         if (!tasks.contains(task)) {
@@ -118,7 +233,7 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                         @Override
                         public void run() {
                             if (holder != null) {
-                                holder.uiUpdater.resume(false);
+                                holder.uiUpdater.resume();
                                 notifyItemChanged(holder.getAdapterPosition());
                             }
 
@@ -145,7 +260,7 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                         @Override
                         public void run() {
                             if (holder != null) {
-                                holder.uiUpdater.pause(false);
+                                holder.uiUpdater.pause();
                                 notifyItemChanged(holder.getAdapterPosition());
                             }
                         }
@@ -171,7 +286,7 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                         @Override
                         public void run() {
                             if (holder != null) {
-                                holder.uiUpdater.resume(false);
+                                holder.uiUpdater.resume();
                                 notifyItemChanged(holder.getAdapterPosition());
                             }
                         }
@@ -197,7 +312,7 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                         @Override
                         public void run() {
                             if (holder != null) {
-                                holder.uiUpdater.pause(false);
+                                holder.uiUpdater.pause();
                                 notifyItemChanged(holder.getAdapterPosition());
                             }
                         }
@@ -254,6 +369,8 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
         void onTaskRemoved(final Task task);
 
         void onEditPressed(final Task task);
+
+        void onSavePressed(final Task task);
     }
 
     public void addEventListener(final EventListener eventListener) {
@@ -288,6 +405,12 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
         }
     }
 
+    private void sendOnSavePressed(final Task task) {
+        for (EventListener eventListener : eventListeners) {
+            eventListener.onSavePressed(task);
+        }
+    }
+
     protected abstract class CustomTaskEventListener extends TaskAdapter {
         protected AbstractTaskListAdapter.ViewHolder holder;
 
@@ -296,30 +419,30 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
         }
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public abstract class ViewHolder extends RecyclerView.ViewHolder {
 
-        public final ViewGroup root;
         public final TextView title;
         public final TextView state;
         public final TextView progress;
         public final ImageButton pauseButton;
         public final ImageButton editButton;
         public final ImageButton deleteButton;
+        public final ImageButton saveButton;
 
-        private final UiUpdater uiUpdater = new UiUpdater(this);
+        protected final UiUpdater uiUpdater = new UiUpdater(this);
 
         public ViewHolder(View itemView) {
             super(itemView);
 
-            root = itemView.findViewById(R.id.root);
             title = itemView.findViewById(R.id.title);
             state = itemView.findViewById(R.id.state);
             progress = itemView.findViewById(R.id.textView_search_progress);
             pauseButton = itemView.findViewById(R.id.pause_button);
             editButton = itemView.findViewById(R.id.edit_button);
             deleteButton = itemView.findViewById(R.id.delete_button);
+            saveButton = itemView.findViewById(R.id.save_button);
 
-            root.setOnClickListener(new View.OnClickListener() {
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (selectedItemPosition == getAdapterPosition()) {
@@ -337,11 +460,11 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                     switch (tasks.get(getAdapterPosition()).getState()) {
 
                         case PAUSED:
-                            tasks.get(getAdapterPosition()).resume(false);
+                            tasks.get(getAdapterPosition()).resume();
                             break;
 
                         case RUNNING:
-                            tasks.get(getAdapterPosition()).pause(false);
+                            tasks.get(getAdapterPosition()).pause();
                             break;
                     }
 
@@ -361,7 +484,7 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                 public void onClick(View v) {
 
                     //Pause the UI updater. It will be re-used by other ViewHolders
-                    tasks.get(getAdapterPosition()).pause(false);
+                    tasks.get(getAdapterPosition()).pause();
 
                     if (getAdapterPosition() < selectedItemPosition) {
                         selectedItemPosition--;
@@ -372,6 +495,7 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
 
                     //Remove the task from the list
                     final Task task = tasks.get(getAdapterPosition());
+                    savedItems.remove(task);
                     customEventListeners.remove(task);
                     tasks.remove(task);
                     notifyItemRemoved(getAdapterPosition());
@@ -382,7 +506,28 @@ public abstract class AbstractTaskListAdapter<T extends AbstractTaskListAdapter.
                     sendOnDeletePressed(task);
                 }
             });
+
+            //Save button
+            saveButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    saveButton.setEnabled(false);
+                    sendOnSavePressed(tasks.get(getAdapterPosition()));
+                }
+            });
         }
+
+        public boolean isSaved(){
+            return savedItems.contains(tasks.get(getAdapterPosition()));
+        }
+    }
+
+    public void setSaved(final Task task){
+        final int index = tasks.indexOf(task);
+        if (!savedItems.contains(task)){
+            savedItems.add(task);
+        }
+        notifyItemChanged(index);
     }
 
     protected void onUpdate(final ViewHolder viewHolder) {

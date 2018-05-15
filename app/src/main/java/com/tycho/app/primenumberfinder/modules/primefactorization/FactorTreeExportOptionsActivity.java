@@ -1,4 +1,4 @@
-package com.tycho.app.primenumberfinder.modules.savedfiles;
+package com.tycho.app.primenumberfinder.modules.primefactorization;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -25,9 +25,10 @@ import android.widget.Toast;
 import com.jaredrummler.android.colorpicker.ColorPickerDialog;
 import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.RangedSeekBar;
-import com.tycho.app.primenumberfinder.TreeView;
-import com.tycho.app.primenumberfinder.ValidEditText;
+import com.tycho.app.primenumberfinder.modules.savedfiles.ColorPickerListener;
+import com.tycho.app.primenumberfinder.ui.RangedSeekBar;
+import com.tycho.app.primenumberfinder.ui.TreeView;
+import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 

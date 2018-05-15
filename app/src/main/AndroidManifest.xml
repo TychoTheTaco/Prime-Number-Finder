@@ -31,7 +31,7 @@
         <activity
             android:theme="@style/FindPrimes.Activity"
             android:windowSoftInputMode="adjustPan"
-            android:name=".modules.savedfiles.activities.DisplayPrimesActivity"
+            android:name=".modules.findprimes.DisplayPrimesActivity"
             android:label="Primes"/>
 
         <activity
@@ -52,12 +52,12 @@
         <activity
             android:theme="@style/FindFactors.Activity"
             android:windowSoftInputMode="adjustPan"
-            android:name=".modules.savedfiles.activities.DisplayFactorsActivity"
+            android:name=".modules.findfactors.DisplayFactorsActivity"
             android:label="Factors"/>
 
         <activity
             android:theme="@style/PrimeFactorization.Activity"
-            android:name=".modules.savedfiles.activities.DisplayPrimeFactorizationActivity"
+            android:name=".modules.primefactorization.DisplayPrimeFactorizationActivity"
             android:label="Prime Factorization"/>
 
         <activity
@@ -67,7 +67,7 @@
 
         <activity
             android:theme="@style/PrimeFactorization.Activity"
-            android:name=".modules.savedfiles.FactorTreeExportOptionsActivity"
+            android:name=".modules.primefactorization.FactorTreeExportOptionsActivity"
             android:windowSoftInputMode="adjustPan"
             android:label="Export Options"/>
 

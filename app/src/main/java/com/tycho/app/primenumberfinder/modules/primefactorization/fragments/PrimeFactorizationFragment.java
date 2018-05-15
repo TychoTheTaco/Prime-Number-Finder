@@ -24,7 +24,7 @@ import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
-import com.tycho.app.primenumberfinder.ValidEditText;
+import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.adapters.PrimeFactorizationTaskListAdapter;
@@ -142,6 +142,11 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
                 intent.putExtra("searchOptions", ((PrimeFactorizationTask) task).getSearchOptions());
                 intent.putExtra("taskId", task.getId());
                 startActivityForResult(intent, 0);
+            }
+
+            @Override
+            public void onSavePressed(Task task) {
+                resultsFragment.saveTask((PrimeFactorizationTask) task);
             }
         });
 

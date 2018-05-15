@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 
@@ -20,17 +21,20 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import easytasks.MultithreadedTask;
 import easytasks.Task;
 
-public class FindPrimesTask extends MultithreadedTask {
+import static com.tycho.app.primenumberfinder.utils.FileManager.EXTENSION;
+
+public class FindPrimesTask extends MultithreadedTask implements Savable {
 
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "FindPrimesTask";
+    private static final String TAG = FindPrimesTask.class.getSimpleName();
 
     public static final int INFINITY = -1;
 
@@ -61,6 +65,8 @@ public class FindPrimesTask extends MultithreadedTask {
     private int primeCount = 0;
 
     private SearchOptions searchOptions;
+
+    private final CopyOnWriteArrayList<SavableCallbacks> savableCallbacks = new CopyOnWriteArrayList<>();
 
     /**
      * Create a new {@linkplain FindPrimesTask}.
@@ -770,6 +776,39 @@ public class FindPrimesTask extends MultithreadedTask {
 
         public void setSearchMethod(SearchMethod searchMethod) {
             this.searchMethod = searchMethod;
+        }
+    }
+
+    @Override
+    public void save() {
+        try {
+            FileManager.copy(saveToFile(), new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getStartValue() + " to " + (getEndValue() == FindPrimesTask.INFINITY ? getCurrentValue() : getEndValue()) + EXTENSION));
+            sendOnSaved();
+        } catch (IOException e) {
+            e.printStackTrace();
+            sendOnError();
+        }
+    }
+
+    public void addSavableCallbacks(final SavableCallbacks callbacks){
+        if (!savableCallbacks.contains(callbacks)){
+            savableCallbacks.add(callbacks);
+        }
+    }
+
+    public void removeSavableCallbacks(final SavableCallbacks callbacks){
+        savableCallbacks.remove(callbacks);
+    }
+
+    private void sendOnSaved(){
+        for (SavableCallbacks callbacks : savableCallbacks){
+            callbacks.onSaved();
+        }
+    }
+
+    private void sendOnError(){
+        for (SavableCallbacks callbacks : savableCallbacks){
+            callbacks.onError();
         }
     }
 }
