@@ -16,6 +16,7 @@ import android.text.SpannableStringBuilder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -77,7 +78,7 @@ public class DisplayFactorsActivity extends AbstractActivity {
 
                 //Set a custom title if there is one
                 if (intent.getBooleanExtra("title", true)) {
-                    setTitle(formatTitle(file.getName().split("\\.")[0]));
+                    setTitle(Utils.formatTitle(file));
                 }
 
                 //Set up adapter
@@ -95,7 +96,7 @@ public class DisplayFactorsActivity extends AbstractActivity {
                 recyclerView.setItemAnimator(null);
 
                 //Header text
-                headerTextView = findViewById(R.id.text);
+                headerTextView = findViewById(R.id.subtitle);
 
                 //Start loading the file
                 loadFile(file);
@@ -191,59 +192,25 @@ public class DisplayFactorsActivity extends AbstractActivity {
                         NUMBER_FORMAT.format(numbers.size()),
                 }, ContextCompat.getColor(getBaseContext(), R.color.orange_inverse)));
 
-                //Set correct height based on the height of the header text view
-                headerTextView.post(new Runnable() {
+                //Update UI
+                runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+
+                        //Set correct height based on the height of the header text view
                         final int defaultHeight = getSupportActionBar().getHeight();
                         final int textHeight = headerTextView.getHeight();
-
                         final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.homeCollapseToolbar);
                         final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
-                        layoutParams.height = (int) (defaultHeight + textHeight + Utils.dpToPx(getBaseContext(), 12.5f));
+                        layoutParams.height = defaultHeight + textHeight;
                         collapsingToolbarLayout.setLayoutParams(layoutParams);
-                    }
-                });
 
-                new Handler(getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
+                        //Update adapter
                         adapter.notifyItemRangeInserted(0, adapter.getItemCount());
                         progressDialog.dismiss();
                     }
                 });
             }
         }).start();
-    }
-
-    private String formatTitle(final String string) {
-
-        try {
-            //Replace all the numbers
-            String replaceNumbers = string.replaceAll("[0-9]+", "<number>");
-
-            //Replace all the text
-            String onlyNumbers = string.replaceAll("[^0-9]+", "<text>");
-
-            //Get all numbers from the string
-            String numbers[] = onlyNumbers.trim().split("<text>");
-            final List<Long> formattedNumbers = new ArrayList<>();
-            for (String numberString : numbers) {
-                if (!numberString.equals("")) {
-                    formattedNumbers.add(Long.valueOf(numberString));
-                }
-            }
-
-            //Replace all place holders with formatted numbers
-            String title = replaceNumbers;
-            for (int i = 0; i < formattedNumbers.size(); i++) {
-                title = title.replaceFirst("<number>", NumberFormat.getInstance().format(formattedNumbers.get(i)));
-            }
-
-            return title;
-        } catch (Exception e) {
-        }
-
-        return string;
     }
 }

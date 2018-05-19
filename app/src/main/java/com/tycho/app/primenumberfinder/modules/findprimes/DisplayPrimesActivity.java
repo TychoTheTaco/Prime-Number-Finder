@@ -103,7 +103,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
                 recyclerView.addOnScrollListener(scrollListener);
 
                 //Header text
-                headerTextView = findViewById(R.id.text);
+                headerTextView = findViewById(R.id.subtitle);
 
                 //Start loading the file
                 loadFile(file);
@@ -329,7 +329,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
 
                 //TODO: I don't know why this works in a non-UI thread, but it breaks if i run it on the UI thread.
                 //Set header text
-                headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getString(R.string.find_primes_subtitle_result), new String[]{
+                headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.find_primes_subtitle_result, totalNumbers), new String[]{
                         NUMBER_FORMAT.format(totalNumbers),
                         NUMBER_FORMAT.format(range[0]),
                         range[1] == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(range[1]),
@@ -345,7 +345,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
                         final int textHeight = headerTextView.getHeight();
                         final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.homeCollapseToolbar);
                         final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
-                        layoutParams.height = (int) (defaultHeight + textHeight + Utils.dpToPx(getBaseContext(), 12.5f));
+                        layoutParams.height = defaultHeight + textHeight;
                         collapsingToolbarLayout.setLayoutParams(layoutParams);
 
                         //Update adapter

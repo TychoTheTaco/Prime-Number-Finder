@@ -37,7 +37,10 @@
     <string name="to">to</string>
     <string name="infinity_text">infinity</string>
     <string name="find_primes_button">Find primes</string>
-    <string name="find_primes_subtitle_result">There are %1$s prime numbers between %2$s and %3$s.</string>
+    <plurals name="find_primes_subtitle_result">
+        <item quantity="one">There is %1$s prime number between %2$s and %3$s.</item>
+        <item quantity="other">There are %1$s prime numbers between %2$s and %3$s.</item>
+    </plurals>
     <string name="find_primes_subtitle">Searching for prime numbers between %1$s and %2$s using %3$s.</string>
     <string name="find_primes_body_text">Already found %1$s prime numbers.</string>
     <string name="find_primes_body_text_sieve_counting">Counting primes: %1$s.</string>
@@ -90,16 +93,14 @@
         <item quantity="one">Are you sure you want to delete this file?</item>
         <item quantity="other">Are you sure you want to delete %1$d selected files?</item>
     </plurals>
+    <string name="scroll_to_top">Scroll to top</string>
+    <string name="scroll_to_bottom">Scroll to bottom</string>
 
     <!-- About page -->
     <string name="about_description">FindPrime is an application that can be used to find prime numbers and factors of any number. Prime numbers and factors can be saved to a text file for later use.\n\nThis application was created by Tycho Bellers.</string>
     <string name="about_page_icon_credits">Application icons by&#160;<a href="https://material.io/icons/">Material Icons</a> and&#160;<a href="https://icons8.com/">Icons8</a>.</string>
 
-    <!-- Bottom sheet -->
-    <string name="bottom_sheet_title">Task Options</string>
-    <string name="statistics_monitor_level_none">None</string>
-    <string name="statistics_monitor_level_simple">Simple</string>
-    <string name="statistics_monitor_level_advanced">Advanced</string>
+    <!--  -->
     <string name="find_primes_search_method_label">Search Method</string>
     <string name="find_primes_search_method_brute_force">Brute force</string>
     <string name="find_primes_search_method_sieve_of_eratosthenes">Sieve of Eratosthenes</string>
