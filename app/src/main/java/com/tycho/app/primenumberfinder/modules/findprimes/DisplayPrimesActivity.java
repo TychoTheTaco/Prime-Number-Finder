@@ -65,12 +65,15 @@ public class DisplayPrimesActivity extends AbstractActivity {
     private FloatingActionButton scrollToTopFab;
     private FloatingActionButton scrollToBottomFab;
 
+    private AppBarLayout appBarLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.display_primes_activity);
 
         //Set up the toolbar
+        appBarLayout = findViewById(R.id.app_bar);
         final Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setPopupTheme(R.style.FindPrimes_PopupOverlay);
         setSupportActionBar(toolbar);
@@ -127,6 +130,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
                 scrollToTopFab.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        appBarLayout.setExpanded(true);
                         scrollListener.specialScrollToPosition(0, false);
                     }
                 });
@@ -136,6 +140,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
                 scrollToBottomFab.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        appBarLayout.setExpanded(false);
                         scrollListener.specialScrollToPosition(scrollListener.totalNumbers - 1, false);
                     }
                 });
@@ -343,7 +348,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
                         //Set correct height based on the height of the header text view
                         final int defaultHeight = getSupportActionBar().getHeight();
                         final int textHeight = headerTextView.getHeight();
-                        final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.homeCollapseToolbar);
+                        final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
                         final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
                         layoutParams.height = defaultHeight + textHeight;
                         collapsingToolbarLayout.setLayoutParams(layoutParams);
@@ -389,7 +394,8 @@ public class DisplayPrimesActivity extends AbstractActivity {
                 findNthNumberDialog.addListener(new FindNthNumberDialog.OnFindClickedListener() {
                     @Override
                     public void onFindClicked(final int number) {
-                        if (number > 0 && number < scrollListener.getTotalNumbers()) {
+                        if (number > 0 && number <= scrollListener.getTotalNumbers()) {
+                            appBarLayout.setExpanded(false);
                             scrollListener.specialScrollToPosition(number - 1, true);
                         } else {
                             Toast.makeText(DisplayPrimesActivity.this, "Invalid number", Toast.LENGTH_SHORT).show();

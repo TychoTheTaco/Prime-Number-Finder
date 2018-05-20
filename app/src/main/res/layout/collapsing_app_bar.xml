@@ -6,7 +6,7 @@
     android:layout_height="wrap_content">
 
     <android.support.design.widget.CollapsingToolbarLayout
-        android:id="@+id/homeCollapseToolbar"
+        android:id="@+id/collapsing_toolbar"
         app:contentScrim="?attr/colorPrimary"
         app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
         app:titleEnabled="false"

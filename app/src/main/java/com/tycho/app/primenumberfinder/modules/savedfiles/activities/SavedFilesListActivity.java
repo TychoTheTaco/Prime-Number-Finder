@@ -8,7 +8,6 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -216,7 +215,7 @@ public class SavedFilesListActivity extends AbstractActivity {
         //Set correct height based on the height of the header text view
         final int defaultHeight = getSupportActionBar().getHeight();
         final int textHeight = subTitleTextView.getHeight();
-        final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.homeCollapseToolbar);
+        final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
         layoutParams.height = defaultHeight + textHeight;
         collapsingToolbarLayout.setLayoutParams(layoutParams);

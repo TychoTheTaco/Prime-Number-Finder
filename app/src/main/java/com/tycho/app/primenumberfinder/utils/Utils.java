@@ -245,8 +245,6 @@ public final class Utils {
     }
 
     public static BigInteger textToNumber(String text) {
-        Crashlytics.log("raw input: '" + text + "'");
-
         //Extract all digits from the input
         final Pattern pattern = Pattern.compile("\\d+");
         final Matcher matcher = pattern.matcher(text);
@@ -254,8 +252,6 @@ public final class Utils {
         while (matcher.find()) {
             numberString.append(matcher.group());
         }
-
-        Crashlytics.log("number: '" + numberString + "'");
 
         if (numberString.length() > 0) {
             return new BigInteger(numberString.toString());
