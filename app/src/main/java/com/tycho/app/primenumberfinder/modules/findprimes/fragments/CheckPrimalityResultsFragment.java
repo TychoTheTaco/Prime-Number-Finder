@@ -71,6 +71,10 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
                     //Format subtitle
                     subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_subtitle_searching), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
+                    //Buttons
+                    pauseButton.setVisibility(View.VISIBLE);
+                    pauseButton.setEnabled(true);
+                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
                 }
             });
         }
@@ -91,6 +95,8 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
                     //Format subtitle
                     subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_subtitle_searching), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
+                    //Buttons
+                    pauseButton.setEnabled(false);
                 }
             });
         }
