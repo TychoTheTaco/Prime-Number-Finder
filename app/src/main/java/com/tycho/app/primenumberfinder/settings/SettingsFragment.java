@@ -7,8 +7,8 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.widget.Toast;
 
-import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener{
 
@@ -33,18 +33,15 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key){
         Preference preference = findPreference(key);
         switch (key){
-            default:
-                break;
-
             case "allowBackgroundThreads":
-                PrimeNumberFinder.getPreferenceManager().setAllowBackgroundTasks(((CheckBoxPreference) preference).isChecked());
+                PreferenceManager.set(PreferenceManager.Preference.ALLOW_BACKGROUND_TASKS, ((CheckBoxPreference) preference).isChecked());
+                //PrimeNumberFinder.getPreferenceManager().setAllowBackgroundTasks(((CheckBoxPreference) preference).isChecked());
                 break;
 
             case "allowAnalytics":
-                PrimeNumberFinder.getPreferenceManager().setAllowAnalytics(((CheckBoxPreference) preference).isChecked());
+                PreferenceManager.set(PreferenceManager.Preference.ALLOW_ANALYTICS, ((CheckBoxPreference) preference).isChecked());
                 Toast.makeText(getActivity(), "You must restart the app for changes to take effect.", Toast.LENGTH_LONG).show();
                 break;
         }
-        PrimeNumberFinder.getPreferenceManager().savePreferences();
     }
 }

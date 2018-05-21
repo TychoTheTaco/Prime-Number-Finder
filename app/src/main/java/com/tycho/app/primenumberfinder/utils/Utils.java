@@ -12,6 +12,7 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.crashlytics.android.Crashlytics;
@@ -245,8 +246,6 @@ public final class Utils {
     }
 
     public static BigInteger textToNumber(String text) {
-        Crashlytics.log("raw input: '" + text + "'");
-
         //Extract all digits from the input
         final Pattern pattern = Pattern.compile("\\d+");
         final Matcher matcher = pattern.matcher(text);
@@ -254,8 +253,6 @@ public final class Utils {
         while (matcher.find()) {
             numberString.append(matcher.group());
         }
-
-        Crashlytics.log("number: '" + numberString + "'");
 
         if (numberString.length() > 0) {
             return new BigInteger(numberString.toString());
@@ -364,5 +361,12 @@ public final class Utils {
         }
 
         return input;
+    }
+
+    public static void reLayoutChildren(View view) {
+        view.measure(
+                View.MeasureSpec.makeMeasureSpec(view.getMeasuredWidth(), View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(view.getMeasuredHeight(), View.MeasureSpec.EXACTLY));
+        view.layout(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
     }
 }

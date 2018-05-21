@@ -62,6 +62,7 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
 
         if (task instanceof CheckPrimalityTask){
             holder.saveButton.setVisibility(View.GONE);
+            holder.editButton.setVisibility(View.GONE);
         }
 
         if (task.getState() == Task.State.STOPPED){

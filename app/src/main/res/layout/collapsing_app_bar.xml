@@ -3,18 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/app_bar"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:fitsSystemWindows="true">
+    android:layout_height="wrap_content">
 
     <android.support.design.widget.CollapsingToolbarLayout
-        android:id="@+id/homeCollapseToolbar"
+        android:id="@+id/collapsing_toolbar"
         app:contentScrim="?attr/colorPrimary"
-        app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+        app:layout_scrollFlags="scroll|exitUntilCollapsed|snap|enterAlways"
         app:titleEnabled="false"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/expanded_toolbar_height"
-        android:animateLayoutChanges="true"
-        android:fitsSystemWindows="true">
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -25,12 +23,14 @@
             android:theme="@style/Default.Toolbar" />
 
         <TextView
-            android:id="@+id/text"
+            android:id="@+id/subtitle"
             style="@style/DefaultText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:padding="8dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="8dp"
             android:textColor="@color/primary_text_light" />
 
     </android.support.design.widget.CollapsingToolbarLayout>

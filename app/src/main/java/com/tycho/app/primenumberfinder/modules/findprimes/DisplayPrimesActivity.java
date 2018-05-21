@@ -65,16 +65,23 @@ public class DisplayPrimesActivity extends AbstractActivity {
     private FloatingActionButton scrollToTopFab;
     private FloatingActionButton scrollToBottomFab;
 
+    private AppBarLayout appBarLayout;
+
+    private ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.display_primes_activity);
 
         //Set up the toolbar
+        appBarLayout = findViewById(R.id.app_bar);
         final Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setPopupTheme(R.style.FindPrimes_PopupOverlay);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        progressDialog = ProgressDialog.show(this, "Loading...", "Loading file.");
 
         //Get the intent
         final Intent intent = getIntent();
@@ -103,7 +110,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
                 recyclerView.addOnScrollListener(scrollListener);
 
                 //Header text
-                headerTextView = findViewById(R.id.text);
+                headerTextView = findViewById(R.id.subtitle);
 
                 //Start loading the file
                 loadFile(file);
@@ -127,6 +134,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
                 scrollToTopFab.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        appBarLayout.setExpanded(true);
                         scrollListener.specialScrollToPosition(0, false);
                     }
                 });
@@ -136,6 +144,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
                 scrollToBottomFab.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        appBarLayout.setExpanded(false);
                         scrollListener.specialScrollToPosition(scrollListener.totalNumbers - 1, false);
                     }
                 });
@@ -307,8 +316,6 @@ public class DisplayPrimesActivity extends AbstractActivity {
     }
 
     private void loadFile(final File file) {
-        final ProgressDialog progressDialog = ProgressDialog.show(this, "Loading...", "Loading file.");
-
         //Load file in another thread
         new Thread(new Runnable() {
             @Override
@@ -327,25 +334,25 @@ public class DisplayPrimesActivity extends AbstractActivity {
                     range = FileManager.getPrimesRangeFromTitle(file);
                 }
 
-                //TODO: I don't know why this works in a non-UI thread, but it breaks if i run it on the UI thread.
-                //Set header text
-                headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getString(R.string.find_primes_subtitle_result), new String[]{
-                        NUMBER_FORMAT.format(totalNumbers),
-                        NUMBER_FORMAT.format(range[0]),
-                        range[1] == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(range[1]),
-                }, ContextCompat.getColor(getBaseContext(), R.color.purple_inverse)));
-
                 //Update UI
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
 
+                        //Set header text
+                        headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.find_primes_subtitle_result, totalNumbers), new String[]{
+                                NUMBER_FORMAT.format(totalNumbers),
+                                NUMBER_FORMAT.format(range[0]),
+                                range[1] == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(range[1]),
+                        }, ContextCompat.getColor(getBaseContext(), R.color.purple_inverse)));
+
                         //Set correct height based on the height of the header text view
+                        final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
+                        Utils.reLayoutChildren(collapsingToolbarLayout);
                         final int defaultHeight = getSupportActionBar().getHeight();
                         final int textHeight = headerTextView.getHeight();
-                        final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.homeCollapseToolbar);
                         final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
-                        layoutParams.height = (int) (defaultHeight + textHeight + Utils.dpToPx(getBaseContext(), 12.5f));
+                        layoutParams.height = defaultHeight + textHeight;
                         collapsingToolbarLayout.setLayoutParams(layoutParams);
 
                         //Update adapter
@@ -389,7 +396,8 @@ public class DisplayPrimesActivity extends AbstractActivity {
                 findNthNumberDialog.addListener(new FindNthNumberDialog.OnFindClickedListener() {
                     @Override
                     public void onFindClicked(final int number) {
-                        if (number > 0 && number < scrollListener.getTotalNumbers()) {
+                        if (number > 0 && number <= scrollListener.getTotalNumbers()) {
+                            appBarLayout.setExpanded(false);
                             scrollListener.specialScrollToPosition(number - 1, true);
                         } else {
                             Toast.makeText(DisplayPrimesActivity.this, "Invalid number", Toast.LENGTH_SHORT).show();
@@ -427,5 +435,11 @@ public class DisplayPrimesActivity extends AbstractActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        progressDialog.dismiss();
     }
 }

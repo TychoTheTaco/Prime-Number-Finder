@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.LocaleSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.text.style.SuperscriptSpan;
@@ -60,9 +61,9 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity {
     private boolean allowExport;
     private boolean allowDelete;
 
-    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
-
     private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +80,8 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        progressDialog = ProgressDialog.show(this, "Loading...", "Loading file.");
+
         //Get the intent
         final Intent intent = getIntent();
         if (intent != null) {
@@ -91,7 +94,7 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity {
 
                 //Set a custom title if there is one
                 if (intent.getBooleanExtra("title", true)) {
-                    setTitle(formatTitle(file.getName().split("\\.")[0]));
+                    setTitle(Utils.formatTitle(file));
                 }
 
                 //Start loading the file
@@ -114,8 +117,6 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity {
     }
 
     private void loadFile(final File file) {
-        final ProgressDialog progressDialog = ProgressDialog.show(this, "Loading...", "Loading file.");
-
         //Load file in another thread
         new Thread(new Runnable() {
             @Override
@@ -124,7 +125,7 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity {
                 factorTree = FileManager.getInstance().readTree(file);
                 progressDialog.dismiss();
 
-                new Handler(getMainLooper()).post(new Runnable() {
+                runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         treeView.setTree(factorTree.formatNumbers());
@@ -162,7 +163,7 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity {
                             spannableStringBuilder.setSpan(new RelativeSizeSpan(0.8f), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 
                             position = spannableStringBuilder.length();
-                            content = " x ";
+                            content = " \u00D7 "; //Multiplication sign
                             spannableStringBuilder.append(content);
                             spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
                         }
@@ -189,37 +190,6 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity {
             }
 
         }
-    }
-
-    private String formatTitle(final String string) {
-
-        try {
-            //Replace all the numbers
-            String replaceNumbers = string.replaceAll("[0-9]+", "<number>");
-
-            //Replace all the text
-            String onlyNumbers = string.replaceAll("[^0-9]+", "<text>");
-
-            //Get all numbers from the string
-            String numbers[] = onlyNumbers.trim().split("<text>");
-            final List<Long> formattedNumbers = new ArrayList<>();
-            for (String numberString : numbers) {
-                if (!numberString.equals("")) {
-                    formattedNumbers.add(Long.valueOf(numberString));
-                }
-            }
-
-            //Replace all place holders with formatted numbers
-            String title = replaceNumbers;
-            for (int i = 0; i < formattedNumbers.size(); i++) {
-                title = title.replaceFirst("<number>", NumberFormat.getInstance().format(formattedNumbers.get(i)));
-            }
-
-            return title;
-        } catch (Exception e) {
-        }
-
-        return string;
     }
 
     @Override
@@ -268,5 +238,11 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        progressDialog.dismiss();
     }
 }

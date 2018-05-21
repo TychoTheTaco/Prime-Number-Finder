@@ -404,7 +404,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                     progressBar.clearAnimation();
 
                     //Subtitle
-                    subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_primes_subtitle_result), new String[]{
+                    subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getResources().getQuantityString(R.plurals.find_primes_subtitle_result, getTask().getPrimeCount()), new String[]{
                             NUMBER_FORMAT.format(getTask().getPrimeCount()),
                             NUMBER_FORMAT.format(getTask().getStartValue()),
                             getTask().getEndValue() == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),

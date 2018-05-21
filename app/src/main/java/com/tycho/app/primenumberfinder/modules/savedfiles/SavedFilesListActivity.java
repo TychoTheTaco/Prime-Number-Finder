@@ -1,9 +1,10 @@
-package com.tycho.app.primenumberfinder.modules.savedfiles.activities;
+package com.tycho.app.primenumberfinder.modules.savedfiles;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -16,6 +17,7 @@ import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesListAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SelectableAdapter;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -90,11 +92,18 @@ public class SavedFilesListActivity extends AbstractActivity {
         //Set the actionbar to a custom toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         //Set up subtitle
-        subTitleTextView = findViewById(R.id.text);
-        updateSubtitle();
+        subTitleTextView = findViewById(R.id.subtitle);
+        toolbar.post(new Runnable() {
+            @Override
+            public void run() {
+                updateSubtitle();
+            }
+        });
 
         //Set up toolbar animation
         ((AppBarLayout) findViewById(R.id.app_bar)).addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
@@ -152,13 +161,13 @@ public class SavedFilesListActivity extends AbstractActivity {
                                 //Get the files to be deleted
                                 final int[] selectedItemIndexes = adapterSavedFilesList.getSelectedItemIndexes();
                                 final List<File> files = new ArrayList<>();
-                                for (int i : selectedItemIndexes){
+                                for (int i : selectedItemIndexes) {
                                     files.add(adapterSavedFilesList.getFiles().get(i));
                                 }
 
                                 final Iterator<File> iterator = files.iterator();
                                 int position = 0;
-                                while (iterator.hasNext()){
+                                while (iterator.hasNext()) {
                                     final File file = iterator.next();
 
                                     //Delete the file
@@ -203,5 +212,14 @@ public class SavedFilesListActivity extends AbstractActivity {
             subtitle += ' ' + getResources().getQuantityString(R.plurals.selected_item_count, adapterSavedFilesList.getSelectedItemCount(), NUMBER_FORMAT.format(adapterSavedFilesList.getSelectedItemCount()));
         }
         subTitleTextView.setText(subtitle);
+
+        //Set correct height based on the height of the header text view
+        final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
+        Utils.reLayoutChildren(collapsingToolbarLayout);
+        final int defaultHeight = getSupportActionBar().getHeight();
+        final int textHeight = subTitleTextView.getHeight();
+        final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
+        layoutParams.height = defaultHeight + textHeight;
+        collapsingToolbarLayout.setLayoutParams(layoutParams);
     }
 }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -12,8 +13,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.ui.FormattedEditText;
+import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
+import java.awt.font.TextAttribute;
 import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -21,11 +25,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class FindNthNumberDialog extends Dialog {
 
+    /**
+     * Tag used for logging and debugging.
+     */
+    private static final String TAG = FindNthNumberDialog.class.getSimpleName();
+
     private final CopyOnWriteArrayList<OnFindClickedListener> listeners = new CopyOnWriteArrayList<>();
 
-    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
-
-    private EditText numberInput;
+    private FormattedEditText numberInput;
 
     private final int max;
 
@@ -41,60 +48,28 @@ public class FindNthNumberDialog extends Dialog {
         //Allow the dialog to be canceled by tapping out of its bounds
         setCancelable(true);
 
-        //Inflate the custom layout
-        final LayoutInflater layoutInflater = LayoutInflater.from(getContext());
-        final View rootView = layoutInflater.inflate(R.layout.find_nth_number_dialog, null);
-
         //Set up the layout
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(rootView);
+        setContentView(R.layout.find_nth_number_dialog);
 
         numberInput = findViewById(R.id.number_input);
-        numberInput.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                final String formattedText = NUMBER_FORMAT.format(getNumber());
-                if (!editable.toString().equals(formattedText)) {
-                    numberInput.setText(formattedText);
-                }
-                numberInput.setSelection(formattedText.length());
-
-            }
-        });
 
         findViewById(R.id.find_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (numberInput.getText().length() > 0) {
-                    final int number = getNumber().intValue();
-                    if (number > 0 && number <= max) {
-                        sendOnFindClicked(number);
-                        dismiss();
-                    } else {
-                        Toast.makeText(getContext(), "Invalid number", Toast.LENGTH_SHORT).show();
-                    }
+                final int number = getNumber().intValue();
+                if (number > 0 && number <= max) {
+                    sendOnFindClicked(number);
+                    dismiss();
                 } else {
-                    Toast.makeText(getContext(), "Invalid input", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Invalid number", Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
 
     private BigInteger getNumber() {
-        if (numberInput.getText().length() > 0){
-            return new BigInteger(numberInput.getText().toString().replace(",", ""));
-        }
-        return BigInteger.ZERO;
+        return Utils.textToNumber(numberInput.getText().toString());
     }
 
     public interface OnFindClickedListener {
