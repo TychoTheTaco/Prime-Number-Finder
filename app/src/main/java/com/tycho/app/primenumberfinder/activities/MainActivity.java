@@ -85,7 +85,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         setContentView(R.layout.main_activity);
 
         //Initialize analytics
-        if (PrimeNumberFinder.getPreferenceManager().isAllowAnalytics()) {
+        if (PreferenceManager.getBoolean(PreferenceManager.Preference.ALLOW_ANALYTICS)) {
             Fabric.with(this, new Crashlytics());
         } else {
             Fabric.with(this, new Crashlytics.Builder().core(new CrashlyticsCore.Builder().disabled(true).build()).build());
@@ -148,7 +148,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         }
 
         //Show a dialog while upgrading to the newest version
-        if (PrimeNumberFinder.getPreferenceManager().getFileVersion() < PreferenceManager.CURRENT_VERSION) {
+        if (PreferenceManager.getInt(PreferenceManager.Preference.FILE_VERSION) < PreferenceManager.CURRENT_VERSION) {
             final ProgressDialog progressDialog = new ProgressDialog(this);
             progressDialog.setTitle("Updating...");
             progressDialog.show();

@@ -503,7 +503,7 @@ public final class FileManager {
     }
 
     public void upgradeTo1_3_0(){
-        if (PrimeNumberFinder.getPreferenceManager().getFileVersion() == 0){
+        if (PreferenceManager.getInt(PreferenceManager.Preference.FILE_VERSION) == 0){
 
             final List<File> files = new ArrayList<>();
             files.addAll(Arrays.asList(savedPrimesDirectory.listFiles()));
@@ -536,8 +536,7 @@ public final class FileManager {
                 writeNumbersQuick(numbers, file, false);
             }
 
-            PrimeNumberFinder.getPreferenceManager().setFileVersion(1);
-            PrimeNumberFinder.getPreferenceManager().savePreferences();
+            PreferenceManager.set(PreferenceManager.Preference.FILE_VERSION, 1);
         }
 
     }

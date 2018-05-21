@@ -25,18 +25,13 @@ public class PrimeNumberFinder extends Application {
      */
     private static TaskManager taskManager;
 
-    /**
-     * Holds all user preferences.
-     */
-    private static PreferenceManager preferenceManager;
-
     @Override
     public void onCreate() {
         super.onCreate();
 
         FileManager.init(this);
         taskManager = new TaskManager();
-        preferenceManager = new PreferenceManager(this, "preferences");
+        PreferenceManager.initialize(this);
     }
 
     public static String getVersionName(final Context context) {
@@ -46,10 +41,6 @@ public class PrimeNumberFinder extends Application {
             Log.e(TAG, "Error getting version name!");
             return "unknown";
         }
-    }
-
-    public static PreferenceManager getPreferenceManager() {
-        return preferenceManager;
     }
 
     public static TaskManager getTaskManager(){

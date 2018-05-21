@@ -2,6 +2,8 @@ package com.tycho.app.primenumberfinder;
 
 import android.support.v7.app.AppCompatActivity;
 
+import com.tycho.app.primenumberfinder.utils.PreferenceManager;
+
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -22,7 +24,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         PrimeNumberFinder.getTaskManager().saveTaskStates();
-        if (!PrimeNumberFinder.getPreferenceManager().isAllowBackgroundTasks()) {
+        if (!PreferenceManager.getBoolean(PreferenceManager.Preference.ALLOW_BACKGROUND_TASKS)) {
             PrimeNumberFinder.getTaskManager().pauseAllTasks();
         }
     }
