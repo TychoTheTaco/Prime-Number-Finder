@@ -11,6 +11,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -87,7 +88,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         if (PrimeNumberFinder.getPreferenceManager().isAllowAnalytics()) {
             Fabric.with(this, new Crashlytics());
         } else {
-            Fabric.with(this, new Crashlytics.Builder().core(new CrashlyticsCore.Builder().build()).build());
+            Fabric.with(this, new Crashlytics.Builder().core(new CrashlyticsCore.Builder().disabled(true).build()).build());
         }
 
         //Set the actionbar to a custom toolbar

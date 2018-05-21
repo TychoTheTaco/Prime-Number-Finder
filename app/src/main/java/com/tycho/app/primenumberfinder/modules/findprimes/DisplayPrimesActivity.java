@@ -67,6 +67,8 @@ public class DisplayPrimesActivity extends AbstractActivity {
 
     private AppBarLayout appBarLayout;
 
+    private ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +80,8 @@ public class DisplayPrimesActivity extends AbstractActivity {
         toolbar.setPopupTheme(R.style.FindPrimes_PopupOverlay);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        progressDialog = ProgressDialog.show(this, "Loading...", "Loading file.");
 
         //Get the intent
         final Intent intent = getIntent();
@@ -312,7 +316,6 @@ public class DisplayPrimesActivity extends AbstractActivity {
     }
 
     private void loadFile(final File file) {
-        final ProgressDialog progressDialog = ProgressDialog.show(this, "Loading...", "Loading file.");
 
         //Load file in another thread
         new Thread(new Runnable() {
@@ -332,18 +335,17 @@ public class DisplayPrimesActivity extends AbstractActivity {
                     range = FileManager.getPrimesRangeFromTitle(file);
                 }
 
-                //TODO: I don't know why this works in a non-UI thread, but it breaks if i run it on the UI thread.
-                //Set header text
-                headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.find_primes_subtitle_result, totalNumbers), new String[]{
-                        NUMBER_FORMAT.format(totalNumbers),
-                        NUMBER_FORMAT.format(range[0]),
-                        range[1] == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(range[1]),
-                }, ContextCompat.getColor(getBaseContext(), R.color.purple_inverse)));
-
                 //Update UI
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+
+                        //Set header text
+                        headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.find_primes_subtitle_result, totalNumbers), new String[]{
+                                NUMBER_FORMAT.format(totalNumbers),
+                                NUMBER_FORMAT.format(range[0]),
+                                range[1] == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(range[1]),
+                        }, ContextCompat.getColor(getBaseContext(), R.color.purple_inverse)));
 
                         //Set correct height based on the height of the header text view
                         final int defaultHeight = getSupportActionBar().getHeight();
@@ -433,5 +435,11 @@ public class DisplayPrimesActivity extends AbstractActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        progressDialog.dismiss();
     }
 }

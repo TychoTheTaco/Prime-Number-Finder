@@ -38,7 +38,7 @@ public class DisplayFactorsActivity extends AbstractActivity {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "DispFactListAct";
+    private static final String TAG = DisplayFactorsActivity.class.getSimpleName();
 
     private File file;
 

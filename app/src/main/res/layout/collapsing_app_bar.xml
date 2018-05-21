@@ -8,10 +8,10 @@
     <android.support.design.widget.CollapsingToolbarLayout
         android:id="@+id/collapsing_toolbar"
         app:contentScrim="?attr/colorPrimary"
-        app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+        app:layout_scrollFlags="scroll|exitUntilCollapsed|snap|enterAlways"
         app:titleEnabled="false"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/expanded_toolbar_height"
+        android:layout_height="wrap_content"
         android:animateLayoutChanges="true">
 
         <android.support.v7.widget.Toolbar
