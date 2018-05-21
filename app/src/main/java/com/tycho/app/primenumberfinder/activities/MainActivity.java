@@ -94,10 +94,8 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         //Set the actionbar to a custom toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null){
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Initialize the fragment IDs
         fragmentIds.put(R.id.drawer_item_find_primes, "findPrimes");

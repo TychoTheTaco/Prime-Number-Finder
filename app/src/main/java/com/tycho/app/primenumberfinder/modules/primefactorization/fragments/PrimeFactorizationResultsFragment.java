@@ -291,7 +291,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                         spannableStringBuilder.setSpan(new RelativeSizeSpan(0.8f), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 
                         position = spannableStringBuilder.length();
-                        content = " x ";
+                        content = " \u00D7 "; //Multiplication sign
                         spannableStringBuilder.append(content);
                         spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
                     }

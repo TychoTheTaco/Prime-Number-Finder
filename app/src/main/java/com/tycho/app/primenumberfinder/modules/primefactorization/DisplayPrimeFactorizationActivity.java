@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.LocaleSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.text.style.SuperscriptSpan;
@@ -162,7 +163,7 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity {
                             spannableStringBuilder.setSpan(new RelativeSizeSpan(0.8f), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 
                             position = spannableStringBuilder.length();
-                            content = " x ";
+                            content = " \u00D7 "; //Multiplication sign
                             spannableStringBuilder.append(content);
                             spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
                         }

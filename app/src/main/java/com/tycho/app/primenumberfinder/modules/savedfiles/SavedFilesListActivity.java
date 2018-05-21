@@ -1,4 +1,4 @@
-package com.tycho.app.primenumberfinder.modules.savedfiles.activities;
+package com.tycho.app.primenumberfinder.modules.savedfiles;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;

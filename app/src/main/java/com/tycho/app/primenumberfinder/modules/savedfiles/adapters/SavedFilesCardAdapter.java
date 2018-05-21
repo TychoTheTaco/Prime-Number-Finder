@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.modules.savedfiles.SavedFilesCard;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.modules.savedfiles.activities.SavedFilesListActivity;
+import com.tycho.app.primenumberfinder.modules.savedfiles.SavedFilesListActivity;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.util.ArrayList;
