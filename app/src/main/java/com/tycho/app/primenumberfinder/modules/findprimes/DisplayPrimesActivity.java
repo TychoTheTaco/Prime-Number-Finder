@@ -316,7 +316,6 @@ public class DisplayPrimesActivity extends AbstractActivity {
     }
 
     private void loadFile(final File file) {
-
         //Load file in another thread
         new Thread(new Runnable() {
             @Override
@@ -348,9 +347,10 @@ public class DisplayPrimesActivity extends AbstractActivity {
                         }, ContextCompat.getColor(getBaseContext(), R.color.purple_inverse)));
 
                         //Set correct height based on the height of the header text view
+                        final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
+                        Utils.reLayoutChildren(collapsingToolbarLayout);
                         final int defaultHeight = getSupportActionBar().getHeight();
                         final int textHeight = headerTextView.getHeight();
-                        final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
                         final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
                         layoutParams.height = defaultHeight + textHeight;
                         collapsingToolbarLayout.setLayoutParams(layoutParams);

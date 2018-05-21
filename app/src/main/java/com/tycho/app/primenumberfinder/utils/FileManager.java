@@ -542,12 +542,10 @@ public final class FileManager {
 
     }
 
-    public File convert(final File file, final String fileName, final String itemSeparator, final boolean includeCommas) {
+    public File export(final File file, final String fileName, final String itemSeparator, final NumberFormat numberFormat) {
         final List<Long> items = readNumbers(file);
 
         final File output = new File(getExportCacheDirectory() + File.separator + fileName);
-
-        final NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
 
         try {
 
@@ -556,7 +554,7 @@ public final class FileManager {
             final long lastItem = items.get(items.size() - 1);
 
             for (long number : items) {
-                if (includeCommas){
+                if (numberFormat != null){
                     bufferedWriter.write(numberFormat.format(number));
                 }else{
                     bufferedWriter.write(String.valueOf(number));

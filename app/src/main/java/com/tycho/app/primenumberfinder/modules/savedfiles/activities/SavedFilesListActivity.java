@@ -17,6 +17,7 @@ import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesListAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SelectableAdapter;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -213,9 +214,10 @@ public class SavedFilesListActivity extends AbstractActivity {
         subTitleTextView.setText(subtitle);
 
         //Set correct height based on the height of the header text view
+        final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
+        Utils.reLayoutChildren(collapsingToolbarLayout);
         final int defaultHeight = getSupportActionBar().getHeight();
         final int textHeight = subTitleTextView.getHeight();
-        final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
         layoutParams.height = defaultHeight + textHeight;
         collapsingToolbarLayout.setLayoutParams(layoutParams);

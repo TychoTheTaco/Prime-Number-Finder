@@ -51,6 +51,8 @@ public class DisplayFactorsActivity extends AbstractActivity {
     private boolean allowExport;
     private boolean allowDelete;
 
+    private ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +63,8 @@ public class DisplayFactorsActivity extends AbstractActivity {
         toolbar.setPopupTheme(R.style.FindFactors_PopupOverlay);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        progressDialog = ProgressDialog.show(this, "Loading...", "Loading file.");
 
         //Get the intent
         final Intent intent = getIntent();
@@ -171,9 +175,13 @@ public class DisplayFactorsActivity extends AbstractActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void loadFile(final File file) {
-        final ProgressDialog progressDialog = ProgressDialog.show(this, "Loading...", "Loading file.");
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        progressDialog.dismiss();
+    }
 
+    private void loadFile(final File file) {
         //Load file in another thread
         new Thread(new Runnable() {
             @Override
@@ -182,21 +190,22 @@ public class DisplayFactorsActivity extends AbstractActivity {
                 final List<Long> numbers = FileManager.readNumbers(file);
                 adapter.getFactors().addAll(numbers);
 
-                //Set header text
-                headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.find_factors_subtitle_results, numbers.size()), new String[]{
-                        NUMBER_FORMAT.format(numbers.get(numbers.size() - 1)),
-                        NUMBER_FORMAT.format(numbers.size()),
-                }, ContextCompat.getColor(getBaseContext(), R.color.orange_inverse)));
-
                 //Update UI
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
 
+                        //Set header text
+                        headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.find_factors_subtitle_results, numbers.size()), new String[]{
+                                NUMBER_FORMAT.format(numbers.get(numbers.size() - 1)),
+                                NUMBER_FORMAT.format(numbers.size()),
+                        }, ContextCompat.getColor(getBaseContext(), R.color.orange_inverse)));
+
                         //Set correct height based on the height of the header text view
+                        final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
+                        Utils.reLayoutChildren(collapsingToolbarLayout);
                         final int defaultHeight = getSupportActionBar().getHeight();
                         final int textHeight = headerTextView.getHeight();
-                        final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
                         final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
                         layoutParams.height = defaultHeight + textHeight;
                         collapsingToolbarLayout.setLayoutParams(layoutParams);

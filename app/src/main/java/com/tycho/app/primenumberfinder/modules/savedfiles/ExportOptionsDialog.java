@@ -19,6 +19,8 @@ import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 /**
  * Created by tycho on 1/23/2018.
@@ -29,7 +31,7 @@ public class ExportOptionsDialog extends Dialog {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "ExportOptionsDialog";
+    private static final String TAG = ExportOptionsDialog.class.getSimpleName();
 
     private final Context context;
 
@@ -91,7 +93,8 @@ public class ExportOptionsDialog extends Dialog {
                 }
 
                 //Get format options
-                final boolean includeCommas = ((CheckBox) findViewById(R.id.include_commas_checkbox)).isChecked();
+                final boolean formatNumber = ((CheckBox) findViewById(R.id.format_number)).isChecked();
+                final NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
 
                 final ProgressDialog progressDialog = new ProgressDialog(context);
                 progressDialog.setTitle("Exporting...");
@@ -102,7 +105,7 @@ public class ExportOptionsDialog extends Dialog {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        final File output = FileManager.getInstance().convert(file, fileNameInput.getText().toString().trim() + ".txt", separator, includeCommas);
+                        final File output = FileManager.getInstance().export(file, fileNameInput.getText().toString().trim() + ".txt", separator, formatNumber ? numberFormat : null);
                         progressDialog.dismiss();
 
                         final Uri path = FileProvider.getUriForFile(context, "com.tycho.app.primenumberfinder", output);

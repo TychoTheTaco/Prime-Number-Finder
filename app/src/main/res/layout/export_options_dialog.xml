@@ -118,10 +118,10 @@
         android:textSize="14sp" />
 
     <CheckBox
-        android:id="@+id/include_commas_checkbox"
+        android:id="@+id/format_number"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/include_numbers_description" />
+        android:text="@string/format_numbers_description" />
 
     <Button
         android:id="@+id/export_button"

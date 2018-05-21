@@ -12,6 +12,7 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.crashlytics.android.Crashlytics;
@@ -360,5 +361,12 @@ public final class Utils {
         }
 
         return input;
+    }
+
+    public static void reLayoutChildren(View view) {
+        view.measure(
+                View.MeasureSpec.makeMeasureSpec(view.getMeasuredWidth(), View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(view.getMeasuredHeight(), View.MeasureSpec.EXACTLY));
+        view.layout(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
     }
 }
