@@ -331,12 +331,12 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     }
 
     @Override
-    public PrimeFactorizationTask getTask() {
+    public synchronized PrimeFactorizationTask getTask() {
         return (PrimeFactorizationTask) super.getTask();
     }
 
     @Override
-    public void setTask(Task task) {
+    public synchronized void setTask(Task task) {
         super.setTask(task);
         if (getView() != null){
             init();

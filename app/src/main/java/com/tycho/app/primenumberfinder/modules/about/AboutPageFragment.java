@@ -34,7 +34,7 @@ public class AboutPageFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto","tycho.developer@gmail.com", null));
-                intent.putExtra(Intent.EXTRA_SUBJECT, "Prime Number Finder Feedback (Version " + PrimeNumberFinder.getVersionName(getActivity()) + ")");
+                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name) + " Feedback (Version " + PrimeNumberFinder.getVersionName(getActivity()) + ")");
                 startActivity(Intent.createChooser(intent, "Send email..."));
             }
         });
