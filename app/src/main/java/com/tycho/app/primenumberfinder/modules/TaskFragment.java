@@ -67,11 +67,11 @@ public abstract class TaskFragment extends Fragment implements TaskListener {
 
     }
 
-    public Task getTask(){
+    public synchronized Task getTask(){
         return task;
     }
 
-    public void setTask(Task task){
+    public synchronized void setTask(Task task){
         //Remove task listener from previous task
         if (this.task != null){
             if (!this.task.removeTaskListener(this)){

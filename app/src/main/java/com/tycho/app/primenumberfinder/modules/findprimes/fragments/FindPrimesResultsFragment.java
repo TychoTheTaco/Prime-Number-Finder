@@ -502,12 +502,12 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     }
 
     @Override
-    public FindPrimesTask getTask() {
+    public synchronized FindPrimesTask getTask() {
         return (FindPrimesTask) super.getTask();
     }
 
     @Override
-    public void setTask(final Task task) {
+    public synchronized void setTask(final Task task) {
         super.setTask(task);
         if (getTask() != null) {
             if (!statisticsMap.containsKey(getTask())) {

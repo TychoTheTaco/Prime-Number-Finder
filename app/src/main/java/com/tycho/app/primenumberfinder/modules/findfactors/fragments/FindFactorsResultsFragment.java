@@ -430,14 +430,14 @@ public class FindFactorsResultsFragment extends ResultsFragment{
     }
 
     @Override
-    public FindFactorsTask getTask() {
+    public synchronized FindFactorsTask getTask() {
         return (FindFactorsTask) super.getTask();
     }
 
     @Override
-    public void setTask(final Task task) {
+    public synchronized void setTask(final Task task) {
         super.setTask(task);
-        if (getTask() != null) {
+        if (task != null) {
             if (!statisticsMap.containsKey(getTask())) {
                 statisticsMap.put(getTask(), new Statistics());
             }
