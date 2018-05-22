@@ -148,7 +148,7 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
 
             @Override
             public void onSavePressed(Task task) {
-                resultsFragment.saveTask((FindFactorsTask) task);
+                resultsFragment.saveTask((FindFactorsTask) task, getActivity());
             }
         });
 

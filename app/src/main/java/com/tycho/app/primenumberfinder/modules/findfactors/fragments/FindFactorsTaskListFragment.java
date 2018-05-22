@@ -2,6 +2,8 @@ package com.tycho.app.primenumberfinder.modules.findfactors.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -20,6 +22,8 @@ import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsTaskListAdapter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -46,6 +50,11 @@ public class FindFactorsTaskListFragment extends Fragment{
     private Queue<AbstractTaskListAdapter.EventListener> eventListenerQueue = new LinkedBlockingQueue<>(5);
     private Queue<ActionViewListener> actionViewListenerQueue = new LinkedBlockingQueue<>(5);
 
+    /**
+     * All UI updates are posted to this {@link Handler} on the main thread.
+     */
+    protected final Handler handler = new Handler(Looper.getMainLooper());
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -60,7 +69,7 @@ public class FindFactorsTaskListFragment extends Fragment{
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_factors_task_list_fragment, container, false);
 
         //Set up the task list
@@ -76,7 +85,7 @@ public class FindFactorsTaskListFragment extends Fragment{
         //Restore tasks if fragment was destroyed
         for (Task task : PrimeNumberFinder.getTaskManager().getTasks()) {
             if (task instanceof FindFactorsTask) {
-                taskListAdapter.addTask(task);
+                addTask((FindFactorsTask) task);
             }
         }
         taskListAdapter.sortByTimeCreated();
@@ -84,6 +93,14 @@ public class FindFactorsTaskListFragment extends Fragment{
         //Select correct task
         if (savedInstanceState != null){
             taskListAdapter.setSelected(savedInstanceState.getInt("selectedItemPosition"));
+
+            //Restore saved state
+            final ArrayList<Integer> savedItemPositions = savedInstanceState.getIntegerArrayList("savedItemPositions");
+            if (savedItemPositions != null) {
+                for (int i : savedItemPositions) {
+                    taskListAdapter.setSaved(i, true);
+                }
+            }
         }else{
             taskListAdapter.setSelected(PrimeNumberFinder.getTaskManager().findTaskById((UUID) getActivity().getIntent().getSerializableExtra("taskId")));
         }
@@ -97,6 +114,14 @@ public class FindFactorsTaskListFragment extends Fragment{
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("selectedItemPosition", taskListAdapter.getSelectedItemPosition());
+
+        //Store the saved item positions
+        final List<Task> savedItems = taskListAdapter.getSavedItems();
+        final ArrayList<Integer> savedItemPositions = new ArrayList<>();
+        for (Task task : savedItems) {
+            savedItemPositions.add(taskListAdapter.indexOf(task));
+        }
+        outState.putIntegerArrayList("savedItemPositions", savedItemPositions);
     }
 
     public void addEventListener(final AbstractTaskListAdapter.EventListener eventListener) {
@@ -111,7 +136,7 @@ public class FindFactorsTaskListFragment extends Fragment{
         task.addSavableCallbacks(new Savable.SavableCallbacks() {
             @Override
             public void onSaved() {
-                taskListAdapter.setSaved(task);
+                taskListAdapter.postSetSaved(task, true);
             }
 
             @Override

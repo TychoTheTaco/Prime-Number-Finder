@@ -167,7 +167,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveTask(getTask());
+                saveTask(getTask(), getActivity());
             }
         });
 
@@ -176,8 +176,8 @@ public class FindFactorsResultsFragment extends ResultsFragment{
         return rootView;
     }
 
-    public void saveTask(final FindFactorsTask task){
-        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+    public void saveTask(final FindFactorsTask task, final Context context){
+        final ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setTitle("Saving...");
         progressDialog.show();
 
@@ -188,7 +188,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getActivity(), getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -198,7 +198,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getActivity(), "Error saving file!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Error saving file!", Toast.LENGTH_SHORT).show();
                     }
                 });
             }

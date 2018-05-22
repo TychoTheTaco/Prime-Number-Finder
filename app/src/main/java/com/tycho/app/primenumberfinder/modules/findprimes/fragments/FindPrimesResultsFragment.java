@@ -1,5 +1,6 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -8,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.text.SpannableStringBuilder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,19 +91,19 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         primesPerSecondTextView = rootView.findViewById(R.id.textView_primes_per_second);
 
         //Apply black tint to icons
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
-            for (Drawable drawable : etaTextView.getCompoundDrawables()){
-                if (drawable != null){
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            for (Drawable drawable : etaTextView.getCompoundDrawables()) {
+                if (drawable != null) {
                     drawable.mutate().setTint(ContextCompat.getColor(getContext(), R.color.black));
                 }
             }
-            for (Drawable drawable : numbersPerSecondTextView.getCompoundDrawables()){
-                if (drawable != null){
+            for (Drawable drawable : numbersPerSecondTextView.getCompoundDrawables()) {
+                if (drawable != null) {
                     drawable.mutate().setTint(ContextCompat.getColor(getContext(), R.color.black));
                 }
             }
-            for (Drawable drawable : primesPerSecondTextView.getCompoundDrawables()){
-                if (drawable != null){
+            for (Drawable drawable : primesPerSecondTextView.getCompoundDrawables()) {
+                if (drawable != null) {
                     drawable.mutate().setTint(ContextCompat.getColor(getContext(), R.color.black));
                 }
             }
@@ -123,7 +125,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                         final Task.State state = getTask().getState();
                         try {
                             getTask().pauseAndWait();
-                        }catch (InterruptedException e){
+                        } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
 
@@ -163,7 +165,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               saveTask(getTask());
+                saveTask(getTask(), getActivity());
             }
         });
 
@@ -172,8 +174,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         return rootView;
     }
 
-    public void saveTask(final FindPrimesTask task){
-        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+    public void saveTask(final FindPrimesTask task, final Context context) {
+        final ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setTitle("Saving...");
         progressDialog.show();
 
@@ -184,7 +186,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getActivity(), getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -194,7 +196,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getActivity(), "Error saving file!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Error saving file!", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -416,7 +418,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                     //Statistics
                     etaTextView.setVisibility(View.GONE);
                     double elapsed = (double) getTask().getElapsedTime() / 1000;
-                    if (elapsed <= 0){
+                    if (elapsed <= 0) {
                         elapsed = 1;
                     }
                     numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_numbers_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getEndValue() / elapsed))}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
@@ -440,7 +442,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             if (getTask().getEndValue() != FindPrimesTask.INFINITY) {
                 progress.setText(String.valueOf((int) (getTask().getProgress() * 100)));
                 progressBar.setProgress((int) (getTask().getProgress() * 100));
-            }else{
+            } else {
                 progressBar.setProgress(50);
             }
 
@@ -475,7 +477,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             bodyTextView.setText(Utils.formatSpannable(spannableStringBuilder, text, content, ContextCompat.getColor(getContext(), R.color.purple_dark)));
 
             //Time remaining
-            if (etaTextView.getVisibility() == View.VISIBLE){
+            if (etaTextView.getVisibility() == View.VISIBLE) {
                 etaTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
             }
 

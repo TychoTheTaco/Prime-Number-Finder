@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -26,6 +27,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import easytasks.Task;
 import easytasks.TaskAdapter;
+import easytasks.TaskListener;
 
 
 /**
@@ -42,7 +44,7 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
     /**
      * List of tasks in the adapter.
      */
-    protected final List<Task> tasks = new ArrayList<>();
+    protected final List<Item> items = new ArrayList<>();
 
     /**
      * The currently selected item position. This will be -1 if nothing is selected.
@@ -96,21 +98,41 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
 
     protected final Context context;
 
-    private final List<Task> savedItems = new ArrayList<>();
+    private class Item {
+        private final Task task;
+        private boolean saved;
 
-    public AbstractTaskListAdapter(final Context context){
+        public Item(final Task task) {
+            this.task = task;
+        }
+
+        public Task getTask() {
+            return task;
+        }
+
+        public void setSaved(boolean saved) {
+            this.saved = saved;
+        }
+
+        public boolean isSaved() {
+            return saved;
+        }
+    }
+
+    public AbstractTaskListAdapter(final Context context) {
         this.context = context;
     }
 
     @Override
     public void onBindViewHolder(@NonNull H holder, int position) {
-        final Task task = tasks.get(position);
+        final Task task = items.get(position).getTask();
         customEventListeners.get(task).setViewHolder(holder);
 
         //Start the UI updater if it hasn't been started yet
         if (holder.uiUpdater.getState() == Task.State.NOT_STARTED) {
+            //holder.uiUpdater.addTaskListener(getUiUpdaterDebugListener(holder));
             holder.uiUpdater.startOnNewThread();
-            if (task.getState() == Task.State.PAUSED || task.getState() == Task.State.NOT_STARTED || task.getState() == Task.State.STOPPED){
+            if (task.getState() == Task.State.PAUSED || task.getState() == Task.State.NOT_STARTED || task.getState() == Task.State.STOPPED) {
                 holder.uiUpdater.pause();
             }
         }
@@ -118,7 +140,51 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
         doOnBindViewHolder(holder, position);
     }
 
-    protected void manageStandardViews(final Task task, final H holder){
+    private TaskListener getUiUpdaterDebugListener(final ViewHolder holder){
+        return new TaskListener() {
+            @Override
+            public void onTaskStarted() {
+                Log.w(TAG, "UI Updater started(): " + holder);
+            }
+
+            @Override
+            public void onTaskPausing() {
+                Log.w(TAG, "UI Updater pausing(): " + holder);
+            }
+
+            @Override
+            public void onTaskPaused() {
+                Log.w(TAG, "UI Updater paused(): " + holder);
+            }
+
+            @Override
+            public void onTaskResuming() {
+                Log.w(TAG, "UI Updater resuming(): " + holder);
+            }
+
+            @Override
+            public void onTaskResumed() {
+                Log.w(TAG, "UI Updater resumed(): " + holder);
+            }
+
+            @Override
+            public void onTaskStopping() {
+                Log.w(TAG, "UI Updater stopping(): " + holder);
+            }
+
+            @Override
+            public void onTaskStopped() {
+                Log.w(TAG, "UI Updater stopped(): " + holder);
+            }
+        };
+    }
+
+    @Override
+    public int getItemCount() {
+        return items.size();
+    }
+
+    protected void manageStandardViews(final Task task, final H holder) {
 
         //Check if this item should be selected
         holder.itemView.setSelected(holder.getAdapterPosition() == getSelectedItemPosition());
@@ -225,111 +291,109 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
     protected abstract void doOnBindViewHolder(H holder, int position);
 
     public void addTask(final Task task) {
-        if (!tasks.contains(task)) {
-            final CustomTaskEventListener customTaskEventListener = new CustomTaskEventListener() {
-                @Override
-                public void onTaskStarted() {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (holder != null) {
-                                holder.uiUpdater.resume();
-                                notifyItemChanged(holder.getAdapterPosition());
-                            }
-
+        final CustomTaskEventListener customTaskEventListener = new CustomTaskEventListener() {
+            @Override
+            public void onTaskStarted() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (holder != null) {
+                            holder.uiUpdater.resume();
+                            notifyItemChanged(holder.getAdapterPosition());
                         }
-                    });
-                }
 
-                @Override
-                public void onTaskPausing() {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (holder != null) {
-                                notifyItemChanged(holder.getAdapterPosition());
-                            }
+                    }
+                });
+            }
 
+            @Override
+            public void onTaskPausing() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (holder != null) {
+                            notifyItemChanged(holder.getAdapterPosition());
                         }
-                    });
-                }
 
-                @Override
-                public void onTaskPaused() {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (holder != null) {
-                                holder.uiUpdater.pause();
-                                notifyItemChanged(holder.getAdapterPosition());
-                            }
+                    }
+                });
+            }
+
+            @Override
+            public void onTaskPaused() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (holder != null) {
+                            holder.uiUpdater.pause();
+                            notifyItemChanged(holder.getAdapterPosition());
                         }
-                    });
-                }
+                    }
+                });
+            }
 
-                @Override
-                public void onTaskResuming() {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (holder != null) {
-                                notifyItemChanged(holder.getAdapterPosition());
-                            }
-
+            @Override
+            public void onTaskResuming() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (holder != null) {
+                            notifyItemChanged(holder.getAdapterPosition());
                         }
-                    });
-                }
 
-                @Override
-                public void onTaskResumed() {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (holder != null) {
-                                holder.uiUpdater.resume();
-                                notifyItemChanged(holder.getAdapterPosition());
-                            }
+                    }
+                });
+            }
+
+            @Override
+            public void onTaskResumed() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (holder != null) {
+                            holder.uiUpdater.resume();
+                            notifyItemChanged(holder.getAdapterPosition());
                         }
-                    });
-                }
+                    }
+                });
+            }
 
-                @Override
-                public void onTaskStopping() {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (holder != null) {
-                                notifyItemChanged(holder.getAdapterPosition());
-                            }
-
+            @Override
+            public void onTaskStopping() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (holder != null) {
+                            notifyItemChanged(holder.getAdapterPosition());
                         }
-                    });
-                }
 
-                @Override
-                public void onTaskStopped() {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (holder != null) {
-                                holder.uiUpdater.pause();
-                                notifyItemChanged(holder.getAdapterPosition());
-                            }
+                    }
+                });
+            }
+
+            @Override
+            public void onTaskStopped() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (holder != null) {
+                            holder.uiUpdater.pause();
+                            notifyItemChanged(holder.getAdapterPosition());
                         }
-                    });
-                }
-            };
-            task.addTaskListener(customTaskEventListener);
-            task.addTaskListener(taskAdapter);
-            this.tasks.add(task);
-            notifyItemInserted(getItemCount());
-            customEventListeners.put(task, customTaskEventListener);
-            sendTaskStatesChanged();
-        }
+                    }
+                });
+            }
+        };
+        task.addTaskListener(customTaskEventListener);
+        task.addTaskListener(taskAdapter);
+        items.add(new Item(task));
+        notifyItemInserted(getItemCount());
+        customEventListeners.put(task, customTaskEventListener);
+        sendTaskStatesChanged();
     }
 
     public void setSelected(int index) {
-        if (index < getItemCount()){
+        if (index < getItemCount()) {
             final int changed = selectedItemPosition;
             selectedItemPosition = index;
             notifyItemChanged(selectedItemPosition);
@@ -338,24 +402,24 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
             if (selectedItemPosition == -1) {
                 sendOnTaskSelected(null);
             } else {
-                sendOnTaskSelected(tasks.get(selectedItemPosition));
+                sendOnTaskSelected(getTask(selectedItemPosition));
             }
         }
     }
 
     public void setSelected(final Task task) {
-        setSelected(tasks.indexOf(task));
+        setSelected(items.indexOf(getItem(task)));
     }
 
     public int getSelectedItemPosition() {
         return selectedItemPosition;
     }
 
-    public void sortByTimeCreated(){
-        Collections.sort(tasks, new Comparator<Task>() {
+    public void sortByTimeCreated() {
+        Collections.sort(items, new Comparator<Item>() {
             @Override
-            public int compare(Task task0, Task task1) {
-                return Long.compare(task0.getStartTime(), task1.getStartTime());
+            public int compare(Item item0, Item item1) {
+                return Long.compare(item0.getTask().getStartTime(), item1.getTask().getStartTime());
             }
         });
         notifyDataSetChanged();
@@ -393,8 +457,8 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
         }
     }
 
-    private void sendOnEditClicked(final Task task){
-        for (EventListener eventListener : eventListeners){
+    private void sendOnEditClicked(final Task task) {
+        for (EventListener eventListener : eventListeners) {
             eventListener.onEditPressed(task);
         }
     }
@@ -417,6 +481,10 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
         private void setViewHolder(final AbstractTaskListAdapter.ViewHolder holder) {
             this.holder = holder;
         }
+    }
+
+    protected Task getTask(final int position) {
+        return items.get(position).getTask();
     }
 
     public abstract class ViewHolder extends RecyclerView.ViewHolder {
@@ -457,25 +525,26 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
             pauseButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    switch (tasks.get(getAdapterPosition()).getState()) {
+                    switch (items.get(getAdapterPosition()).getTask().getState()) {
 
                         case PAUSED:
-                            tasks.get(getAdapterPosition()).resume();
+                            getTask(getAdapterPosition()).resume();
                             break;
 
                         case RUNNING:
-                            tasks.get(getAdapterPosition()).pause();
+                            getTask(getAdapterPosition()).pause();
                             break;
                     }
 
-                    sendOnPausePressed(tasks.get(getAdapterPosition()));
+                    onPausePressed();
+                    sendOnPausePressed(getTask(getAdapterPosition()));
                 }
             });
 
             editButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    sendOnEditClicked(tasks.get(getAdapterPosition()));
+                    sendOnEditClicked(getTask(getAdapterPosition()));
                 }
             });
 
@@ -484,7 +553,7 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
                 public void onClick(View v) {
 
                     //Pause the UI updater. It will be re-used by other ViewHolders
-                    tasks.get(getAdapterPosition()).pause();
+                    getTask(getAdapterPosition()).pause();
 
                     if (getAdapterPosition() < selectedItemPosition) {
                         selectedItemPosition--;
@@ -494,15 +563,16 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
                     }
 
                     //Remove the task from the list
-                    final Task task = tasks.get(getAdapterPosition());
-                    savedItems.remove(task);
+                    final int position = getAdapterPosition();
+                    final Task task = getTask(position);
                     customEventListeners.remove(task);
-                    tasks.remove(task);
-                    notifyItemRemoved(getAdapterPosition());
+                    items.remove(position);
+                    notifyItemRemoved(position);
 
                     PrimeNumberFinder.getTaskManager().unregisterTask(task);
 
                     //Notify listeners
+                    onDeletePressed();
                     sendOnDeletePressed(task);
                 }
             });
@@ -512,26 +582,71 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
                 @Override
                 public void onClick(View v) {
                     saveButton.setEnabled(false);
-                    sendOnSavePressed(tasks.get(getAdapterPosition()));
+                    sendOnSavePressed(getTask(getAdapterPosition()));
                 }
             });
         }
 
-        public boolean isSaved(){
-            return savedItems.contains(tasks.get(getAdapterPosition()));
+        protected void onPausePressed(){}
+
+        protected void onDeletePressed(){}
+    }
+
+    public void setSaved(final int index, boolean isSaved){
+        final Item item = items.get(index);
+        if (item != null){
+            item.setSaved(isSaved);
+            notifyItemChanged(index);
         }
     }
 
-    public void setSaved(final Task task){
-        final int index = tasks.indexOf(task);
-        if (!savedItems.contains(task)){
-            savedItems.add(task);
+    public void setSaved(final Task task, boolean isSaved) {
+        final Item item = getItem(task);
+        final int index = items.indexOf(item);
+        if (item != null){
+            item.setSaved(isSaved);
+            notifyItemChanged(index);
         }
-        notifyItemChanged(index);
+    }
+
+    public void postSetSaved(final Task task, final boolean isSaved){
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                setSaved(task, isSaved);
+            }
+        });
+    }
+
+    protected boolean isSaved(Task task){
+        return getItem(task).isSaved();
+    }
+
+    public List<Task> getSavedItems(){
+        final List<Task> savedItems = new ArrayList<>();
+        for (Item item : items){
+            if (item.isSaved()){
+                savedItems.add(item.getTask());
+            }
+        }
+        return savedItems;
+    }
+
+    public int indexOf(final Task task){
+        return items.indexOf(getItem(task));
     }
 
     protected void onUpdate(final ViewHolder viewHolder) {
         notifyItemChanged(viewHolder.getAdapterPosition());
+    }
+
+    protected Item getItem(final Task task) {
+        for (Item item : items) {
+            if (item.getTask() == task) {
+                return item;
+            }
+        }
+        return null;
     }
 
     private class UiUpdater extends Task {
@@ -553,6 +668,8 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
                         //Make sure the view holder is still visible
                         if (viewHolder.getAdapterPosition() != -1) {
                             onUpdate(viewHolder);
+                        }else{
+                            Log.e(TAG, "Posted an invalid update on " + viewHolder);
                         }
                     }
                 });
@@ -565,7 +682,7 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
                 }
 
                 tryPause();
-                if (shouldStop()){
+                if (shouldStop()) {
                     break;
                 }
             }
@@ -573,7 +690,7 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
     }
 
     public void addActionViewListener(final ActionViewListener actionViewListener) {
-        if (!actionViewListeners.contains(actionViewListener)){
+        if (!actionViewListeners.contains(actionViewListener)) {
             this.actionViewListeners.add(actionViewListener);
         }
     }
@@ -584,8 +701,8 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
 
     private void sendTaskStatesChanged() {
         boolean active = false;
-        for (Task task : this.tasks) {
-            if (task.getState() == Task.State.RUNNING) {
+        for (Item item : items) {
+            if (item.getTask().getState() == Task.State.RUNNING) {
                 active = true;
                 break;
             }

@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,12 +27,13 @@ import java.util.List;
 import java.util.UUID;
 
 import easytasks.Task;
+import easytasks.TaskAdapter;
 
 /**
  * Created by tycho on 11/16/2017.
  */
 
-public class FindPrimesTaskListFragment extends Fragment{
+public class FindPrimesTaskListFragment extends Fragment {
 
     /**
      * Tag used for logging and debugging.
@@ -51,10 +53,10 @@ public class FindPrimesTaskListFragment extends Fragment{
     public void onAttach(Context context) {
         super.onAttach(context);
         taskListAdapter = new FindPrimesTaskListAdapter(context);
-        for (AbstractTaskListAdapter.EventListener eventListener : eventListeners){
+        for (AbstractTaskListAdapter.EventListener eventListener : eventListeners) {
             taskListAdapter.addEventListener(eventListener);
         }
-        for (ActionViewListener actionViewListener : actionViewListeners){
+        for (ActionViewListener actionViewListener : actionViewListeners) {
             taskListAdapter.addActionViewListener(actionViewListener);
         }
     }
@@ -77,15 +79,23 @@ public class FindPrimesTaskListFragment extends Fragment{
         //Restore tasks if fragment was destroyed
         for (Task task : PrimeNumberFinder.getTaskManager().getTasks()) {
             if (task instanceof FindPrimesTask || task instanceof CheckPrimalityTask) {
-                taskListAdapter.addTask(task);
+                addTask(task);
             }
         }
         taskListAdapter.sortByTimeCreated();
 
         //Select correct task
-        if (savedInstanceState != null){
+        if (savedInstanceState != null) {
             taskListAdapter.setSelected(savedInstanceState.getInt("selectedItemPosition"));
-        }else{
+
+            //Restore saved state
+            final ArrayList<Integer> savedItemPositions = savedInstanceState.getIntegerArrayList("savedItemPositions");
+            if (savedItemPositions != null) {
+                for (int i : savedItemPositions) {
+                    taskListAdapter.setSaved(i, true);
+                }
+            }
+        } else {
             taskListAdapter.setSelected(PrimeNumberFinder.getTaskManager().findTaskById((UUID) getActivity().getIntent().getSerializableExtra("taskId")));
         }
 
@@ -98,14 +108,22 @@ public class FindPrimesTaskListFragment extends Fragment{
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("selectedItemPosition", taskListAdapter.getSelectedItemPosition());
+
+        //Store the saved item positions
+        final List<Task> savedItems = taskListAdapter.getSavedItems();
+        final ArrayList<Integer> savedItemPositions = new ArrayList<>();
+        for (Task task : savedItems) {
+            savedItemPositions.add(taskListAdapter.indexOf(task));
+        }
+        outState.putIntegerArrayList("savedItemPositions", savedItemPositions);
     }
 
     public void addTask(final Task task) {
-        if (task instanceof FindPrimesTask){
+        if (task instanceof FindPrimesTask) {
             ((FindPrimesTask) task).addSavableCallbacks(new Savable.SavableCallbacks() {
                 @Override
                 public void onSaved() {
-                    taskListAdapter.setSaved(task);
+                    taskListAdapter.postSetSaved(task, true);
                 }
 
                 @Override
