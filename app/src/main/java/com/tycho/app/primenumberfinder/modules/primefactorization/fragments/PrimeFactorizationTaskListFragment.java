@@ -20,6 +20,8 @@ import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.adapters.PrimeFactorizationTaskListAdapter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -76,7 +78,7 @@ public class PrimeFactorizationTaskListFragment extends Fragment{
         //Restore tasks if fragment was destroyed
         for (Task task : PrimeNumberFinder.getTaskManager().getTasks()) {
             if (task instanceof PrimeFactorizationTask) {
-                taskListAdapter.addTask(task);
+                addTask((PrimeFactorizationTask) task);
             }
         }
         taskListAdapter.sortByTimeCreated();
@@ -84,6 +86,14 @@ public class PrimeFactorizationTaskListFragment extends Fragment{
         //Select correct task
         if (savedInstanceState != null){
             taskListAdapter.setSelected(savedInstanceState.getInt("selectedItemPosition"));
+
+            //Restore saved state
+            final ArrayList<Integer> savedItemPositions = savedInstanceState.getIntegerArrayList("savedItemPositions");
+            if (savedItemPositions != null) {
+                for (int i : savedItemPositions) {
+                    taskListAdapter.setSaved(i, true);
+                }
+            }
         }else{
             taskListAdapter.setSelected(PrimeNumberFinder.getTaskManager().findTaskById((UUID) getActivity().getIntent().getSerializableExtra("taskId")));
         }
@@ -97,13 +107,21 @@ public class PrimeFactorizationTaskListFragment extends Fragment{
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("selectedItemPosition", taskListAdapter.getSelectedItemPosition());
+
+        //Store the saved item positions
+        final List<Task> savedItems = taskListAdapter.getSavedItems();
+        final ArrayList<Integer> savedItemPositions = new ArrayList<>();
+        for (Task task : savedItems) {
+            savedItemPositions.add(taskListAdapter.indexOf(task));
+        }
+        outState.putIntegerArrayList("savedItemPositions", savedItemPositions);
     }
 
     public void addTask(final PrimeFactorizationTask task) {
         task.addSavableCallbacks(new Savable.SavableCallbacks() {
             @Override
             public void onSaved() {
-                taskListAdapter.setSaved(task);
+                taskListAdapter.postSetSaved(task, true);
             }
 
             @Override

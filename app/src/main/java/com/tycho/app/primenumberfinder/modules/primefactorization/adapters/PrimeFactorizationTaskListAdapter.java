@@ -42,7 +42,7 @@ public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<P
     protected void doOnBindViewHolder(PrimeFactorizationTaskListAdapter.Dummy holder, int position) {
 
         //Get the current task
-        final PrimeFactorizationTask task = (PrimeFactorizationTask) tasks.get(holder.getAdapterPosition());
+        final PrimeFactorizationTask task = (PrimeFactorizationTask) getTask(position);
 
         //Set title
         holder.title.setText(context.getString(R.string.prime_factorization_task_list_item_title, NUMBER_FORMAT.format(task.getNumber())));
@@ -89,16 +89,11 @@ public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<P
         }
 
         //Show saved
-        if (holder.isSaved()){
+        if (isSaved(task)){
             holder.saveButton.setVisibility(View.GONE);
             holder.progress.setVisibility(View.VISIBLE);
-            holder.progress.setText("Saved");
+            holder.progress.setText(context.getString(R.string.saved));
         }
-    }
-
-    @Override
-    public int getItemCount() {
-        return tasks.size();
     }
 
     @Override

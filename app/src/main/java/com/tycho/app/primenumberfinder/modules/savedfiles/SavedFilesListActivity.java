@@ -92,9 +92,7 @@ public class SavedFilesListActivity extends AbstractActivity {
         //Set the actionbar to a custom toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Set up subtitle
         subTitleTextView = findViewById(R.id.subtitle);

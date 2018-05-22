@@ -163,5 +163,6 @@
     <string name="general_error">An error occurred!</string>
     <string name="loading">Loading&#8230;</string>
     <string name="hex">0x%1$s</string>
+    <string name="saved">Saved</string>
 
 </resources>

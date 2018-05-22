@@ -48,7 +48,7 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
     protected void doOnBindViewHolder(FindPrimesTaskListAdapter.Dummy holder, int position) {
 
         //Get the current task
-        final Task task = tasks.get(holder.getAdapterPosition());
+        final Task task = getTask(position);
 
         //Set title
         if (task instanceof FindPrimesTask) {
@@ -84,9 +84,10 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
 
     @Override
     protected void onUpdate(AbstractTaskListAdapter.ViewHolder holder) {
+        final Task task = getTask(holder.getAdapterPosition());
+
         //Set progress
         if (holder.getAdapterPosition() != -1){
-            final Task task = tasks.get(holder.getAdapterPosition());
             if (task.getState() == Task.State.STOPPED || task instanceof FindPrimesTask && ((FindPrimesTask) task).getEndValue() == FindPrimesTask.INFINITY){
                 holder.progress.setVisibility(View.GONE);
             }else if (task.getState() != Task.State.STOPPED){
@@ -96,16 +97,11 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
         }
 
         //Show saved
-        if (holder.isSaved()){
+        if (isSaved(task)){
             holder.saveButton.setVisibility(View.GONE);
             holder.progress.setVisibility(View.VISIBLE);
-            holder.progress.setText("Saved");
+            holder.progress.setText(context.getString(R.string.saved));
         }
-    }
-
-    @Override
-    public int getItemCount() {
-        return tasks.size();
     }
 
     @Override
@@ -116,6 +112,14 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
     class Dummy extends AbstractTaskListAdapter.ViewHolder{
         Dummy(View itemView){
             super(itemView);
+        }
+
+        @Override
+        protected void onPausePressed() {
+            final Task task = getTask(getAdapterPosition());
+            if (task instanceof FindPrimesTask && ((FindPrimesTask) task).getEndValue() == FindPrimesTask.INFINITY){
+                setSaved(task, false);
+            }
         }
     }
 }
