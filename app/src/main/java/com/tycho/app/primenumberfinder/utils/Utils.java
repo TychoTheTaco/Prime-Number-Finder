@@ -14,8 +14,12 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.tycho.app.primenumberfinder.ProgressDialog;
+import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.Savable;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -29,6 +33,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import easytasks.Task;
 
 /**
  * This class contains lots of random utility methods.

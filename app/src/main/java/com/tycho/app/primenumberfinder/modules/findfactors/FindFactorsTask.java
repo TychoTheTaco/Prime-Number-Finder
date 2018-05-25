@@ -49,8 +49,6 @@ public class FindFactorsTask extends Task implements Savable{
 
     private SearchOptions searchOptions;
 
-    private final CopyOnWriteArrayList<SavableCallbacks> savableCallbacks = new CopyOnWriteArrayList<>();
-
     private long i;
 
     final int sqrtMax;
@@ -174,33 +172,7 @@ public class FindFactorsTask extends Task implements Savable{
     }
 
     @Override
-    public void save() {
-        if (FileManager.getInstance().saveFactors(getFactors(), getNumber())){
-            sendOnSaved();
-        }else{
-            sendOnError();
-        }
-    }
-
-    public void addSavableCallbacks(final SavableCallbacks callbacks){
-        if (!savableCallbacks.contains(callbacks)){
-            savableCallbacks.add(callbacks);
-        }
-    }
-
-    public void removeSavableCallbacks(final SavableCallbacks callbacks){
-        savableCallbacks.remove(callbacks);
-    }
-
-    private void sendOnSaved(){
-        for (SavableCallbacks callbacks : savableCallbacks){
-            callbacks.onSaved();
-        }
-    }
-
-    private void sendOnError(){
-        for (SavableCallbacks callbacks : savableCallbacks){
-            callbacks.onError();
-        }
+    public boolean save() {
+        return FileManager.getInstance().saveFactors(getFactors(), getNumber());
     }
 }

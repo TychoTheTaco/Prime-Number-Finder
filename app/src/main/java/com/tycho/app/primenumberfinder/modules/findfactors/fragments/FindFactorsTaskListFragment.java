@@ -70,7 +70,7 @@ public class FindFactorsTaskListFragment extends Fragment{
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.find_factors_task_list_fragment, container, false);
+        final View rootView = inflater.inflate(R.layout.task_list_fragment, container, false);
 
         //Set up the task list
         recyclerView = rootView.findViewById(R.id.task_list);
@@ -133,7 +133,7 @@ public class FindFactorsTaskListFragment extends Fragment{
     }
 
     public void addTask(final FindFactorsTask task) {
-        task.addSavableCallbacks(new Savable.SavableCallbacks() {
+       /* task.addSavableCallbacks(new Savable.SavableCallbacks() {
             @Override
             public void onSaved() {
                 taskListAdapter.postSetSaved(task, true);
@@ -143,7 +143,7 @@ public class FindFactorsTaskListFragment extends Fragment{
             public void onError() {
 
             }
-        });
+        });*/
         taskListAdapter.addTask(task);
         update();
     }

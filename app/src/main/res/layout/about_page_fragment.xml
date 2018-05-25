@@ -10,34 +10,31 @@
         android:clipChildren="false"
         android:clipToPadding="false"
         android:orientation="vertical"
-        android:paddingBottom="8dp"
-        android:paddingTop="8dp">
+        android:padding="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
             android:background="@drawable/round_rectangle_white"
-            android:elevation="2dp"
+            android:elevation="1dp"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingEnd="8dp"
-                android:paddingStart="8dp"
-                android:paddingTop="8dp"
+                android:paddingStart="16dp"
+                android:paddingTop="16dp"
                 android:text="@string/app_name"
                 android:textColor="@color/primary_text"
-                android:textSize="18sp" />
+                android:textSize="21sp" />
 
             <TextView
                 android:id="@+id/app_version"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingEnd="8dp"
-                android:paddingStart="8dp"
+                android:paddingStart="16dp"
                 android:text="@string/app_version_name"
                 android:textSize="12sp" />
 
@@ -46,8 +43,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:paddingEnd="8dp"
-                android:paddingStart="8dp"
-                android:text="Developed by Tycho Bellers."
+                android:paddingStart="16dp"
+                android:text="@string/developed_by_description"
                 android:textColor="@color/primary_text"
                 android:textSize="14sp" />
 
@@ -56,28 +53,26 @@
                 style="?borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="Contact Developer" />
+                android:padding="16dp"
+                android:text="@string/contact_developer" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:background="@drawable/round_rectangle_white"
-            android:elevation="2dp"
+            android:elevation="1dp"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingEnd="8dp"
-                android:paddingStart="8dp"
-                android:paddingTop="8dp"
-                android:text="Changelog"
+                android:paddingStart="16dp"
+                android:paddingTop="16dp"
+                android:text="@string/changelog_title"
                 android:textColor="@color/primary_text"
                 android:textSize="18sp" />
 
@@ -86,7 +81,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingEnd="8dp"
-                android:paddingStart="8dp"
+                android:paddingStart="16dp"
                 android:textColor="@color/accent"
                 android:textSize="12sp" />
 
@@ -96,7 +91,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:paddingEnd="8dp"
-                android:paddingStart="8dp"
+                android:paddingStart="16dp"
                 android:textColor="@color/primary_text"
                 android:textSize="14sp" />
 
@@ -105,28 +100,26 @@
                 style="?borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="View Older Versions" />
+                android:padding="16dp"
+                android:text="@string/view_old_versions" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:background="@drawable/round_rectangle_white"
-            android:elevation="2dp"
+            android:elevation="1dp"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingEnd="8dp"
-                android:paddingStart="8dp"
-                android:paddingTop="8dp"
-                android:text="Credits"
+                android:paddingStart="16dp"
+                android:paddingTop="16dp"
+                android:text="@string/credits_title"
                 android:textColor="@color/primary_text"
                 android:textSize="18sp" />
 
@@ -135,8 +128,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:padding="8dp"
-                android:text="@string/about_page_icon_credits"
+                android:padding="16dp"
+                android:text="@string/credits_description"
                 android:textColor="@color/primary_text"
                 android:textSize="14sp" />
         </LinearLayout>

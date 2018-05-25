@@ -12,6 +12,7 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.text.style.SuperscriptSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -90,33 +91,26 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         progressDialog.setTitle("Saving...");
         progressDialog.show();
 
-        task.addSavableCallbacks(new Savable.SavableCallbacks() {
-            @Override
-            public void onSaved() {
-                progressDialog.dismiss();
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(context, getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-
-            @Override
-            public void onError() {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(context, "Error saving file!", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
-
         new Thread(new Runnable() {
             @Override
             public void run() {
-                task.save();
+                if (task.save()) {
+                    progressDialog.dismiss();
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d(TAG, "Posted context: " + getContext() + " " + getActivity());
+                            Toast.makeText(context.getApplicationContext(), context.getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context.getApplicationContext(), context.getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
         }).start();
     }
