@@ -66,8 +66,6 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
 
     private SearchOptions searchOptions;
 
-    private final CopyOnWriteArrayList<SavableCallbacks> savableCallbacks = new CopyOnWriteArrayList<>();
-
     /**
      * Create a new {@linkplain FindPrimesTask}.
      *
@@ -780,35 +778,13 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
     }
 
     @Override
-    public void save() {
+    public boolean save() {
         try {
             FileManager.copy(saveToFile(), new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getStartValue() + " to " + (getEndValue() == FindPrimesTask.INFINITY ? getCurrentValue() : getEndValue()) + EXTENSION));
-            sendOnSaved();
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
-            sendOnError();
         }
-    }
-
-    public void addSavableCallbacks(final SavableCallbacks callbacks){
-        if (!savableCallbacks.contains(callbacks)){
-            savableCallbacks.add(callbacks);
-        }
-    }
-
-    public void removeSavableCallbacks(final SavableCallbacks callbacks){
-        savableCallbacks.remove(callbacks);
-    }
-
-    private void sendOnSaved(){
-        for (SavableCallbacks callbacks : savableCallbacks){
-            callbacks.onSaved();
-        }
-    }
-
-    private void sendOnError(){
-        for (SavableCallbacks callbacks : savableCallbacks){
-            callbacks.onError();
-        }
+        return false;
     }
 }

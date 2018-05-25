@@ -74,6 +74,13 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         private long finalPrimesPerSecond;
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Log.e(TAG, "onAttach(): " + context);
+        //TODO: This is being called twice and that is a problem!
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -165,6 +172,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.w(TAG, "Save clicked: " + getContext());
                 saveTask(getTask(), getActivity());
             }
         });
@@ -179,33 +187,26 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         progressDialog.setTitle("Saving...");
         progressDialog.show();
 
-        task.addSavableCallbacks(new Savable.SavableCallbacks() {
-            @Override
-            public void onSaved() {
-                progressDialog.dismiss();
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(context, getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-
-            @Override
-            public void onError() {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(context, "Error saving file!", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
-
         new Thread(new Runnable() {
             @Override
             public void run() {
-                task.save();
+                if (task.save()) {
+                    progressDialog.dismiss();
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d(TAG, "Posted context: " + getContext() + " " + getActivity());
+                            Toast.makeText(context.getApplicationContext(), context.getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context.getApplicationContext(), context.getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
         }).start();
     }

@@ -43,8 +43,6 @@ public class PrimeFactorizationTask extends Task implements Savable{
 
     final FindFactorsTask findFactorsTask;
 
-    private final CopyOnWriteArrayList<SavableCallbacks> savableCallbacks = new CopyOnWriteArrayList<>();
-
     public PrimeFactorizationTask(final SearchOptions searchOptions){
         this.number = searchOptions.getNumber();
         this.searchOptions = searchOptions;
@@ -253,33 +251,7 @@ public class PrimeFactorizationTask extends Task implements Savable{
     }
 
     @Override
-    public void save() {
-        if (FileManager.getInstance().saveTree(getFactorTree())){
-            sendOnSaved();
-        }else{
-            sendOnError();
-        }
-    }
-
-    public void addSavableCallbacks(final SavableCallbacks callbacks){
-        if (!savableCallbacks.contains(callbacks)){
-            savableCallbacks.add(callbacks);
-        }
-    }
-
-    public void removeSavableCallbacks(final SavableCallbacks callbacks){
-        savableCallbacks.remove(callbacks);
-    }
-
-    private void sendOnSaved(){
-        for (SavableCallbacks callbacks : savableCallbacks){
-            callbacks.onSaved();
-        }
-    }
-
-    private void sendOnError(){
-        for (SavableCallbacks callbacks : savableCallbacks){
-            callbacks.onError();
-        }
+    public boolean save() {
+       return FileManager.getInstance().saveTree(getFactorTree());
     }
 }

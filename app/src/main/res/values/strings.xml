@@ -97,8 +97,13 @@
     <string name="scroll_to_bottom">Scroll to bottom</string>
 
     <!-- About page -->
-    <string name="about_description">FindPrime is an application that can be used to find prime numbers and factors of any number. Prime numbers and factors can be saved to a text file for later use.\n\nThis application was created by Tycho Bellers.</string>
-    <string name="about_page_icon_credits">Application icons by&#160;<a href="https://material.io/icons/">Material Icons</a> and&#160;<a href="https://icons8.com/">Icons8</a>.</string>
+    <string name="developed_by_description">This application was developed by Tycho Bellers.</string>
+    <string name="contact_developer">Contact Developer</string>
+    <string name="changelog_title">Changelog</string>
+    <string name="new_in_version">New in version %1$s</string>
+    <string name="view_old_versions">View Older Versions</string>
+    <string name="credits_title">Credits</string>
+    <string name="credits_description">Application icons by&#160;<a href="https://material.io/icons/">Material Icons</a> and&#160;<a href="https://icons8.com/">Icons8</a>.</string>
 
     <!--  -->
     <string name="find_primes_search_method_label">Search Method</string>

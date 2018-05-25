@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +20,9 @@ import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesCar
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class SavedFilesFragment extends Fragment {
 
@@ -32,16 +35,15 @@ public class SavedFilesFragment extends Fragment {
 
     private SavedFilesCardAdapter cardAdapter;
 
-    private SavedFilesCard[] cards;
+    private final List<SavedFilesCard> cards = new ArrayList<>();
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        cards = new SavedFilesCard[]{
-                new SavedFilesCard(context, "primeNumbers", "Prime Numbers", R.color.purple, FileManager.getInstance().getSavedPrimesDirectory()),
-                new SavedFilesCard(context, "factors", "Factors", R.color.orange, FileManager.getInstance().getSavedFactorsDirectory()),
-                new SavedFilesCard(context, "factorTree", "Factor Trees", R.color.green, FileManager.getInstance().getSavedTreesDirectory())
-        };
+        cards.clear();
+        cards.add(new SavedFilesCard(context, "primeNumbers", "Prime Numbers", R.color.purple, FileManager.getInstance().getSavedPrimesDirectory()));
+        cards.add(new SavedFilesCard(context, "factors", "Factors", R.color.orange, FileManager.getInstance().getSavedFactorsDirectory()));
+        cards.add(new SavedFilesCard(context, "factorTree", "Factor Trees", R.color.green, FileManager.getInstance().getSavedTreesDirectory()));
         cardAdapter = new SavedFilesCardAdapter(context);
     }
 
@@ -81,19 +83,15 @@ public class SavedFilesFragment extends Fragment {
 
     private void update(){
 
-        //Remove all cards
-        final Iterator<SavedFilesCard> iterator = cardAdapter.getCards().iterator();
-        while (iterator.hasNext()){
-            iterator.next().getFilesListAdapter().refresh();
-            iterator.remove();
-        }
-
         for (SavedFilesCard card : cards){
             card.getFilesListAdapter().refresh();
             if (!cardAdapter.getCards().contains(card) && card.getFilesListAdapter().getItemCount() > 0){
                 cardAdapter.getCards().add(card);
+            }else if (card.getFilesListAdapter().getItemCount() == 0){
+                cardAdapter.getCards().remove(card);
             }
         }
+
         cardAdapter.notifyDataSetChanged();
 
         textViewNoFiles.setVisibility(cardAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);

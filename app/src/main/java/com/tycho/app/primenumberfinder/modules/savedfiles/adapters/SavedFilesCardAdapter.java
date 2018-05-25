@@ -2,6 +2,7 @@ package com.tycho.app.primenumberfinder.modules.savedfiles.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,7 +26,7 @@ import java.util.List;
  *         Date Created: 11/3/2016
  */
 
-public class SavedFilesCardAdapter extends RecyclerView.Adapter<SavedFilesCardAdapter.ViewHolderSavedFilesCard>{
+public class SavedFilesCardAdapter extends RecyclerView.Adapter<SavedFilesCardAdapter.ViewHolder>{
 
     /**
      * List of cards in the recycler view
@@ -38,21 +39,19 @@ public class SavedFilesCardAdapter extends RecyclerView.Adapter<SavedFilesCardAd
         this.context = context;
     }
 
+    @NonNull
     @Override
-    public ViewHolderSavedFilesCard onCreateViewHolder(ViewGroup parent, int viewType){
-        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view_saved_files, parent, false);
-        return new SavedFilesCardAdapter.ViewHolderSavedFilesCard(view);
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view_saved_files, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolderSavedFilesCard holder, int position){
-
-        //Get the card at this position
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final SavedFilesCard card = cards.get(position);
 
         holder.recyclerView.setAdapter(card.getFilesListAdapter());
         card.getFilesListAdapter().refresh();
-       // holder.listView.setAdapter(card.getAdapterSavedFilesTest());
+        // holder.listView.setAdapter(card.getAdapterSavedFilesTest());
 
         final ViewGroup.LayoutParams layoutParams = holder.recyclerView.getLayoutParams();
         //final ViewGroup.LayoutParams layoutParams = holder.listView.getLayoutParams();
@@ -78,7 +77,7 @@ public class SavedFilesCardAdapter extends RecyclerView.Adapter<SavedFilesCardAd
         return cards;
     }
 
-    class ViewHolderSavedFilesCard extends RecyclerView.ViewHolder{
+    class ViewHolder extends RecyclerView.ViewHolder{
 
         private final View headerLayout;
         private final TextView title;
@@ -87,7 +86,7 @@ public class SavedFilesCardAdapter extends RecyclerView.Adapter<SavedFilesCardAd
         private final View bottomBar;
         private final Button viewAllButton;
 
-        public ViewHolderSavedFilesCard(final View itemView){
+        public ViewHolder(final View itemView){
             super(itemView);
 
             headerLayout = itemView.findViewById(R.id.layout_title);
