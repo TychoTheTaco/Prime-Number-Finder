@@ -22,7 +22,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingEnd="8dp"
+                android:paddingEnd="16dp"
                 android:paddingStart="16dp"
                 android:paddingTop="16dp"
                 android:text="@string/app_name"
@@ -33,7 +33,7 @@
                 android:id="@+id/app_version"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingEnd="8dp"
+                android:paddingEnd="16dp"
                 android:paddingStart="16dp"
                 android:text="@string/app_version_name"
                 android:textSize="12sp" />
@@ -42,7 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:paddingEnd="8dp"
+                android:paddingEnd="16dp"
                 android:paddingStart="16dp"
                 android:text="@string/developed_by_description"
                 android:textColor="@color/primary_text"
@@ -69,7 +69,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingEnd="8dp"
+                android:paddingEnd="16dp"
                 android:paddingStart="16dp"
                 android:paddingTop="16dp"
                 android:text="@string/changelog_title"
@@ -80,7 +80,7 @@
                 android:id="@+id/new_version_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingEnd="8dp"
+                android:paddingEnd="16dp"
                 android:paddingStart="16dp"
                 android:textColor="@color/accent"
                 android:textSize="12sp" />
@@ -90,7 +90,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:paddingEnd="8dp"
+                android:paddingEnd="16dp"
                 android:paddingStart="16dp"
                 android:textColor="@color/primary_text"
                 android:textSize="14sp" />
@@ -116,7 +116,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingEnd="8dp"
+                android:paddingEnd="16dp"
                 android:paddingStart="16dp"
                 android:paddingTop="16dp"
                 android:text="@string/credits_title"

@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import easytasks.MultithreadedTask;
@@ -109,9 +108,41 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
             if (s % 2 == 0) {
                 s -= 1;
             }
+
+            //If 's' is divisible by 'threadCount', increment it by 2 to avoid a thread with all non-primes
+            /*Log.e(TAG, "s: " + s + " " + (s % threadCount));
+            if (threadCount != 1 && s % threadCount == 0){
+                s += 2;
+            }*/
+
             final BruteForceTask task = new BruteForceTask(s, endValue, threadCount * 2);
             task.bufferSize = searchOptions.bufferSize / threadCount;
             addTask(task);
+        }
+
+        /*
+        1 7  13
+        3 9  15
+        5 11 17
+
+        if first number is multiple of threadcount, redo it
+
+        29  35  41
+        31  37  43
+        33  39  45
+
+        29  37
+        31  39
+        35  41
+         */
+
+        final long[] startValues = new long[threadCount];
+        for (int i = 0; i < threadCount; i++){
+            long s = startValue + (2 * i + 1);
+            if (s % 2 == 0) {
+                s -= 1;
+            }
+            startValues[i] = s;
         }
 
         /*final long partition = (endValue - startValue) / threadCount;
