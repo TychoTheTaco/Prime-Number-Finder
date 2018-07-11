@@ -15,6 +15,7 @@
 
     <!-- Action bar items -->
     <string name="action_bar_item_title_delete">Delete</string>
+    <string name="action_bar_item_title_sort">Sort</string>
     <string name="action_bar_item_title_export">Export</string>
     <string name="find_nth_number_title">Find Nth number</string>
 
@@ -82,8 +83,8 @@
     <!-- Saved files page -->
     <string name="no_saved_files_message">You have no saved files.</string>
     <plurals name="saved_files_count">
-        <item quantity="one">You have %1$s saved file.</item>
-        <item quantity="other">You have %1$s saved files.</item>
+        <item quantity="one">You have %1$s saved file using %2$s of storage.</item>
+        <item quantity="other">You have %1$s saved files using %2$s of storage.</item>
     </plurals>
     <plurals name="selected_item_count">
         <item quantity="one">Selected %1$s file.</item>

@@ -116,14 +116,17 @@ public class SavedFilesListActivity extends AbstractActivity {
         switch (FileManager.getFileType(directory)) {
             case PRIMES:
                 setTitle("Prime Numbers");
+                toolbar.setPopupTheme(R.style.FindPrimes_PopupOverlay);
                 break;
 
             case FACTORS:
                 setTitle("Factors");
+                toolbar.setPopupTheme(R.style.FindFactors_PopupOverlay);
                 break;
 
             case TREE:
                 setTitle("Factor Trees");
+                toolbar.setPopupTheme(R.style.PrimeFactorization_PopupOverlay);
                 break;
         }
 
@@ -146,6 +149,22 @@ public class SavedFilesListActivity extends AbstractActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
+            case R.id.sort_date:
+                adapterSavedFilesList.sortDate(false);
+                break;
+
+            case R.id.sort_size:
+                adapterSavedFilesList.sortSize(false);
+                break;
+
+            case R.id.sort_search_range:
+                adapterSavedFilesList.sortSearchRange(false);
+                break;
+
+            case R.id.sort_number:
+                adapterSavedFilesList.sortNumber(false);
+                break;
+
             case R.id.delete:
 
                 //Show warning dialog
@@ -205,7 +224,7 @@ public class SavedFilesListActivity extends AbstractActivity {
     }
 
     private void updateSubtitle() {
-        String subtitle = getResources().getQuantityString(R.plurals.saved_files_count, adapterSavedFilesList.getItemCount(), NUMBER_FORMAT.format(adapterSavedFilesList.getItemCount()));
+        String subtitle = getResources().getQuantityString(R.plurals.saved_files_count, adapterSavedFilesList.getItemCount(), NUMBER_FORMAT.format(adapterSavedFilesList.getItemCount()), Utils.humanReadableByteCount(adapterSavedFilesList.getTotalStorage(), true));
         if (adapterSavedFilesList.isSelectionMode()) {
             subtitle += ' ' + getResources().getQuantityString(R.plurals.selected_item_count, adapterSavedFilesList.getSelectedItemCount(), NUMBER_FORMAT.format(adapterSavedFilesList.getSelectedItemCount()));
         }

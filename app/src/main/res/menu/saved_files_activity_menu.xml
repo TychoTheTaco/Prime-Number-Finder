@@ -2,8 +2,37 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/delete"
+        android:id="@+id/sort"
         android:orderInCategory="0"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_list_white_24dp"
+        android:title="@string/action_bar_item_title_sort">
+        <menu>
+            <item
+                android:id="@+id/sort_date"
+                android:icon="@drawable/ic_delete_white_24dp"
+                android:title="Date"/>
+
+            <item
+                android:id="@+id/sort_size"
+                android:icon="@drawable/ic_delete_white_24dp"
+                android:title="Size"/>
+
+            <item
+                android:id="@+id/sort_search_range"
+                android:icon="@drawable/ic_delete_white_24dp"
+                android:title="Search Range"/>
+
+            <item
+                android:id="@+id/sort_number"
+                android:icon="@drawable/ic_delete_white_24dp"
+                android:title="Factor"/>
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/delete"
+        android:orderInCategory="1"
         app:showAsAction="ifRoom"
         android:visible="false"
         android:icon="@drawable/ic_delete_white_24dp"

@@ -23,9 +23,13 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Tycho Bellers
@@ -110,11 +114,69 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
         holder.itemView.setSelected(holder.isSelected());
     }
 
+    public long getTotalStorage(){
+        long size = 0;
+        for (File file : files){
+            size += file.length();
+        }
+        return size;
+    }
+
     public void refresh(){
         files.clear();
         files.addAll(Arrays.asList(directory.listFiles()));
         Utils.sortByDate(files, false);
         notifyDataSetChanged();
+    }
+
+    public void sortDate(final boolean ascending){
+        Utils.sortByDate(files, ascending);
+        notifyDataSetChanged();
+    }
+
+    public void sortSize(final boolean ascending){
+        Utils.sortBySize(files, ascending);
+        notifyDataSetChanged();
+    }
+
+    public void sortSearchRange(final boolean ascending){
+        Collections.sort(files, new Comparator<File>() {
+            @Override
+            public int compare(File file0, File file1) {
+                return (ascending ? 1 : -1) * Long.compare(getRangeFromFileName(file0)[0], getRangeFromFileName(file1)[0]);
+            }
+        });
+        notifyDataSetChanged();
+    }
+
+    public void sortNumber(final boolean ascending){
+        Collections.sort(files, new Comparator<File>() {
+            @Override
+            public int compare(File file0, File file1) {
+                return (ascending ? 1 : -1) * Long.compare(getNumberFromFileName(file0), getNumberFromFileName(file1));
+            }
+        });
+        notifyDataSetChanged();
+    }
+
+    private long[] getRangeFromFileName(final File file){
+        final long[] range = new long[2];
+
+        final Pattern pattern = Pattern.compile("\\d+");
+        final Matcher matcher = pattern.matcher(file.getName());
+        for (int i = 0; i < range.length; i++){
+            matcher.find();
+            range[i] = Long.valueOf(matcher.group());
+        }
+
+        return range;
+    }
+
+    private long getNumberFromFileName(final File file){
+        final Pattern pattern = Pattern.compile("\\d+");
+        final Matcher matcher = pattern.matcher(file.getName());
+        matcher.find();
+        return Long.valueOf(matcher.group());
     }
 
     public List<File> getFiles() {

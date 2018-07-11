@@ -197,11 +197,16 @@ public final class Utils {
         Collections.sort(files, new Comparator<File>() {
             @Override
             public int compare(File file0, File file1) {
-                if (ascending) {
-                    return Long.valueOf(file0.lastModified()).compareTo(file1.lastModified());
-                } else {
-                    return Long.valueOf(file1.lastModified()).compareTo(file0.lastModified());
-                }
+                return (ascending ? 1 : -1) * Long.compare(file0.lastModified(), file1.lastModified());
+            }
+        });
+    }
+
+    public static void sortBySize(final List<File> files, final boolean ascending) {
+        Collections.sort(files, new Comparator<File>() {
+            @Override
+            public int compare(File file0, File file1) {
+                return (ascending ? 1 : -1) * Long.compare(file0.length(), file1.length());
             }
         });
     }
