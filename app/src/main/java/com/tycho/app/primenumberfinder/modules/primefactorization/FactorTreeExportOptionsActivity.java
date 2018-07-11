@@ -294,7 +294,7 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                 });
                 branchWidthSeekBar = findViewById(R.id.branch_width_seekbar);
                 branchWidthSeekBar.setRange(1, 5);
-                branchWidthSeekBar.setSteps(1);
+                branchWidthSeekBar.setSteps(10);
                 branchWidthSeekBar.setValue(exportOptions.branchWidth);
                 branchWidthSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangedAdapter() {
                     @Override

@@ -280,40 +280,21 @@ public final class Utils {
             return BigDecimal.ZERO;
         }
 
-        Pattern pattern;
-        Matcher matcher;
-
-        //Find the last non-digit character. Assume this is the decimal point
-        pattern = Pattern.compile("[^\\d]");
-        matcher = pattern.matcher(text);
-        int matchIndex = -1;
-        while (matcher.find()) {
-            matchIndex = matcher.start();
+        //Extract only digits and the decimal separator from the input
+        final Pattern pattern = Pattern.compile("\\d+(" + Pattern.quote(String.valueOf(decimalSeparator)) + ")?");
+        final Matcher matcher = pattern.matcher(text);
+        final StringBuilder stringBuilder = new StringBuilder();
+        while (matcher.find()){
+            stringBuilder.append(matcher.group());
         }
 
-        final StringBuilder numberString = new StringBuilder();
-        if (matchIndex != -1) {
-            final int posFromEnd = text.length() - 1 - matchIndex;
-            Log.d(TAG, "Last Index: " + posFromEnd);
+        Log.d(TAG, "Built: " + stringBuilder);
 
-            //Extract all digits from the input
-            pattern = Pattern.compile("\\d+");
-            matcher = pattern.matcher(text);
-            while (matcher.find()) {
-                numberString.append(matcher.group());
-            }
-
-            //Put the decimal point back
-            numberString.insert(numberString.length() - posFromEnd, '.');
-            Log.w(TAG, "After insert: " + numberString);
-        } else {
-            numberString.append(text);
-        }
-
-        DecimalFormat decimalFormat = (DecimalFormat) DecimalFormat.getInstance(Locale.ENGLISH);
+        //TODO: Possibly need to use the correct locale
+        final DecimalFormat decimalFormat = (DecimalFormat) DecimalFormat.getInstance(Locale.ENGLISH);
         decimalFormat.setParseBigDecimal(true);
 
-        return new BigDecimal(numberString.toString());
+        return new BigDecimal(stringBuilder.toString());
     }
 
     public static int getAccentColor(final Context context) {
