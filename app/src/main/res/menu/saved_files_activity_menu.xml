@@ -5,17 +5,17 @@
         android:id="@+id/sort"
         android:orderInCategory="0"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_list_white_24dp"
+        android:icon="@drawable/round_sort_24"
         android:title="@string/action_bar_item_title_sort">
         <menu>
             <item
                 android:id="@+id/sort_date"
-                android:icon="@drawable/ic_delete_white_24dp"
+                android:icon="@drawable/round_date_range_24"
                 android:title="Date"/>
 
             <item
                 android:id="@+id/sort_size"
-                android:icon="@drawable/ic_delete_white_24dp"
+                android:icon="@drawable/round_sort_24"
                 android:title="Size"/>
 
             <item

@@ -84,13 +84,6 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        //Initialize analytics
-        if (PreferenceManager.getBoolean(PreferenceManager.Preference.ALLOW_ANALYTICS)) {
-            Fabric.with(this, new Crashlytics());
-        } else {
-            Fabric.with(this, new Crashlytics.Builder().core(new CrashlyticsCore.Builder().disabled(true).build()).build());
-        }
-
         //Set the actionbar to a custom toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
