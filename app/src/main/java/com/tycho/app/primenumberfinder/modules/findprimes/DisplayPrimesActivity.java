@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.activities.DisplayContentActivity;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.ExportOptionsDialog;
 import com.tycho.app.primenumberfinder.modules.savedfiles.FindNthNumberDialog;
@@ -38,7 +39,7 @@ import java.util.List;
  * Date Created: 11/5/2016
  */
 
-public class DisplayPrimesActivity extends AbstractActivity {
+public class DisplayPrimesActivity extends DisplayContentActivity {
 
     /**
      * Tag used for logging and debugging.
@@ -315,6 +316,11 @@ public class DisplayPrimesActivity extends AbstractActivity {
         }
     }
 
+    @Override
+    protected void load(File file) {
+
+    }
+
     private void loadFile(final File file) {
         //Load file in another thread
         new Thread(new Runnable() {
@@ -344,18 +350,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
 
                         //If there are no numbers, there was probably an error
                         if (numbers.size() == 0 && totalNumbers > 0){
-                            final AlertDialog alertDialog = new AlertDialog.Builder(DisplayPrimesActivity.this).create();
-                            alertDialog.setTitle("Error!");
-                            alertDialog.setMessage("There was an error reading this file.");
-                            alertDialog.setCancelable(false);
-                            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Okay",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            alertDialog.dismiss();
-                                            finish();
-                                        }
-                                    });
-                            alertDialog.show();
+                            showLoadingError();
                         }else {
                             //Set header text
                             headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.find_primes_subtitle_result, totalNumbers), new String[]{

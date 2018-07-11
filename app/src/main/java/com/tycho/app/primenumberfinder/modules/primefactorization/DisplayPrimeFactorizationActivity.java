@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.activities.DisplayContentActivity;
 import com.tycho.app.primenumberfinder.ui.TreeView;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
@@ -43,7 +44,7 @@ import simpletrees.Tree;
  * Created by tycho on 11/12/2017.
  */
 
-public class DisplayPrimeFactorizationActivity extends AbstractActivity {
+public class DisplayPrimeFactorizationActivity extends DisplayContentActivity {
 
     /**
      * Tag used for logging and debugging.
@@ -116,6 +117,11 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity {
 
     }
 
+    @Override
+    protected void load(File file) {
+
+    }
+
     private void loadFile(final File file) {
         //Load file in another thread
         new Thread(new Runnable() {
@@ -128,6 +134,12 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+
+                        if (factorTree == null){
+                            showLoadingError();
+                            return;
+                        }
+                        
                         treeView.setTree(factorTree.formatNumbers());
 
                         final Map<Long, Integer> map = new TreeMap<>();
