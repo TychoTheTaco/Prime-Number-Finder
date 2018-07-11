@@ -212,6 +212,8 @@ public class FindFactorsResultsFragment extends ResultsFragment{
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    updateUi();
+
                     //Title
                     title.setText(getString(R.string.status_searching));
                     progressBar.startAnimation(rotateAnimation);

@@ -59,9 +59,6 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
 
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
-    /**
-     * All views
-     */
     private ValidEditText editTextNumberToFactor;
 
     private final FindFactorsTask.SearchOptions searchOptions = new FindFactorsTask.SearchOptions(0);
@@ -308,9 +305,5 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
 
     private BigInteger getNumberToFactor() {
         return Utils.textToNumber(editTextNumberToFactor.getText().toString());
-    }
-
-    public void addActionViewListener(final ActionViewListener actionViewListener){
-        taskListFragment.addActionViewListener(actionViewListener);
     }
 }
