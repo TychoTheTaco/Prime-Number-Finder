@@ -66,7 +66,7 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
 
                     //Title
                     title.setText(getString(R.string.status_searching));
-                    progressBar.startAnimation(rotate);
+                    progressBar.startAnimation(rotateAnimation);
 
                     //Format subtitle
                     subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_subtitle_searching), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
