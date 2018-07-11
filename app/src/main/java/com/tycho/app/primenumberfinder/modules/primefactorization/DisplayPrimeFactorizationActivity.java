@@ -118,11 +118,7 @@ public class DisplayPrimeFactorizationActivity extends DisplayContentActivity {
     }
 
     @Override
-    protected void load(File file) {
-
-    }
-
-    private void loadFile(final File file) {
+    protected void loadFile(final File file) {
         //Load file in another thread
         new Thread(new Runnable() {
             @Override

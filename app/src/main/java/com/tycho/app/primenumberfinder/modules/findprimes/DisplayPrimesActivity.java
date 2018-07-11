@@ -46,8 +46,6 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
      */
     private static final String TAG = DisplayPrimesActivity.class.getSimpleName();
 
-    private File file;
-
     private TextView headerTextView;
 
     private RecyclerView recyclerView;
@@ -87,12 +85,7 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
         //Get the intent
         final Intent intent = getIntent();
         if (intent != null) {
-
-            //Get the file path from the extras
-            final String filePath = intent.getStringExtra("filePath");
-            if (filePath != null) {
-
-                file = new File(filePath);
+            if (file != null) {
 
                 //Set a custom title if there is one
                 if (intent.getBooleanExtra("title", true)) {
@@ -317,11 +310,7 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
     }
 
     @Override
-    protected void load(File file) {
-
-    }
-
-    private void loadFile(final File file) {
+    protected void loadFile(final File file) {
         //Load file in another thread
         new Thread(new Runnable() {
             @Override
@@ -359,21 +348,21 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
                                     range[1] == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(range[1]),
                             }, ContextCompat.getColor(getBaseContext(), R.color.purple_inverse)));
 
-                            //Set correct height based on the height of the header text view
-                            final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
-                            Utils.reLayoutChildren(collapsingToolbarLayout);
-                            final int defaultHeight = getSupportActionBar().getHeight();
-                            final int textHeight = headerTextView.getHeight();
-                            final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
-                            layoutParams.height = defaultHeight + textHeight;
-                            collapsingToolbarLayout.setLayoutParams(layoutParams);
+                            resizeCollapsingToolbar();
 
                             //Update adapter
                             primesAdapter.notifyItemRangeInserted(0, primesAdapter.getItemCount());
                             recyclerView.post(new Runnable() {
+
+                                /**
+                                 * Minimum number of extra adapter items before displaying the
+                                 * scroll to top and scroll to bottom buttons.
+                                 */
+                                private final int SCROLL_BUTTON_MIN_OVERFLOW = 20;
+
                                 @Override
                                 public void run() {
-                                    final int visibility = ((linearLayoutManager.findLastVisibleItemPosition() - linearLayoutManager.findFirstVisibleItemPosition()) == scrollListener.totalNumbers - 1) ? View.GONE : View.VISIBLE;
+                                    final int visibility = ((linearLayoutManager.findLastVisibleItemPosition() - linearLayoutManager.findFirstVisibleItemPosition()) >= scrollListener.totalNumbers - SCROLL_BUTTON_MIN_OVERFLOW) ? View.GONE : View.VISIBLE;
                                     scrollToTopFab.setVisibility(visibility);
                                     scrollToBottomFab.setVisibility(visibility);
                                     findButton.setVisible(enableSearch && visibility == View.VISIBLE);
