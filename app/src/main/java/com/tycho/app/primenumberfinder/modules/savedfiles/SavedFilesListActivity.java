@@ -2,14 +2,22 @@ package com.tycho.app.primenumberfinder.modules.savedfiles;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableStringBuilder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.PopupMenu;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.AbstractActivity;
@@ -36,6 +44,7 @@ public class SavedFilesListActivity extends AbstractActivity {
     private static final String TAG = SavedFilesListActivity.class.getSimpleName();
 
     private TextView subTitleTextView;
+    private TextView totalSizeTextView;
 
     SavedFilesListAdapter adapterSavedFilesList;
 
@@ -67,9 +76,12 @@ public class SavedFilesListActivity extends AbstractActivity {
         //Set up adapter
         adapterSavedFilesList = new SavedFilesListAdapter(this, directory);
         adapterSavedFilesList.addOnSelectionStateChangedListener(new SelectableAdapter.OnSelectionStateChangedListener() {
+
             @Override
             public void onStartSelection() {
+                getSupportActionBar().setHomeAsUpIndicator(R.drawable.round_clear_24);
                 menu.findItem(R.id.delete).setVisible(true);
+                menu.findItem(R.id.sort).setVisible(false);
             }
 
             @Override
@@ -84,7 +96,9 @@ public class SavedFilesListActivity extends AbstractActivity {
 
             @Override
             public void onStopSelection() {
+                getSupportActionBar().setHomeAsUpIndicator(0);
                 menu.findItem(R.id.delete).setVisible(false);
+                menu.findItem(R.id.sort).setVisible(true);
                 updateSubtitle();
             }
         });
@@ -96,6 +110,7 @@ public class SavedFilesListActivity extends AbstractActivity {
 
         //Set up subtitle
         subTitleTextView = findViewById(R.id.subtitle);
+        totalSizeTextView = findViewById(R.id.right_message);
         toolbar.post(new Runnable() {
             @Override
             public void run() {
@@ -104,12 +119,13 @@ public class SavedFilesListActivity extends AbstractActivity {
         });
 
         //Set up toolbar animation
+        final ViewGroup expandedLayout = findViewById(R.id.expanded_layout);
         ((AppBarLayout) findViewById(R.id.app_bar)).addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
 
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
                 final int height = appBarLayout.getTotalScrollRange();
-                subTitleTextView.setAlpha(1.0f - ((float) -verticalOffset) / height);
+                expandedLayout.setAlpha(1.0f - ((float) -verticalOffset) / height);
             }
         });
 
@@ -149,6 +165,12 @@ public class SavedFilesListActivity extends AbstractActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
+           /* case R.id.sort:
+                Log.e(TAG, "View: " + findViewById(R.id.sort));
+                final PopupWindow popupWindow = new PopupWindow(getLayoutInflater().inflate(R.layout.sort_dialog_menu, null), LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                popupWindow.showAsDropDown(findViewById(R.id.sort), (int) -Utils.dpToPx(this, 24), (int) -Utils.dpToPx(this, 32));
+                break;*/
+
             case R.id.sort_date:
                 adapterSavedFilesList.sortDate(false);
                 break;
@@ -166,7 +188,6 @@ public class SavedFilesListActivity extends AbstractActivity {
                 break;
 
             case R.id.delete:
-
                 //Show warning dialog
                 final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
                 alertDialog.setTitle("Warning");
@@ -224,18 +245,25 @@ public class SavedFilesListActivity extends AbstractActivity {
     }
 
     private void updateSubtitle() {
-        String subtitle = getResources().getQuantityString(R.plurals.saved_files_count, adapterSavedFilesList.getItemCount(), NUMBER_FORMAT.format(adapterSavedFilesList.getItemCount()), Utils.humanReadableByteCount(adapterSavedFilesList.getTotalStorage(), true));
         if (adapterSavedFilesList.isSelectionMode()) {
-            subtitle += ' ' + getResources().getQuantityString(R.plurals.selected_item_count, adapterSavedFilesList.getSelectedItemCount(), NUMBER_FORMAT.format(adapterSavedFilesList.getSelectedItemCount()));
+            subTitleTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.selected_item_count, adapterSavedFilesList.getItemCount()), new String[]{
+                    NUMBER_FORMAT.format(adapterSavedFilesList.getSelectedItemCount()),
+                    NUMBER_FORMAT.format(adapterSavedFilesList.getItemCount())
+            }, Color.WHITE));
+            totalSizeTextView.setText(Utils.humanReadableByteCount(adapterSavedFilesList.getSelectedSize(), true) + " / " + Utils.humanReadableByteCount(adapterSavedFilesList.getTotalStorage(), true));
+        } else {
+            subTitleTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.saved_files_count, adapterSavedFilesList.getItemCount()), new String[]{
+                    NUMBER_FORMAT.format(adapterSavedFilesList.getItemCount())
+            }, Color.WHITE));
+            totalSizeTextView.setText(Utils.humanReadableByteCount(adapterSavedFilesList.getTotalStorage(), true));
         }
-        subTitleTextView.setText(subtitle);
 
         //Set correct height based on the height of the header text view
         final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         Utils.reLayoutChildren(collapsingToolbarLayout);
         final int defaultHeight = getSupportActionBar().getHeight();
         final int textHeight = subTitleTextView.getHeight();
-        final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
+        final ViewGroup.LayoutParams layoutParams = (ViewGroup.LayoutParams) collapsingToolbarLayout.getLayoutParams();
         layoutParams.height = defaultHeight + textHeight;
         collapsingToolbarLayout.setLayoutParams(layoutParams);
     }

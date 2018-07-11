@@ -122,6 +122,14 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
         return size;
     }
 
+    public long getSelectedSize(){
+        long size = 0;
+        for (int i : getSelectedItemIndexes()){
+            size += files.get(i).length();
+        }
+        return size;
+    }
+
     public void refresh(){
         files.clear();
         files.addAll(Arrays.asList(directory.listFiles()));
