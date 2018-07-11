@@ -6,6 +6,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.utils.Utils;
@@ -97,13 +98,16 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
                 final Pattern pattern = Pattern.compile("[^\\d]$");
                 final Matcher matcher = pattern.matcher(editable);
                 if (matcher.find()) {
+                    Log.w(TAG, "Ended with decimal, not modifying.");
                     return;
                 }
 
                 final String formatted = DECIMAL_FORMAT.format(Utils.textToDecimal(getText().toString(), DECIMAL_FORMAT.getDecimalFormatSymbols().getDecimalSeparator()));
                 if (editable.length() > 0 && !editable.toString().equals(formatted)) {
+                    Log.w(TAG, "Modified: " + formatted);
                     setText(formatted, formatted.length() > 1);
                 } else if (!allowZeroInput && editable.toString().equals(DECIMAL_FORMAT.format(0))) {
+                    Log.w(TAG, "Text cleared");
                     getText().clear();
                 }
             } else {
