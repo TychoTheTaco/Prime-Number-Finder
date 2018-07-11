@@ -29,16 +29,12 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
     /**
      * {@linkplain NumberFormat} instance used to format numbers with commas.
      */
-    protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
+    protected final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
     /**
      * {@linkplain DecimalFormat} instance used to format numbers with a decimal point.
      */
-    protected static final DecimalFormat DECIMAL_FORMAT = (DecimalFormat) DecimalFormat.getInstance(Locale.getDefault());
-    static {
-        DECIMAL_FORMAT.setMaximumFractionDigits(1);
-        DECIMAL_FORMAT.setRoundingMode(RoundingMode.DOWN);
-    }
+    protected final DecimalFormat DECIMAL_FORMAT = (DecimalFormat) DecimalFormat.getInstance(Locale.getDefault());
 
     /**
      * If this is set to {@code true}, then this view will allow the user to enter the number '0'.
@@ -74,6 +70,9 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
         } finally {
             typedArray.recycle();
         }
+
+        DECIMAL_FORMAT.setMaximumFractionDigits(1);
+        DECIMAL_FORMAT.setRoundingMode(RoundingMode.DOWN);
 
         addTextChangedListener(textWatcher);
     }
@@ -118,7 +117,6 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
                     Log.w(TAG, "Modified: " + formatted);
                     setText(formatted, formatted.length() > 1);
                 } else if (!allowZeroInput && editable.toString().equals(DECIMAL_FORMAT.format(0))) {
-                    Log.w(TAG, "Text cleared");
                     getText().clear();
                 }
             } else {

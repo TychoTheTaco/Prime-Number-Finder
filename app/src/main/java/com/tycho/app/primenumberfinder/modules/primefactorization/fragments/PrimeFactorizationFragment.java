@@ -301,6 +301,7 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
 
         //Start the task
         task.startOnNewThread();
+        Utils.logTaskStarted(getContext(), task);
 
         //Post to a handler because "java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState"
         new Handler(Looper.getMainLooper()).post(new Runnable() {
