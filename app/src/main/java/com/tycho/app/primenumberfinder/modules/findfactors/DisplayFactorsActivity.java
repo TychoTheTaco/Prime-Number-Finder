@@ -20,7 +20,9 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.activities.DisplayContentActivity;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
+import com.tycho.app.primenumberfinder.modules.findprimes.DisplayPrimesActivity;
 import com.tycho.app.primenumberfinder.modules.savedfiles.ExportOptionsDialog;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
@@ -33,7 +35,7 @@ import java.util.List;
  * Date Created: 11/5/2016
  */
 
-public class DisplayFactorsActivity extends AbstractActivity {
+public class DisplayFactorsActivity extends DisplayContentActivity {
 
     /**
      * Tag used for logging and debugging.
@@ -181,6 +183,11 @@ public class DisplayFactorsActivity extends AbstractActivity {
         progressDialog.dismiss();
     }
 
+    @Override
+    protected void load(File file) {
+
+    }
+
     private void loadFile(final File file) {
         //Load file in another thread
         new Thread(new Runnable() {
@@ -195,23 +202,29 @@ public class DisplayFactorsActivity extends AbstractActivity {
                     @Override
                     public void run() {
 
-                        //Set header text
-                        headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.find_factors_subtitle_results, numbers.size()), new String[]{
-                                NUMBER_FORMAT.format(numbers.get(numbers.size() - 1)),
-                                NUMBER_FORMAT.format(numbers.size()),
-                        }, ContextCompat.getColor(getBaseContext(), R.color.orange_inverse)));
+                        //If there are no numbers, there was probably an error
+                        if (numbers.size() == 0 && file.length() > 0){
+                            showLoadingError();
+                        }else {
+                            //Set header text
+                            headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.find_factors_subtitle_results, numbers.size()), new String[]{
+                                    NUMBER_FORMAT.format(numbers.get(numbers.size() - 1)),
+                                    NUMBER_FORMAT.format(numbers.size()),
+                            }, ContextCompat.getColor(getBaseContext(), R.color.orange_inverse)));
 
-                        //Set correct height based on the height of the header text view
-                        final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
-                        Utils.reLayoutChildren(collapsingToolbarLayout);
-                        final int defaultHeight = getSupportActionBar().getHeight();
-                        final int textHeight = headerTextView.getHeight();
-                        final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
-                        layoutParams.height = defaultHeight + textHeight;
-                        collapsingToolbarLayout.setLayoutParams(layoutParams);
+                            //Set correct height based on the height of the header text view
+                            final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
+                            Utils.reLayoutChildren(collapsingToolbarLayout);
+                            final int defaultHeight = getSupportActionBar().getHeight();
+                            final int textHeight = headerTextView.getHeight();
+                            final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
+                            layoutParams.height = defaultHeight + textHeight;
+                            collapsingToolbarLayout.setLayoutParams(layoutParams);
 
-                        //Update adapter
-                        adapter.notifyItemRangeInserted(0, adapter.getItemCount());
+                            //Update adapter
+                            adapter.notifyItemRangeInserted(0, adapter.getItemCount());
+                        }
+
                         progressDialog.dismiss();
                     }
                 });

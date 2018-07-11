@@ -12,7 +12,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
     /**
      * {@linkplain NumberFormat} used for formatting numbers.
      */
-    protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
+    protected final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
     @Override
     protected void onResume() {

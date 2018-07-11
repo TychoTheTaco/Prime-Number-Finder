@@ -191,7 +191,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             @Override
             public void run() {
                 if (task.save()) {
-                    progressDialog.dismiss();
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -207,6 +206,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                         }
                     });
                 }
+                progressDialog.dismiss();
             }
         }).start();
     }
