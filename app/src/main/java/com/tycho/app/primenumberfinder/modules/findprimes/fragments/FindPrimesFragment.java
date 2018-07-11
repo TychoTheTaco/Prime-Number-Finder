@@ -23,6 +23,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FabAnimator;
 import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
@@ -50,6 +51,7 @@ import easytasks.Task;
 import easytasks.TaskAdapter;
 
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
+import static com.tycho.app.primenumberfinder.utils.Utils.logTaskStarted;
 
 /**
  * @author Tycho Bellers
@@ -438,6 +440,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
         //Start the task
         task.startOnNewThread();
+        Utils.logTaskStarted(getContext(), task);
 
         taskListFragment.setSelected(task);
     }

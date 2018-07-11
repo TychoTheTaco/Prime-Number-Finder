@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -17,9 +18,13 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Savable;
+import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -364,5 +369,21 @@ public final class Utils {
                 View.MeasureSpec.makeMeasureSpec(view.getMeasuredWidth(), View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(view.getMeasuredHeight(), View.MeasureSpec.EXACTLY));
         view.layout(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
+    }
+
+    public static void logTaskStarted(final Context context, final Task task){
+        final Bundle bundle = new Bundle();
+        bundle.putString("type", task.getClass().getSimpleName());
+        if (task instanceof FindPrimesTask){
+            bundle.putLong("start", ((FindPrimesTask) task).getStartValue());
+            bundle.putLong("end", ((FindPrimesTask) task).getEndValue());
+            bundle.putString("method", ((FindPrimesTask) task).getSearchOptions().getSearchMethod().name());
+            bundle.putInt("threads", ((FindPrimesTask) task).getThreadCount());
+        }else if (task instanceof FindFactorsTask){
+            bundle.putLong("number", ((FindFactorsTask) task).getNumber());
+        }else if (task instanceof PrimeFactorizationTask){
+            bundle.putLong("number", ((PrimeFactorizationTask) task).getNumber());
+        }
+        FirebaseAnalytics.getInstance(context).logEvent("task_started", bundle);
     }
 }
