@@ -22,7 +22,6 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.ui.TreeView;
@@ -126,7 +125,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
 
                     //Title
                     title.setText(getString(R.string.status_searching));
-                    progressBar.startAnimation(rotate);
+                    progressBar.startAnimation(rotateAnimation);
 
                     //Subtitle
                     subtitle.setText(Utils.formatSpannable(spannableStringBuilder,

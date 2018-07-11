@@ -21,7 +21,6 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findfactors.DisplayFactorsActivity;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
@@ -215,7 +214,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                 public void run() {
                     //Title
                     title.setText(getString(R.string.status_searching));
-                    progressBar.startAnimation(rotate);
+                    progressBar.startAnimation(rotateAnimation);
 
                     //Subtitle
                     subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));

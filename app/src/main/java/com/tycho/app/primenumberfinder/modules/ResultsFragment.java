@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
+import android.view.animation.Transformation;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -57,7 +58,16 @@ public abstract class ResultsFragment extends TaskFragment {
 
     protected TextView timeElapsedTextView;
 
-    protected final RotateAnimation rotate = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+    protected final RotateAnimation rotateAnimation = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f){
+
+        @Override
+        protected void applyTransformation(float interpolatedTime, Transformation t) {
+            rotation = 0 + (360 - 0) * interpolatedTime;
+            super.applyTransformation(interpolatedTime, t);
+        }
+    };
+
+    protected float rotation;
 
     protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
@@ -224,10 +234,26 @@ public abstract class ResultsFragment extends TaskFragment {
         timeElapsedTextView = rootView.findViewById(R.id.textView_elapsed_time);
 
         //Set up progress animation
-        rotate.setDuration(3000);
-        rotate.setRepeatCount(Animation.INFINITE);
-        rotate.setRepeatMode(Animation.INFINITE);
-        rotate.setInterpolator(new LinearInterpolator());
+        rotateAnimation.setDuration(3000);
+        rotateAnimation.setRepeatCount(Animation.INFINITE);
+        rotateAnimation.setRepeatMode(Animation.INFINITE);
+        rotateAnimation.setInterpolator(new LinearInterpolator());
+        rotateAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                progressBar.setRotation(progressBar.getRotation() + rotation);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
 
         //Buttons
         pauseButton = rootView.findViewById(R.id.pause_button);

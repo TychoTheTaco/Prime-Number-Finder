@@ -222,7 +222,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
                     //Title
                     title.setText(getString(R.string.status_searching));
-                    progressBar.startAnimation(rotate);
+                    progressBar.startAnimation(rotateAnimation);
 
                     //Subtitle
                     subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_primes_subtitle), new String[]{
@@ -309,6 +309,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
                     //Title
                     title.setText(getString(R.string.status_paused));
+                    Log.d(TAG, "Stopping on rotation: " + rotation);
                     progressBar.clearAnimation();
 
                     //Subtitle
