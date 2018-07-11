@@ -11,6 +11,8 @@ import android.util.Log;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -35,6 +37,7 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
     protected static final DecimalFormat DECIMAL_FORMAT = (DecimalFormat) DecimalFormat.getInstance(Locale.getDefault());
     static {
         DECIMAL_FORMAT.setMaximumFractionDigits(1);
+        DECIMAL_FORMAT.setRoundingMode(RoundingMode.DOWN);
     }
 
     /**
@@ -102,7 +105,15 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
                     return;
                 }
 
-                final String formatted = DECIMAL_FORMAT.format(Utils.textToDecimal(getText().toString(), DECIMAL_FORMAT.getDecimalFormatSymbols().getDecimalSeparator()));
+                //If the text contains a decimal and ends with a zero, don't modify it
+                if (getText().toString().contains(String.valueOf(DECIMAL_FORMAT.getDecimalFormatSymbols().getDecimalSeparator())) && getText().toString().endsWith("0")){
+                    Log.w(TAG, "Ended with dot zero, not modifying.");
+                    return;
+                }
+
+                //final String formatted = DECIMAL_FORMAT.format(Utils.textToDecimal(getText().toString(), DECIMAL_FORMAT.getDecimalFormatSymbols().getDecimalSeparator()));
+                final BigDecimal bigDecimal = Utils.textToDecimal(getText().toString(), DECIMAL_FORMAT.getDecimalFormatSymbols().getDecimalSeparator());
+                final String formatted = DECIMAL_FORMAT.format(bigDecimal);
                 if (editable.length() > 0 && !editable.toString().equals(formatted)) {
                     Log.w(TAG, "Modified: " + formatted);
                     setText(formatted, formatted.length() > 1);

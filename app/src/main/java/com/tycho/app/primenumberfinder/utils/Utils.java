@@ -24,6 +24,8 @@ import com.tycho.app.primenumberfinder.Savable;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -285,16 +287,18 @@ public final class Utils {
         final Matcher matcher = pattern.matcher(text);
         final StringBuilder stringBuilder = new StringBuilder();
         while (matcher.find()){
-            stringBuilder.append(matcher.group());
+            stringBuilder.append(matcher.group().replace(decimalSeparator, '.'));
         }
 
         Log.d(TAG, "Built: " + stringBuilder);
 
         //TODO: Possibly need to use the correct locale
-        final DecimalFormat decimalFormat = (DecimalFormat) DecimalFormat.getInstance(Locale.ENGLISH);
-        decimalFormat.setParseBigDecimal(true);
+        //final DecimalFormat decimalFormat = (DecimalFormat) DecimalFormat.getInstance(Locale.ENGLISH);
+        //decimalFormat.setParseBigDecimal(true);
 
-        return new BigDecimal(stringBuilder.toString());
+        BigDecimal bigDecimal = new BigDecimal(stringBuilder.toString());
+        bigDecimal = bigDecimal.setScale(2, RoundingMode.FLOOR);
+        return bigDecimal;
     }
 
     public static int getAccentColor(final Context context) {
