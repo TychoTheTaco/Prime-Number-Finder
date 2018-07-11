@@ -42,8 +42,6 @@ public class DisplayFactorsActivity extends DisplayContentActivity {
      */
     private static final String TAG = DisplayFactorsActivity.class.getSimpleName();
 
-    private File file;
-
     private TextView headerTextView;
 
     private RecyclerView recyclerView;
@@ -71,12 +69,7 @@ public class DisplayFactorsActivity extends DisplayContentActivity {
         //Get the intent
         final Intent intent = getIntent();
         if (intent != null) {
-
-            //Get the file path from the extras
-            final String filePath = intent.getStringExtra("filePath");
-            if (filePath != null) {
-
-                file = new File(filePath);
+            if (file != null) {
 
                 //Set a custom title if there is one
                 if (intent.getBooleanExtra("title", true)) {
@@ -184,11 +177,7 @@ public class DisplayFactorsActivity extends DisplayContentActivity {
     }
 
     @Override
-    protected void load(File file) {
-
-    }
-
-    private void loadFile(final File file) {
+    protected void loadFile(final File file) {
         //Load file in another thread
         new Thread(new Runnable() {
             @Override
@@ -212,14 +201,7 @@ public class DisplayFactorsActivity extends DisplayContentActivity {
                                     NUMBER_FORMAT.format(numbers.size()),
                             }, ContextCompat.getColor(getBaseContext(), R.color.orange_inverse)));
 
-                            //Set correct height based on the height of the header text view
-                            final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
-                            Utils.reLayoutChildren(collapsingToolbarLayout);
-                            final int defaultHeight = getSupportActionBar().getHeight();
-                            final int textHeight = headerTextView.getHeight();
-                            final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
-                            layoutParams.height = defaultHeight + textHeight;
-                            collapsingToolbarLayout.setLayoutParams(layoutParams);
+                            resizeCollapsingToolbar();
 
                             //Update adapter
                             adapter.notifyItemRangeInserted(0, adapter.getItemCount());
