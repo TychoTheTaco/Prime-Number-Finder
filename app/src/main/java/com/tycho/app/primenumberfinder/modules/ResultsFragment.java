@@ -25,6 +25,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import easytasks.Task;
+import easytasks.TaskListener;
 
 /**
  * Created by tycho on 11/19/2017.
@@ -79,6 +80,42 @@ public abstract class ResultsFragment extends TaskFragment {
     public void onTaskStarted() {
         super.onTaskStarted();
         if (uiUpdater.getState() == Task.State.NOT_STARTED) {
+            uiUpdater.addTaskListener(new TaskListener() {
+                @Override
+                public void onTaskStarted() {
+                    Log.d(TAG, "onTaskStarted(): " + uiUpdater);
+                }
+
+                @Override
+                public void onTaskPausing() {
+                    Log.d(TAG, "onTaskPausing(): " + uiUpdater);
+                }
+
+                @Override
+                public void onTaskPaused() {
+                    Log.d(TAG, "onTaskPaused(): " + uiUpdater);
+                }
+
+                @Override
+                public void onTaskResuming() {
+                    Log.d(TAG, "onTaskResuming(): " + uiUpdater);
+                }
+
+                @Override
+                public void onTaskResumed() {
+                    Log.d(TAG, "onTaskResumed(): " + uiUpdater);
+                }
+
+                @Override
+                public void onTaskStopping() {
+                    Log.d(TAG, "onTaskStopping(): " + uiUpdater);
+                }
+
+                @Override
+                public void onTaskStopped() {
+                    Log.d(TAG, "onTaskStopped(): " + uiUpdater);
+                }
+            });
             uiUpdater.startOnNewThread();
         } else {
             uiUpdater.resume();
