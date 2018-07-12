@@ -70,4 +70,12 @@ public class RangedSeekBar extends AppCompatSeekBar {
     public void setValue(final float value){
         setProgress((int) ((value - minValue) * steps));
     }
+
+    public float getMinValue() {
+        return minValue;
+    }
+
+    public float getMaxValue() {
+        return maxValue;
+    }
 }

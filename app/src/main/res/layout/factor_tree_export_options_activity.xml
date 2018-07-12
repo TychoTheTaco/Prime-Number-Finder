@@ -22,6 +22,7 @@
             android:requiresFadingEdge="vertical">
 
             <LinearLayout
+                android:id="@+id/options_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -67,29 +68,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="Image Style" />
-
-                <!-- Image background color-->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        style="@style/DefaultText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Image background color:" />
-
-                    <TextView
-                        android:id="@+id/image_background_color"
-                        style="@style/ColorPicker"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp" />
-
-                </LinearLayout>
 
                 <!-- Vertical item spacing-->
                 <LinearLayout
@@ -372,7 +350,7 @@
                         android:gravity="center_horizontal"
                         android:imeOptions="actionDone"
                         android:includeFontPadding="false"
-                        android:inputType="number"
+                        android:inputType="numberDecimal"
                         android:textSize="14sp" />
 
                     <TextView

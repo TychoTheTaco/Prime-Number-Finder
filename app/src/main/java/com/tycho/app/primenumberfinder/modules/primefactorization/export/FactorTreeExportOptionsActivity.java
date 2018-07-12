@@ -1,4 +1,4 @@
-package com.tycho.app.primenumberfinder.modules.primefactorization;
+package com.tycho.app.primenumberfinder.modules.primefactorization.export;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -15,6 +15,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -36,6 +37,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import simpletrees.Tree;
@@ -59,7 +62,6 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
 
     private TreeView treeView;
 
-    private TextView imageBackgroundColorTextView;
     private TextView itemTextColorTextView;
     private TextView itemBackgroundColorTextView;
     private TextView primeFactorTextColorTextView;
@@ -69,6 +71,7 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
     private TreeView.ExportOptions exportOptions;
 
     private int selectedItemIndex = -1;
+    private ColorOption selectedColorOption;
 
     private ValidEditText verticalItemSpacing;
     private ValidEditText itemTextSize;
@@ -81,6 +84,8 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
     private RangedSeekBar itemBorderWidthSeekBar;
 
     private TextView imageSizeTextView;
+
+    private final List<Option> options = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -103,6 +108,23 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                 final EditText fileNameInput = findViewById(R.id.file_name);
                 treeView = findViewById(R.id.factor_tree_preview);
                 exportOptions = treeView.getDefaultExportOptions();
+
+                options.add(new ColorOption(this, "Image background color", exportOptions.imageBackgroundColor){
+                    @Override
+                    public void onClick(View v) {
+                        Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
+                        ColorPickerDialog.newBuilder().setColor(exportOptions.imageBackgroundColor).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
+                        selectedItemIndex = 0;
+                    }
+                });
+                options.add(new SliderOption(this, "Vertical item spacing", 0, 400, exportOptions.verticalSpacing){
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        exportOptions.verticalSpacing = verticalItemSpacingSeekBar.getFloatValue();
+                        treeView.recalculate();
+                        waitAndUpdateDimensions();
+                    }
+                });
 
                 //Vertical item spacing
                 verticalItemSpacing = findViewById(R.id.vertical_item_spacing);
@@ -143,17 +165,9 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                 });
 
                 //Image background color
-                imageBackgroundColorTextView = findViewById(R.id.image_background_color);
-                imageBackgroundColorTextView.setBackgroundTintList(generateColorStateList(exportOptions.imageBackgroundColor));
-                imageBackgroundColorTextView.setText(getString(R.string.hex, Integer.toHexString(exportOptions.imageBackgroundColor).toUpperCase()));
-                imageBackgroundColorTextView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
-                        ColorPickerDialog.newBuilder().setColor(exportOptions.imageBackgroundColor).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
-                        selectedItemIndex = 0;
-                    }
-                });
+                final ViewGroup optionsLayout = findViewById(R.id.options_layout);
+                optionsLayout.addView(options.get(0).inflate());
+                optionsLayout.addView(options.get(1).inflate());
 
                 //Item text color
                 itemTextColorTextView = findViewById(R.id.item_text_color);
@@ -287,13 +301,13 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                     @Override
                     public void afterTextChanged(Editable s) {
                         final float value = branchWidth.getFloatValue();
-                        branchWidth.setValid(branchWidth.length() > 0 && value >= 1 && value <= 5);
+                        branchWidth.setValid(branchWidth.length() > 0 && value >= branchWidthSeekBar.getMinValue() && value <= branchWidthSeekBar.getMaxValue());
 
                         branchWidthSeekBar.setValue(value);
                     }
                 });
                 branchWidthSeekBar = findViewById(R.id.branch_width_seekbar);
-                branchWidthSeekBar.setRange(1, 5);
+                branchWidthSeekBar.setRange(1, 10);
                 branchWidthSeekBar.setSteps(10);
                 branchWidthSeekBar.setValue(exportOptions.branchWidth);
                 branchWidthSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangedAdapter() {
@@ -325,14 +339,14 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                     @Override
                     public void afterTextChanged(Editable s) {
                         final float value = itemBorderWidth.getFloatValue();
-                        itemBorderWidth.setValid(itemBorderWidth.length() > 0 && value >= 1 && value <= 5);
+                        itemBorderWidth.setValid(itemBorderWidth.length() > 0 && value >= itemBorderWidthSeekBar.getMinValue() && value <= itemBorderWidthSeekBar.getMaxValue());
 
                         itemBorderWidthSeekBar.setValue(value);
                     }
                 });
                 itemBorderWidthSeekBar = findViewById(R.id.item_border_width_seekbar);
-                itemBorderWidthSeekBar.setRange(1, 5);
-                itemBorderWidthSeekBar.setSteps(1);
+                itemBorderWidthSeekBar.setRange(1, 10);
+                itemBorderWidthSeekBar.setSteps(10);
                 itemBorderWidthSeekBar.setValue(exportOptions.branchWidth);
                 itemBorderWidthSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangedAdapter() {
                     @Override
@@ -508,9 +522,8 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
         switch (selectedItemIndex) {
 
             case 0:
-                imageBackgroundColorTextView.setBackgroundTintList(colorStateList);
-                imageBackgroundColorTextView.setText(hex);
                 exportOptions.imageBackgroundColor = color;
+                ((ColorOption) options.get(0)).setColor(color);
                 break;
 
             case 1:
