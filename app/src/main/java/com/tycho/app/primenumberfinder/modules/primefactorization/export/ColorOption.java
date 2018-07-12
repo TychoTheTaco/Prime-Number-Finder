@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +32,8 @@ public class ColorOption extends Option implements View.OnClickListener{
     @Override
     public View inflate(final ViewGroup parent, final boolean attachToParent) {
         final View view = LayoutInflater.from(context).inflate(R.layout.color_option, parent, attachToParent);
-        ((TextView) view.findViewById(R.id.text)).setText(text);
+        titleTextView = view.findViewById(R.id.text);
+        titleTextView.setText(text);
 
         colorTextView = view.findViewById(R.id.color);
         colorTextView.setOnClickListener(this);
@@ -76,5 +78,13 @@ public class ColorOption extends Option implements View.OnClickListener{
                         color,
                         color
                 });
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        final int color = enabled ? this.color : ContextCompat.getColor(context, R.color.item_disabled);
+        colorTextView.setBackgroundTintList(generateColorStateList(color));
+        colorTextView.setTextColor(enabled ? getTextColor(this.color) : ContextCompat.getColor(context, R.color.gray));
     }
 }

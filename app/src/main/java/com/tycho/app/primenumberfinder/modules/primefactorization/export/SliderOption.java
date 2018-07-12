@@ -46,7 +46,8 @@ public class SliderOption extends Option implements SeekBar.OnSeekBarChangeListe
     @Override
     public View inflate(final ViewGroup parent, final boolean attachToParent) {
         final View view = LayoutInflater.from(context).inflate(R.layout.slider_option, parent, attachToParent);
-        ((TextView) view.findViewById(R.id.text)).setText(text);
+        titleTextView = view.findViewById(R.id.text);
+        titleTextView.setText(text);
 
         input = view.findViewById(R.id.input);
         input.setInputType(InputType.TYPE_CLASS_NUMBER | ((step == 1) ? 0 : InputType.TYPE_NUMBER_FLAG_DECIMAL));
@@ -96,5 +97,12 @@ public class SliderOption extends Option implements SeekBar.OnSeekBarChangeListe
             rangedSeekBar.requestFocus();
             Utils.hideKeyboard(context);
         }
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        input.setEnabled(enabled);
+        rangedSeekBar.setEnabled(enabled);
     }
 }
