@@ -20,7 +20,7 @@ public class SortPopupWindow extends PopupWindow {
 
     private final List<SortMethodView> sortMethodViews = new ArrayList<>();
 
-    public SortPopupWindow(final Context context, final int backgroundColor, final SortMethod... sortMethods){
+    public SortPopupWindow(final Context context, final int backgroundColor, final List<SortMethod> sortMethods){
         super(LayoutInflater.from(context).inflate(R.layout.sort_dialog_menu, null), ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         this.context = context;
 
@@ -70,9 +70,9 @@ public class SortPopupWindow extends PopupWindow {
     public enum SortMethod{
         DATE("Date", R.drawable.round_date_range_24),
         FILE_SIZE("Size", R.drawable.round_sort_24),
-        SEARCH_RANGE_START("Search Range", R.drawable.ic_delete_white_24dp),
-        SEARCH_RANGE_END("Search Range", R.drawable.ic_delete_white_24dp),
-        NUMBER("Number", R.drawable.ic_delete_white_24dp);
+        SEARCH_RANGE_START("Range", R.drawable.ic_width),
+        SEARCH_RANGE_END("Range", R.drawable.ic_width),
+        NUMBER("Number", R.drawable.ic_numeric);
 
         private final String name;
 
