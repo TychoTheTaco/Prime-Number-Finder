@@ -6,29 +6,7 @@
         android:orderInCategory="0"
         app:showAsAction="ifRoom"
         android:icon="@drawable/round_sort_24"
-        android:title="@string/action_bar_item_title_sort">
-        <!--<menu>
-            <item
-                android:id="@+id/sort_date"
-                android:icon="@drawable/round_date_range_24"
-                android:title="Date"/>
-
-            <item
-                android:id="@+id/sort_size"
-                android:icon="@drawable/round_sort_24"
-                android:title="Size"/>
-
-            <item
-                android:id="@+id/sort_search_range"
-                android:icon="@drawable/ic_delete_white_24dp"
-                android:title="Search Range"/>
-
-            <item
-                android:id="@+id/sort_number"
-                android:icon="@drawable/ic_delete_white_24dp"
-                android:title="Factor"/>
-        </menu>-->
-    </item>
+        android:title="@string/action_bar_item_title_sort"/>
 
     <item
         android:id="@+id/delete"

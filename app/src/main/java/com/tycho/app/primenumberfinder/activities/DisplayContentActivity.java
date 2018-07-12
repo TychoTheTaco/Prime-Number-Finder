@@ -54,7 +54,7 @@ public abstract class DisplayContentActivity extends AbstractActivity {
     protected void showLoadingError(){
         final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle("Error!");
-        alertDialog.setMessage("There was an error reading this file.");
+        alertDialog.setMessage("An unknown error occurred while reading this file.");
         alertDialog.setCancelable(false);
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Okay",
                 new DialogInterface.OnClickListener() {

@@ -3,8 +3,6 @@ package com.tycho.app.primenumberfinder.modules.savedfiles;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -12,13 +10,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -26,6 +20,7 @@ import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesListAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SelectableAdapter;
+import com.tycho.app.primenumberfinder.modules.savedfiles.sort.SortPopupWindow;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
@@ -163,14 +158,33 @@ public class SavedFilesListActivity extends AbstractActivity {
         return true;
     }
 
+    private SortPopupWindow.SortMethod lastSortMethod;
+    private boolean lasSortAscending;
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
             case R.id.sort:
-                final PopupWindow popupWindow = new PopupWindow(getLayoutInflater().inflate(R.layout.sort_dialog_menu, null), LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                final SortPopupWindow popupWindow = new SortPopupWindow(this, SortPopupWindow.SortMethod.DATE, SortPopupWindow.SortMethod.FILE_SIZE){
+                    @Override
+                    protected void onSortMethodSelected(SortMethod sortMethod, boolean ascending) {
+                        switch (sortMethod){
+                            case DATE:
+                                adapterSavedFilesList.sortDate(ascending);
+                                break;
+
+                            case FILE_SIZE:
+                                adapterSavedFilesList.sortSize(ascending);
+                                break;
+                        }
+                        lastSortMethod = sortMethod;
+                        lasSortAscending = ascending;
+                    }
+                };
                 popupWindow.setOutsideTouchable(true);
-                popupWindow.showAsDropDown(findViewById(R.id.sort), (int) Utils.dpToPx(this, -56), (int) Utils.dpToPx(this, -48));
+                popupWindow.showAsDropDown(findViewById(R.id.sort), (int) Utils.dpToPx(this, -96), (int) Utils.dpToPx(this, -48));
+                popupWindow.setSearchMethod(lastSortMethod != null ? lastSortMethod : SortPopupWindow.SortMethod.DATE, lasSortAscending);
                 break;
 
             case R.id.delete:
