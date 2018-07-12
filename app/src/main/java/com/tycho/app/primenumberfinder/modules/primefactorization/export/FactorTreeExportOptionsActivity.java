@@ -183,10 +183,9 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                         super.onClick(v);
 
                         //Change dependent visibility
-                        //itemBackgroundColorTextView.setEnabled(checkBox.isChecked());
-                        //itemBorderColorTextView.setEnabled(checkBox.isChecked());
-                        //itemBorderWidth.setEnabled(checkBox.isChecked());
-                        //itemBorderWidthSeekBar.setEnabled(checkBox.isChecked());
+                        sections.get(3).getOptions().get(1).setEnabled(checkBox.isChecked());
+                        sections.get(3).getOptions().get(2).setEnabled(checkBox.isChecked());
+                        sections.get(3).getOptions().get(3).setEnabled(checkBox.isChecked());
 
                         exportOptions.itemBackgrounds = checkBox.isChecked();
                         treeView.redraw();

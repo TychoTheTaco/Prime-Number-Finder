@@ -84,7 +84,7 @@
 
     <style name="DefaultText">
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/primary_text</item>
+        <item name="android:textColor">@color/text_color</item>
     </style>
 
     <style name="Label" parent="DefaultText">

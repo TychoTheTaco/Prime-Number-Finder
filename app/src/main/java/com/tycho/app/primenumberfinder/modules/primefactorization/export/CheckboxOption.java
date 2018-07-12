@@ -40,4 +40,10 @@ public class CheckboxOption extends Option implements View.OnClickListener{
     public void onClick(View v) {
 
     }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        checkBox.setEnabled(enabled);
+    }
 }
