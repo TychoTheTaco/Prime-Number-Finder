@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.jaredrummler.android.colorpicker.ColorPickerDialog;
@@ -14,7 +15,7 @@ public class ColorOption extends Option implements View.OnClickListener{
 
     private final Context context;
 
-    private int color;
+    protected int color;
 
     private TextView colorTextView;
 
@@ -25,8 +26,8 @@ public class ColorOption extends Option implements View.OnClickListener{
     }
 
     @Override
-    public View inflate() {
-        final View view = LayoutInflater.from(context).inflate(R.layout.color_option, null);
+    public View inflate(final ViewGroup parent, final boolean attachToParent) {
+        final View view = LayoutInflater.from(context).inflate(R.layout.color_option, parent, attachToParent);
         ((TextView) view.findViewById(R.id.text)).setText(text);
 
         colorTextView = view.findViewById(R.id.color);

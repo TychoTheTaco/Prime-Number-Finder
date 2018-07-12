@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -62,30 +63,13 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
 
     private TreeView treeView;
 
-    private TextView itemTextColorTextView;
-    private TextView itemBackgroundColorTextView;
-    private TextView primeFactorTextColorTextView;
-    private TextView branchColorTextView;
-    private TextView itemBorderColorTextView;
-
     private TreeView.ExportOptions exportOptions;
 
     private int selectedItemIndex = -1;
-    private ColorOption selectedColorOption;
-
-    private ValidEditText verticalItemSpacing;
-    private ValidEditText itemTextSize;
-    private ValidEditText branchWidth;
-    private ValidEditText itemBorderWidth;
-
-    private RangedSeekBar verticalItemSpacingSeekBar;
-    private RangedSeekBar itemTextSizeSeekBar;
-    private RangedSeekBar branchWidthSeekBar;
-    private RangedSeekBar itemBorderWidthSeekBar;
 
     private TextView imageSizeTextView;
 
-    private final List<Option> options = new ArrayList<>();
+    private final List<Section> sections = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -109,7 +93,9 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                 treeView = findViewById(R.id.factor_tree_preview);
                 exportOptions = treeView.getDefaultExportOptions();
 
-                options.add(new ColorOption(this, "Image background color", exportOptions.imageBackgroundColor){
+                //Image style
+                final Section imageStyleSection = new Section(this, "Image Style");
+                imageStyleSection.addOption(new ColorOption(this, "Background color", exportOptions.imageBackgroundColor){
                     @Override
                     public void onClick(View v) {
                         Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
@@ -117,76 +103,81 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                         selectedItemIndex = 0;
                     }
                 });
-                options.add(new SliderOption(this, "Vertical item spacing", 0, 400, exportOptions.verticalSpacing){
+                imageStyleSection.addOption(new SliderOption(this, "Vertical item spacing", 0, 400, exportOptions.verticalSpacing){
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        exportOptions.verticalSpacing = verticalItemSpacingSeekBar.getFloatValue();
+                        super.onProgressChanged(seekBar, progress, fromUser);
+                        exportOptions.verticalSpacing = rangedSeekBar.getFloatValue();
                         treeView.recalculate();
                         waitAndUpdateDimensions();
                     }
                 });
 
-                //Vertical item spacing
-                verticalItemSpacing = findViewById(R.id.vertical_item_spacing);
-                verticalItemSpacing.setHint(exportOptions.verticalSpacing);
-                verticalItemSpacing.setNumber(exportOptions.verticalSpacing);
-                verticalItemSpacing.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                        final int value = verticalItemSpacing.getIntValue();
-                        verticalItemSpacing.setValid(verticalItemSpacing.length() > 0 && value >= 0 && value <= 400);
-
-                        verticalItemSpacingSeekBar.setValue(value);
-                    }
-                });
-                verticalItemSpacingSeekBar = findViewById(R.id.vertical_item_spacing_seekbar);
-                verticalItemSpacingSeekBar.setRange(0, 400);
-                verticalItemSpacingSeekBar.setValue(exportOptions.verticalSpacing);
-                verticalItemSpacingSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangedAdapter() {
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        exportOptions.verticalSpacing = verticalItemSpacingSeekBar.getFloatValue();
-                        if (fromUser) {
-                            verticalItemSpacing.setNumber(exportOptions.verticalSpacing);
-                        }
-                        treeView.recalculate();
-                        waitAndUpdateDimensions();
-                    }
-                });
-
-                //Image background color
-                final ViewGroup optionsLayout = findViewById(R.id.options_layout);
-                optionsLayout.addView(options.get(0).inflate());
-                optionsLayout.addView(options.get(1).inflate());
-
-                //Item text color
-                itemTextColorTextView = findViewById(R.id.item_text_color);
-                itemTextColorTextView.setBackgroundTintList(generateColorStateList(exportOptions.itemTextColor));
-                itemTextColorTextView.setText(getString(R.string.hex, Integer.toHexString(exportOptions.itemTextColor).toUpperCase()));
-                itemTextColorTextView.setOnClickListener(new View.OnClickListener() {
+                //Branch style
+                final Section branchStyleSection = new Section(this, "Branch Style");
+                branchStyleSection.addOption(new ColorOption(this, "Color", exportOptions.branchColor){
                     @Override
                     public void onClick(View v) {
                         Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
-                        ColorPickerDialog.newBuilder().setColor(exportOptions.itemTextColor).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
-                        selectedItemIndex = 1;
+                        ColorPickerDialog.newBuilder().setColor(exportOptions.branchColor).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
+                        selectedItemIndex = 4;
+                    }
+                });
+                branchStyleSection.addOption(new SliderOption(this, "Width", 1, 10, 10, exportOptions.branchWidth){
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        super.onProgressChanged(seekBar, progress, fromUser);
+                        exportOptions.branchWidth = rangedSeekBar.getFloatValue();
+                        treeView.redraw();
                     }
                 });
 
-                //Item background color
-                itemBackgroundColorTextView = findViewById(R.id.item_background_color);
-                itemBackgroundColorTextView.setBackgroundTintList(generateColorStateList(exportOptions.itemBackgroundColor));
-                itemBackgroundColorTextView.setText(getString(R.string.hex, Integer.toHexString(exportOptions.itemBackgroundColor).toUpperCase()));
-                itemBackgroundColorTextView.setOnClickListener(new View.OnClickListener() {
+                //Text style
+                final Section textStyleSection = new Section(this, "Text Style");
+                textStyleSection.addOption(new ColorOption(this, "Text color", exportOptions.itemTextColor){
+                    @Override
+                    public void onClick(View v) {
+                        Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
+                        ColorPickerDialog.newBuilder().setColor(exportOptions.branchColor).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
+                        selectedItemIndex = 1;
+                    }
+                });
+                textStyleSection.addOption(new ColorOption(this, "Prime factor text color", exportOptions.primeFactorTextColor){
+                    @Override
+                    public void onClick(View v) {
+                        Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
+                        ColorPickerDialog.newBuilder().setColor(color).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
+                        selectedItemIndex = 3;
+                    }
+                });
+                textStyleSection.addOption(new SliderOption(this, "Text size", 8, 100, exportOptions.itemTextSize){
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        super.onProgressChanged(seekBar, progress, fromUser);
+                        exportOptions.itemTextSize = rangedSeekBar.getIntValue();
+                        treeView.recalculate();
+                        waitAndUpdateDimensions();
+                    }
+                });
+
+                //Item background style
+                final Section itemBackgroundSection = new Section(this, "Item Background Style");
+                itemBackgroundSection.addOption(new CheckboxOption(this, "Item backgrounds", exportOptions.itemBackgrounds){
+                    @Override
+                    public void onClick(View v) {
+                        super.onClick(v);
+
+                        //Change dependent visibility
+                        //itemBackgroundColorTextView.setEnabled(checkBox.isChecked());
+                        //itemBorderColorTextView.setEnabled(checkBox.isChecked());
+                        //itemBorderWidth.setEnabled(checkBox.isChecked());
+                        //itemBorderWidthSeekBar.setEnabled(checkBox.isChecked());
+
+                        exportOptions.itemBackgrounds = checkBox.isChecked();
+                        treeView.redraw();
+                    }
+                });
+                itemBackgroundSection.addOption(new ColorOption(this, "Background color", exportOptions.itemBackgroundColor){
                     @Override
                     public void onClick(View v) {
                         Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
@@ -194,45 +185,37 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                         selectedItemIndex = 2;
                     }
                 });
-
-                //Prime factor text color
-                primeFactorTextColorTextView = findViewById(R.id.prime_factor_text_color);
-                primeFactorTextColorTextView.setBackgroundTintList(generateColorStateList(exportOptions.primeFactorTextColor));
-                primeFactorTextColorTextView.setText(getString(R.string.hex, Integer.toHexString(exportOptions.primeFactorTextColor).toUpperCase()));
-                primeFactorTextColorTextView.setOnClickListener(new View.OnClickListener() {
+                itemBackgroundSection.addOption(new ColorOption(this, "Border color", exportOptions.itemBorderColor){
                     @Override
                     public void onClick(View v) {
                         Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
-                        ColorPickerDialog.newBuilder().setColor(exportOptions.primeFactorTextColor).setShowAlphaSlider(true).show((FactorTreeExportOptionsActivity.this));
-                        selectedItemIndex = 3;
-                    }
-                });
-
-                //Branch color
-                branchColorTextView = findViewById(R.id.branch_color);
-                branchColorTextView.setBackgroundTintList(generateColorStateList(exportOptions.branchColor));
-                branchColorTextView.setText(getString(R.string.hex, Integer.toHexString(exportOptions.branchColor).toUpperCase()));
-                branchColorTextView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
-                        ColorPickerDialog.newBuilder().setColor(exportOptions.branchColor).setShowAlphaSlider(true).show((FactorTreeExportOptionsActivity.this));
-                        selectedItemIndex = 4;
-                    }
-                });
-
-                //Item border color
-                itemBorderColorTextView = findViewById(R.id.item_border_color);
-                itemBorderColorTextView.setBackgroundTintList(generateColorStateList(exportOptions.itemBorderColor));
-                itemBorderColorTextView.setText(getString(R.string.hex, Integer.toHexString(exportOptions.itemBorderColor).toUpperCase()));
-                itemBorderColorTextView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
-                        ColorPickerDialog.newBuilder().setColor(exportOptions.itemBorderColor).setShowAlphaSlider(true).show((FactorTreeExportOptionsActivity.this));
+                        ColorPickerDialog.newBuilder().setColor(exportOptions.itemBorderColor).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
                         selectedItemIndex = 5;
                     }
                 });
+                itemBackgroundSection.addOption(new SliderOption(this, "Border width", 1, 10, 10, exportOptions.itemBorderWidth){
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        super.onProgressChanged(seekBar, progress, fromUser);
+                        exportOptions.itemBorderWidth = rangedSeekBar.getFloatValue();
+                        treeView.redraw();
+                    }
+                });
+
+                sections.add(imageStyleSection);
+                sections.add(branchStyleSection);
+                sections.add(textStyleSection);
+                sections.add(itemBackgroundSection);
+
+                //Add sections
+                final ViewGroup optionsLayout = findViewById(R.id.options_layout);
+                final LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                layoutParams.topMargin = (int) Utils.dpToPx(this, 16);
+                for (Section section : sections){
+                    final View view = section.inflate(null, false);
+                    view.setLayoutParams(layoutParams);
+                    optionsLayout.addView(view);
+                }
 
                 imageSizeTextView = findViewById(R.id.image_size);
                 imageSizeTextView.post(new Runnable() {
@@ -241,138 +224,6 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                         if (treeView.isGenerated()) {
                             imageSizeTextView.setText("(" + NUMBER_FORMAT.format(treeView.getBoundingRect().width()) + " x " + NUMBER_FORMAT.format(Math.abs(treeView.getBoundingRect().height())) + ")");
                         }
-                    }
-                });
-
-                //Item text size
-                itemTextSize = findViewById(R.id.item_text_size);
-                itemTextSize.setHintNumber(exportOptions.itemTextSize);
-                itemTextSize.setNumber(exportOptions.itemTextSize);
-                itemTextSize.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                        final int value = itemTextSize.getIntValue();
-                        itemTextSize.setValid(itemTextSize.length() > 0 && value >= 8 && value <= 100);
-
-                        itemTextSizeSeekBar.setValue(value);
-                    }
-                });
-                itemTextSizeSeekBar = findViewById(R.id.item_text_size_seekbar);
-                itemTextSizeSeekBar.setRange(8, 100);
-                itemTextSizeSeekBar.setSteps(10);
-                itemTextSizeSeekBar.setValue(exportOptions.itemTextSize);
-                itemTextSizeSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangedAdapter() {
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        exportOptions.itemTextSize = itemTextSizeSeekBar.getIntValue();
-                        if (fromUser) {
-                            itemTextSize.setNumber(exportOptions.itemTextSize);
-                        }
-
-                        treeView.recalculate();
-                        waitAndUpdateDimensions();
-                    }
-                });
-
-                branchWidth = findViewById(R.id.branch_width);
-                branchWidth.setHintNumber(exportOptions.branchWidth);
-                branchWidth.setNumber(exportOptions.branchWidth);
-                branchWidth.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                        final float value = branchWidth.getFloatValue();
-                        branchWidth.setValid(branchWidth.length() > 0 && value >= branchWidthSeekBar.getMinValue() && value <= branchWidthSeekBar.getMaxValue());
-
-                        branchWidthSeekBar.setValue(value);
-                    }
-                });
-                branchWidthSeekBar = findViewById(R.id.branch_width_seekbar);
-                branchWidthSeekBar.setRange(1, 10);
-                branchWidthSeekBar.setSteps(10);
-                branchWidthSeekBar.setValue(exportOptions.branchWidth);
-                branchWidthSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangedAdapter() {
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        exportOptions.branchWidth = branchWidthSeekBar.getFloatValue();
-                        if (fromUser) {
-                            branchWidth.setNumber(exportOptions.branchWidth);
-                        }
-                        treeView.redraw();
-                    }
-                });
-
-                //Item border width
-                itemBorderWidth = findViewById(R.id.item_border_width);
-                itemBorderWidth.setHintNumber(exportOptions.itemBorderWidth);
-                itemBorderWidth.setNumber(exportOptions.itemBorderWidth);
-                itemBorderWidth.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                        final float value = itemBorderWidth.getFloatValue();
-                        itemBorderWidth.setValid(itemBorderWidth.length() > 0 && value >= itemBorderWidthSeekBar.getMinValue() && value <= itemBorderWidthSeekBar.getMaxValue());
-
-                        itemBorderWidthSeekBar.setValue(value);
-                    }
-                });
-                itemBorderWidthSeekBar = findViewById(R.id.item_border_width_seekbar);
-                itemBorderWidthSeekBar.setRange(1, 10);
-                itemBorderWidthSeekBar.setSteps(10);
-                itemBorderWidthSeekBar.setValue(exportOptions.branchWidth);
-                itemBorderWidthSeekBar.setOnSeekBarChangeListener(new OnSeekBarChangedAdapter() {
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        exportOptions.itemBorderWidth = itemBorderWidthSeekBar.getFloatValue();
-                        if (fromUser) {
-                            itemBorderWidth.setNumber(exportOptions.itemBorderWidth);
-                        }
-                        treeView.redraw();
-                        //waitAndUpdateDimensions();
-                    }
-                });
-
-                final CheckBox itemBackgroundsCheckbox = findViewById(R.id.item_background_checkbox);
-                itemBackgroundsCheckbox.setChecked(exportOptions.itemBackgrounds);
-                itemBackgroundsCheckbox.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //Change dependent visibility
-                        itemBackgroundColorTextView.setEnabled(itemBackgroundsCheckbox.isChecked());
-                        itemBorderColorTextView.setEnabled(itemBackgroundsCheckbox.isChecked());
-                        itemBorderWidth.setEnabled(itemBackgroundsCheckbox.isChecked());
-                        itemBorderWidthSeekBar.setEnabled(itemBackgroundsCheckbox.isChecked());
-
-                        exportOptions.itemBackgrounds = itemBackgroundsCheckbox.isChecked();
-                        treeView.redraw();
                     }
                 });
 
@@ -489,17 +340,6 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
         }).start();
     }
 
-    private ColorStateList generateColorStateList(final int color) {
-        return new ColorStateList(
-                new int[][]{
-                        new int[]{android.R.attr.state_pressed},
-                        new int[]{android.R.attr.state_enabled}},
-                new int[]{
-                        color,
-                        color
-                });
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -514,46 +354,35 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
 
     @Override
     public void onColorSelected(int dialogId, int color) {
-
-        final ColorStateList colorStateList = generateColorStateList(color);
-
-        final String hex = "0x" + Integer.toHexString(color).toUpperCase();
-
         switch (selectedItemIndex) {
-
             case 0:
                 exportOptions.imageBackgroundColor = color;
-                ((ColorOption) options.get(0)).setColor(color);
+                ((ColorOption) sections.get(0).getOptions().get(0)).setColor(color);
                 break;
 
             case 1:
-                itemTextColorTextView.setBackgroundTintList(colorStateList);
-                itemTextColorTextView.setText(hex);
                 exportOptions.itemTextColor = color;
+                ((ColorOption) sections.get(2).getOptions().get(0)).setColor(color);
                 break;
 
             case 2:
-                itemBackgroundColorTextView.setBackgroundTintList(colorStateList);
-                itemBackgroundColorTextView.setText(hex);
                 exportOptions.itemBackgroundColor = color;
+                ((ColorOption) sections.get(3).getOptions().get(1)).setColor(color);
                 break;
 
             case 3:
-                primeFactorTextColorTextView.setBackgroundTintList(colorStateList);
-                primeFactorTextColorTextView.setText(hex);
                 exportOptions.primeFactorTextColor = color;
+                ((ColorOption) sections.get(2).getOptions().get(1)).setColor(color);
                 break;
 
             case 4:
-                branchColorTextView.setBackgroundTintList(colorStateList);
-                branchColorTextView.setText(hex);
                 exportOptions.branchColor = color;
+                ((ColorOption) sections.get(1).getOptions().get(0)).setColor(color);
                 break;
 
             case 5:
-                itemBorderColorTextView.setBackgroundTintList(colorStateList);
-                itemBorderColorTextView.setText(hex);
                 exportOptions.itemBorderColor = color;
+                ((ColorOption) sections.get(3).getOptions().get(2)).setColor(color);
                 break;
         }
 
@@ -582,12 +411,12 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
     }
 
     private boolean checkInputs() {
-        final ValidEditText[] editTexts = new ValidEditText[]{verticalItemSpacing, branchWidth, itemTextSize, itemBorderWidth};
+        /*final ValidEditText[] editTexts = new ValidEditText[]{verticalItemSpacing, branchWidth, itemTextSize, itemBorderWidth};
         for (ValidEditText editText : editTexts) {
             if (!editText.isValid()) {
                 return false;
             }
-        }
+        }*/
         return true;
     }
 }

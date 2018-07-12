@@ -281,7 +281,6 @@ public final class Utils {
 
     public static BigDecimal textToDecimal(String text, final char decimalSeparator) {
         Crashlytics.log("Raw input: '" + text + "'");
-        Log.d(TAG, "Raw input: '" + text + "'");
 
         if (text.length() == 0) {
             return BigDecimal.ZERO;
@@ -290,16 +289,10 @@ public final class Utils {
         //Extract only digits and the decimal separator from the input
         final Pattern pattern = Pattern.compile("\\d+(" + Pattern.quote(String.valueOf(decimalSeparator)) + ")?");
         final Matcher matcher = pattern.matcher(text);
-        final StringBuilder stringBuilder = new StringBuilder();
+        final StringBuilder stringBuilder = new StringBuilder("0");
         while (matcher.find()){
             stringBuilder.append(matcher.group().replace(decimalSeparator, '.'));
         }
-
-        Log.d(TAG, "Built: " + stringBuilder);
-
-        //TODO: Possibly need to use the correct locale
-        //final DecimalFormat decimalFormat = (DecimalFormat) DecimalFormat.getInstance(Locale.ENGLISH);
-        //decimalFormat.setParseBigDecimal(true);
 
         BigDecimal bigDecimal = new BigDecimal(stringBuilder.toString());
         bigDecimal = bigDecimal.setScale(2, RoundingMode.FLOOR);
