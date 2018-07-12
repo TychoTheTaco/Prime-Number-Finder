@@ -12,9 +12,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -49,6 +51,9 @@ public class SavedFilesListActivity extends AbstractActivity {
 
     SavedFilesListAdapter adapterSavedFilesList;
 
+    private AppBarLayout appBarLayout;
+    private CollapsingToolbarLayout collapsingToolbarLayout;
+
     private Menu menu;
 
     private FileType fileType;
@@ -81,11 +86,17 @@ public class SavedFilesListActivity extends AbstractActivity {
         adapterSavedFilesList = new SavedFilesListAdapter(this, directory);
         adapterSavedFilesList.addOnSelectionStateChangedListener(new SelectableAdapter.OnSelectionStateChangedListener() {
 
+            private int defaultScrollFlags;
+
+            private boolean locked = false;
+
             @Override
             public void onStartSelection() {
                 getSupportActionBar().setHomeAsUpIndicator(R.drawable.round_clear_24);
                 menu.findItem(R.id.delete).setVisible(true);
                 menu.findItem(R.id.sort).setVisible(false);
+                appBarLayout.addOnOffsetChangedListener(onOffsetChangedListener);
+                appBarLayout.setExpanded(true);
             }
 
             @Override
@@ -104,10 +115,33 @@ public class SavedFilesListActivity extends AbstractActivity {
                 menu.findItem(R.id.delete).setVisible(false);
                 menu.findItem(R.id.sort).setVisible(true);
                 updateSubtitle();
+
+                //Restore scroll flags
+                appBarLayout.removeOnOffsetChangedListener(onOffsetChangedListener);
+                final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
+                layoutParams.setScrollFlags(defaultScrollFlags);
+                collapsingToolbarLayout.setLayoutParams(layoutParams);
+                locked = false;
             }
+
+            private final AppBarLayout.OnOffsetChangedListener onOffsetChangedListener = new AppBarLayout.OnOffsetChangedListener() {
+                @Override
+                public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                    if (verticalOffset == 0 && !locked){
+                        //Lock action bar
+                        final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
+                        defaultScrollFlags = layoutParams.getScrollFlags();
+                        layoutParams.setScrollFlags(0);
+                        collapsingToolbarLayout.setLayoutParams(layoutParams);
+                        locked = true;
+                    }
+                }
+            };
         });
 
         //Set the actionbar to a custom toolbar
+        appBarLayout = findViewById(R.id.app_bar);
+        collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
