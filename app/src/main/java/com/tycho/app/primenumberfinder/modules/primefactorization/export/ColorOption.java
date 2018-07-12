@@ -73,8 +73,10 @@ public class ColorOption extends Option implements View.OnClickListener{
         return new ColorStateList(
                 new int[][]{
                         new int[]{android.R.attr.state_pressed},
-                        new int[]{android.R.attr.state_enabled}},
+                        new int[]{android.R.attr.state_enabled},
+                        new int[]{-android.R.attr.state_enabled}},
                 new int[]{
+                        color,
                         color,
                         color
                 });
@@ -83,6 +85,7 @@ public class ColorOption extends Option implements View.OnClickListener{
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
+        colorTextView.setEnabled(enabled);
         final int color = enabled ? this.color : ContextCompat.getColor(context, R.color.item_disabled);
         colorTextView.setBackgroundTintList(generateColorStateList(color));
         colorTextView.setTextColor(enabled ? getTextColor(this.color) : ContextCompat.getColor(context, R.color.gray));
