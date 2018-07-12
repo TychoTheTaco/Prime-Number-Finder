@@ -3,6 +3,7 @@ package com.tycho.app.primenumberfinder.modules.savedfiles;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -12,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
@@ -165,26 +167,10 @@ public class SavedFilesListActivity extends AbstractActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
-           /* case R.id.sort:
-                Log.e(TAG, "View: " + findViewById(R.id.sort));
+            case R.id.sort:
                 final PopupWindow popupWindow = new PopupWindow(getLayoutInflater().inflate(R.layout.sort_dialog_menu, null), LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-                popupWindow.showAsDropDown(findViewById(R.id.sort), (int) -Utils.dpToPx(this, 24), (int) -Utils.dpToPx(this, 32));
-                break;*/
-
-            case R.id.sort_date:
-                adapterSavedFilesList.sortDate(false);
-                break;
-
-            case R.id.sort_size:
-                adapterSavedFilesList.sortSize(false);
-                break;
-
-            case R.id.sort_search_range:
-                adapterSavedFilesList.sortSearchRange(false);
-                break;
-
-            case R.id.sort_number:
-                adapterSavedFilesList.sortNumber(false);
+                popupWindow.setOutsideTouchable(true);
+                popupWindow.showAsDropDown(findViewById(R.id.sort), (int) Utils.dpToPx(this, -56), (int) Utils.dpToPx(this, -48));
                 break;
 
             case R.id.delete:
@@ -263,7 +249,7 @@ public class SavedFilesListActivity extends AbstractActivity {
         Utils.reLayoutChildren(collapsingToolbarLayout);
         final int defaultHeight = getSupportActionBar().getHeight();
         final int textHeight = subTitleTextView.getHeight();
-        final ViewGroup.LayoutParams layoutParams = (ViewGroup.LayoutParams) collapsingToolbarLayout.getLayoutParams();
+        final ViewGroup.LayoutParams layoutParams = collapsingToolbarLayout.getLayoutParams();
         layoutParams.height = defaultHeight + textHeight;
         collapsingToolbarLayout.setLayoutParams(layoutParams);
     }

@@ -412,23 +412,6 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
     public void onDialogDismissed(int dialogId) {
     }
 
-    private class OnSeekBarChangedAdapter implements SeekBar.OnSeekBarChangeListener {
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-            findViewById(R.id.root).requestFocus();
-            Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-
-        }
-    }
-
     private boolean checkInputs() {
         /*final ValidEditText[] editTexts = new ValidEditText[]{verticalItemSpacing, branchWidth, itemTextSize, itemBorderWidth};
         for (ValidEditText editText : editTexts) {

@@ -7,7 +7,7 @@
         app:showAsAction="ifRoom"
         android:icon="@drawable/round_sort_24"
         android:title="@string/action_bar_item_title_sort">
-        <menu>
+        <!--<menu>
             <item
                 android:id="@+id/sort_date"
                 android:icon="@drawable/round_date_range_24"
@@ -27,7 +27,7 @@
                 android:id="@+id/sort_number"
                 android:icon="@drawable/ic_delete_white_24dp"
                 android:title="Factor"/>
-        </menu>
+        </menu>-->
     </item>
 
     <item
