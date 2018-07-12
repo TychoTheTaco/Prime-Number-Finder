@@ -29,6 +29,7 @@ import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -175,24 +176,33 @@ public class SavedFilesListActivity extends AbstractActivity {
         switch (item.getItemId()) {
             case R.id.sort:
                 final int color;
+
+                final List<SortPopupWindow.SortMethod> sortMethods = new ArrayList<>();
+                sortMethods.add(SortPopupWindow.SortMethod.DATE);
+                sortMethods.add(SortPopupWindow.SortMethod.FILE_SIZE);
+
                 switch (fileType) {
                     case PRIMES:
                         color = ContextCompat.getColor(this, R.color.purple_light);
+                        sortMethods.add(SortPopupWindow.SortMethod.SEARCH_RANGE_START);
                         break;
 
                     case FACTORS:
                         color = ContextCompat.getColor(this, R.color.orange_light);
+                        sortMethods.add(SortPopupWindow.SortMethod.NUMBER);
                         break;
 
                     case TREE:
                         color = ContextCompat.getColor(this, R.color.green_light);
+                        sortMethods.add(SortPopupWindow.SortMethod.NUMBER);
                         break;
 
                     default:
                         color = ContextCompat.getColor(this, R.color.primary_light);
                         break;
                 }
-                sortPopupWindow = new SortPopupWindow(this, color, SortPopupWindow.SortMethod.DATE, SortPopupWindow.SortMethod.FILE_SIZE) {
+
+                sortPopupWindow = new SortPopupWindow(this, color, sortMethods) {
                     @Override
                     protected void onSortMethodSelected(SortMethod sortMethod, boolean ascending) {
                         switch (sortMethod) {
@@ -203,6 +213,14 @@ public class SavedFilesListActivity extends AbstractActivity {
                             case FILE_SIZE:
                                 adapterSavedFilesList.sortSize(ascending);
                                 break;
+
+                            case SEARCH_RANGE_START:
+                                adapterSavedFilesList.sortSearchRange(ascending);
+                                break;
+
+                            case NUMBER:
+                                adapterSavedFilesList.sortNumber(ascending);
+                                break;
                         }
                         lastSortMethod = sortMethod;
                         lasSortAscending = ascending;
@@ -210,7 +228,7 @@ public class SavedFilesListActivity extends AbstractActivity {
                 };
                 sortPopupWindow.setFocusable(true);
                 sortPopupWindow.setOutsideTouchable(true);
-                sortPopupWindow.showAsDropDown(findViewById(R.id.sort), (int) Utils.dpToPx(this, -96), (int) Utils.dpToPx(this, -48));
+                sortPopupWindow.showAsDropDown(findViewById(R.id.sort), (int) Utils.dpToPx(this, -106), (int) Utils.dpToPx(this, -48));
                 sortPopupWindow.setSearchMethod(lastSortMethod != null ? lastSortMethod : SortPopupWindow.SortMethod.DATE, lasSortAscending);
                 break;
 
