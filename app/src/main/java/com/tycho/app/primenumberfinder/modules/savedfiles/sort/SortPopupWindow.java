@@ -1,6 +1,8 @@
 package com.tycho.app.primenumberfinder.modules.savedfiles.sort;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +20,17 @@ public class SortPopupWindow extends PopupWindow {
 
     private final List<SortMethodView> sortMethodViews = new ArrayList<>();
 
-    public SortPopupWindow(final Context context, final SortMethod... sortMethods){
+    public SortPopupWindow(final Context context, final int backgroundColor, final SortMethod... sortMethods){
         super(LayoutInflater.from(context).inflate(R.layout.sort_dialog_menu, null), ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         this.context = context;
+
+        getContentView().setBackgroundTintList(new ColorStateList(
+                new int[][]{
+                        new int[]{},
+                        },
+                new int[]{
+                        backgroundColor,
+                }));
 
         for (final SortMethod methods : sortMethods){
             sortMethodViews.add(new SortMethodView(context, methods.drawableResource, methods.name){
