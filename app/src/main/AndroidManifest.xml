@@ -67,7 +67,7 @@
 
         <activity
             android:theme="@style/PrimeFactorization.Activity"
-            android:name=".modules.primefactorization.FactorTreeExportOptionsActivity"
+            android:name=".modules.primefactorization.export.FactorTreeExportOptionsActivity"
             android:windowSoftInputMode="adjustPan"
             android:label="Export Options"/>
 

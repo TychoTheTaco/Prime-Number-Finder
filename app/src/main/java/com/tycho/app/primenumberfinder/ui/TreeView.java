@@ -378,9 +378,11 @@ public class TreeView extends View {
 
             //Draw item borders
             paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeJoin(options.itemStyle);
             paint.setColor(options.itemBorderColor);
             paint.setStrokeWidth(options.itemBorderWidth);
             canvas.drawRect(itemTree.getValue().bounds, paint);
+            paint.setStrokeJoin(Paint.Join.BEVEL);
 
             for (Tree<Item> child : itemTree.getChildren()) {
                 drawItemBackgrounds(child, canvas, options);
@@ -459,7 +461,9 @@ public class TreeView extends View {
             //Draw branches connecting nodes to parent
             paint.setColor(options.branchColor);
             paint.setStrokeWidth(options.branchWidth);
+            paint.setStrokeCap(options.branchStyle);
             canvas.drawLine(itemTree.getValue().bounds.exactCenterX(), itemTree.getValue().bounds.bottom, itemTree.getChildren().get(i).getValue().bounds.exactCenterX(), itemTree.getChildren().get(i).getValue().bounds.top, paint);
+            paint.setStrokeCap(Paint.Cap.BUTT);
 
             drawContents(itemTree.getChildren().get(i), canvas, options);
         }
@@ -644,11 +648,13 @@ public class TreeView extends View {
         public int itemBackgroundColor;
         public int itemBorderColor;
         public float itemBorderWidth;
+        public Paint.Join itemStyle = Paint.Join.ROUND;
 
         public int primeFactorTextColor;
 
         public int branchColor;
         public float branchWidth;
+        public Paint.Cap branchStyle = Paint.Cap.ROUND;
 
         public float verticalSpacing;
 
