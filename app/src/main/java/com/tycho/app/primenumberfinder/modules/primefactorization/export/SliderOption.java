@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.ui.RangedSeekBar;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.awt.font.TextAttribute;
 
@@ -92,6 +93,8 @@ public class SliderOption extends Option implements SeekBar.OnSeekBarChangeListe
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         if (fromUser) {
             input.setNumber(rangedSeekBar.getFloatValue());
+            rangedSeekBar.requestFocus();
+            Utils.hideKeyboard(context);
         }
     }
 }
