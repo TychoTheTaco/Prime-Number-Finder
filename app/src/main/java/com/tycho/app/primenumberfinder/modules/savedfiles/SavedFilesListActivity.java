@@ -3,9 +3,11 @@ package com.tycho.app.primenumberfinder.modules.savedfiles;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -22,6 +24,7 @@ import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesLis
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SelectableAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.sort.SortPopupWindow;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.FileType;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
@@ -47,13 +50,16 @@ public class SavedFilesListActivity extends AbstractActivity {
 
     private Menu menu;
 
+    private FileType fileType;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         //Apply custom theme depending on directory
         final File directory = (File) getIntent().getSerializableExtra("directory");
-        switch (FileManager.getFileType(directory)) {
+        fileType = FileManager.getFileType(directory);
+        switch (fileType) {
             case PRIMES:
                 setTheme(R.style.FindPrimes_Activity);
                 break;
@@ -126,7 +132,7 @@ public class SavedFilesListActivity extends AbstractActivity {
             }
         });
 
-        switch (FileManager.getFileType(directory)) {
+        switch (fileType) {
             case PRIMES:
                 setTitle("Prime Numbers");
                 toolbar.setPopupTheme(R.style.FindPrimes_PopupOverlay);
@@ -161,15 +167,35 @@ public class SavedFilesListActivity extends AbstractActivity {
     private SortPopupWindow.SortMethod lastSortMethod;
     private boolean lasSortAscending;
 
+    private SortPopupWindow sortPopupWindow;
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
             case R.id.sort:
-                final SortPopupWindow popupWindow = new SortPopupWindow(this, SortPopupWindow.SortMethod.DATE, SortPopupWindow.SortMethod.FILE_SIZE){
+                final int color;
+                switch (fileType) {
+                    case PRIMES:
+                        color = ContextCompat.getColor(this, R.color.purple_light);
+                        break;
+
+                    case FACTORS:
+                        color = ContextCompat.getColor(this, R.color.orange_light);
+                        break;
+
+                    case TREE:
+                        color = ContextCompat.getColor(this, R.color.green_light);
+                        break;
+
+                    default:
+                        color = ContextCompat.getColor(this, R.color.primary_light);
+                        break;
+                }
+                sortPopupWindow = new SortPopupWindow(this, color, SortPopupWindow.SortMethod.DATE, SortPopupWindow.SortMethod.FILE_SIZE) {
                     @Override
                     protected void onSortMethodSelected(SortMethod sortMethod, boolean ascending) {
-                        switch (sortMethod){
+                        switch (sortMethod) {
                             case DATE:
                                 adapterSavedFilesList.sortDate(ascending);
                                 break;
@@ -182,9 +208,10 @@ public class SavedFilesListActivity extends AbstractActivity {
                         lasSortAscending = ascending;
                     }
                 };
-                popupWindow.setOutsideTouchable(true);
-                popupWindow.showAsDropDown(findViewById(R.id.sort), (int) Utils.dpToPx(this, -96), (int) Utils.dpToPx(this, -48));
-                popupWindow.setSearchMethod(lastSortMethod != null ? lastSortMethod : SortPopupWindow.SortMethod.DATE, lasSortAscending);
+                sortPopupWindow.setFocusable(true);
+                sortPopupWindow.setOutsideTouchable(true);
+                sortPopupWindow.showAsDropDown(findViewById(R.id.sort), (int) Utils.dpToPx(this, -96), (int) Utils.dpToPx(this, -48));
+                sortPopupWindow.setSearchMethod(lastSortMethod != null ? lastSortMethod : SortPopupWindow.SortMethod.DATE, lasSortAscending);
                 break;
 
             case R.id.delete:
@@ -237,11 +264,13 @@ public class SavedFilesListActivity extends AbstractActivity {
 
     @Override
     public void onBackPressed() {
+        //Cancel selection mode
         if (adapterSavedFilesList.isSelectionMode()) {
             adapterSavedFilesList.setSelectionMode(false);
-        } else {
-            super.onBackPressed();
+            return;
         }
+
+        super.onBackPressed();
     }
 
     private void updateSubtitle() {
