@@ -111,6 +111,11 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                         treeView.recalculate();
                         waitAndUpdateDimensions();
                     }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        findViewById(R.id.root).requestFocus();
+                    }
                 });
 
                 //Branch style
@@ -129,6 +134,11 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                         super.onProgressChanged(seekBar, progress, fromUser);
                         exportOptions.branchWidth = rangedSeekBar.getFloatValue();
                         treeView.redraw();
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        findViewById(R.id.root).requestFocus();
                     }
                 });
 
@@ -157,6 +167,11 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                         exportOptions.itemTextSize = rangedSeekBar.getIntValue();
                         treeView.recalculate();
                         waitAndUpdateDimensions();
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        findViewById(R.id.root).requestFocus();
                     }
                 });
 
@@ -200,6 +215,11 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                         exportOptions.itemBorderWidth = rangedSeekBar.getFloatValue();
                         treeView.redraw();
                     }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        findViewById(R.id.root).requestFocus();
+                    }
                 });
 
                 sections.add(imageStyleSection);
@@ -210,7 +230,7 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                 //Add sections
                 final ViewGroup optionsLayout = findViewById(R.id.options_layout);
                 final LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                layoutParams.topMargin = (int) Utils.dpToPx(this, 16);
+                layoutParams.topMargin = (int) Utils.dpToPx(this, 24);
                 for (Section section : sections){
                     final View view = section.inflate(null, false);
                     view.setLayoutParams(layoutParams);

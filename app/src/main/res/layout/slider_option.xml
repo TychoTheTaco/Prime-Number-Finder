@@ -3,6 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/export_option_height"
     android:gravity="center_vertical"
+    android:padding="0.5dp"
+    android:paddingStart="4dp"
+    android:paddingEnd="4dp"
+    android:background="@drawable/option_background"
     android:orientation="horizontal">
 
     <TextView
@@ -32,6 +36,7 @@
 
     <com.tycho.app.primenumberfinder.ui.RangedSeekBar
         android:id="@+id/slider"
+        android:focusableInTouchMode="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

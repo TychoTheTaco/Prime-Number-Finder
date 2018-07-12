@@ -41,6 +41,6 @@
 
     <dimen name="expanded_toolbar_height">104dp</dimen>
 
-    <dimen name="export_option_height">34dp</dimen>
+    <dimen name="export_option_height">38dp</dimen>
 
 </resources>

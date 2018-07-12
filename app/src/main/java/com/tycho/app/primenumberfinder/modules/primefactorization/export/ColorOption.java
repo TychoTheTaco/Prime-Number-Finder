@@ -2,6 +2,9 @@ package com.tycho.app.primenumberfinder.modules.primefactorization.export;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.TypedArray;
+import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,8 +47,24 @@ public class ColorOption extends Option implements View.OnClickListener{
     }
 
     public void setColor(final int color){
+        this.color = color;
         colorTextView.setBackgroundTintList(generateColorStateList(color));
         colorTextView.setText(context.getString(R.string.hex, Integer.toHexString(color).toUpperCase()));
+        colorTextView.setTextColor(getTextColor(color));
+    }
+
+    private int getTextColor(final int background){
+        final int a = (background >> 24) & 0xFF;
+        final int r = (background >> 16) & 0xFF;
+        final int g = (background >> 8) & 0xFF;
+        final int b = background & 0xFF;
+        if (a < 128){
+            return Color.BLACK;
+        }
+        if (g >= 128 && b >= 128){
+            return Color.BLACK;
+        }
+        return Color.WHITE;
     }
 
     private ColorStateList generateColorStateList(final int color) {
