@@ -108,6 +108,7 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                         super.onProgressChanged(seekBar, progress, fromUser);
                         exportOptions.verticalSpacing = rangedSeekBar.getFloatValue();
+                        ((SliderOption) sections.get(1).getOptions().get(2)).setMax(exportOptions.verticalSpacing / 2);
                         treeView.recalculate();
                         waitAndUpdateDimensions();
                     }
@@ -133,6 +134,19 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                         super.onProgressChanged(seekBar, progress, fromUser);
                         exportOptions.branchWidth = rangedSeekBar.getFloatValue();
+                        treeView.redraw();
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        findViewById(R.id.root).requestFocus();
+                    }
+                });
+                branchStyleSection.addOption(new SliderOption(this, "Padding", 0, exportOptions.verticalSpacing / 2, 10, exportOptions.branchPadding){
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        super.onProgressChanged(seekBar, progress, fromUser);
+                        exportOptions.branchPadding = rangedSeekBar.getFloatValue();
                         treeView.redraw();
                     }
 

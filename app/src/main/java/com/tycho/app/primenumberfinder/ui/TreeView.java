@@ -462,7 +462,7 @@ public class TreeView extends View {
             paint.setColor(options.branchColor);
             paint.setStrokeWidth(options.branchWidth);
             paint.setStrokeCap(options.branchStyle);
-            canvas.drawLine(itemTree.getValue().bounds.exactCenterX(), itemTree.getValue().bounds.bottom, itemTree.getChildren().get(i).getValue().bounds.exactCenterX(), itemTree.getChildren().get(i).getValue().bounds.top, paint);
+            canvas.drawLine(itemTree.getValue().bounds.exactCenterX(), itemTree.getValue().bounds.bottom + options.branchPadding, itemTree.getChildren().get(i).getValue().bounds.exactCenterX(), itemTree.getChildren().get(i).getValue().bounds.top - options.branchPadding, paint);
             paint.setStrokeCap(Paint.Cap.BUTT);
 
             drawContents(itemTree.getChildren().get(i), canvas, options);
@@ -655,6 +655,7 @@ public class TreeView extends View {
         public int branchColor;
         public float branchWidth;
         public Paint.Cap branchStyle = Paint.Cap.ROUND;
+        public float branchPadding = 8;
 
         public float verticalSpacing;
 

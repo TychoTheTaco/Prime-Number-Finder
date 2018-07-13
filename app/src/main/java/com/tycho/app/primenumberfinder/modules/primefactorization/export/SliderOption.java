@@ -52,6 +52,7 @@ public class SliderOption extends Option implements SeekBar.OnSeekBarChangeListe
         input = view.findViewById(R.id.input);
         input.setInputType(InputType.TYPE_CLASS_NUMBER | ((step == 1) ? 0 : InputType.TYPE_NUMBER_FLAG_DECIMAL));
         input.setNumber(value);
+        input.setAllowZeroInput(min <= 0);
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -104,5 +105,10 @@ public class SliderOption extends Option implements SeekBar.OnSeekBarChangeListe
         super.setEnabled(enabled);
         input.setEnabled(enabled);
         rangedSeekBar.setEnabled(enabled);
+    }
+
+    public void setMax(float max) {
+        this.max = max;
+        rangedSeekBar.setMaxValue(max);
     }
 }
