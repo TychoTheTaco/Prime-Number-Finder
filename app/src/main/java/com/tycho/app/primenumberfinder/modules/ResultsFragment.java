@@ -80,42 +80,6 @@ public abstract class ResultsFragment extends TaskFragment {
     public void onTaskStarted() {
         super.onTaskStarted();
         if (uiUpdater.getState() == Task.State.NOT_STARTED) {
-            uiUpdater.addTaskListener(new TaskListener() {
-                @Override
-                public void onTaskStarted() {
-                    Log.d(TAG, "onTaskStarted(): " + uiUpdater);
-                }
-
-                @Override
-                public void onTaskPausing() {
-                    Log.d(TAG, "onTaskPausing(): " + uiUpdater);
-                }
-
-                @Override
-                public void onTaskPaused() {
-                    Log.d(TAG, "onTaskPaused(): " + uiUpdater);
-                }
-
-                @Override
-                public void onTaskResuming() {
-                    Log.d(TAG, "onTaskResuming(): " + uiUpdater);
-                }
-
-                @Override
-                public void onTaskResumed() {
-                    Log.d(TAG, "onTaskResumed(): " + uiUpdater);
-                }
-
-                @Override
-                public void onTaskStopping() {
-                    Log.d(TAG, "onTaskStopping(): " + uiUpdater);
-                }
-
-                @Override
-                public void onTaskStopped() {
-                    Log.d(TAG, "onTaskStopped(): " + uiUpdater);
-                }
-            });
             uiUpdater.startOnNewThread();
         } else {
             uiUpdater.resume();
@@ -159,10 +123,8 @@ public abstract class ResultsFragment extends TaskFragment {
      */
     @Override
     public synchronized void setTask(Task task) {
-        if (task == null || task.getState() != Task.State.RUNNING) {
-            uiUpdater.pause();
-        }
         super.setTask(task);
+        switchState();
     }
 
     @Override
@@ -188,6 +150,10 @@ public abstract class ResultsFragment extends TaskFragment {
 
         updateUi();
 
+        switchState();
+    }
+
+    private void switchState(){
         if (getTask() != null) {
             switch (getTask().getState()) {
                 case RUNNING:
@@ -307,14 +273,11 @@ public abstract class ResultsFragment extends TaskFragment {
         }
 
         //Set up pause button
-        pauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (getTask().getState() == Task.State.RUNNING) {
-                    getTask().pause();
-                } else if (getTask().getState() == Task.State.PAUSED) {
-                    getTask().resume();
-                }
+        pauseButton.setOnClickListener(v -> {
+            if (getTask().getState() == Task.State.RUNNING) {
+                getTask().pause();
+            } else if (getTask().getState() == Task.State.PAUSED) {
+                getTask().resume();
             }
         });
     }
@@ -325,31 +288,7 @@ public abstract class ResultsFragment extends TaskFragment {
             //Reset view states
             onResetViews();
 
-            switch (getTask().getState()) {
-                case RUNNING:
-                    onTaskStarted();
-                    break;
-
-                case PAUSING:
-                    onTaskPausing();
-                    break;
-
-                case PAUSED:
-                    onTaskPaused();
-                    break;
-
-                case RESUMING:
-                    onTaskResuming();
-                    break;
-
-                case STOPPING:
-                    onTaskStopping();
-                    break;
-
-                case STOPPED:
-                    onTaskStopped();
-                    break;
-            }
+            switchState();
 
         } else {
             noTaskView.setVisibility(View.VISIBLE);

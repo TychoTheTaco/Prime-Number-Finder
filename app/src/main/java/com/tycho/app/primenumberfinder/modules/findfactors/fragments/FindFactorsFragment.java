@@ -296,12 +296,8 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
         Utils.logTaskStarted(getContext(), task);
 
         //Post to a handler because "java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState"
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                taskListFragment.setSelected(task);
-            }
-        });
+        //new Handler(Looper.getMainLooper()).post(() -> taskListFragment.setSelected(task));
+        taskListFragment.setSelected(task);
     }
 
     private BigInteger getNumberToFactor() {
