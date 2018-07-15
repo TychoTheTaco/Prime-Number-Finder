@@ -299,7 +299,6 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                     //Buttons
                     centerView.setVisibility(View.GONE);
                     pauseButton.setVisibility(View.GONE);
-                    //viewAllButton.setVisibility(View.VISIBLE);
                     final RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) saveButton.getLayoutParams();
                     layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
                     saveButton.setLayoutParams(layoutParams);
