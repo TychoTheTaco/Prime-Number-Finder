@@ -38,7 +38,7 @@ import easytasks.Task;
  * Created by tycho on 11/19/2017.
  */
 
-public class FindFactorsResultsFragment extends ResultsFragment{
+public class FindFactorsResultsFragment extends ResultsFragment {
 
     /**
      * Tag used for logging and debugging.
@@ -106,14 +106,14 @@ public class FindFactorsResultsFragment extends ResultsFragment{
         numbersPerSecondTextView = rootView.findViewById(R.id.textView_numbers_per_second);
 
         //Apply black tint to icons
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
-            for (Drawable drawable : etaTextView.getCompoundDrawables()){
-                if (drawable != null){
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            for (Drawable drawable : etaTextView.getCompoundDrawables()) {
+                if (drawable != null) {
                     drawable.mutate().setTint(ContextCompat.getColor(getActivity(), R.color.black));
                 }
             }
-            for (Drawable drawable : numbersPerSecondTextView.getCompoundDrawables()){
-                if (drawable != null){
+            for (Drawable drawable : numbersPerSecondTextView.getCompoundDrawables()) {
+                if (drawable != null) {
                     drawable.mutate().setTint(ContextCompat.getColor(getActivity(), R.color.black));
                 }
             }
@@ -137,12 +137,12 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                         final Task.State state = getTask().getState();
                         try {
                             getTask().pauseAndWait();
-                        }catch (InterruptedException e){
+                        } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                         final File file = new File(getActivity().getFilesDir() + File.separator + "temp");
                         final boolean success = FileManager.getInstance().saveFactors(getTask().getFactors(), file);
-                        if (!success){
+                        if (!success) {
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -150,7 +150,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                                 }
                             });
                         }
-                        if (state == Task.State.RUNNING){
+                        if (state == Task.State.RUNNING) {
                             getTask().resume();
                         }
 
@@ -176,7 +176,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
         return rootView;
     }
 
-    public void saveTask(final FindFactorsTask task, final Context context){
+    public void saveTask(final FindFactorsTask task, final Context context) {
         final ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setTitle("Saving...");
         progressDialog.show();
@@ -208,10 +208,10 @@ public class FindFactorsResultsFragment extends ResultsFragment{
     @Override
     public void onTaskStarted() {
         super.onTaskStarted();
-        if (isAdded() && !isDetached() && getTask() != null){
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (isAdded() && !isDetached() && getTask() != null) {
                     updateUi();
 
                     //Title
@@ -231,8 +231,8 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                     viewAllButton.setVisibility(View.VISIBLE);
                     saveButton.setVisibility(View.GONE);
                 }
-            });
-        }
+            }
+        });
     }
 
     @Override
@@ -270,10 +270,11 @@ public class FindFactorsResultsFragment extends ResultsFragment{
     @Override
     public void onTaskPaused() {
         super.onTaskPaused();
-        if (isAdded() && !isDetached() && getTask() != null){
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (isAdded() && !isDetached() && getTask() != null) {
+
                     updateUi();
 
                     //Title
@@ -296,8 +297,8 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                     viewAllButton.setVisibility(View.VISIBLE);
                     saveButton.setVisibility(View.GONE);
                 }
-            });
-        }
+            }
+        });
     }
 
     @Override
@@ -341,7 +342,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        if (isAdded() && !isDetached()&& getTask() != null){
+        if (isAdded() && !isDetached() && getTask() != null) {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -353,9 +354,9 @@ public class FindFactorsResultsFragment extends ResultsFragment{
 
                     //Subtitle
                     Utils.formatSpannable(spannableStringBuilder, getResources().getQuantityString(R.plurals.find_factors_subtitle_results, getTask().getFactors().size()), new String[]{NUMBER_FORMAT.format(getTask().getNumber()), NUMBER_FORMAT.format(getTask().getFactors().size())}, ContextCompat.getColor(getActivity(), R.color.orange_dark));
-                    if (getTask().getFactors().size() != 2){
+                    if (getTask().getFactors().size() != 2) {
                         subtitleTextView.setText(spannableStringBuilder);
-                    }else{
+                    } else {
                         final SpannableStringBuilder ssb = new SpannableStringBuilder();
                         Utils.formatSpannable(ssb, getResources().getString(R.string.find_factors_subtitle_results_extension), new String[]{"prime"}, ContextCompat.getColor(getActivity(), R.color.orange_dark));
                         subtitleTextView.setText(TextUtils.concat(spannableStringBuilder, " ", ssb));
@@ -367,7 +368,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                     //Statistics
                     etaTextView.setVisibility(View.GONE);
                     double elapsed = (double) getTask().getElapsedTime() / 1000;
-                    if (elapsed <= 0){
+                    if (elapsed <= 0) {
                         elapsed = 1;
                     }
                     numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_numbers_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getMaxValue() / elapsed))}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
@@ -386,7 +387,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
 
     @Override
     protected void onUiUpdate() {
-        if (getTask() != null){
+        if (getTask() != null) {
 
             //Update progress
             progress.setText(String.valueOf((int) (getTask().getProgress() * 100)));
@@ -414,10 +415,11 @@ public class FindFactorsResultsFragment extends ResultsFragment{
             }
 
             //Update recyclerView
-            if (lastAdapterSize != adapter.getItemCount()){
+            if (lastAdapterSize != adapter.getItemCount()) {
                 try {
                     adapter.notifyItemRangeInserted(lastAdapterSize, adapter.getItemCount() - lastAdapterSize);
-                }catch (IllegalStateException e) {}
+                } catch (IllegalStateException e) {
+                }
                 lastAdapterSize = adapter.getItemCount();
                 recyclerView.scrollToPosition(adapter.getItemCount() - 1);
             }
@@ -437,7 +439,7 @@ public class FindFactorsResultsFragment extends ResultsFragment{
                 statisticsMap.put(getTask(), new Statistics());
             }
         }
-        if (getView() != null){
+        if (getView() != null) {
             init();
         }
     }

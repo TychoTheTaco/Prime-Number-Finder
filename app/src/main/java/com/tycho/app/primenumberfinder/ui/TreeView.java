@@ -655,7 +655,7 @@ public class TreeView extends View {
         public int branchColor;
         public float branchWidth;
         public Paint.Cap branchStyle = Paint.Cap.ROUND;
-        public float branchPadding = 8;
+        public float branchPadding = 2;
 
         public float verticalSpacing;
 
