@@ -48,7 +48,6 @@ public class FindPrimesTaskListFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Log.e(TAG, "onAttach(): " + context);
         taskListAdapter = new FindPrimesTaskListAdapter(context);
 
         if (context instanceof ActionViewListener) {

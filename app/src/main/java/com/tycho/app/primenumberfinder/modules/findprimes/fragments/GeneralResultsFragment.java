@@ -38,8 +38,15 @@ public class GeneralResultsFragment extends ResultsFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.general_results_fragment, container, false);
         this.container = (ViewGroup) rootView;
+
+        //Empty message
         emptyMessage = rootView.findViewById(R.id.empty_message);
-        //updateContent();
+        emptyMessage.setVisibility(this.content == null ? View.VISIBLE : View.GONE);
+
+        if (content != null){
+            getChildFragmentManager().beginTransaction().replace(this.container.getId(), content).commit();
+        }
+
         return rootView;
     }
 
@@ -48,28 +55,23 @@ public class GeneralResultsFragment extends ResultsFragment {
 
     public void setContent(final ResultsFragment fragment){
         this.content = fragment;
-        updateContent();
+
+        if (getView() != null){
+            emptyMessage.setVisibility(this.content == null ? View.VISIBLE : View.GONE);
+            final FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+            if (content == null){
+                for (Fragment f : getChildFragmentManager().getFragments()){
+                    fragmentTransaction.remove(f);
+                }
+            }else{
+                fragmentTransaction.replace(container.getId(), content);
+            }
+            fragmentTransaction.commit();
+        }
     }
 
     public ResultsFragment getContent(){
         if (container == null) return null;
-        Log.d(TAG, "Container ID: " + container.getId());
         return (ResultsFragment) getChildFragmentManager().findFragmentById(container.getId());
-        //return this.content;
-    }
-
-    private void updateContent(){
-        if (container != null && content == null){
-            emptyMessage.setVisibility(View.VISIBLE);
-            final FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-            for (Fragment fragment : getChildFragmentManager().getFragments()){
-                fragmentTransaction.remove(fragment);
-            }
-            fragmentTransaction.commit();
-        }
-        if (content != null && container != null){
-            emptyMessage.setVisibility(View.GONE);
-            getChildFragmentManager().beginTransaction().replace(container.getId(), content).commit();
-        }
     }
 }
