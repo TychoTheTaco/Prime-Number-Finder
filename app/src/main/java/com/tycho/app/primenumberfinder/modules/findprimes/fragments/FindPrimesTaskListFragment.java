@@ -79,19 +79,19 @@ public class FindPrimesTaskListFragment extends Fragment {
         for (Task task : PrimeNumberFinder.getTaskManager().getTasks()) {
             if (task instanceof FindPrimesTask || task instanceof CheckPrimalityTask) {
                 addTask(task);
+                if (task instanceof FindPrimesTask){
+                    taskListAdapter.setSaved(task, ((FindPrimesTask) task).isSaved());
+                }
             }
         }
         taskListAdapter.sortByTimeCreated();
 
-        //Select correct task
-        Log.e(TAG, "savedInstanceState: " + savedInstanceState);
+        //Restore saved instance
         if (savedInstanceState != null) {
             taskListAdapter.setSelected(savedInstanceState.getInt("selectedItemPosition"));
 
             //Restore saved state
             final ArrayList<Integer> savedItemPositions = savedInstanceState.getIntegerArrayList("savedItemPositions");
-            Crashlytics.log(Log.DEBUG, TAG, "Tasks: " + PrimeNumberFinder.getTaskManager().getTasks());
-            Crashlytics.log(Log.DEBUG, TAG, "Saved positions: " + savedItemPositions);
             if (savedItemPositions != null) {
                 for (int i : savedItemPositions) {
                     taskListAdapter.setSaved(i, true);
@@ -113,12 +113,10 @@ public class FindPrimesTaskListFragment extends Fragment {
 
         //Store the saved item positions
         final List<Task> savedItems = taskListAdapter.getSavedItems();
-        Log.w(TAG, "Saved items: " + savedItems);
         final ArrayList<Integer> savedItemPositions = new ArrayList<>();
         for (Task task : savedItems) {
             savedItemPositions.add(taskListAdapter.indexOf(task));
         }
-        Log.d(TAG, "savedItemPositions: " + savedItemPositions);
         outState.putIntegerArrayList("savedItemPositions", savedItemPositions);
     }
 

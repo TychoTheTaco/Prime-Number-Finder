@@ -1,6 +1,10 @@
 package com.tycho.app.primenumberfinder.modules.findprimes;
 
 
+import com.tycho.app.primenumberfinder.Savable;
+
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import easytasks.Task;
 
 /**
@@ -8,7 +12,7 @@ import easytasks.Task;
  *         Date Created: 5/12/2017
  */
 
-public class CheckPrimalityTask extends Task {
+public class CheckPrimalityTask extends Task{
 
     /**
      * Tag used for logging and debugging.

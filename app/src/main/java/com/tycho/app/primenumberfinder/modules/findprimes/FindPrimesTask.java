@@ -808,10 +808,13 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
         }
     }
 
+    private boolean saved = false;
+
     @Override
     public boolean save() {
         try {
             FileManager.copy(saveToFile(), new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getStartValue() + " to " + (getEndValue() == FindPrimesTask.INFINITY ? getCurrentValue() : getEndValue()) + EXTENSION));
+            saved = true;
             sendOnSaved();
             return true;
         } catch (IOException e) {
@@ -841,5 +844,9 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
         for (SaveListener listener : saveListeners){
             listener.onError();
         }
+    }
+
+    public boolean isSaved(){
+        return saved;
     }
 }
