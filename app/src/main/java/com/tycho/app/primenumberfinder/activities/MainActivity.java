@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -109,22 +110,21 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
                 //Ignore NPE because there is no action view
             }
         }
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                selectDrawerItem(item);
-                return true;
-            }
+        navigationView.setNavigationItemSelectedListener(item -> {
+            selectDrawerItem(item);
+            return true;
         });
+
+        //Set up drawer icon animation
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.content_description_edit_button, R.string.content_description_pause_button);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();
 
         //Set up floating action button
         floatingActionButton = findViewById(R.id.fab);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (currentFragment instanceof FloatingActionButtonListener) {
-                    ((FloatingActionButtonListener) currentFragment).onClick(v);
-                }
+        floatingActionButton.setOnClickListener(v -> {
+            if (currentFragment instanceof FloatingActionButtonListener) {
+                ((FloatingActionButtonListener) currentFragment).onClick(v);
             }
         });
 
@@ -144,15 +144,12 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
             progressDialog.setTitle("Updating...");
             progressDialog.show();
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    //Update file system
-                    FileManager.getInstance().updateFileSystem(getBaseContext());
-                    FileManager.getInstance().upgradeTo1_3_0();
+            new Thread(() -> {
+                //Update file system
+                FileManager.getInstance().updateFileSystem(getBaseContext());
+                FileManager.getInstance().upgradeTo1_3_0();
 
-                    progressDialog.dismiss();
-                }
+                progressDialog.dismiss();
             }).start();
         }
     }
