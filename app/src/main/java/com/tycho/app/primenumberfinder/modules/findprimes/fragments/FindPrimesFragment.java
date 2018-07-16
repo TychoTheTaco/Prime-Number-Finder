@@ -3,12 +3,10 @@ package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -23,8 +21,6 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
-import com.google.firebase.analytics.FirebaseAnalytics;
-import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FabAnimator;
 import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
 import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
@@ -35,7 +31,6 @@ import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
@@ -51,7 +46,6 @@ import easytasks.Task;
 import easytasks.TaskAdapter;
 
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
-import static com.tycho.app.primenumberfinder.utils.Utils.logTaskStarted;
 
 /**
  * @author Tycho Bellers
@@ -384,7 +378,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
     }
 
     private void startTask(final FindPrimesTask.SearchOptions searchOptions) {
-        final FindPrimesTask task = new FindPrimesTask(searchOptions, getActivity());
+        final FindPrimesTask task = new FindPrimesTask(searchOptions);
         task.addTaskListener(new TaskAdapter() {
 
             @Override

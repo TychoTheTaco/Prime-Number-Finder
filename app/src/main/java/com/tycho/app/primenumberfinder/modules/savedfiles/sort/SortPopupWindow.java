@@ -3,10 +3,10 @@ package com.tycho.app.primenumberfinder.modules.savedfiles.sort;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 
 import com.tycho.app.primenumberfinder.R;
@@ -24,13 +24,22 @@ public class SortPopupWindow extends PopupWindow {
         super(LayoutInflater.from(context).inflate(R.layout.sort_dialog_menu, null), ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         this.context = context;
 
+        setFocusable(true);
+        setOutsideTouchable(true);
         getContentView().setBackgroundTintList(new ColorStateList(
                 new int[][]{
-                        new int[]{},
+                        new int[]{}
                         },
                 new int[]{
-                        backgroundColor,
+                        backgroundColor
                 }));
+        /*
+        TODO: WTF
+        For some reason these are required on API < 23. It will not set the color to red, but it will
+        keep the correct background tint list.
+         */
+        setBackgroundDrawable(new ColorDrawable()); //Required for setTouchOutside()
+        getContentView().setBackgroundColor(Color.RED); //Required for setBackgroundTintList()
 
         for (final SortMethod methods : sortMethods){
             sortMethodViews.add(new SortMethodView(context, methods.drawableResource, methods.name){

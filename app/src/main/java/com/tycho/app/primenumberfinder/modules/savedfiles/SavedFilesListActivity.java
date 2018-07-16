@@ -1,9 +1,7 @@
 package com.tycho.app.primenumberfinder.modules.savedfiles;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -12,12 +10,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.AbstractActivity;
@@ -31,7 +26,6 @@ import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -149,22 +143,13 @@ public class SavedFilesListActivity extends AbstractActivity {
         //Set up subtitle
         subTitleTextView = findViewById(R.id.subtitle);
         totalSizeTextView = findViewById(R.id.right_message);
-        toolbar.post(new Runnable() {
-            @Override
-            public void run() {
-                updateSubtitle();
-            }
-        });
+        toolbar.post(this::updateSubtitle);
 
         //Set up toolbar animation
         final ViewGroup expandedLayout = findViewById(R.id.expanded_layout);
-        ((AppBarLayout) findViewById(R.id.app_bar)).addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                final int height = appBarLayout.getTotalScrollRange();
-                expandedLayout.setAlpha(1.0f - ((float) -verticalOffset) / height);
-            }
+        ((AppBarLayout) findViewById(R.id.app_bar)).addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
+            final int height = appBarLayout.getTotalScrollRange();
+            expandedLayout.setAlpha(1.0f - ((float) -verticalOffset) / height);
         });
 
         switch (fileType) {
@@ -260,8 +245,6 @@ public class SavedFilesListActivity extends AbstractActivity {
                         lasSortAscending = ascending;
                     }
                 };
-                sortPopupWindow.setFocusable(true);
-                sortPopupWindow.setOutsideTouchable(true);
                 sortPopupWindow.showAsDropDown(findViewById(R.id.sort), (int) Utils.dpToPx(this, -106), (int) Utils.dpToPx(this, -48));
                 sortPopupWindow.setSearchMethod(lastSortMethod != null ? lastSortMethod : SortPopupWindow.SortMethod.DATE, lasSortAscending);
                 break;
@@ -272,37 +255,31 @@ public class SavedFilesListActivity extends AbstractActivity {
                 alertDialog.setTitle("Warning");
                 alertDialog.setMessage(getResources().getQuantityString(R.plurals.delete_warning, adapterSavedFilesList.getSelectedItemCount(), adapterSavedFilesList.getSelectedItemCount()));
                 alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Delete",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
+                        (dialog, which) -> {
 
-                                //Get the files to be deleted
-                                final int[] selectedItemIndexes = adapterSavedFilesList.getSelectedItemIndexes();
-                                final List<File> files = new ArrayList<>();
-                                for (int i : selectedItemIndexes) {
-                                    files.add(adapterSavedFilesList.getFiles().get(i));
-                                }
-
-                                final Iterator<File> iterator = files.iterator();
-                                int position = 0;
-                                while (iterator.hasNext()) {
-                                    final File file = iterator.next();
-
-                                    //Delete the file
-                                    file.delete();
-                                    adapterSavedFilesList.getFiles().remove(file);
-                                    adapterSavedFilesList.notifyItemRemoved(selectedItemIndexes[position] - position);
-                                    position++;
-                                }
-                                adapterSavedFilesList.setSelectionMode(false);
-                                alertDialog.dismiss();
+                            //Get the files to be deleted
+                            final int[] selectedItemIndexes = adapterSavedFilesList.getSelectedItemIndexes();
+                            final List<File> files = new ArrayList<>();
+                            for (int i : selectedItemIndexes) {
+                                files.add(adapterSavedFilesList.getFiles().get(i));
                             }
+
+                            final Iterator<File> iterator = files.iterator();
+                            int position = 0;
+                            while (iterator.hasNext()) {
+                                final File file = iterator.next();
+
+                                //Delete the file
+                                file.delete();
+                                adapterSavedFilesList.getFiles().remove(file);
+                                adapterSavedFilesList.notifyItemRemoved(selectedItemIndexes[position] - position);
+                                position++;
+                            }
+                            adapterSavedFilesList.setSelectionMode(false);
+                            alertDialog.dismiss();
                         });
                 alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                alertDialog.dismiss();
-                            }
-                        });
+                        (dialog, which) -> alertDialog.dismiss());
                 alertDialog.show();
                 break;
 

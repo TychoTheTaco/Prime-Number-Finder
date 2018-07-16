@@ -34,7 +34,7 @@ import easytasks.TaskListener;
  * Created by tycho on 12/12/2017.
  */
 
-public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.ViewHolder> extends RecyclerView.Adapter<H> {
+public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.ViewHolder> extends RecyclerView.Adapter<H> implements TaskListener{
 
     /**
      * Tag used for logging and debugging.
@@ -73,28 +73,6 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
 
     protected static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("##0.00");
     protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
-
-    private final TaskAdapter taskAdapter = new TaskAdapter() {
-        @Override
-        public void onTaskStarted() {
-            sendTaskStatesChanged();
-        }
-
-        @Override
-        public void onTaskPaused() {
-            sendTaskStatesChanged();
-        }
-
-        @Override
-        public void onTaskResumed() {
-            sendTaskStatesChanged();
-        }
-
-        @Override
-        public void onTaskStopped() {
-            sendTaskStatesChanged();
-        }
-    };
 
     protected final Context context;
 
@@ -182,6 +160,41 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
     @Override
     public int getItemCount() {
         return items.size();
+    }
+
+    @Override
+    public void onTaskStarted() {
+        sendTaskStatesChanged();
+    }
+
+    @Override
+    public void onTaskPausing() {
+
+    }
+
+    @Override
+    public void onTaskPaused() {
+        sendTaskStatesChanged();
+    }
+
+    @Override
+    public void onTaskResuming() {
+
+    }
+
+    @Override
+    public void onTaskResumed() {
+        sendTaskStatesChanged();
+    }
+
+    @Override
+    public void onTaskStopping() {
+
+    }
+
+    @Override
+    public void onTaskStopped() {
+        sendTaskStatesChanged();
     }
 
     protected void manageStandardViews(final Task task, final H holder) {
@@ -385,7 +398,7 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
             }
         };
         task.addTaskListener(customTaskEventListener);
-        task.addTaskListener(taskAdapter);
+        task.addTaskListener(this);
         items.add(new Item(task));
         notifyItemInserted(getItemCount());
         customEventListeners.put(task, customTaskEventListener);
