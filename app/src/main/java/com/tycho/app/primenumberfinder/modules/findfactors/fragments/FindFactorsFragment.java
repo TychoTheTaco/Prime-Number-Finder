@@ -6,6 +6,8 @@ import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -24,6 +26,8 @@ import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
+import com.tycho.app.primenumberfinder.modules.ModuleHostFragment;
+import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.TaskListFragment;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
@@ -52,113 +56,20 @@ import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
  * @author Tycho Bellers
  *         Date Created: 11/12/2016
  */
-public class FindFactorsFragment extends Fragment implements FloatingActionButtonListener{
+public class FindFactorsFragment extends ModuleHostFragment{
 
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "LeastCommonMultipleFragment";
-
-    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
+    private static final String TAG = FindFactorsFragment.class.getSimpleName();
 
     private ValidEditText editTextNumberToFactor;
 
     private final FindFactorsTask.SearchOptions searchOptions = new FindFactorsTask.SearchOptions(0);
 
-    private TaskListFragment taskListFragment;
-    private FindFactorsResultsFragment resultsFragment;
-
-    private ViewPager viewPager;
-    private FabAnimator fabAnimator;
-
-    private FloatingActionButtonHost floatingActionButtonHost;
-
-    private ActionViewListener actionViewListener;
-
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof FloatingActionButtonHost) {
-            floatingActionButtonHost = (FloatingActionButtonHost) context;
-        }
-        if (context instanceof ActionViewListener){
-            actionViewListener = (ActionViewListener) context;
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
+    public View createView(LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_factors_fragment, viewGroup, false);
-
-        //Apply action button color
-        if (floatingActionButtonHost != null){
-            floatingActionButtonHost.getFab(0).setBackgroundTintList(new ColorStateList(
-                    new int[][]{
-                            new int[]{}
-                    },
-                    new int[]{
-                            Utils.getAccentColor(rootView.getContext())
-                    }));
-        }
-
-        //Set fragment adapter
-        final SimpleFragmentAdapter simpleFragmentAdapter = new SimpleFragmentAdapter(getChildFragmentManager(), getContext());
-        viewPager = rootView.findViewById(R.id.view_pager);
-
-        //Add fragments to adapter
-        simpleFragmentAdapter.add("Tasks", TaskListFragment.class);
-        simpleFragmentAdapter.add("Results", FindFactorsResultsFragment.class);
-
-        //Instantiate fragments now to save a reference to them
-        simpleFragmentAdapter.startUpdate(viewPager);
-        taskListFragment = (TaskListFragment) simpleFragmentAdapter.instantiateItem(viewPager, 0);
-        resultsFragment = (FindFactorsResultsFragment) simpleFragmentAdapter.instantiateItem(viewPager, 1);
-        simpleFragmentAdapter.finishUpdate(viewPager);
-
-        //Set up Task list fragment
-        taskListFragment.setAdapter(new FindFactorsTaskListAdapter(getContext()));
-        taskListFragment.whitelist(FindFactorsTask.class);
-        taskListFragment.addActionViewListener(actionViewListener);
-        taskListFragment.addEventListener(new FindFactorsTaskListAdapter.EventListener() {
-            @Override
-            public void onTaskSelected(Task task) {
-                resultsFragment.setTask(task);
-            }
-
-            @Override
-            public void onPausePressed(Task task) {
-
-            }
-
-            @Override
-            public void onTaskRemoved(Task task) {
-                if (resultsFragment.getTask() == task) {
-                    resultsFragment.setTask(null);
-                }
-
-                taskListFragment.update();
-            }
-
-            @Override
-            public void onEditPressed(Task task) {
-                final Intent intent = new Intent(getActivity(), FindFactorsConfigurationActivity.class);
-                intent.putExtra("searchOptions", ((FindFactorsTask) task).getSearchOptions());
-                intent.putExtra("taskId", task.getId());
-                startActivityForResult(intent, 0);
-            }
-
-            @Override
-            public void onSavePressed(Task task) {
-                resultsFragment.saveTask((FindFactorsTask) task, getActivity());
-            }
-        });
-
-        //Set up view pager
-        viewPager.setAdapter(simpleFragmentAdapter);
-        fabAnimator = new FabAnimator(floatingActionButtonHost.getFab(0));
-        viewPager.addOnPageChangeListener(fabAnimator);
-        final TabLayout tabLayout = rootView.findViewById(R.id.tab_layout);
-        tabLayout.setupWithViewPager(viewPager);
 
         //Set up factor input
         editTextNumberToFactor = rootView.findViewById(R.id.editText_input_number);
@@ -203,15 +114,33 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
             }
         });
 
-        //Give the root view focus to prevent EditTexts from initially getting focus
-        rootView.requestFocus();
-
-        //Scroll to Results fragment if started from a notification
-        if (getActivity().getIntent().getSerializableExtra("taskId") != null){
-            viewPager.setCurrentItem(1);
-        }
-
         return rootView;
+    }
+
+    @Override
+    protected void loadFragments() {
+        taskListFragment = (TaskListFragment) addFragment("Tasks", TaskListFragment.class);
+        resultsFragment = (FindFactorsResultsFragment) addFragment("Results", FindFactorsResultsFragment.class);
+    }
+
+    @Override
+    protected void afterLoadFragments() {
+        //Set up Task list fragment
+        taskListFragment.setAdapter(new FindFactorsTaskListAdapter(getContext()));
+        taskListFragment.whitelist(FindFactorsTask.class);
+    }
+
+    @Override
+    public void onEditPressed(Task task) {
+        final Intent intent = new Intent(getActivity(), FindFactorsConfigurationActivity.class);
+        intent.putExtra("searchOptions", ((FindFactorsTask) task).getSearchOptions());
+        intent.putExtra("taskId", task.getId());
+        startActivityForResult(intent, 0);
+    }
+
+    @Override
+    public void onSavePressed(Task task) {
+        ((FindFactorsResultsFragment) resultsFragment).saveTask((FindFactorsTask) task, getActivity());
     }
 
     private static final int REQUEST_CODE_NEW_TASK = 0;
@@ -220,24 +149,6 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
     public void onClick(View view) {
         final Intent intent = new Intent(getActivity(), FindFactorsConfigurationActivity.class);
         startActivityForResult(intent, REQUEST_CODE_NEW_TASK);
-    }
-
-    @Override
-    public void initFab(View view) {
-        if (fabAnimator != null){
-            fabAnimator.onPageScrolled(viewPager.getCurrentItem(), 0, 0);
-
-            if (getView() != null){
-                floatingActionButtonHost.getFab(0).setBackgroundTintList(new ColorStateList(
-                        new int[][]{
-                                new int[]{}
-                        },
-                        new int[]{
-                                Utils.getAccentColor(getView().getContext())
-                        })
-                );
-            }
-        }
     }
 
     @Override

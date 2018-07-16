@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,25 +65,25 @@ public class TaskListFragment extends Fragment {
         this.taskListAdapter = adapter;
     }
 
-   /* @Override
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        if (context instanceof ActionViewListener) {
+        /*if (context instanceof ActionViewListener) {
             taskListAdapter.addActionViewListener((ActionViewListener) context);
         }
 
         if (getParentFragment() instanceof AbstractTaskListAdapter.EventListener) {
             taskListAdapter.addEventListener((AbstractTaskListAdapter.EventListener) getParentFragment());
-        }
+        }*/
 
-        while (!eventListenerQueue.isEmpty()) {
+        /*while (!eventListenerQueue.isEmpty()) {
             taskListAdapter.addEventListener(eventListenerQueue.poll());
         }
         while (!actionViewListenerQueue.isEmpty()) {
             taskListAdapter.addActionViewListener(actionViewListenerQueue.poll());
-        }
-    }*/
+        }*/
+    }
 
     @Nullable
     @Override

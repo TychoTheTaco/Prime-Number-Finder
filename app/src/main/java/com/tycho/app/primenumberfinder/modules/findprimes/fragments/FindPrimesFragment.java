@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -29,6 +30,7 @@ import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
+import com.tycho.app.primenumberfinder.modules.ModuleHostFragment;
 import com.tycho.app.primenumberfinder.modules.TaskListFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfigurationActivity;
@@ -54,7 +56,7 @@ import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
  * @author Tycho Bellers
  * Date Created: 11/12/2016
  */
-public class FindPrimesFragment extends Fragment implements FloatingActionButtonListener, AbstractTaskListAdapter.EventListener {
+public class FindPrimesFragment extends ModuleHostFragment {
 
     /**
      * Tag used for logging and debugging.
@@ -67,17 +69,11 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
     private ValidEditText editTextSearchRangeEnd;
 
     //Fragments in the main adapter.
-    private TaskListFragment taskListFragment;
-    private GeneralResultsFragment generalResultsFragment;
+    //private GeneralResultsFragment generalResultsFragment;
 
     //Results fragments
     private final FindPrimesResultsFragment findPrimesResultsFragment = new FindPrimesResultsFragment();
     private final CheckPrimalityResultsFragment checkPrimalityResultsFragment = new CheckPrimalityResultsFragment();
-
-    /**
-     * {@linkplain NumberFormat} instance used to format numbers with commas.
-     */
-    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
     /**
      * Search options used for starting tasks.
@@ -89,60 +85,9 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
      */
     private static final int REQUEST_CODE_NEW_TASK = 0;
 
-    private ViewPager viewPager;
-    private FabAnimator fabAnimator;
-
-    private FloatingActionButtonHost floatingActionButtonHost;
-
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof FloatingActionButtonHost) {
-            floatingActionButtonHost = (FloatingActionButtonHost) context;
-        }
-    }
-
-    @Override
-    public View onCreateView(@NonNull final LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.find_primes_fragment, viewGroup, false);
-
-        //Apply action button color
-        if (floatingActionButtonHost != null) {
-            floatingActionButtonHost.getFab(0).setBackgroundTintList(new ColorStateList(
-                    new int[][]{
-                            new int[]{}
-                    },
-                    new int[]{
-                            Utils.getAccentColor(rootView.getContext())
-                    }));
-        }
-
-        //Set fragment adapter
-        final SimpleFragmentAdapter simpleFragmentAdapter = new SimpleFragmentAdapter(getChildFragmentManager(), getContext());
-        viewPager = rootView.findViewById(R.id.view_pager);
-
-        //Add fragments to adapter
-        simpleFragmentAdapter.add("Tasks", TaskListFragment.class);
-        simpleFragmentAdapter.add("Results", GeneralResultsFragment.class);
-
-        //Instantiate fragments now to save a reference to them
-        simpleFragmentAdapter.startUpdate(viewPager);
-        taskListFragment = (TaskListFragment) simpleFragmentAdapter.instantiateItem(viewPager, 0);
-        generalResultsFragment = (GeneralResultsFragment) simpleFragmentAdapter.instantiateItem(viewPager, 1);
-        simpleFragmentAdapter.finishUpdate(viewPager);
-
-        //Set up task list fragment
-        taskListFragment.setAdapter(new FindPrimesTaskListAdapter(getContext()));
-        taskListFragment.whitelist(FindPrimesTask.class, CheckPrimalityTask.class);
-        taskListFragment.addActionViewListener((ActionViewListener) getActivity());
-        taskListFragment.addEventListener(this);
-
-        //Set up view pager
-        viewPager.setAdapter(simpleFragmentAdapter);
-        fabAnimator = new FabAnimator(floatingActionButtonHost.getFab(0));
-        viewPager.addOnPageChangeListener(fabAnimator);
-        final TabLayout tabLayout = rootView.findViewById(R.id.tab_layout);
-        tabLayout.setupWithViewPager(viewPager);
+    protected View createView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        final View rootView = inflater.inflate(R.layout.find_primes_fragment, container, false);
 
         //Set up number input
         editTextPrimalityInput = rootView.findViewById(R.id.primality_input);
@@ -291,15 +236,20 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             }
         });
 
-        //Give the root view focus to prevent EditTexts from initially getting focus
-        rootView.requestFocus();
-
-        //Scroll to Results fragment if started from a notification
-        if (getActivity().getIntent().getSerializableExtra("taskId") != null) {
-            viewPager.setCurrentItem(1);
-        }
-
         return rootView;
+    }
+
+    @Override
+    protected void loadFragments() {
+        taskListFragment = (TaskListFragment) addFragment("Tasks", TaskListFragment.class);
+        resultsFragment = (GeneralResultsFragment) addFragment("Results", GeneralResultsFragment.class);
+    }
+
+    @Override
+    protected void afterLoadFragments() {
+        //Set up Task list fragment
+        taskListFragment.setAdapter(new FindPrimesTaskListAdapter(getContext()));
+        taskListFragment.whitelist(FindPrimesTask.class, CheckPrimalityTask.class);
     }
 
     @Override
@@ -325,24 +275,6 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
     public void onClick(View view) {
         final Intent intent = new Intent(getActivity(), FindPrimesConfigurationActivity.class);
         startActivityForResult(intent, REQUEST_CODE_NEW_TASK);
-    }
-
-    @Override
-    public void initFab(View view) {
-        if (fabAnimator != null) {
-            fabAnimator.onPageScrolled(viewPager.getCurrentItem(), 0, 0);
-
-            if (getView() != null) {
-                floatingActionButtonHost.getFab(0).setBackgroundTintList(new ColorStateList(
-                        new int[][]{
-                                new int[]{}
-                        },
-                        new int[]{
-                                Utils.getAccentColor(getView().getContext())
-                        })
-                );
-            }
-        }
     }
 
     private FindPrimesTask.SearchMethod determineBestSearchMethod() {
@@ -438,13 +370,13 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         if (task instanceof FindPrimesTask) {
             findPrimesResultsFragment.setTask(task);
             checkPrimalityResultsFragment.setTask(null);
-            generalResultsFragment.setContent(findPrimesResultsFragment);
+            ((GeneralResultsFragment) resultsFragment).setContent(findPrimesResultsFragment);
         } else if (task instanceof CheckPrimalityTask) {
             findPrimesResultsFragment.setTask(null);
             checkPrimalityResultsFragment.setTask(task);
-            generalResultsFragment.setContent(checkPrimalityResultsFragment);
+            ((GeneralResultsFragment) resultsFragment).setContent(checkPrimalityResultsFragment);
         } else {
-            generalResultsFragment.setContent(null);
+            ((GeneralResultsFragment) resultsFragment).setContent(null);
             findPrimesResultsFragment.setTask(null);
             checkPrimalityResultsFragment.setTask(null);
         }
