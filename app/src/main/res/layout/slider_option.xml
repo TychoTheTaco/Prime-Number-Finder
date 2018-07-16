@@ -18,8 +18,8 @@
     <com.tycho.app.primenumberfinder.ui.ValidEditText
         android:id="@+id/input"
         android:layout_width="48dp"
-        android:layout_height="match_parent"
-        android:gravity="center_horizontal"
+        android:layout_height="wrap_content"
+        android:gravity="center"
         android:imeOptions="actionDone"
         android:includeFontPadding="false"
         android:inputType="numberDecimal"
@@ -38,6 +38,6 @@
         android:id="@+id/slider"
         android:focusableInTouchMode="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

@@ -2,6 +2,7 @@ package com.tycho.app.primenumberfinder.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
@@ -15,13 +16,9 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.tycho.app.primenumberfinder.ProgressDialog;
-import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
@@ -29,9 +26,7 @@ import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactoriza
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.MathContext;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,12 +44,6 @@ import easytasks.Task;
  * Created by tycho on 11/13/2017.
  */
 public final class Utils {
-
-    /*static {
-        System.loadLibrary("native-utils");
-    }
-
-    public native static void compact();*/
 
     /**
      * Tag used for logging and debugging.
@@ -289,7 +278,7 @@ public final class Utils {
         final Pattern pattern = Pattern.compile("\\d+|" + Pattern.quote(String.valueOf(decimalSeparator)));
         final Matcher matcher = pattern.matcher(text);
         final StringBuilder stringBuilder = new StringBuilder("0"); //Prepend 0 in case input starts with decimal point
-        while (matcher.find()){
+        while (matcher.find()) {
             stringBuilder.append(matcher.group().replace(decimalSeparator, '.'));
         }
         BigDecimal bigDecimal = new BigDecimal(stringBuilder.toString());
@@ -362,19 +351,27 @@ public final class Utils {
         view.layout(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
     }
 
-    public static void logTaskStarted(final Context context, final Task task){
+    public static void logTaskStarted(final Context context, final Task task) {
         final Bundle bundle = new Bundle();
         bundle.putString("type", task.getClass().getSimpleName());
-        if (task instanceof FindPrimesTask){
+        if (task instanceof FindPrimesTask) {
             bundle.putLong("start", ((FindPrimesTask) task).getStartValue());
             bundle.putLong("end", ((FindPrimesTask) task).getEndValue());
             bundle.putString("method", ((FindPrimesTask) task).getSearchOptions().getSearchMethod().name());
             bundle.putInt("threads", ((FindPrimesTask) task).getThreadCount());
-        }else if (task instanceof FindFactorsTask){
+        } else if (task instanceof FindFactorsTask) {
             bundle.putLong("number", ((FindFactorsTask) task).getNumber());
-        }else if (task instanceof PrimeFactorizationTask){
+        } else if (task instanceof PrimeFactorizationTask) {
             bundle.putLong("number", ((PrimeFactorizationTask) task).getNumber());
         }
         FirebaseAnalytics.getInstance(context).logEvent("task_started", bundle);
+    }
+
+    public static ColorStateList generateColorStateList(final int[] states, final int[] colors) {
+        final int[][] stateArray = new int[states.length][];
+        for (int i = 0; i < states.length; i++){
+            stateArray[i] = new int[]{states[i]};
+        }
+        return new ColorStateList(stateArray, colors);
     }
 }
