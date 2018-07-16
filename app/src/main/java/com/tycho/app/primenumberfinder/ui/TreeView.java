@@ -181,21 +181,17 @@ public class TreeView extends View {
             canvas.drawText(text, ((canvas.getWidth() - getStringWidth(text, paint)) / 2), ((canvas.getHeight() - getStringHeight(paint)) / 2), paint);
 
             if (!threadStarted){
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //recalculateBounds();
-                        do{
-                            dirty = false;
-                            while (true) {
-                                itemTree = generateRectangleTree(tree, exportOptions);
-                                if (!checkChildren(itemTree, 0)) break;
-                            }
-                            generated = true;
-                        }while(dirty);
-                        postInvalidate();
-                        threadStarted = false;
-                    }
+                new Thread(() -> {
+                    do{
+                        dirty = false;
+                        while (true) {
+                            itemTree = generateRectangleTree(tree, exportOptions);
+                            if (!checkChildren(itemTree, 0)) break;
+                        }
+                        generated = true;
+                    }while(dirty);
+                    postInvalidate();
+                    threadStarted = false;
                 }).start();
                 threadStarted = true;
             }

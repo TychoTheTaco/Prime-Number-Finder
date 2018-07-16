@@ -280,20 +280,18 @@ public final class Utils {
     }
 
     public static BigDecimal textToDecimal(String text, final char decimalSeparator) {
-        Crashlytics.log("Raw input: '" + text + "'");
+        Crashlytics.log(Log.DEBUG, TAG, "Raw input: '" + text + "'");
 
         if (text.length() == 0) {
             return BigDecimal.ZERO;
         }
 
-        //Extract only digits and the decimal separator from the input
-        final Pattern pattern = Pattern.compile("\\d+(" + Pattern.quote(String.valueOf(decimalSeparator)) + ")?");
+        final Pattern pattern = Pattern.compile("\\d+|" + Pattern.quote(String.valueOf(decimalSeparator)));
         final Matcher matcher = pattern.matcher(text);
-        final StringBuilder stringBuilder = new StringBuilder("0");
+        final StringBuilder stringBuilder = new StringBuilder("0"); //Prepend 0 in case input starts with decimal point
         while (matcher.find()){
             stringBuilder.append(matcher.group().replace(decimalSeparator, '.'));
         }
-
         BigDecimal bigDecimal = new BigDecimal(stringBuilder.toString());
         bigDecimal = bigDecimal.setScale(2, RoundingMode.FLOOR);
         return bigDecimal;

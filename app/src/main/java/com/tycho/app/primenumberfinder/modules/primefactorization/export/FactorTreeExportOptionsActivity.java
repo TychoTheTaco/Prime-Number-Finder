@@ -158,6 +158,13 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
 
                 //Text style
                 final Section textStyleSection = new Section(this, "Text Style");
+                textStyleSection.addOption(new CheckboxOption(this, "Format numbers", true){
+                    @Override
+                    public void onClick(View v) {
+                        super.onClick(v);
+                        treeView.setTree(checkBox.isChecked() ? factorTree.formatNumbers() : factorTree);
+                    }
+                });
                 textStyleSection.addOption(new ColorOption(this, "Text color", exportOptions.itemTextColor){
                     @Override
                     public void onClick(View v) {
@@ -251,52 +258,43 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                 }
 
                 imageSizeTextView = findViewById(R.id.image_size);
-                imageSizeTextView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (treeView.isGenerated()) {
-                            imageSizeTextView.setText("(" + NUMBER_FORMAT.format(treeView.getBoundingRect().width()) + " x " + NUMBER_FORMAT.format(Math.abs(treeView.getBoundingRect().height())) + ")");
-                        }
+                imageSizeTextView.post(() -> {
+                    if (treeView.isGenerated()) {
+                        imageSizeTextView.setText("(" + NUMBER_FORMAT.format(treeView.getBoundingRect().width()) + " x " + NUMBER_FORMAT.format(Math.abs(treeView.getBoundingRect().height())) + ")");
                     }
                 });
 
                 //Set up export button
                 final Button exportButton = findViewById(R.id.export_button);
-                exportButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (checkInputs()) {
-                            final com.tycho.app.primenumberfinder.ProgressDialog progressDialog = new com.tycho.app.primenumberfinder.ProgressDialog(FactorTreeExportOptionsActivity.this);
-                            progressDialog.setTitle("Exporting...");
-                            progressDialog.show();
+                exportButton.setOnClickListener(v -> {
+                    if (checkInputs()) {
+                        final com.tycho.app.primenumberfinder.ProgressDialog progressDialog = new com.tycho.app.primenumberfinder.ProgressDialog(FactorTreeExportOptionsActivity.this);
+                        progressDialog.setTitle("Exporting...");
+                        progressDialog.show();
 
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
+                        new Thread(() -> {
 
-                                    //Convert the file to the requested format
-                                    final File image = new File(FileManager.getInstance().getExportCacheDirectory() + File.separator + fileNameInput.getText().toString().trim() + ".png");
-                                    try {
-                                        final OutputStream stream = new FileOutputStream(image);
-                                        treeView.drawToBitmap(exportOptions).compress(Bitmap.CompressFormat.PNG, 100, stream);
-                                        stream.close();
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
+                            //Convert the file to the requested format
+                            final File image = new File(FileManager.getInstance().getExportCacheDirectory() + File.separator + fileNameInput.getText().toString().trim() + ".png");
+                            try {
+                                final OutputStream stream = new FileOutputStream(image);
+                                treeView.drawToBitmap(exportOptions).compress(Bitmap.CompressFormat.PNG, 100, stream);
+                                stream.close();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
 
-                                    progressDialog.dismiss();
+                            progressDialog.dismiss();
 
-                                    final Uri path = FileProvider.getUriForFile(FactorTreeExportOptionsActivity.this, "com.tycho.app.primenumberfinder", image);
-                                    final Intent intent = new Intent(Intent.ACTION_SEND);
-                                    intent.putExtra(Intent.EXTRA_STREAM, path);
-                                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                    intent.setType("image/*");
-                                    startActivity(intent);
-                                }
-                            }).start();
-                        } else {
-                            Toast.makeText(getBaseContext(), "Invalid inputs!", Toast.LENGTH_LONG).show();
-                        }
+                            final Uri path = FileProvider.getUriForFile(FactorTreeExportOptionsActivity.this, "com.tycho.app.primenumberfinder", image);
+                            final Intent intent1 = new Intent(Intent.ACTION_SEND);
+                            intent1.putExtra(Intent.EXTRA_STREAM, path);
+                            intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            intent1.setType("image/*");
+                            startActivity(intent1);
+                        }).start();
+                    } else {
+                        Toast.makeText(getBaseContext(), "Invalid inputs!", Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -355,21 +353,13 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
         final ProgressDialog progressDialog = ProgressDialog.show(this, "Loading...", "Loading file.");
 
         //Load file in another thread
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+        new Thread(() -> {
 
-                factorTree = FileManager.getInstance().readTree(file);
-                progressDialog.dismiss();
+            factorTree = FileManager.getInstance().readTree(file);
+            progressDialog.dismiss();
 
-                new Handler(getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        treeView.setTree(factorTree.formatNumbers());
-                    }
-                });
+            new Handler(getMainLooper()).post(() -> treeView.setTree(factorTree.formatNumbers()));
 
-            }
         }).start();
     }
 
@@ -395,7 +385,7 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
 
             case 1:
                 exportOptions.itemTextColor = color;
-                ((ColorOption) sections.get(2).getOptions().get(0)).setColor(color);
+                ((ColorOption) sections.get(2).getOptions().get(1)).setColor(color);
                 break;
 
             case 2:
@@ -405,7 +395,7 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
 
             case 3:
                 exportOptions.primeFactorTextColor = color;
-                ((ColorOption) sections.get(2).getOptions().get(1)).setColor(color);
+                ((ColorOption) sections.get(2).getOptions().get(2)).setColor(color);
                 break;
 
             case 4:
