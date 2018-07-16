@@ -1,4 +1,4 @@
-package com.tycho.app.primenumberfinder.modules.findfactors.fragments;
+package com.tycho.app.primenumberfinder.modules.lcm.fragments;
 
 import android.content.Context;
 import android.content.Intent;
@@ -24,12 +24,10 @@ import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
-import com.tycho.app.primenumberfinder.modules.TaskListFragment;
-import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
-import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsTaskListAdapter;
+import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
@@ -52,7 +50,7 @@ import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
  * @author Tycho Bellers
  *         Date Created: 11/12/2016
  */
-public class FindFactorsFragment extends Fragment implements FloatingActionButtonListener{
+public class LeastCommonMultipleFragment extends Fragment implements FloatingActionButtonListener{
 
     /**
      * Tag used for logging and debugging.
@@ -65,8 +63,8 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
 
     private final FindFactorsTask.SearchOptions searchOptions = new FindFactorsTask.SearchOptions(0);
 
-    private TaskListFragment taskListFragment;
-    private FindFactorsResultsFragment resultsFragment;
+    private LeastCommonMultipleTaskListFragment taskListFragment;
+    private LeastCommonMultipleResultsFragment resultsFragment;
 
     private ViewPager viewPager;
     private FabAnimator fabAnimator;
@@ -106,17 +104,16 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
         viewPager = rootView.findViewById(R.id.view_pager);
 
         //Add fragments to adapter
-        simpleFragmentAdapter.add("Tasks", TaskListFragment.class);
-        simpleFragmentAdapter.add("Results", FindFactorsResultsFragment.class);
+        simpleFragmentAdapter.add("Tasks", LeastCommonMultipleTaskListFragment.class);
+        simpleFragmentAdapter.add("Results", LeastCommonMultipleResultsFragment.class);
 
         //Instantiate fragments now to save a reference to them
         simpleFragmentAdapter.startUpdate(viewPager);
-        taskListFragment = (TaskListFragment) simpleFragmentAdapter.instantiateItem(viewPager, 0);
-        resultsFragment = (FindFactorsResultsFragment) simpleFragmentAdapter.instantiateItem(viewPager, 1);
+        taskListFragment = (LeastCommonMultipleTaskListFragment) simpleFragmentAdapter.instantiateItem(viewPager, 0);
+        resultsFragment = (LeastCommonMultipleResultsFragment) simpleFragmentAdapter.instantiateItem(viewPager, 1);
         simpleFragmentAdapter.finishUpdate(viewPager);
 
         //Set up Task list fragment
-        taskListFragment.setAdapter(new FindFactorsTaskListAdapter(getContext()));
         taskListFragment.addActionViewListener(actionViewListener);
         taskListFragment.addEventListener(new FindFactorsTaskListAdapter.EventListener() {
             @Override

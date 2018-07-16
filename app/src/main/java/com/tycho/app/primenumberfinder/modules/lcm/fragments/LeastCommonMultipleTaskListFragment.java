@@ -1,4 +1,4 @@
-package com.tycho.app.primenumberfinder.modules.findfactors.fragments;
+package com.tycho.app.primenumberfinder.modules.lcm.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -21,7 +21,6 @@ import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsTaskListAdapter;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,12 +34,12 @@ import easytasks.Task;
  * Created by tycho on 11/19/2017.
  */
 
-public class FindFactorsTaskListFragment extends Fragment {
+public class LeastCommonMultipleTaskListFragment extends Fragment {
 
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = FindFactorsTaskListFragment.class.getSimpleName();
+    private static final String TAG = LeastCommonMultipleTaskListFragment.class.getSimpleName();
 
     private FindFactorsTaskListAdapter taskListAdapter;
 

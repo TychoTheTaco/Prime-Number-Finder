@@ -5,7 +5,11 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.util.Log;
 import android.view.ViewGroup;
+
+import com.tycho.app.primenumberfinder.modules.TaskListFragment;
+import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsTaskListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +32,7 @@ public class SimpleFragmentAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return Fragment.instantiate(context, items.get(position).className);
+      return Fragment.instantiate(context, items.get(position).mClass.getName());
     }
 
     @Override
@@ -49,8 +53,8 @@ public class SimpleFragmentAdapter extends FragmentPagerAdapter {
         return fragment;
     }
 
-    public void add(final String className, final String title){
-        items.add(new AdapterItem(className, title));
+    public void add(final String title, final Class<? extends Fragment> cls){
+        items.add(new AdapterItem(title, cls));
     }
 
     public Fragment getFragment(final int position){
@@ -62,13 +66,13 @@ public class SimpleFragmentAdapter extends FragmentPagerAdapter {
     }
 
     private class AdapterItem{
-        private final String className;
         private final String title;
+        private final Class<? extends Fragment> mClass;
         private Fragment fragment;
 
-        AdapterItem(String className, String title) {
-            this.className = className;
+        AdapterItem(String title, Class<? extends Fragment> cls) {
             this.title = title;
+            mClass = cls;
         }
     }
 }

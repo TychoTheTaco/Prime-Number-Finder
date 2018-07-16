@@ -119,8 +119,8 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         viewPager = rootView.findViewById(R.id.view_pager);
 
         //Add fragments to adapter
-        simpleFragmentAdapter.add(FindPrimesTaskListFragment.class.getName(), "Tasks");
-        simpleFragmentAdapter.add(GeneralResultsFragment.class.getName(), "Results");
+        simpleFragmentAdapter.add("Tasks", FindPrimesTaskListFragment.class);
+        simpleFragmentAdapter.add("Results", GeneralResultsFragment.class);
 
         //Instantiate fragments now to save a reference to them
         simpleFragmentAdapter.startUpdate(viewPager);

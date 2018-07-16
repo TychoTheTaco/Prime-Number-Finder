@@ -25,6 +25,7 @@ import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
+import com.tycho.app.primenumberfinder.modules.findprimes.fragments.GeneralResultsFragment;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
@@ -105,8 +106,8 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
         viewPager = rootView.findViewById(R.id.view_pager);
 
         //Add fragments to adapter
-        simpleFragmentAdapter.add(PrimeFactorizationTaskListFragment.class.getName(), "Tasks");
-        simpleFragmentAdapter.add(PrimeFactorizationResultsFragment.class.getName(), "Results");
+        simpleFragmentAdapter.add("Tasks", PrimeFactorizationTaskListFragment.class);
+        simpleFragmentAdapter.add("Results", PrimeFactorizationResultsFragment.class);
 
         //Instantiate fragments now to save a reference to them
         simpleFragmentAdapter.startUpdate(viewPager);
