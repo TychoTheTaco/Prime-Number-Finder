@@ -25,6 +25,7 @@ import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
+import com.tycho.app.primenumberfinder.modules.TaskListFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.fragments.GeneralResultsFragment;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationConfigurationActivity;
@@ -60,7 +61,7 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
 
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
-    private PrimeFactorizationTaskListFragment taskListFragment;
+    private TaskListFragment taskListFragment;
     private PrimeFactorizationResultsFragment resultsFragment;
 
     private final PrimeFactorizationTask.SearchOptions searchOptions = new PrimeFactorizationTask.SearchOptions(0);
@@ -106,16 +107,18 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
         viewPager = rootView.findViewById(R.id.view_pager);
 
         //Add fragments to adapter
-        simpleFragmentAdapter.add("Tasks", PrimeFactorizationTaskListFragment.class);
+        simpleFragmentAdapter.add("Tasks", TaskListFragment.class);
         simpleFragmentAdapter.add("Results", PrimeFactorizationResultsFragment.class);
 
         //Instantiate fragments now to save a reference to them
         simpleFragmentAdapter.startUpdate(viewPager);
-        taskListFragment = (PrimeFactorizationTaskListFragment) simpleFragmentAdapter.instantiateItem(viewPager, 0);
+        taskListFragment = (TaskListFragment) simpleFragmentAdapter.instantiateItem(viewPager, 0);
         resultsFragment = (PrimeFactorizationResultsFragment) simpleFragmentAdapter.instantiateItem(viewPager, 1);
         simpleFragmentAdapter.finishUpdate(viewPager);
 
         //Set up Task list fragment
+        taskListFragment.setAdapter(new PrimeFactorizationTaskListAdapter(getContext()));
+        taskListFragment.whitelist(PrimeFactorizationTask.class);
         taskListFragment.addActionViewListener(actionViewListener);
         taskListFragment.addEventListener(new PrimeFactorizationTaskListAdapter.EventListener() {
             @Override
@@ -273,17 +276,9 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
 
                 //Auto-save
                 if (task.getSearchOptions().isAutoSave()) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            final boolean success = FileManager.getInstance().saveTree(task.getFactorTree());
-                            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
+                    new Thread(() -> {
+                        final boolean success = FileManager.getInstance().saveTree(task.getFactorTree());
+                        new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show());
                     }).start();
                 }
 

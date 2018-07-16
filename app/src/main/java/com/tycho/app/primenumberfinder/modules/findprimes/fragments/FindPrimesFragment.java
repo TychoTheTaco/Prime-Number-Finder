@@ -21,6 +21,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FabAnimator;
 import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
 import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
@@ -28,9 +29,11 @@ import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
+import com.tycho.app.primenumberfinder.modules.TaskListFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
@@ -64,7 +67,7 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
     private ValidEditText editTextSearchRangeEnd;
 
     //Fragments in the main adapter.
-    private FindPrimesTaskListFragment taskListFragment;
+    private TaskListFragment taskListFragment;
     private GeneralResultsFragment generalResultsFragment;
 
     //Results fragments
@@ -119,18 +122,23 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         viewPager = rootView.findViewById(R.id.view_pager);
 
         //Add fragments to adapter
-        simpleFragmentAdapter.add("Tasks", FindPrimesTaskListFragment.class);
+        simpleFragmentAdapter.add("Tasks", TaskListFragment.class);
         simpleFragmentAdapter.add("Results", GeneralResultsFragment.class);
 
         //Instantiate fragments now to save a reference to them
         simpleFragmentAdapter.startUpdate(viewPager);
-        taskListFragment = (FindPrimesTaskListFragment) simpleFragmentAdapter.instantiateItem(viewPager, 0);
+        taskListFragment = (TaskListFragment) simpleFragmentAdapter.instantiateItem(viewPager, 0);
         generalResultsFragment = (GeneralResultsFragment) simpleFragmentAdapter.instantiateItem(viewPager, 1);
         simpleFragmentAdapter.finishUpdate(viewPager);
 
+        //Set up task list fragment
+        taskListFragment.setAdapter(new FindPrimesTaskListAdapter(getContext()));
+        taskListFragment.whitelist(FindPrimesTask.class, CheckPrimalityTask.class);
+        taskListFragment.addActionViewListener((ActionViewListener) getActivity());
+        taskListFragment.addEventListener(this);
+
         //Set up view pager
         viewPager.setAdapter(simpleFragmentAdapter);
-
         fabAnimator = new FabAnimator(floatingActionButtonHost.getFab(0));
         viewPager.addOnPageChangeListener(fabAnimator);
         final TabLayout tabLayout = rootView.findViewById(R.id.tab_layout);

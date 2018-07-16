@@ -19,8 +19,11 @@ import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
@@ -35,14 +38,22 @@ public class TaskListFragment extends Fragment {
      */
     private static final String TAG = TaskListFragment.class.getSimpleName();
 
+    /**
+     * Adapter used to display task list.
+     */
     private AbstractTaskListAdapter taskListAdapter;
 
+    /**
+     * Displayed when the task list is empty.
+     */
     private TextView textViewNoTasks;
 
     private RecyclerView recyclerView;
 
     private Queue<AbstractTaskListAdapter.EventListener> eventListenerQueue = new LinkedBlockingQueue<>(5);
     private Queue<ActionViewListener> actionViewListenerQueue = new LinkedBlockingQueue<>(5);
+
+    private final List<Class<? extends Task>> whitelist = new ArrayList<>();
 
     /**
      * All UI updates are posted to this {@link Handler} on the main thread.
@@ -53,16 +64,25 @@ public class TaskListFragment extends Fragment {
         this.taskListAdapter = adapter;
     }
 
-    @Override
+   /* @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+        if (context instanceof ActionViewListener) {
+            taskListAdapter.addActionViewListener((ActionViewListener) context);
+        }
+
+        if (getParentFragment() instanceof AbstractTaskListAdapter.EventListener) {
+            taskListAdapter.addEventListener((AbstractTaskListAdapter.EventListener) getParentFragment());
+        }
+
         while (!eventListenerQueue.isEmpty()) {
             taskListAdapter.addEventListener(eventListenerQueue.poll());
         }
         while (!actionViewListenerQueue.isEmpty()) {
             taskListAdapter.addActionViewListener(actionViewListenerQueue.poll());
         }
-    }
+    }*/
 
     @Nullable
     @Override
@@ -81,9 +101,9 @@ public class TaskListFragment extends Fragment {
 
         //Restore tasks if fragment was destroyed
         for (Task task : PrimeNumberFinder.getTaskManager().getTasks()) {
-            if (task instanceof FindFactorsTask) {
-                addTask((FindFactorsTask) task);
-                taskListAdapter.setSaved(task, ((FindFactorsTask) task).isSaved());
+            if (whitelist.contains(task.getClass())){
+                addTask(task);
+                if (task instanceof Savable) taskListAdapter.setSaved(task, ((Savable) task).isSaved());
             }
         }
         taskListAdapter.sortByTimeCreated();
@@ -130,18 +150,45 @@ public class TaskListFragment extends Fragment {
         }
     }
 
-    public void addTask(final FindFactorsTask task) {
-        task.addSaveListener(new Savable.SaveListener() {
-            @Override
-            public void onSaved() {
-                taskListAdapter.postSetSaved(task, true);
-            }
+    public void addTask(final Task task) {
+        if (task instanceof FindPrimesTask){
+            ((FindPrimesTask) task).addSaveListener(new Savable.SaveListener() {
+                @Override
+                public void onSaved() {
+                    taskListAdapter.postSetSaved(task, true);
+                }
 
-            @Override
-            public void onError() {
+                @Override
+                public void onError() {
 
-            }
-        });
+                }
+            });
+        }else if (task instanceof FindFactorsTask){
+            ((FindFactorsTask) task).addSaveListener(new Savable.SaveListener() {
+                @Override
+                public void onSaved() {
+                    taskListAdapter.postSetSaved(task, true);
+                }
+
+                @Override
+                public void onError() {
+
+                }
+            });
+        }else if (task instanceof PrimeFactorizationTask){
+            ((PrimeFactorizationTask) task).addSaveListener(new Savable.SaveListener() {
+                @Override
+                public void onSaved() {
+                    taskListAdapter.postSetSaved(task, true);
+                }
+
+                @Override
+                public void onError() {
+
+                }
+            });
+        }
+
         taskListAdapter.addTask(task);
         update();
     }
@@ -168,5 +215,9 @@ public class TaskListFragment extends Fragment {
         } else {
             taskListAdapter.addActionViewListener(actionViewListener);
         }
+    }
+
+    public void whitelist(final Class<? extends Task>... classes){
+        whitelist.addAll(Arrays.asList(classes));
     }
 }

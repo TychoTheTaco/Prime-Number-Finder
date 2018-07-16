@@ -1,6 +1,7 @@
 package com.tycho.app.primenumberfinder;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -32,7 +33,7 @@ public class SimpleFragmentAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-      return Fragment.instantiate(context, items.get(position).mClass.getName());
+      return Fragment.instantiate(context, items.get(position).mClass.getName(), items.get(position).args);
     }
 
     @Override
@@ -68,11 +69,17 @@ public class SimpleFragmentAdapter extends FragmentPagerAdapter {
     private class AdapterItem{
         private final String title;
         private final Class<? extends Fragment> mClass;
+        private final Bundle args;
         private Fragment fragment;
 
-        AdapterItem(String title, Class<? extends Fragment> cls) {
+        AdapterItem(String title, Class<? extends Fragment> cls, final Bundle args) {
             this.title = title;
             mClass = cls;
+            this.args = args;
+        }
+
+        AdapterItem(String title, Class<? extends Fragment> cls) {
+            this(title, cls, null);
         }
     }
 }

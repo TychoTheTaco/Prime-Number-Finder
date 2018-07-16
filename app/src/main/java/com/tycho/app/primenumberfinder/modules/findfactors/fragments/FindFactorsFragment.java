@@ -117,6 +117,7 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
 
         //Set up Task list fragment
         taskListFragment.setAdapter(new FindFactorsTaskListAdapter(getContext()));
+        taskListFragment.whitelist(FindFactorsTask.class);
         taskListFragment.addActionViewListener(actionViewListener);
         taskListFragment.addEventListener(new FindFactorsTaskListAdapter.EventListener() {
             @Override
