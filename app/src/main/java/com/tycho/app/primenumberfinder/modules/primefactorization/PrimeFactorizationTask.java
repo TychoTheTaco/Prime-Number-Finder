@@ -250,8 +250,38 @@ public class PrimeFactorizationTask extends Task implements Savable{
         }
     }
 
+    private boolean saved;
+
     @Override
     public boolean save() {
-       return FileManager.getInstance().saveTree(getFactorTree());
+        saved = FileManager.getInstance().saveTree(getFactorTree());
+        if (saved){
+            sendOnSaved();
+        }else{
+            sendOnError();
+        }
+        return saved;
+    }
+
+    private CopyOnWriteArrayList<SaveListener> saveListeners = new CopyOnWriteArrayList<>();
+
+    public void addSaveListener(final SaveListener listener){
+        saveListeners.add(listener);
+    }
+
+    public void removeSaveListener(final SaveListener listener){
+        saveListeners.remove(listener);
+    }
+
+    private void sendOnSaved(){
+        for (SaveListener listener : saveListeners){
+            listener.onSaved();
+        }
+    }
+
+    private void sendOnError(){
+        for (SaveListener listener : saveListeners){
+            listener.onError();
+        }
     }
 }

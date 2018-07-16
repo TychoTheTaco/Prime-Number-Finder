@@ -118,7 +118,7 @@ public class PrimeFactorizationTaskListFragment extends Fragment{
     }
 
     public void addTask(final PrimeFactorizationTask task) {
-        /*task.addSavableCallbacks(new Savable.SavableCallbacks() {
+        task.addSaveListener(new Savable.SaveListener() {
             @Override
             public void onSaved() {
                 taskListAdapter.postSetSaved(task, true);
@@ -128,7 +128,7 @@ public class PrimeFactorizationTaskListFragment extends Fragment{
             public void onError() {
 
             }
-        });*/
+        });
         taskListAdapter.addTask(task);
         update();
     }

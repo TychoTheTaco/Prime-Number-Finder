@@ -21,6 +21,7 @@ import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsTaskListAdapter;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,7 @@ import easytasks.Task;
  * Created by tycho on 11/19/2017.
  */
 
-public class FindFactorsTaskListFragment extends Fragment{
+public class FindFactorsTaskListFragment extends Fragment {
 
     /**
      * Tag used for logging and debugging.
@@ -91,7 +92,7 @@ public class FindFactorsTaskListFragment extends Fragment{
         taskListAdapter.sortByTimeCreated();
 
         //Select correct task
-        if (savedInstanceState != null){
+        if (savedInstanceState != null) {
             taskListAdapter.setSelected(savedInstanceState.getInt("selectedItemPosition"));
 
             //Restore saved state
@@ -101,7 +102,7 @@ public class FindFactorsTaskListFragment extends Fragment{
                     taskListAdapter.setSaved(i, true);
                 }
             }
-        }else{
+        } else {
             taskListAdapter.setSelected(PrimeNumberFinder.getTaskManager().findTaskById((UUID) getActivity().getIntent().getSerializableExtra("taskId")));
         }
 
@@ -133,7 +134,7 @@ public class FindFactorsTaskListFragment extends Fragment{
     }
 
     public void addTask(final FindFactorsTask task) {
-       /* task.addSavableCallbacks(new Savable.SavableCallbacks() {
+        task.addSaveListener(new Savable.SaveListener() {
             @Override
             public void onSaved() {
                 taskListAdapter.postSetSaved(task, true);
@@ -143,7 +144,7 @@ public class FindFactorsTaskListFragment extends Fragment{
             public void onError() {
 
             }
-        });*/
+        });
         taskListAdapter.addTask(task);
         update();
     }
@@ -164,7 +165,7 @@ public class FindFactorsTaskListFragment extends Fragment{
         recyclerView.scrollToPosition(taskListAdapter.getItemCount() - 1);
     }
 
-    public void addActionViewListener(final ActionViewListener actionViewListener){
+    public void addActionViewListener(final ActionViewListener actionViewListener) {
         if (taskListAdapter == null) {
             actionViewListenerQueue.add(actionViewListener);
         } else {
