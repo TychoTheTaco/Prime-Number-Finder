@@ -17,6 +17,7 @@ import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
+import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.adapters.PrimeFactorizationTaskListAdapter;
 
@@ -79,6 +80,7 @@ public class PrimeFactorizationTaskListFragment extends Fragment{
         for (Task task : PrimeNumberFinder.getTaskManager().getTasks()) {
             if (task instanceof PrimeFactorizationTask) {
                 addTask((PrimeFactorizationTask) task);
+                taskListAdapter.setSaved(task, ((PrimeFactorizationTask) task).isSaved());
             }
         }
         taskListAdapter.sortByTimeCreated();

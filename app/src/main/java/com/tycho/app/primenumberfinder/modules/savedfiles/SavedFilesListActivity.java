@@ -10,8 +10,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -245,7 +247,8 @@ public class SavedFilesListActivity extends AbstractActivity {
                         lasSortAscending = ascending;
                     }
                 };
-                sortPopupWindow.showAsDropDown(findViewById(R.id.sort), (int) Utils.dpToPx(this, -106), (int) Utils.dpToPx(this, -48));
+                sortPopupWindow.getContentView().measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+                sortPopupWindow.showAsDropDown(findViewById(R.id.sort), -(sortPopupWindow.getContentView().getMeasuredWidth() - (int) Utils.dpToPx(this, 45)), (int) Utils.dpToPx(this, -48));
                 sortPopupWindow.setSearchMethod(lastSortMethod != null ? lastSortMethod : SortPopupWindow.SortMethod.DATE, lasSortAscending);
                 break;
 
