@@ -100,9 +100,6 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Log.e(TAG, "onAttach(): " + context);
-        Log.d(TAG, "Results: " + findPrimesResultsFragment);
-
         if (context instanceof FloatingActionButtonHost) {
             floatingActionButtonHost = (FloatingActionButtonHost) context;
         }
@@ -128,25 +125,14 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
         viewPager = rootView.findViewById(R.id.view_pager);
 
         //Add fragments to adapter
-        Log.d(TAG, "Adding fragments...");
         simpleFragmentAdapter.add(FindPrimesTaskListFragment.class.getName(), "Tasks");
         simpleFragmentAdapter.add(GeneralResultsFragment.class.getName(), "Results");
 
         //Instantiate fragments now to save a reference to them
-        Log.e(TAG, "Fragments before: " + simpleFragmentAdapter.getFragment(0));
-        Log.e(TAG, "Fragments before: " + simpleFragmentAdapter.getFragment(1));
         simpleFragmentAdapter.startUpdate(viewPager);
         taskListFragment = (FindPrimesTaskListFragment) simpleFragmentAdapter.instantiateItem(viewPager, 0);
         generalResultsFragment = (GeneralResultsFragment) simpleFragmentAdapter.instantiateItem(viewPager, 1);
         simpleFragmentAdapter.finishUpdate(viewPager);
-        Log.e(TAG, "Fragments after: " + simpleFragmentAdapter.getFragment(0));
-        Log.e(TAG, "Fragments after: " + simpleFragmentAdapter.getFragment(1));
-
-        Log.d(TAG, "Contains fragments: " + generalResultsFragment.getChildFragmentManager().getFragments());
-        for (Fragment fragment : generalResultsFragment.getChildFragmentManager().getFragments()) {
-            Log.d(TAG, "Fragment: " + fragment.getId() + " " + fragment.getTag());
-        }
-        Log.w(TAG, "Fragment from find: " + generalResultsFragment.getContent());
 
         //Set up view pager
         viewPager.setAdapter(simpleFragmentAdapter);
@@ -179,27 +165,24 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
         //Set up check primality button
         final Button buttonCheckPrimality = rootView.findViewById(R.id.check_primality_button);
-        buttonCheckPrimality.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        buttonCheckPrimality.setOnClickListener(v -> {
 
-                //Check if the number is valid
-                if (Validator.isPrimalityInputValid(getPrimalityInput())) {
+            //Check if the number is valid
+            if (Validator.isPrimalityInputValid(getPrimalityInput())) {
 
-                    //Create a new task
-                    final Task task = new CheckPrimalityTask(getPrimalityInput().longValue());
-                    taskListFragment.addTask(task);
-                    PrimeNumberFinder.getTaskManager().registerTask(task);
+                //Create a new task
+                final Task task = new CheckPrimalityTask(getPrimalityInput().longValue());
+                taskListFragment.addTask(task);
+                PrimeNumberFinder.getTaskManager().registerTask(task);
 
-                    //Start the task
-                    task.startOnNewThread();
-                    taskListFragment.setSelected(task);
+                //Start the task
+                task.startOnNewThread();
+                taskListFragment.setSelected(task);
 
-                    hideKeyboard(getActivity());
+                hideKeyboard(getActivity());
 
-                } else {
-                    Toast.makeText(getActivity(), getString(R.string.error_invalid_number), Toast.LENGTH_SHORT).show();
-                }
+            } else {
+                Toast.makeText(getActivity(), getString(R.string.error_invalid_number), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -276,41 +259,33 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
 
         //Set up infinity button
         final ImageButton infinityButton = rootView.findViewById(R.id.infinity_button);
-        infinityButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editTextSearchRangeEnd.setText(getString(R.string.infinity_text), false);
-            }
-        });
+        infinityButton.setOnClickListener(v -> editTextSearchRangeEnd.setText(getString(R.string.infinity_text), false));
 
         //Set up find primes button
         final Button buttonFindPrimes = rootView.findViewById(R.id.button_find_primes);
-        buttonFindPrimes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        buttonFindPrimes.setOnClickListener(v -> {
 
-                //Determine best search method
-                searchOptions.setSearchMethod(determineBestSearchMethod());
+            //Determine best search method
+            searchOptions.setSearchMethod(determineBestSearchMethod());
 
-                //Check if the range is valid
-                if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
+            //Check if the range is valid
+            if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
 
-                    //Create a new task
-                    searchOptions.setThreadCount(1);
-                    try {
-                        startTask((FindPrimesTask.SearchOptions) searchOptions.clone());
-                    } catch (CloneNotSupportedException e) {
-                        e.printStackTrace();
-                    }
-
-                    //Reset search options
-                    searchOptions.setSearchMethod(FindPrimesTask.SearchMethod.BRUTE_FORCE);
-
-                    hideKeyboard(getActivity());
-
-                } else {
-                    Toast.makeText(getActivity(), getString(R.string.error_invalid_range), Toast.LENGTH_SHORT).show();
+                //Create a new task
+                searchOptions.setThreadCount(1);
+                try {
+                    startTask((FindPrimesTask.SearchOptions) searchOptions.clone());
+                } catch (CloneNotSupportedException e) {
+                    e.printStackTrace();
                 }
+
+                //Reset search options
+                searchOptions.setSearchMethod(FindPrimesTask.SearchMethod.BRUTE_FORCE);
+
+                hideKeyboard(getActivity());
+
+            } else {
+                Toast.makeText(getActivity(), getString(R.string.error_invalid_range), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -415,17 +390,9 @@ public class FindPrimesFragment extends Fragment implements FloatingActionButton
             @Override
             public void onTaskStopped() {
                 if (task.getSearchOptions().isAutoSave()) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            final boolean success = FileManager.getInstance().savePrimes(task.getStartValue(), task.getEndValue(), task.getSortedPrimes());
-                            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
+                    new Thread(() -> {
+                        final boolean success = FileManager.getInstance().savePrimes(task.getStartValue(), task.getEndValue(), task.getSortedPrimes());
+                        new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show());
                     }).start();
                 }
 

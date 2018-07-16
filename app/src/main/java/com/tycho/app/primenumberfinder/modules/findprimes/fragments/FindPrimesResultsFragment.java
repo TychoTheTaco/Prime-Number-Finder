@@ -74,13 +74,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         private long finalPrimesPerSecond;
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        Log.e(TAG, "onAttach(): " + context);
-        //TODO: This is being called twice and that is a problem!
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -116,58 +109,48 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             }
         }
 
-        viewAllButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        viewAllButton.setOnClickListener(v -> {
+            final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setTitle("Loading...");
+            progressDialog.show();
 
-                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                progressDialog.setTitle("Loading...");
-                progressDialog.show();
+            new Thread(() -> {
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
+                //Pause the task
+                final Task.State state = getTask().getState();
+                try {
+                    getTask().pauseAndWait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
-                        //Pause the task
-                        final Task.State state = getTask().getState();
-                        try {
-                            getTask().pauseAndWait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                final File file;
 
-                        final File file;
+                //Check if cached file exists
+                final File cached = new File(FileManager.getInstance().getTaskCacheDirectory(getTask()) + File.separator + "primes");
+                if (cached.exists() && getTask().getState() == Task.State.STOPPED) {
+                    file = cached;
+                } else {
+                    file = getTask().saveToFile();
+                }
 
-                        //Check if cached file exists
-                        final File cached = new File(FileManager.getInstance().getTaskCacheDirectory(getTask()) + File.separator + "primes");
-                        if (cached.exists() && getTask().getState() == Task.State.STOPPED) {
-                            file = cached;
-                        } else {
-                            file = getTask().saveToFile();
-                        }
+                //Resume the task
+                if (state == Task.State.RUNNING) {
+                    getTask().resume();
+                }
 
-                        //Resume the task
-                        if (state == Task.State.RUNNING) {
-                            getTask().resume();
-                        }
+                handler.post(progressDialog::dismiss);
 
-                        handler.post(progressDialog::dismiss);
-
-                        final Intent intent = new Intent(getActivity(), DisplayPrimesActivity.class);
-                        intent.putExtra("filePath", file.getAbsolutePath());
-                        intent.putExtra("enableSearch", true);
-                        intent.putExtra("range", new long[]{getTask().getStartValue(), getTask().getState() == Task.State.STOPPED ? getTask().getEndValue() : getTask().getCurrentValue()});
-                        intent.putExtra("title", false);
-                        getActivity().startActivity(intent);
-                    }
-                }).start();
-            }
+                final Intent intent = new Intent(getActivity(), DisplayPrimesActivity.class);
+                intent.putExtra("filePath", file.getAbsolutePath());
+                intent.putExtra("enableSearch", true);
+                intent.putExtra("range", new long[]{getTask().getStartValue(), getTask().getState() == Task.State.STOPPED ? getTask().getEndValue() : getTask().getCurrentValue()});
+                intent.putExtra("title", false);
+                getActivity().startActivity(intent);
+            }).start();
         });
 
-        saveButton.setOnClickListener(v -> {
-            Log.w(TAG, "Save clicked: " + getContext());
-            saveTask(getTask(), getActivity());
-        });
+        saveButton.setOnClickListener(v -> saveTask(getTask(), getActivity()));
 
         init();
 
@@ -179,24 +162,16 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         progressDialog.setTitle("Saving...");
         progressDialog.show();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (task.save()) {
-                    handler.post(() -> {
-                        Log.d(TAG, "Posted context: " + getContext() + " " + getActivity());
-                        Toast.makeText(context.getApplicationContext(), context.getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
-                    });
-                } else {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(context.getApplicationContext(), context.getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-                progressDialog.dismiss();
+        new Thread(() -> {
+            if (task.save()) {
+                handler.post(() -> {
+                    Log.d(TAG, "Posted context: " + getContext() + " " + getActivity());
+                    Toast.makeText(context.getApplicationContext(), context.getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
+                });
+            } else {
+                handler.post(() -> Toast.makeText(context.getApplicationContext(), context.getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show());
             }
+            progressDialog.dismiss();
         }).start();
     }
 

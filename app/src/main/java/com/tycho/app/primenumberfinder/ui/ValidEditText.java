@@ -58,23 +58,20 @@ public class ValidEditText extends FormattedEditText {
                 Color.RED
         ));
 
-        setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                //Perform click
-                performClick();
+        setOnTouchListener((v, event) -> {
+            //Perform click
+            performClick();
 
-                //Clear text
-                if (clearOnTouch) {
-                    getText().clear();
-                }
-
-                //Notify listeners
-                sendOnTouch(v, event);
-
-                //Do not consume event
-                return false;
+            //Clear text
+            if (clearOnTouch) {
+                getText().clear();
             }
+
+            //Notify listeners
+            sendOnTouch(v, event);
+
+            //Do not consume event
+            return false;
         });
     }
 

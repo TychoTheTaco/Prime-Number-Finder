@@ -5,8 +5,11 @@ import android.content.res.TypedArray;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.text.method.KeyListener;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.utils.Utils;
@@ -80,7 +83,7 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
     private final TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+            Log.e(TAG, "beforeTextChanged!");
         }
 
         @Override
@@ -90,31 +93,28 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
 
         @Override
         public void afterTextChanged(Editable editable) {
-
-            //Format text
             if (isDecimalInput()) {
+                final String decimalSeparator = String.valueOf(DECIMAL_FORMAT.getDecimalFormatSymbols().getDecimalSeparator());
 
-                //Log.d(TAG, "Decimal separator is '" + DECIMAL_FORMAT.getDecimalFormatSymbols().getDecimalSeparator() + "'");
+                //If the text ends with a character that isn't a digit or the decimal separator, replace it
+                final Pattern pattern = Pattern.compile("[^\\d]$");
+                final Matcher matcher = pattern.matcher(editable.toString());
+                if (matcher.find() && matcher.group().charAt(0) != decimalSeparator.charAt(0)){
+                    setText(editable.toString().replace(matcher.group().charAt(0), decimalSeparator.charAt(0)), true);
+                    return;
+                }
 
                 //If the text ends with a decimal, don't modify it
-                final Pattern pattern = Pattern.compile("[^\\d]$");
-                final Matcher matcher = pattern.matcher(editable);
-                if (matcher.find()) {
-                    Log.w(TAG, "Ended with decimal, not modifying.");
-                    return;
-                }
+                if (editable.toString().endsWith(decimalSeparator)) return;
 
                 //If the text contains a decimal and ends with a zero, don't modify it
-                if (getText().toString().contains(String.valueOf(DECIMAL_FORMAT.getDecimalFormatSymbols().getDecimalSeparator())) && getText().toString().endsWith("0")){
-                    Log.w(TAG, "Ended with dot zero, not modifying.");
+                if (getText().toString().contains(decimalSeparator) && getText().toString().endsWith("0")){
                     return;
                 }
 
-                //final String formatted = DECIMAL_FORMAT.format(Utils.textToDecimal(getText().toString(), DECIMAL_FORMAT.getDecimalFormatSymbols().getDecimalSeparator()));
                 final BigDecimal bigDecimal = Utils.textToDecimal(getText().toString(), DECIMAL_FORMAT.getDecimalFormatSymbols().getDecimalSeparator());
                 final String formatted = DECIMAL_FORMAT.format(bigDecimal);
                 if (editable.length() > 0 && !editable.toString().equals(formatted)) {
-                    Log.w(TAG, "Modified: " + formatted);
                     setText(formatted, formatted.length() > 1);
                 } else if (!allowZeroInput && editable.toString().equals(DECIMAL_FORMAT.format(0))) {
                     getText().clear();
