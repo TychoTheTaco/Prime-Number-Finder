@@ -206,12 +206,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
     @Override
     public void onTaskStatesChanged(final int taskType, final boolean active) {
         if (navigationView != null) {
-            navigationView.post(new Runnable() {
-                @Override
-                public void run() {
-                    setActionViewVisibility(navigationView.getMenu().getItem(taskType), active);
-                }
-            });
+            navigationView.post(() -> setActionViewVisibility(navigationView.getMenu().getItem(taskType), active));
         }
     }
 
