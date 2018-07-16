@@ -1,6 +1,5 @@
 package com.tycho.app.primenumberfinder.modules.findprimes;
 
-import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
@@ -21,6 +20,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import easytasks.MultithreadedTask;
@@ -79,7 +79,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
         this.searchMethod = searchMethod;
     }
 
-    public FindPrimesTask(final SearchOptions searchOptions, final Context context) {
+    public FindPrimesTask(final SearchOptions searchOptions) {
         this(searchOptions.getStartValue(), searchOptions.getEndValue(), searchOptions.getThreadCount(), searchOptions.getSearchMethod());
         this.searchOptions = searchOptions;
     }
@@ -812,10 +812,34 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
     public boolean save() {
         try {
             FileManager.copy(saveToFile(), new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getStartValue() + " to " + (getEndValue() == FindPrimesTask.INFINITY ? getCurrentValue() : getEndValue()) + EXTENSION));
+            sendOnSaved();
             return true;
         } catch (IOException e) {
             e.printStackTrace();
         }
+        sendOnError();
         return false;
+    }
+
+    private CopyOnWriteArrayList<SaveListener> saveListeners = new CopyOnWriteArrayList<>();
+
+    public void addSaveListener(final SaveListener listener){
+        saveListeners.add(listener);
+    }
+
+    public void removeSaveListener(final SaveListener listener){
+        saveListeners.remove(listener);
+    }
+
+    private void sendOnSaved(){
+        for (SaveListener listener : saveListeners){
+            listener.onSaved();
+        }
+    }
+
+    private void sendOnError(){
+        for (SaveListener listener : saveListeners){
+            listener.onError();
+        }
     }
 }

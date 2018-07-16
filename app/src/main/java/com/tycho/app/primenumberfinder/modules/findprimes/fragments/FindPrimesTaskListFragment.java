@@ -17,6 +17,7 @@ import com.crashlytics.android.Crashlytics;
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
@@ -111,16 +112,18 @@ public class FindPrimesTaskListFragment extends Fragment {
 
         //Store the saved item positions
         final List<Task> savedItems = taskListAdapter.getSavedItems();
+        Log.w(TAG, "Saved items: " + savedItems);
         final ArrayList<Integer> savedItemPositions = new ArrayList<>();
         for (Task task : savedItems) {
             savedItemPositions.add(taskListAdapter.indexOf(task));
         }
+        Log.d(TAG, "savedItemPositions: " + savedItemPositions);
         outState.putIntegerArrayList("savedItemPositions", savedItemPositions);
     }
 
     public void addTask(final Task task) {
-        /*if (task instanceof FindPrimesTask) {
-            ((FindPrimesTask) task).addSavableCallbacks(new Savable.SavableCallbacks() {
+        if (task instanceof FindPrimesTask) {
+            ((FindPrimesTask) task).addSaveListener(new Savable.SaveListener() {
                 @Override
                 public void onSaved() {
                     taskListAdapter.postSetSaved(task, true);
@@ -131,7 +134,7 @@ public class FindPrimesTaskListFragment extends Fragment {
 
                 }
             });
-        }*/
+        }
         taskListAdapter.addTask(task);
         recyclerView.scrollToPosition(taskListAdapter.getItemCount() - 1);
         update();

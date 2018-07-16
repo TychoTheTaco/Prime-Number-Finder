@@ -2,7 +2,8 @@ package com.tycho.app.primenumberfinder.modules.savedfiles.sort;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,12 +33,22 @@ public class SortMethodView implements View.OnClickListener{
     public View inflate(final ViewGroup parent, final boolean attachToParent){
         final View view = LayoutInflater.from(context).inflate(R.layout.sort_method, parent, attachToParent);
 
-        ((TextView) view.findViewById(R.id.text)).setText(name);
-        ((TextView) view.findViewById(R.id.text)).setCompoundDrawablesWithIntrinsicBounds(drawableRes, 0, 0, 0);
+        final TextView nameTextView = view.findViewById(R.id.text);
+        nameTextView.setText(name);
+        nameTextView.setCompoundDrawablesWithIntrinsicBounds(drawableRes, 0, 0, 0);
 
         ascendingView = view.findViewById(R.id.direction);
         ascendingView.setImageResource(ascending ? R.drawable.ic_keyboard_arrow_up_white_24dp : R.drawable.ic_keyboard_arrow_down_white_24dp);
         ascendingView.setVisibility(selected ? View.VISIBLE : View.INVISIBLE);
+
+        //Apply tint to icons
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            for (Drawable drawable : nameTextView.getCompoundDrawables()) {
+                if (drawable != null) {
+                    drawable.mutate().setTint(ContextCompat.getColor(context, R.color.white));
+                }
+            }
+        }
 
         view.setOnClickListener(this);
 
