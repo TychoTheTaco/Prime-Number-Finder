@@ -284,4 +284,8 @@ public class PrimeFactorizationTask extends Task implements Savable{
             listener.onError();
         }
     }
+
+    public boolean isSaved(){
+        return saved;
+    }
 }

@@ -87,6 +87,7 @@ public class FindFactorsTaskListFragment extends Fragment {
         for (Task task : PrimeNumberFinder.getTaskManager().getTasks()) {
             if (task instanceof FindFactorsTask) {
                 addTask((FindFactorsTask) task);
+                taskListAdapter.setSaved(task, ((FindFactorsTask) task).isSaved());
             }
         }
         taskListAdapter.sortByTimeCreated();

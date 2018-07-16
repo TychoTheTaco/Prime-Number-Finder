@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,17 @@ public class SortPopupWindow extends PopupWindow {
 
         setFocusable(true);
         setOutsideTouchable(true);
+
+        /*
+        TODO: WTF
+        For some reason these are required on API < 23. It will not set the color to red, but it will
+        keep the correct background tint list.
+         */
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
+            getContentView().setBackgroundColor(Color.RED); //Required for setBackgroundTintList()
+            setBackgroundDrawable(context.getResources().getDrawable(R.drawable.round_rectangle_white, null)); //Required for setOutsideTouchable()
+        }
+
         getContentView().setBackgroundTintList(new ColorStateList(
                 new int[][]{
                         new int[]{}
@@ -33,13 +45,6 @@ public class SortPopupWindow extends PopupWindow {
                 new int[]{
                         backgroundColor
                 }));
-        /*
-        TODO: WTF
-        For some reason these are required on API < 23. It will not set the color to red, but it will
-        keep the correct background tint list.
-         */
-        setBackgroundDrawable(new ColorDrawable()); //Required for setTouchOutside()
-        getContentView().setBackgroundColor(Color.RED); //Required for setBackgroundTintList()
 
         for (final SortMethod methods : sortMethods){
             sortMethodViews.add(new SortMethodView(context, methods.drawableResource, methods.name){
