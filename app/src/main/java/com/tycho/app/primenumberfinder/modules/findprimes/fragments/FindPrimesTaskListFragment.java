@@ -84,13 +84,14 @@ public class FindPrimesTaskListFragment extends Fragment {
         taskListAdapter.sortByTimeCreated();
 
         //Select correct task
+        Log.e(TAG, "savedInstanceState: " + savedInstanceState);
         if (savedInstanceState != null) {
             taskListAdapter.setSelected(savedInstanceState.getInt("selectedItemPosition"));
 
             //Restore saved state
             final ArrayList<Integer> savedItemPositions = savedInstanceState.getIntegerArrayList("savedItemPositions");
-            Crashlytics.log("Tasks: " + PrimeNumberFinder.getTaskManager().getTasks());
-            Crashlytics.log("Saved positions: " + savedItemPositions);
+            Crashlytics.log(Log.DEBUG, TAG, "Tasks: " + PrimeNumberFinder.getTaskManager().getTasks());
+            Crashlytics.log(Log.DEBUG, TAG, "Saved positions: " + savedItemPositions);
             if (savedItemPositions != null) {
                 for (int i : savedItemPositions) {
                     taskListAdapter.setSaved(i, true);

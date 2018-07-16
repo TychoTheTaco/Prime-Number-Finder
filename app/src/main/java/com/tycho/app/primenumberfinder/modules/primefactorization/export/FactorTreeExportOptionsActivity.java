@@ -2,7 +2,6 @@ package com.tycho.app.primenumberfinder.modules.primefactorization.export;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,27 +9,23 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.jaredrummler.android.colorpicker.ColorPickerDialog;
 import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.savedfiles.ColorPickerListener;
-import com.tycho.app.primenumberfinder.ui.RangedSeekBar;
 import com.tycho.app.primenumberfinder.ui.TreeView;
-import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
@@ -285,6 +280,10 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                             }
 
                             progressDialog.dismiss();
+
+                            final Bundle bundle = new Bundle();
+                            bundle.putLong("number", factorTree.getValue());
+                            FirebaseAnalytics.getInstance(getBaseContext()).logEvent("tree_exported", bundle);
 
                             final Uri path = FileProvider.getUriForFile(FactorTreeExportOptionsActivity.this, "com.tycho.app.primenumberfinder", image);
                             final Intent intent1 = new Intent(Intent.ACTION_SEND);
