@@ -2,20 +2,17 @@ package com.tycho.app.primenumberfinder.modules.primefactorization.export;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.jaredrummler.android.colorpicker.ColorPickerDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
-public class ColorOption extends Option implements View.OnClickListener{
+public class ColorOption extends Option implements View.OnClickListener {
 
     private final Context context;
 
@@ -23,7 +20,7 @@ public class ColorOption extends Option implements View.OnClickListener{
 
     private TextView colorTextView;
 
-    public ColorOption(final Context context, final String text, final int color){
+    public ColorOption(final Context context, final String text, final int color) {
         super(text);
         this.context = context;
         this.color = color;
@@ -48,46 +45,42 @@ public class ColorOption extends Option implements View.OnClickListener{
 
     }
 
-    public void setColor(final int color){
+    public void setColor(final int color) {
         this.color = color;
         colorTextView.setBackgroundTintList(generateColorStateList(color));
         colorTextView.setText(context.getString(R.string.hex, Integer.toHexString(color).toUpperCase()));
         colorTextView.setTextColor(getTextColor(color));
     }
 
-    private int getTextColor(final int background){
+    private int getTextColor(final int background) {
         final int a = (background >> 24) & 0xFF;
         final int r = (background >> 16) & 0xFF;
         final int g = (background >> 8) & 0xFF;
         final int b = background & 0xFF;
-        if (a < 128){
+        if (a < 128) {
             return Color.BLACK;
         }
-        if (g >= 128 && b >= 128){
+        if (g >= 128 && b >= 128) {
             return Color.BLACK;
         }
         return Color.WHITE;
     }
 
     private ColorStateList generateColorStateList(final int color) {
-        return new ColorStateList(
-                new int[][]{
-                        new int[]{android.R.attr.state_pressed},
-                        new int[]{android.R.attr.state_enabled},
-                        new int[]{-android.R.attr.state_enabled}},
+        return Utils.generateColorStateList(
+                new int[]{
+                        android.R.attr.state_enabled,
+                        -android.R.attr.state_enabled},
                 new int[]{
                         color,
-                        color,
-                        color
-                });
+                        ContextCompat.getColor(context, R.color.item_disabled)});
     }
 
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
         colorTextView.setEnabled(enabled);
-        final int color = enabled ? this.color : ContextCompat.getColor(context, R.color.item_disabled);
-        colorTextView.setBackgroundTintList(generateColorStateList(color));
+        colorTextView.setBackgroundTintList(generateColorStateList(this.color));
         colorTextView.setTextColor(enabled ? getTextColor(this.color) : ContextCompat.getColor(context, R.color.gray));
     }
 }

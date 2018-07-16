@@ -5,11 +5,7 @@ import android.content.res.TypedArray;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.text.method.KeyListener;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.View;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.utils.Utils;
@@ -63,7 +59,7 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
 
     private void init(final AttributeSet attributeSet) {
         //Get xml attributes
-        TypedArray typedArray = getContext().obtainStyledAttributes(
+        final TypedArray typedArray = getContext().obtainStyledAttributes(
                 attributeSet,
                 R.styleable.FormattedEditText,
                 0, 0);
@@ -83,7 +79,7 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
     private final TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            Log.e(TAG, "beforeTextChanged!");
+
         }
 
         @Override
