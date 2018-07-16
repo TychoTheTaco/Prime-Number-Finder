@@ -440,7 +440,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
                 }
 
                 int li = 0;
-                long lowest = 0;
+                long lowest;
                 do {
                     lowest = 0;
                     for (int i = 0; i < getTasks().size(); i++) {
@@ -491,14 +491,6 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
         return lowest;
     }
 
-    /*public long getNumbersPerSecond(){
-        long total = 0;
-        for (Task task : getTasks()) {
-            total += ((BruteForceTask) task).getCurrentValue();
-        }
-        return total;
-    }*/
-
     public void setOptions(final SearchOptions searchOptions) {
         this.searchOptions = searchOptions;
     }
@@ -524,8 +516,6 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
         private final List<Long> primes = new ArrayList<>();
         private final BlockingQueue<Long> queue = new LinkedBlockingQueue<>();
 
-        private int totalDistance = 0;
-
         private final Object QUEUE_LOCK = new Object();
 
         private int bufferSize = -1;
@@ -549,27 +539,27 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
 
             boolean running = true;
 
-            while (running && (currentNumber <= endValue || endValue == -1)) {
+            while (running && (currentNumber <= endValue || endValue == INFINITY)) {
 
                 /*
-                 * Get the square root of the number. We only need to calculate up to the square
-                 * root to determine if the number is prime. The square root of a long will
-                 * always fit inside the value range of an int.
+                Get the square root of the number. We only need to calculate up to the square root
+                to determine if the number is prime. The square root of a long will always fit
+                inside the value range of an int.
                  */
                 final int sqrtMax = (int) Math.sqrt(currentNumber);
 
                 // Assume the number is prime
                 boolean isPrime = true;
 
-                /*
-                 * Check if the number is divisible by every odd number below it's square root.
-                 */
+                // Check if the number is divisible by every odd number below it's square root.
                 for (int i = 3; i <= sqrtMax; i += 2) {
 
-                    // Check if we should pause
-                    // Ideally, this check should go after the check for primality so it does not get
-                    // called every iteration. For now, this will remain here in case a thread
-                    // never finds a prime number.
+                    /*
+                    TODO: Optimization
+                    Ideally, this check should go after the check for primality so it does not get
+                    called every iteration. For now, this will remain here in case a thread never
+                    finds a prime number.
+                     */
                     tryPause();
                     if (shouldStop()) {
                         running = false;
@@ -590,8 +580,6 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
 
                 currentNumber += increment;
             }
-
-            //Log.e(TAG, "SubTask: " + this + " finished. (" + startValue + ", " + endValue + ")");
         }
 
         @Override

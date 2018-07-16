@@ -1,6 +1,9 @@
 package com.tycho.app.primenumberfinder.activities;
 
 import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -80,6 +83,8 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
      */
     private OneToOneMap<Integer, String> fragmentIds = new OneToOneMap<>();
 
+    private final int defaultDrawerIconTint = Color.BLACK;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,6 +109,12 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         navigationView = findViewById(R.id.navigation_view);
         ((TextView) navigationView.getHeaderView(0).findViewById(R.id.app_version)).setText(getString(R.string.app_version_name, PrimeNumberFinder.getVersionName(this)));
         for (int i = 0; i < navigationView.getMenu().size(); i++) {
+            //Apply icon tint
+            /*if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
+                navigationView.setItemIconTintList(createColorStateList(Color.BLACK, ContextCompat.getColor(this, R.color.accent)));
+            }*/
+
+            //Hide action view
             try {
                 setActionViewVisibility(navigationView.getMenu().getItem(i), false);
             } catch (NullPointerException e) {
@@ -292,49 +303,49 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
 
             default:
                 setTitle(fragmentIds.get(menuItem.getItemId()));
-                navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.accent)));
+                navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.accent)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.primary_dark), ContextCompat.getColor(this, R.color.primary));
                 break;
 
             case R.id.drawer_item_find_primes:
                 setTitle(getString(R.string.title_find_primes));
-                navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.purple)));
+                navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.purple)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.purple_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));
                 break;
 
             case R.id.drawer_item_find_factors:
                 setTitle(getString(R.string.title_find_factors));
-                navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.orange)));
+                navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.orange)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.orange_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.orange_dark), ContextCompat.getColor(this, R.color.orange));
                 break;
 
             case R.id.drawer_item_factor_tree:
                 setTitle(getString(R.string.title_factor_tree));
-                navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.green)));
+                navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.green)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.green_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
                 break;
 
             case R.id.drawer_item_saved_files:
                 setTitle(getString(R.string.title_saved_files));
-                navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.accent)));
+                navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.accent)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.primary_dark), ContextCompat.getColor(this, R.color.primary));
                 break;
 
             case R.id.drawer_item_settings:
                 setTitle(getString(R.string.title_settings));
-                navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.accent)));
+                navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.accent)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.primary_dark), ContextCompat.getColor(this, R.color.primary));
                 break;
 
             case R.id.drawer_item_about:
                 setTitle(getString(R.string.title_about));
-                navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.accent)));
+                navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.accent)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.primary_dark), ContextCompat.getColor(this, R.color.primary));
                 break;

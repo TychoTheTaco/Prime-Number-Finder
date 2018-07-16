@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <group
         android:id="@+id/group_main"
         android:checkableBehavior="single">
@@ -8,20 +8,23 @@
         <item
             android:id="@+id/drawer_item_find_primes"
             android:icon="@drawable/circle_white"
-            app:actionLayout="@layout/navigation_drawer_item"
-            android:title="@string/title_find_primes"/>
+            android:iconTint="@color/black"
+            android:title="@string/title_find_primes"
+            app:actionLayout="@layout/navigation_drawer_item" />
 
         <item
             android:id="@+id/drawer_item_find_factors"
-            app:actionLayout="@layout/navigation_drawer_item"
             android:icon="@drawable/circle_white"
-            android:title="@string/title_find_factors"/>
+            android:iconTint="@color/black"
+            android:title="@string/title_find_factors"
+            app:actionLayout="@layout/navigation_drawer_item" />
 
         <item
             android:id="@+id/drawer_item_factor_tree"
             android:icon="@drawable/circle_white"
-            app:actionLayout="@layout/navigation_drawer_item"
-            android:title="@string/title_factor_tree"/>
+            android:iconTint="@color/black"
+            android:title="@string/title_factor_tree"
+            app:actionLayout="@layout/navigation_drawer_item" />
 
     </group>
 
@@ -32,8 +35,8 @@
         <item
             android:id="@+id/drawer_item_saved_files"
             android:icon="@drawable/ic_insert_drive_file_white_24dp"
-            android:title="@string/title_saved_files" >
-        </item>
+            android:iconTint="@color/black"
+            android:title="@string/title_saved_files"/>
     </group>
 
     <group
@@ -43,14 +46,14 @@
         <item
             android:id="@+id/drawer_item_settings"
             android:icon="@drawable/ic_settings_white_24dp"
-            android:title="@string/title_settings" >
-        </item>
+            android:iconTint="@color/black"
+            android:title="@string/title_settings"/>
 
         <item
             android:id="@+id/drawer_item_about"
             android:icon="@drawable/ic_info_outline_white_24dp"
-            android:title="@string/title_about" >
-        </item>
+            android:iconTint="@color/black"
+            android:title="@string/title_about"/>
     </group>
 
 </menu>
