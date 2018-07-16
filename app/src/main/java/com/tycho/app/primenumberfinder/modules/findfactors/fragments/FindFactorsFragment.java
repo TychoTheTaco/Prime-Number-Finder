@@ -178,27 +178,24 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
 
         //Set up start button
         final Button buttonFindFactors = rootView.findViewById(R.id.button_find_factors);
-        buttonFindFactors.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        buttonFindFactors.setOnClickListener(v -> {
 
-                //Check if the number is valid
-                if (Validator.isValidFactorInput(getNumberToFactor())) {
+            //Check if the number is valid
+            if (Validator.isValidFactorInput(getNumberToFactor())) {
 
-                    //Create a new task
-                    searchOptions.setNumber(getNumberToFactor().longValue());
-                    try {
-                        startTask((FindFactorsTask.SearchOptions) searchOptions.clone());
-                    }catch (CloneNotSupportedException e){
-                        e.printStackTrace();
-                    }
-
-                    hideKeyboard(getActivity());
-                    taskListFragment.scrollToBottom();
-
-                } else {
-                    Toast.makeText(getActivity(), getString(R.string.error_invalid_number), Toast.LENGTH_SHORT).show();
+                //Create a new task
+                searchOptions.setNumber(getNumberToFactor().longValue());
+                try {
+                    startTask((FindFactorsTask.SearchOptions) searchOptions.clone());
+                }catch (CloneNotSupportedException e){
+                    e.printStackTrace();
                 }
+
+                hideKeyboard(getActivity());
+                taskListFragment.scrollToBottom();
+
+            } else {
+                Toast.makeText(getActivity(), getString(R.string.error_invalid_number), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -267,17 +264,9 @@ public class FindFactorsFragment extends Fragment implements FloatingActionButto
 
                 //Auto-save
                 if (task.getSearchOptions().isAutoSave()) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            final boolean success = FileManager.getInstance().saveFactors(task.getFactors(), task.getNumber());
-                            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
+                    new Thread(() -> {
+                        final boolean success = FileManager.getInstance().saveFactors(task.getFactors(), task.getNumber());
+                        new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show());
                     }).start();
                 }
 
