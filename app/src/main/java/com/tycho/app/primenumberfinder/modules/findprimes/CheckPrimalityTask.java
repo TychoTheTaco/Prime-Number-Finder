@@ -3,6 +3,7 @@ package com.tycho.app.primenumberfinder.modules.findprimes;
 
 import com.tycho.app.primenumberfinder.Savable;
 
+import java.math.BigInteger;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import easytasks.Task;
@@ -24,6 +25,11 @@ public class CheckPrimalityTask extends Task{
     private boolean isPrime = false;
 
     public boolean finishedSearch = false;
+
+    /**
+     * The factor that was found causing this number not to be prime.
+     */
+    private int factor = 0;
 
     public CheckPrimalityTask(final long number){
         this.number = number;
@@ -60,6 +66,7 @@ public class CheckPrimalityTask extends Task{
                     //Check if the number divides perfectly
                     if (number % i == 0){
                         isPrime = false;
+                        factor = i;
                         break;
                     }
 
@@ -98,5 +105,9 @@ public class CheckPrimalityTask extends Task{
 
     public long getNumber() {
         return number;
+    }
+
+    public int getFactor() {
+        return factor;
     }
 }

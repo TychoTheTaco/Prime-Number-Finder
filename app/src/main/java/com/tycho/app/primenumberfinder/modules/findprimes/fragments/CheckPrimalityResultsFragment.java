@@ -148,10 +148,19 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
                 progressBar.clearAnimation();
 
                 //Format subtitle
-                subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_result), new String[]{
-                        NUMBER_FORMAT.format(getTask().getNumber()),
-                        getTask().isPrime() ? "prime" : "not prime"
-                }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                if (getTask().isPrime()){
+                    subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_result), new String[]{
+                            NUMBER_FORMAT.format(getTask().getNumber()),
+                            "prime"
+                    }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                }else{
+                    subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_result_negative), new String[]{
+                            NUMBER_FORMAT.format(getTask().getNumber()),
+                            "not prime",
+                            NUMBER_FORMAT.format(getTask().getFactor())
+                    }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                }
+
 
                 //Statistics
                 statisticsLayout.setVisibility(View.GONE);
