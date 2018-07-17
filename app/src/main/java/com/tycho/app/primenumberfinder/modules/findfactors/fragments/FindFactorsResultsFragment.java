@@ -119,57 +119,33 @@ public class FindFactorsResultsFragment extends ResultsFragment {
             }
         }
 
-        viewAllButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        viewAllButton.setOnClickListener(v -> new Thread(() -> {
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
+            handler.post(() -> Toast.makeText(getActivity(), getString(R.string.loading), Toast.LENGTH_SHORT).show());
 
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getActivity(), getString(R.string.loading), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-                        final Task.State state = getTask().getState();
-                        try {
-                            getTask().pauseAndWait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        final File file = new File(getActivity().getFilesDir() + File.separator + "temp");
-                        final boolean success = FileManager.getInstance().saveFactors(getTask().getFactors(), file);
-                        if (!success) {
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getActivity(), getString(R.string.general_error), Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
-                        if (state == Task.State.RUNNING) {
-                            getTask().resume();
-                        }
-
-                        final Intent intent = new Intent(getActivity(), DisplayFactorsActivity.class);
-                        intent.putExtra("filePath", file.getAbsolutePath());
-                        intent.putExtra("title", false);
-                        intent.putExtra("number", getTask().getNumber());
-                        getActivity().startActivity(intent);
-                    }
-                }).start();
+            final Task.State state = getTask().getState();
+            try {
+                getTask().pauseAndWait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        });
-
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveTask(getTask(), getActivity());
+            final File file = new File(getActivity().getFilesDir() + File.separator + "temp");
+            final boolean success = FileManager.getInstance().saveFactors(getTask().getFactors(), file);
+            if (!success) {
+                handler.post(() -> Toast.makeText(getActivity(), getString(R.string.general_error), Toast.LENGTH_SHORT).show());
             }
-        });
+            if (state == Task.State.RUNNING) {
+                getTask().resume();
+            }
+
+            final Intent intent = new Intent(getActivity(), DisplayFactorsActivity.class);
+            intent.putExtra("filePath", file.getAbsolutePath());
+            intent.putExtra("title", false);
+            intent.putExtra("number", getTask().getNumber());
+            getActivity().startActivity(intent);
+        }).start());
+
+        saveButton.setOnClickListener(v -> saveTask(getTask(), getActivity()));
 
         init();
 
@@ -181,26 +157,15 @@ public class FindFactorsResultsFragment extends ResultsFragment {
         progressDialog.setTitle("Saving...");
         progressDialog.show();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (task.save()) {
-                    progressDialog.dismiss();
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.d(TAG, "Posted context: " + getContext() + " " + getActivity());
-                            Toast.makeText(context.getApplicationContext(), context.getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                } else {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(context.getApplicationContext(), context.getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
+        new Thread(() -> {
+            if (task.save()) {
+                progressDialog.dismiss();
+                handler.post(() -> {
+                    Log.d(TAG, "Posted context: " + getContext() + " " + getActivity());
+                    Toast.makeText(context.getApplicationContext(), context.getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
+                });
+            } else {
+                handler.post(() -> Toast.makeText(context.getApplicationContext(), context.getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show());
             }
         }).start();
     }
@@ -208,29 +173,26 @@ public class FindFactorsResultsFragment extends ResultsFragment {
     @Override
     public void onTaskStarted() {
         super.onTaskStarted();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (isAdded() && !isDetached() && getTask() != null) {
-                    updateUi();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
 
-                    //Title
-                    title.setText(getString(R.string.status_searching));
-                    progressBar.startAnimation(rotateAnimation);
+                //Title
+                title.setText(getString(R.string.status_searching));
+                progressBar.startAnimation(rotateAnimation);
 
-                    //Subtitle
-                    subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+                //Subtitle
+                subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
 
-                    //Buttons
-                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                    layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
-                    centerView.setLayoutParams(layoutParams);
-                    pauseButton.setVisibility(View.VISIBLE);
-                    pauseButton.setEnabled(true);
-                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                    viewAllButton.setVisibility(View.VISIBLE);
-                    saveButton.setVisibility(View.GONE);
-                }
+                //Buttons
+                final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
+                centerView.setLayoutParams(layoutParams);
+                pauseButton.setVisibility(View.VISIBLE);
+                pauseButton.setEnabled(true);
+                pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                viewAllButton.setVisibility(View.VISIBLE);
+                saveButton.setVisibility(View.GONE);
             }
         });
     }
@@ -238,31 +200,28 @@ public class FindFactorsResultsFragment extends ResultsFragment {
     @Override
     public void onTaskPausing() {
         super.onTaskPausing();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (isAdded() && !isDetached() && getTask() != null) {
-                    updateUi();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
 
-                    //Title
-                    title.setText(getString(R.string.state_pausing));
+                //Title
+                title.setText(getString(R.string.state_pausing));
 
-                    //Subtitle
-                    subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+                //Subtitle
+                subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
 
-                    //Statistics
-                    numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+                //Statistics
+                numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
 
-                    //Buttons
-                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                    layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
-                    centerView.setLayoutParams(layoutParams);
-                    pauseButton.setVisibility(View.VISIBLE);
-                    pauseButton.setEnabled(false);
-                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                    viewAllButton.setVisibility(View.VISIBLE);
-                    saveButton.setVisibility(View.GONE);
-                }
+                //Buttons
+                final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
+                centerView.setLayoutParams(layoutParams);
+                pauseButton.setVisibility(View.VISIBLE);
+                pauseButton.setEnabled(false);
+                pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                viewAllButton.setVisibility(View.VISIBLE);
+                saveButton.setVisibility(View.GONE);
             }
         });
     }
@@ -270,33 +229,30 @@ public class FindFactorsResultsFragment extends ResultsFragment {
     @Override
     public void onTaskPaused() {
         super.onTaskPaused();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (isAdded() && !isDetached() && getTask() != null) {
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
 
-                    updateUi();
+                updateUi();
 
-                    //Title
-                    title.setText(getString(R.string.status_paused));
-                    progressBar.clearAnimation();
+                //Title
+                title.setText(getString(R.string.status_paused));
+                progressBar.clearAnimation();
 
-                    //Subtitle
-                    subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+                //Subtitle
+                subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
 
-                    //Statistics
-                    numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+                //Statistics
+                numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
 
-                    //Buttons
-                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                    layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
-                    centerView.setLayoutParams(layoutParams);
-                    pauseButton.setVisibility(View.VISIBLE);
-                    pauseButton.setEnabled(true);
-                    pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                    viewAllButton.setVisibility(View.VISIBLE);
-                    saveButton.setVisibility(View.GONE);
-                }
+                //Buttons
+                final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
+                centerView.setLayoutParams(layoutParams);
+                pauseButton.setVisibility(View.VISIBLE);
+                pauseButton.setEnabled(true);
+                pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+                viewAllButton.setVisibility(View.VISIBLE);
+                saveButton.setVisibility(View.GONE);
             }
         });
     }
@@ -304,31 +260,28 @@ public class FindFactorsResultsFragment extends ResultsFragment {
     @Override
     public void onTaskResuming() {
         super.onTaskResuming();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (isAdded() && !isDetached() && getTask() != null) {
-                    updateUi();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
 
-                    //Title
-                    title.setText(getString(R.string.state_resuming));
+                //Title
+                title.setText(getString(R.string.state_resuming));
 
-                    //Subtitle
-                    subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+                //Subtitle
+                subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
 
-                    //Statistics
-                    numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+                //Statistics
+                numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
 
-                    //Buttons
-                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                    layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
-                    centerView.setLayoutParams(layoutParams);
-                    pauseButton.setVisibility(View.VISIBLE);
-                    pauseButton.setEnabled(false);
-                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                    viewAllButton.setVisibility(View.VISIBLE);
-                    saveButton.setVisibility(View.GONE);
-                }
+                //Buttons
+                final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
+                centerView.setLayoutParams(layoutParams);
+                pauseButton.setVisibility(View.VISIBLE);
+                pauseButton.setEnabled(false);
+                pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                viewAllButton.setVisibility(View.VISIBLE);
+                saveButton.setVisibility(View.GONE);
             }
         });
     }
@@ -343,44 +296,41 @@ public class FindFactorsResultsFragment extends ResultsFragment {
     public void onTaskStopped() {
         super.onTaskStopped();
         if (isAdded() && !isDetached() && getTask() != null) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    updateUi();
+            handler.post(() -> {
+                updateUi();
 
-                    //Title
-                    title.setText(getString(R.string.status_finished));
-                    progressBar.clearAnimation();
+                //Title
+                title.setText(getString(R.string.status_finished));
+                progressBar.clearAnimation();
 
-                    //Subtitle
-                    Utils.formatSpannable(spannableStringBuilder, getResources().getQuantityString(R.plurals.find_factors_subtitle_results, getTask().getFactors().size()), new String[]{NUMBER_FORMAT.format(getTask().getNumber()), NUMBER_FORMAT.format(getTask().getFactors().size())}, ContextCompat.getColor(getActivity(), R.color.orange_dark));
-                    if (getTask().getFactors().size() != 2) {
-                        subtitleTextView.setText(spannableStringBuilder);
-                    } else {
-                        final SpannableStringBuilder ssb = new SpannableStringBuilder();
-                        Utils.formatSpannable(ssb, getResources().getString(R.string.find_factors_subtitle_results_extension), new String[]{"prime"}, ContextCompat.getColor(getActivity(), R.color.orange_dark));
-                        subtitleTextView.setText(TextUtils.concat(spannableStringBuilder, " ", ssb));
-                    }
-
-                    //Body
-                    bodyTextView.setVisibility(View.GONE);
-
-                    //Statistics
-                    etaTextView.setVisibility(View.GONE);
-                    double elapsed = (double) getTask().getElapsedTime() / 1000;
-                    if (elapsed <= 0) {
-                        elapsed = 1;
-                    }
-                    numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_numbers_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getMaxValue() / elapsed))}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
-
-                    //Buttons
-                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                    layoutParams.width = 0;
-                    centerView.setLayoutParams(layoutParams);
-                    pauseButton.setVisibility(View.GONE);
-                    viewAllButton.setVisibility(View.VISIBLE);
-                    saveButton.setVisibility(View.VISIBLE);
+                //Subtitle
+                Utils.formatSpannable(spannableStringBuilder, getResources().getQuantityString(R.plurals.find_factors_subtitle_results, getTask().getFactors().size()), new String[]{NUMBER_FORMAT.format(getTask().getNumber()), NUMBER_FORMAT.format(getTask().getFactors().size())}, ContextCompat.getColor(getActivity(), R.color.orange_dark));
+                if (getTask().getFactors().size() != 2) {
+                    subtitleTextView.setText(spannableStringBuilder);
+                } else {
+                    final SpannableStringBuilder ssb = new SpannableStringBuilder();
+                    Utils.formatSpannable(ssb, getResources().getString(R.string.find_factors_subtitle_results_extension), new String[]{"prime"}, ContextCompat.getColor(getActivity(), R.color.orange_dark));
+                    subtitleTextView.setText(TextUtils.concat(spannableStringBuilder, " ", ssb));
                 }
+
+                //Body
+                bodyTextView.setVisibility(View.GONE);
+
+                //Statistics
+                etaTextView.setVisibility(View.GONE);
+                double elapsed = (double) getTask().getElapsedTime() / 1000;
+                if (elapsed <= 0) {
+                    elapsed = 1;
+                }
+                numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_numbers_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getMaxValue() / elapsed))}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+
+                //Buttons
+                final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                layoutParams.width = 0;
+                centerView.setLayoutParams(layoutParams);
+                pauseButton.setVisibility(View.GONE);
+                viewAllButton.setVisibility(View.VISIBLE);
+                saveButton.setVisibility(View.VISIBLE);
             });
         }
     }

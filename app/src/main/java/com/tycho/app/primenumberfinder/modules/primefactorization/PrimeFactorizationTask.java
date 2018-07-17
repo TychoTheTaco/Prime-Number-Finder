@@ -5,11 +5,9 @@ import android.os.Parcelable;
 
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -37,16 +35,16 @@ public class PrimeFactorizationTask extends Task implements Savable{
 
     private int total;
 
-    private String status;
+    private String status = "";
 
     private SearchOptions searchOptions;
 
-    final FindFactorsTask findFactorsTask;
+    //final FindFactorsTask findFactorsTask;
 
     public PrimeFactorizationTask(final SearchOptions searchOptions){
         this.number = searchOptions.getNumber();
         this.searchOptions = searchOptions;
-        findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number));
+        //findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number));
     }
 
     @Override
@@ -54,10 +52,10 @@ public class PrimeFactorizationTask extends Task implements Savable{
 
         status = "findFactors";
         //final FindFactorsTask findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number));
-        findFactorsTask.start();
-        final List<Long> factors = findFactorsTask.getFactors();
+        //findFactorsTask.start();
+        //final List<Long> factors = findFactorsTask.getFactors();
 
-        status = "checkPrimality";
+        /*status = "checkPrimality";
 
         for (long n : factors){
             final CheckPrimalityTask checkPrimalityTask = new CheckPrimalityTask(n);
@@ -69,57 +67,15 @@ public class PrimeFactorizationTask extends Task implements Savable{
             if (shouldStop()){
                 return;
             }
-        }
+        }*/
         status = "generatingTree";
         this.factorTree = generateTree(number);
         status = "";
     }
 
     @Override
-    public void pause() {
-        synchronized (STATE_LOCK){
-            if (findFactorsTask.getState() != State.STOPPED){
-                try {
-                    findFactorsTask.pauseAndWait();
-                }catch (InterruptedException e){
-                    e.printStackTrace();
-                }
-                dispatchPaused();
-            }else{
-                super.pause();
-            }
-        }
-    }
-
-    @Override
-    public void resume() {
-        synchronized (STATE_LOCK){
-            if (findFactorsTask.getState() == State.PAUSED){
-                try {
-                    findFactorsTask.resumeAndWait();
-                }catch (InterruptedException e){
-                    e.printStackTrace();
-                }
-                dispatchResumed();
-            }else{
-                super.resume();
-            }
-        }
-    }
-
-    @Override
-    public void stop() {
-        findFactorsTask.stop();
-        super.stop();
-    }
-
-    @Override
     public float getProgress() {
         switch (status){
-            case "findFactors":
-                setProgress(0.33f * (findFactorsTask.getProgress()));
-                break;
-
             case "checkPrimality":
                 setProgress(0.33f);
                 break;

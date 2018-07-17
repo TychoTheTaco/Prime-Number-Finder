@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +20,6 @@ import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class SavedFilesFragment extends Fragment {
@@ -58,7 +56,7 @@ public class SavedFilesFragment extends Fragment {
         final RecyclerView recyclerViewCards = rootView.findViewById(R.id.recyclerView_savedFiles);
         recyclerViewCards.setHasFixedSize(true);
         recyclerViewCards.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerViewCards.addItemDecoration(new VerticalItemDecoration((int) Utils.dpToPx(getActivity(), 8)));
+        recyclerViewCards.addItemDecoration(new VerticalItemDecoration((int) Utils.dpToPx(getContext(), 8)));
         recyclerViewCards.setAdapter(cardAdapter);
         recyclerViewCards.setItemAnimator(null);
 
@@ -82,11 +80,10 @@ public class SavedFilesFragment extends Fragment {
     }
 
     private void update(){
-
         for (SavedFilesCard card : cards){
             card.getFilesListAdapter().refresh();
             if (!cardAdapter.getCards().contains(card) && card.getFilesListAdapter().getItemCount() > 0){
-                cardAdapter.getCards().add(card);
+                cardAdapter.getCards().add(cards.indexOf(card) > cardAdapter.getItemCount() ? cardAdapter.getItemCount() : cards.indexOf(card), card);
             }else if (card.getFilesListAdapter().getItemCount() == 0){
                 cardAdapter.getCards().remove(card);
             }

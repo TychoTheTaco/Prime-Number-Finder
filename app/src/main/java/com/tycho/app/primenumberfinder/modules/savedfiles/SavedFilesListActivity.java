@@ -10,7 +10,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -280,6 +279,10 @@ public class SavedFilesListActivity extends AbstractActivity {
                             }
                             adapterSavedFilesList.setSelectionMode(false);
                             alertDialog.dismiss();
+
+                            if (adapterSavedFilesList.getItemCount() == 0){
+                                finish();
+                            }
                         });
                 alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
                         (dialog, which) -> alertDialog.dismiss());
