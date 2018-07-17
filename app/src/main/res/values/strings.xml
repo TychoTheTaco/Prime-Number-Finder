@@ -113,7 +113,7 @@
     <string name="new_in_version">New in version %1$s</string>
     <string name="view_old_versions">View Older Versions</string>
     <string name="credits_title">Credits</string>
-    <string name="credits_description">Application icons by&#160;<a href="https://material.io/icons/">Material Icons</a> and&#160;<a href="https://icons8.com/">Icons8</a>.</string>
+    <string name="credits_description">Application icons provided by&#160;<a href="https://material.io/icons/">Material Icons</a> and&#160;<a href="https://icons8.com/">Icons8</a>.</string>
 
     <!--  -->
     <string name="find_primes_search_method_label">Search Method</string>

@@ -1,11 +1,6 @@
 package com.tycho.app.primenumberfinder.modules.findprimes;
 
 
-import com.tycho.app.primenumberfinder.Savable;
-
-import java.math.BigInteger;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import easytasks.Task;
 
 /**
@@ -24,7 +19,7 @@ public class CheckPrimalityTask extends Task{
 
     private boolean isPrime = false;
 
-    public boolean finishedSearch = false;
+    public boolean isFinished = false;
 
     /**
      * The factor that was found causing this number not to be prime.
@@ -41,8 +36,6 @@ public class CheckPrimalityTask extends Task{
     @Override
     public void run(){
 
-        boolean isFinished = true;
-
         if (number > 2){
 
             //Check if the number is divisible by 2
@@ -58,9 +51,7 @@ public class CheckPrimalityTask extends Task{
                 //Assume the number is prime
                 isPrime = true;
 
-                /*
-                 * Check if the number is divisible by every odd number below it's square root.
-                 */
+                //Check if the number is divisible by every odd number below it's square root.
                 for (i = 3; i <= sqrtMax; i += 2){
 
                     //Check if the number divides perfectly
@@ -70,25 +61,23 @@ public class CheckPrimalityTask extends Task{
                         break;
                     }
 
-                    //setProgress((float) i / sqrtMax);
-
                     //Check if we should pause
                     tryPause();
                     if (shouldStop()){
-                        //running = false;
-                        isFinished = false;
-                        break;
+                        return;
                     }
                 }
+            }else{
+                factor = 2;
             }
+        }else{
+            factor = 1;
         }
 
         if (number == 2) isPrime = true;
 
         //The task has finished
-        if (isFinished){
-            finishedSearch = true;
-        }
+        isFinished = true;
     }
 
     @Override
