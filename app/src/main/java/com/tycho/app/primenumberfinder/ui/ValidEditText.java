@@ -4,6 +4,7 @@ package com.tycho.app.primenumberfinder.ui;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -51,12 +52,7 @@ public class ValidEditText extends FormattedEditText {
     }
 
     private void init(final Context context, final AttributeSet attributeSet) {
-        setBackgroundTintList(createColorStateList(
-                Color.GRAY,
-                Utils.getAccentColor(context),
-                Color.GRAY,
-                Color.RED
-        ));
+        setBackgroundTintList(null);
 
         setOnTouchListener((v, event) -> {
             //Perform click
@@ -96,6 +92,20 @@ public class ValidEditText extends FormattedEditText {
     @Override
     public boolean performClick() {
         return super.performClick();
+    }
+
+    @Override
+    public void setBackgroundTintList(@Nullable ColorStateList tint) {
+        if (tint == null){
+            setBackgroundTintList(createColorStateList(
+                    Color.GRAY,
+                    Utils.getAccentColor(getContext()),
+                    Color.GRAY,
+                    Color.RED
+            ));
+        }else{
+            super.setBackgroundTintList(tint);
+        }
     }
 
     public void addOnTouchListener(final OnTouchListener onTouchListener) {

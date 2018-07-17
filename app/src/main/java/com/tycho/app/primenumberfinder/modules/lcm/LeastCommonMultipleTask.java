@@ -1,8 +1,11 @@
 package com.tycho.app.primenumberfinder.modules.lcm;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
+import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,14 +28,11 @@ public class LeastCommonMultipleTask extends Task {
 
     private long lcm;
 
-    public LeastCommonMultipleTask(final List<Long> numbers){
-        this.numbers.addAll(numbers);
-    }
+    private SearchOptions searchOptions;
 
-    public LeastCommonMultipleTask(final long... numbers){
-        for (long l : numbers){
-            this.numbers.add(l);
-        }
+    public LeastCommonMultipleTask(final SearchOptions searchOptions){
+        this.searchOptions = searchOptions;
+        this.numbers.addAll(searchOptions.getNumbers());
     }
 
     @Override
@@ -47,6 +47,8 @@ public class LeastCommonMultipleTask extends Task {
                     occurrences.put(l, treeMap.get(l));
                 }
             }
+            Log.d(TAG, "setProgress: " + ((float) numbers.indexOf(number) / numbers.size()));
+            setProgress((float) numbers.indexOf(number) / numbers.size());
         }
 
         lcm = 1;
@@ -61,5 +63,47 @@ public class LeastCommonMultipleTask extends Task {
 
     public List<Long> getNumbers() {
         return numbers;
+    }
+
+    public static class SearchOptions extends GeneralSearchOptions{
+
+        private final List<Long> numbers = new ArrayList<>();
+
+        public SearchOptions(final List<Long> numbers){
+            super(1, false, false);
+            this.numbers.addAll(numbers);
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeList(numbers);
+        }
+
+        public static final Parcelable.Creator<SearchOptions> CREATOR = new Parcelable.Creator<SearchOptions>() {
+
+            @Override
+            public SearchOptions createFromParcel(Parcel in) {
+                return new SearchOptions(in);
+            }
+
+            @Override
+            public SearchOptions[] newArray(int size) {
+                return new SearchOptions[size];
+            }
+        };
+
+        private SearchOptions(final Parcel parcel) {
+            super(parcel);
+            parcel.readList(numbers, ArrayList.class.getClassLoader());
+        }
+
+        public List<Long> getNumbers() {
+            return numbers;
+        }
+    }
+
+    public void setSearchOptions(final SearchOptions searchOptions){
+        this.searchOptions = searchOptions;
     }
 }

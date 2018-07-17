@@ -84,7 +84,7 @@ public class LeastCommonMultipleFragment extends ModuleHostFragment{
 
                 @Override
                 public void afterTextChanged(Editable editable) {
-                    editText.setValid(Validator.isValidFactorInput((BigInteger) editText.getNumberValue()));
+                    editText.setValid(Validator.isValidLCMInput(editText.getLongValue()));
                 }
             });
         }
@@ -93,26 +93,26 @@ public class LeastCommonMultipleFragment extends ModuleHostFragment{
         final Button buttonFindFactors = rootView.findViewById(R.id.button_find_factors);
         buttonFindFactors.setOnClickListener(v -> {
 
-            LeastCommonMultipleTask task = new LeastCommonMultipleTask(getNumbers());
-            startTask(task);
-
             //Check if the number is valid
-            /*if (Validator.isValidFactorInput(getNumberToFactor())) {
+            if (Validator.isValidLCMInput(getNumbers())) {
 
-                //Create a new task
+                LeastCommonMultipleTask task = new LeastCommonMultipleTask(new LeastCommonMultipleTask.SearchOptions(getNumbers()));
+                startTask(task);
+
+               /* //Create a new task
                 searchOptions.setNumber(getNumberToFactor().longValue());
                 try {
                     startTask((FindFactorsTask.SearchOptions) searchOptions.clone());
                 }catch (CloneNotSupportedException e){
                     e.printStackTrace();
-                }
+                }*/
 
                 hideKeyboard(getActivity());
                 taskListFragment.scrollToBottom();
 
             } else {
                 Toast.makeText(getActivity(), getString(R.string.error_invalid_number), Toast.LENGTH_SHORT).show();
-            }*/
+            }
         });
 
         return rootView;
@@ -121,7 +121,7 @@ public class LeastCommonMultipleFragment extends ModuleHostFragment{
     private List<Long> getNumbers(){
         final List<Long> numbers = new ArrayList<>();
         for (ValidEditText editText : inputs){
-            numbers.add(editText.getLongValue());
+            if (editText.isValid()) numbers.add(editText.getLongValue());
         }
         return numbers;
     }
@@ -146,20 +146,18 @@ public class LeastCommonMultipleFragment extends ModuleHostFragment{
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         switch (requestCode) {
-
-            /*case REQUEST_CODE_NEW_TASK:
+            case REQUEST_CODE_NEW_TASK:
                 if (data != null && data.getExtras() != null) {
-                    final FindFactorsTask.SearchOptions searchOptions = data.getExtras().getParcelable("searchOptions");
-                    final FindFactorsTask task = (FindFactorsTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) data.getExtras().get("taskId"));
+                    final LeastCommonMultipleTask.SearchOptions searchOptions = data.getExtras().getParcelable("searchOptions");
+                    final LeastCommonMultipleTask task = (LeastCommonMultipleTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) data.getExtras().get("taskId"));
                     if (task == null) {
-                        startTask(searchOptions);
+                        startTask(new LeastCommonMultipleTask(searchOptions));
                     } else {
                         task.setSearchOptions(searchOptions);
                     }
                 }
-                break;*/
+                break;
         }
     }
 }

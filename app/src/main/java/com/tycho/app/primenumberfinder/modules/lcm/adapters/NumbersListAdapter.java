@@ -1,11 +1,13 @@
 package com.tycho.app.primenumberfinder.modules.lcm.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -42,8 +44,6 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
 
     private final Context context;
 
-    private final NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
-
     public NumbersListAdapter(final Context context){
         this.context = context;
     }
@@ -57,7 +57,16 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
+        if (position == getItemCount() - 1){
+            holder.input.setBackgroundTintList(Utils.generateColorStateList(
+                    new int[]{},
+                    new int[]{Color.YELLOW}
+            ));
+            holder.input.setHint("Add");
+        }else{
+            holder.input.setBackgroundTintList(null);
+            holder.input.setHint("");
+        }
     }
 
     @Override
@@ -66,6 +75,14 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
     }
 
     public List<Long> getNumbers(){
+        return numbers;
+    }
+
+    public List<Long> getValidNumbers(){
+        final List<Long> numbers = new ArrayList<>();
+        for (Long l : this.numbers){
+            if (Validator.isValidLCMInput(l)) numbers.add(l);
+        }
         return numbers;
     }
 
@@ -95,6 +112,14 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
                         numbers.set(getAdapterPosition(), number.longValue());
                     }
                 }
+            });
+
+            input.addOnTouchListener((v, event) -> {
+                if (getAdapterPosition() == getItemCount() - 1){
+                    numbers.add(0L);
+                    notifyDataSetChanged();
+                }
+                return false;
             });
         }
 

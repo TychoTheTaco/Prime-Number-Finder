@@ -3,6 +3,7 @@ package com.tycho.app.primenumberfinder.utils;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 
 import java.math.BigInteger;
+import java.util.List;
 
 public class Validator {
 
@@ -87,6 +88,22 @@ public class Validator {
 
         //Number must be greater than 0
         if (input.compareTo(BigInteger.ONE) < 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean isValidLCMInput(final List<Long> numbers) {
+        for (Long number : numbers) {
+            if (!isValidLCMInput(number)) return false;
+        }
+
+        return true;
+    }
+
+    public static boolean isValidLCMInput(long number) {
+        if (number == 0 || number == 1 || number == -1) {
             return false;
         }
 

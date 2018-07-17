@@ -368,9 +368,13 @@ public final class Utils {
     }
 
     public static ColorStateList generateColorStateList(final int[] states, final int[] colors) {
-        final int[][] stateArray = new int[states.length][];
-        for (int i = 0; i < states.length; i++){
-            stateArray[i] = new int[]{states[i]};
+        final int[][] stateArray = new int[colors.length][];
+        for (int i = 0; i < stateArray.length; i++){
+            if (i < states.length){
+                stateArray[i] = new int[]{states[i]};
+            }else{
+                stateArray[i] = new int[]{};
+            }
         }
         return new ColorStateList(stateArray, colors);
     }

@@ -38,6 +38,7 @@ import com.tycho.app.primenumberfinder.utils.Validator;
 
 import java.math.BigInteger;
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.UUID;
@@ -138,17 +139,17 @@ public class LCMConfigurationActivity extends AbstractActivity {
                 onBackPressed();
                 break;
 
-            /*case R.id.start:
-                if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
+            case R.id.start:
+                if (Validator.isValidLCMInput(numbersListAdapter.getValidNumbers())) {
                     final Intent intent = new Intent();
-                    intent.putExtra("searchOptions", searchOptions);
+                    intent.putExtra("searchOptions", new LeastCommonMultipleTask.SearchOptions(numbersListAdapter.getValidNumbers()));
                     if (task != null) intent.putExtra("taskId", task.getId());
                     setResult(0, intent);
                     finish();
                 } else {
                     Toast.makeText(this, getString(R.string.error_invalid_range), Toast.LENGTH_SHORT).show();
                 }
-                break;*/
+                break;
         }
         return true;
     }
