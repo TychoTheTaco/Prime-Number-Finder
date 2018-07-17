@@ -1,7 +1,9 @@
-package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
+package com.tycho.app.primenumberfinder.modules;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,46 +20,50 @@ import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Savable;
-import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
-import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
+import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
+import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import easytasks.Task;
 
-/**
- * Created by tycho on 11/16/2017.
- */
-
-public class FindPrimesTaskListFragment extends Fragment {
+public class TaskListFragment extends Fragment {
 
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = FindPrimesTaskListFragment.class.getSimpleName();
+    private static final String TAG = TaskListFragment.class.getSimpleName();
 
-    private FindPrimesTaskListAdapter taskListAdapter;
+    /**
+     * Adapter used to display task list.
+     */
+    private AbstractTaskListAdapter taskListAdapter;
 
+    /**
+     * Displayed when the task list is empty.
+     */
     private TextView textViewNoTasks;
 
     private RecyclerView recyclerView;
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        taskListAdapter = new FindPrimesTaskListAdapter(context);
+    private Queue<AbstractTaskListAdapter.EventListener> eventListenerQueue = new LinkedBlockingQueue<>(5);
+    private Queue<ActionViewListener> actionViewListenerQueue = new LinkedBlockingQueue<>(5);
 
-        if (context instanceof ActionViewListener) {
-            taskListAdapter.addActionViewListener((ActionViewListener) context);
-        }
+    private final List<Class<? extends Task>> whitelist = new ArrayList<>();
 
-        if (getParentFragment() instanceof AbstractTaskListAdapter.EventListener) {
-            taskListAdapter.addEventListener((AbstractTaskListAdapter.EventListener) getParentFragment());
-        }
+    /**
+     * All UI updates are posted to this {@link Handler} on the main thread.
+     */
+    protected final Handler handler = new Handler(Looper.getMainLooper());
+
+    public void setAdapter(final AbstractTaskListAdapter adapter){
+        this.taskListAdapter = adapter;
     }
 
     @Nullable
@@ -77,11 +83,9 @@ public class FindPrimesTaskListFragment extends Fragment {
 
         //Restore tasks if fragment was destroyed
         for (Task task : PrimeNumberFinder.getTaskManager().getTasks()) {
-            if (task instanceof FindPrimesTask || task instanceof CheckPrimalityTask) {
+            if (whitelist.contains(task.getClass())){
                 addTask(task);
-                if (task instanceof FindPrimesTask){
-                    taskListAdapter.setSaved(task, ((FindPrimesTask) task).isSaved());
-                }
+                if (task instanceof Savable) taskListAdapter.setSaved(task, ((Savable) task).isSaved());
             }
         }
         taskListAdapter.sortByTimeCreated();
@@ -120,8 +124,16 @@ public class FindPrimesTaskListFragment extends Fragment {
         outState.putIntegerArrayList("savedItemPositions", savedItemPositions);
     }
 
+    public void addEventListener(final AbstractTaskListAdapter.EventListener eventListener) {
+        if (taskListAdapter == null) {
+            eventListenerQueue.add(eventListener);
+        } else {
+            taskListAdapter.addEventListener(eventListener);
+        }
+    }
+
     public void addTask(final Task task) {
-        if (task instanceof FindPrimesTask) {
+        if (task instanceof FindPrimesTask){
             ((FindPrimesTask) task).addSaveListener(new Savable.SaveListener() {
                 @Override
                 public void onSaved() {
@@ -133,14 +145,34 @@ public class FindPrimesTaskListFragment extends Fragment {
 
                 }
             });
-        }
-        taskListAdapter.addTask(task);
-        recyclerView.scrollToPosition(taskListAdapter.getItemCount() - 1);
-        update();
-    }
+        }else if (task instanceof FindFactorsTask){
+            ((FindFactorsTask) task).addSaveListener(new Savable.SaveListener() {
+                @Override
+                public void onSaved() {
+                    taskListAdapter.postSetSaved(task, true);
+                }
 
-    public void update() {
-        textViewNoTasks.setVisibility(taskListAdapter.getItemCount() > 0 ? View.GONE : View.VISIBLE);
+                @Override
+                public void onError() {
+
+                }
+            });
+        }else if (task instanceof PrimeFactorizationTask){
+            ((PrimeFactorizationTask) task).addSaveListener(new Savable.SaveListener() {
+                @Override
+                public void onSaved() {
+                    taskListAdapter.postSetSaved(task, true);
+                }
+
+                @Override
+                public void onError() {
+
+                }
+            });
+        }
+
+        taskListAdapter.addTask(task);
+        update();
     }
 
     public void setSelected(final int index) {
@@ -149,5 +181,25 @@ public class FindPrimesTaskListFragment extends Fragment {
 
     public void setSelected(final Task task) {
         taskListAdapter.setSelected(task);
+    }
+
+    public void update() {
+        textViewNoTasks.setVisibility(taskListAdapter.getItemCount() > 0 ? View.GONE : View.VISIBLE);
+    }
+
+    public void scrollToBottom() {
+        recyclerView.scrollToPosition(taskListAdapter.getItemCount() - 1);
+    }
+
+    public void addActionViewListener(final ActionViewListener actionViewListener) {
+        if (taskListAdapter == null) {
+            actionViewListenerQueue.add(actionViewListener);
+        } else {
+            taskListAdapter.addActionViewListener(actionViewListener);
+        }
+    }
+
+    public void whitelist(final Class<? extends Task>... classes){
+        whitelist.addAll(Arrays.asList(classes));
     }
 }

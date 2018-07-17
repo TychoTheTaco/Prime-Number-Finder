@@ -12,7 +12,13 @@ import android.view.ViewGroup;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
+import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import easytasks.Task;
 
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_PRIME_FACTORIZATION;
 

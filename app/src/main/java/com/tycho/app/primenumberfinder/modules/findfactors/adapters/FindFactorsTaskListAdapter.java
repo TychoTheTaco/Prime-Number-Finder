@@ -14,6 +14,11 @@ import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import easytasks.Task;
+
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_FACTORS;
 
 /**

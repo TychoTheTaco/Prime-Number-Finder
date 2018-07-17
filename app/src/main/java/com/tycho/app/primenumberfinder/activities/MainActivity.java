@@ -27,6 +27,7 @@ import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.about.AboutPageFragment;
 import com.tycho.app.primenumberfinder.modules.findfactors.fragments.FindFactorsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesFragment;
+import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.fragments.PrimeFactorizationFragment;
 import com.tycho.app.primenumberfinder.modules.savedfiles.SavedFilesFragment;
 import com.tycho.app.primenumberfinder.settings.SettingsFragment;

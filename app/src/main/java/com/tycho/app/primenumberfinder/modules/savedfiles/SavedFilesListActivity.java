@@ -280,7 +280,7 @@ public class SavedFilesListActivity extends AbstractActivity {
                             adapterSavedFilesList.setSelectionMode(false);
                             alertDialog.dismiss();
 
-                            if (adapterSavedFilesList.getItemCount() == 0){
+                            if (adapterSavedFilesList.getItemCount() == 0) {
                                 finish();
                             }
                         });
