@@ -315,10 +315,10 @@ public final class Utils {
         }
 
         //Replace all the numbers
-        String replaceNumbers = input.replaceAll("[0-9]+", "<number>");
+        String replaceNumbers = input.replaceAll("\\d+", "<number>");
 
         //Replace all the text
-        String onlyNumbers = input.replaceAll("[^0-9]+", "<text>");
+        String onlyNumbers = input.replaceAll("[^\\d]+", "<text>");
 
         //Get all numbers from the string
         try {

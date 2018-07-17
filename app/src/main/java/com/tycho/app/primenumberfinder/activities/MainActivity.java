@@ -2,10 +2,7 @@ package com.tycho.app.primenumberfinder.activities;
 
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -15,14 +12,11 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.core.CrashlyticsCore;
 import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
@@ -40,8 +34,6 @@ import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.OneToOneMap;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
-
-import io.fabric.sdk.android.Fabric;
 
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
@@ -127,7 +119,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         });
 
         //Set up drawer icon animation
-        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.content_description_edit_button, R.string.content_description_pause_button);
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_drawer, R.string.close_drawer);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
 
