@@ -75,15 +75,15 @@ public class PrimeFactorizationTask extends Task implements Savable{
 
     @Override
     public float getProgress() {
-        switch (status){
+        /*switch (status){
             case "checkPrimality":
                 setProgress(0.33f);
                 break;
 
             case "generatingTree":
-                setProgress(0.67f);
+                setProgress(0.5f);
                 break;
-        }
+        }*/
         return super.getProgress();
     }
 
@@ -128,7 +128,7 @@ public class PrimeFactorizationTask extends Task implements Savable{
                 number2 = findFactorsTask.getFactors().get((size / 2));
             }
 
-            //setProgress(primeFactors.size() / total);
+            setProgress((float) number / getNumber());
 
             tree.addNode(generateTree(number1));
             tree.addNode(generateTree(number2));

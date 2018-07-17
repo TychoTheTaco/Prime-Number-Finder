@@ -73,12 +73,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         statisticsLayout.setVisibility(View.GONE);
         etaTextView = rootView.findViewById(R.id.textView_eta);
 
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveTask(getTask(), getActivity());
-            }
-        });
+        saveButton.setOnClickListener(v -> saveTask(getTask(), getActivity()));
 
         init();
 
@@ -90,26 +85,15 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         progressDialog.setTitle("Saving...");
         progressDialog.show();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (task.save()) {
-                    progressDialog.dismiss();
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.d(TAG, "Posted context: " + getContext() + " " + getActivity());
-                            Toast.makeText(context.getApplicationContext(), context.getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                } else {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(context.getApplicationContext(), context.getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
+        new Thread(() -> {
+            if (task.save()) {
+                progressDialog.dismiss();
+                handler.post(() -> {
+                    Log.d(TAG, "Posted context: " + getContext() + " " + getActivity());
+                    Toast.makeText(context.getApplicationContext(), context.getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
+                });
+            } else {
+                handler.post(() -> Toast.makeText(context.getApplicationContext(), context.getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show());
             }
         }).start();
     }
@@ -117,10 +101,8 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     @Override
     public void onTaskStarted() {
         super.onTaskStarted();
-        if (isAdded() && !isDetached() && getTask() != null){
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
+            handler.post(() -> {
+                if (isAdded() && !isDetached() && getTask() != null) {
                     updateUi();
 
                     //Title
@@ -143,36 +125,31 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                     saveButton.setVisibility(View.GONE);
                 }
             });
-        }
-
     }
 
     @Override
     public void onTaskPausing() {
         super.onTaskPausing();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (isAdded() && !isDetached() && getTask() != null) {
-                    updateUi();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
 
-                    //Title
-                    title.setText(getString(R.string.state_pausing));
+                //Title
+                title.setText(getString(R.string.state_pausing));
 
-                    //Subtitle
-                    subtitle.setText(Utils.formatSpannable(spannableStringBuilder,
-                            getString(R.string.prime_factorization_subtitle),
-                            new String[]{NUMBER_FORMAT.format(getTask().getNumber())},
-                            ContextCompat.getColor(getActivity(), R.color.green_dark)
-                    ));
+                //Subtitle
+                subtitle.setText(Utils.formatSpannable(spannableStringBuilder,
+                        getString(R.string.prime_factorization_subtitle),
+                        new String[]{NUMBER_FORMAT.format(getTask().getNumber())},
+                        ContextCompat.getColor(getActivity(), R.color.green_dark)
+                ));
 
-                    //Buttons
-                    pauseButton.setVisibility(View.VISIBLE);
-                    pauseButton.setEnabled(false);
-                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                    saveButton.setVisibility(View.GONE);
-                    //viewAllButton.setVisibility(View.GONE);
-                }
+                //Buttons
+                pauseButton.setVisibility(View.VISIBLE);
+                pauseButton.setEnabled(false);
+                pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                saveButton.setVisibility(View.GONE);
+                //viewAllButton.setVisibility(View.GONE);
             }
         });
     }
@@ -181,29 +158,26 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     public void onTaskPaused() {
         super.onTaskPaused();
         if (isAdded() && !isDetached() && getTask() != null){
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    updateUi();
+            handler.post(() -> {
+                updateUi();
 
-                    //Title
-                    title.setText(getString(R.string.status_paused));
-                    progressBar.clearAnimation();
+                //Title
+                title.setText(getString(R.string.status_paused));
+                progressBar.clearAnimation();
 
-                    //Subtitle
-                    subtitle.setText(Utils.formatSpannable(spannableStringBuilder,
-                            getString(R.string.prime_factorization_subtitle),
-                            new String[]{NUMBER_FORMAT.format(getTask().getNumber())},
-                            ContextCompat.getColor(getActivity(), R.color.green_dark)
-                    ));
+                //Subtitle
+                subtitle.setText(Utils.formatSpannable(spannableStringBuilder,
+                        getString(R.string.prime_factorization_subtitle),
+                        new String[]{NUMBER_FORMAT.format(getTask().getNumber())},
+                        ContextCompat.getColor(getActivity(), R.color.green_dark)
+                ));
 
-                    //Buttons
-                    pauseButton.setVisibility(View.VISIBLE);
-                    pauseButton.setEnabled(true);
-                    pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                    saveButton.setVisibility(View.GONE);
-                    //viewAllButton.setVisibility(View.GONE);
-                }
+                //Buttons
+                pauseButton.setVisibility(View.VISIBLE);
+                pauseButton.setEnabled(true);
+                pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+                saveButton.setVisibility(View.GONE);
+                //viewAllButton.setVisibility(View.GONE);
             });
         }
     }
@@ -211,25 +185,22 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     @Override
     public void onTaskResuming() {
         super.onTaskResuming();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (isAdded() && !isDetached() && getTask() != null) {
-                    updateUi();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
 
-                    //Title
-                    title.setText(getString(R.string.state_resuming));
+                //Title
+                title.setText(getString(R.string.state_resuming));
 
-                    //Subtitle
-                    subtitle.setText(Utils.formatSpannable(spannableStringBuilder,
-                            getString(R.string.prime_factorization_subtitle),
-                            new String[]{NUMBER_FORMAT.format(getTask().getNumber())},
-                            ContextCompat.getColor(getActivity(), R.color.green_dark)
-                    ));
+                //Subtitle
+                subtitle.setText(Utils.formatSpannable(spannableStringBuilder,
+                        getString(R.string.prime_factorization_subtitle),
+                        new String[]{NUMBER_FORMAT.format(getTask().getNumber())},
+                        ContextCompat.getColor(getActivity(), R.color.green_dark)
+                ));
 
-                    //Buttons
-                    pauseButton.setEnabled(false);
-                }
+                //Buttons
+                pauseButton.setEnabled(false);
             }
         });
     }
@@ -244,66 +215,63 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     public void onTaskStopped() {
         super.onTaskStopped();
         if (isAdded() && !isDetached() && getTask() != null){
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    updateUi();
+            handler.post(() -> {
+                updateUi();
 
-                    //Title
-                    title.setText(getString(R.string.status_finished));
-                    progressBar.clearAnimation();
+                //Title
+                title.setText(getString(R.string.status_finished));
+                progressBar.clearAnimation();
 
-                    //Subtitle
-                    subtitle.setText(Utils.formatSpannable(spannableStringBuilder,
-                            getResources().getQuantityString(R.plurals.prime_factorization_subtitle_results, getTask().getPrimeFactors().size()),
-                            new String[]{NUMBER_FORMAT.format(getTask().getNumber()), NUMBER_FORMAT.format(getTask().getPrimeFactors().size())},
-                            ContextCompat.getColor(getActivity(), R.color.green_dark)
-                    ));
+                //Subtitle
+                subtitle.setText(Utils.formatSpannable(spannableStringBuilder,
+                        getResources().getQuantityString(R.plurals.prime_factorization_subtitle_results, getTask().getPrimeFactors().size()),
+                        new String[]{NUMBER_FORMAT.format(getTask().getNumber()), NUMBER_FORMAT.format(getTask().getPrimeFactors().size())},
+                        ContextCompat.getColor(getActivity(), R.color.green_dark)
+                ));
 
-                    //Body
-                    spannableStringBuilder.clear();
-                    spannableStringBuilder.clearSpans();
-                    spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumber()));
-                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.green_dark)), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                    spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                    int position = spannableStringBuilder.length();
-                    spannableStringBuilder.append(" = ");
+                //Body
+                spannableStringBuilder.clear();
+                spannableStringBuilder.clearSpans();
+                spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumber()));
+                spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.green_dark)), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                int position = spannableStringBuilder.length();
+                spannableStringBuilder.append(" = ");
+                spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                final Map map = getTask().getPrimeFactors();
+                for (Object factor : map.keySet()){
+                    position = spannableStringBuilder.length();
+                    String content = NUMBER_FORMAT.format(factor);
+                    spannableStringBuilder.append(content);
+                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.green_dark)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                    spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+
+                    position = spannableStringBuilder.length();
+                    content = NUMBER_FORMAT.format(map.get(factor));
+                    spannableStringBuilder.append(content);
+                    spannableStringBuilder.setSpan(new SuperscriptSpan(), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                    spannableStringBuilder.setSpan(new RelativeSizeSpan(0.8f), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+
+                    position = spannableStringBuilder.length();
+                    content = " \u00D7 "; //Multiplication sign
+                    spannableStringBuilder.append(content);
                     spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                    final Map map = getTask().getPrimeFactors();
-                    for (Object factor : map.keySet()){
-                        position = spannableStringBuilder.length();
-                        String content = NUMBER_FORMAT.format(factor);
-                        spannableStringBuilder.append(content);
-                        spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.green_dark)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                        spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-
-                        position = spannableStringBuilder.length();
-                        content = NUMBER_FORMAT.format(map.get(factor));
-                        spannableStringBuilder.append(content);
-                        spannableStringBuilder.setSpan(new SuperscriptSpan(), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                        spannableStringBuilder.setSpan(new RelativeSizeSpan(0.8f), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-
-                        position = spannableStringBuilder.length();
-                        content = " \u00D7 "; //Multiplication sign
-                        spannableStringBuilder.append(content);
-                        spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                    }
-                    spannableStringBuilder.delete(spannableStringBuilder.length() - 3, spannableStringBuilder.length());
-                    bodyTextView.setVisibility(View.VISIBLE);
-                    bodyTextView.setText(spannableStringBuilder);
-
-                    //Tree
-                    treeView.setVisibility(View.VISIBLE);
-                    treeView.setTree(getTask().getFactorTree().formatNumbers());
-
-                    //Buttons
-                    centerView.setVisibility(View.GONE);
-                    pauseButton.setVisibility(View.GONE);
-                    final RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) saveButton.getLayoutParams();
-                    layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                    saveButton.setLayoutParams(layoutParams);
-                    saveButton.setVisibility(View.VISIBLE);
                 }
+                spannableStringBuilder.delete(spannableStringBuilder.length() - 3, spannableStringBuilder.length());
+                bodyTextView.setVisibility(View.VISIBLE);
+                bodyTextView.setText(spannableStringBuilder);
+
+                //Tree
+                treeView.setVisibility(View.VISIBLE);
+                treeView.setTree(getTask().getFactorTree().formatNumbers());
+
+                //Buttons
+                centerView.setVisibility(View.GONE);
+                pauseButton.setVisibility(View.GONE);
+                final RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) saveButton.getLayoutParams();
+                layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                saveButton.setLayoutParams(layoutParams);
+                saveButton.setVisibility(View.VISIBLE);
             });
         }
     }
