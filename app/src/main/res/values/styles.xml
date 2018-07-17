@@ -81,6 +81,25 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
+    <!-- Least Common Multiple themes-->
+    <style name="LCM" parent="Default.NoActionBar">
+        <item name="colorPrimary">@color/yellow</item>
+        <item name="colorPrimaryDark">@color/yellow_dark</item>
+        <item name="colorAccent">@color/yellow</item>
+    </style>
+    <style name="LCM.Activity">
+        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
+    </style>
+    <style name="LCM.Dialog" parent="Default.Dialog">
+        <item name="colorPrimary">@color/yellow</item>
+        <item name="colorPrimaryDark">@color/yellow_dark</item>
+        <item name="colorAccent">@color/yellow</item>
+    </style>
+    <style name="LCM.PopupOverlay">
+        <item name="android:colorBackground">@color/yellow_light</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
 
     <style name="DefaultText">
         <item name="android:textSize">14sp</item>

@@ -26,6 +26,13 @@
             android:title="@string/title_factor_tree"
             app:actionLayout="@layout/navigation_drawer_item" />
 
+        <item
+            android:id="@+id/drawer_item_lcm"
+            android:icon="@drawable/circle_white"
+            android:iconTint="@color/black"
+            android:title="@string/title_lcm"
+            app:actionLayout="@layout/navigation_drawer_item" />
+
     </group>
 
     <group

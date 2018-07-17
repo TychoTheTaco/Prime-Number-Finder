@@ -208,7 +208,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
                 //Create a new task
                 searchOptions.setThreadCount(1);
                 try {
-                    startTask((FindPrimesTask.SearchOptions) searchOptions.clone());
+                    startTask(new FindPrimesTask((FindPrimesTask.SearchOptions) searchOptions.clone()));
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }
@@ -228,13 +228,12 @@ public class FindPrimesFragment extends ModuleHostFragment {
 
     @Override
     protected void loadFragments() {
-        taskListFragment = (TaskListFragment) addFragment("Tasks", TaskListFragment.class);
-        resultsFragment = (GeneralResultsFragment) addFragment("Results", GeneralResultsFragment.class);
+        super.loadFragments();
+        setResultsFragment(GeneralResultsFragment.class);
     }
 
     @Override
     protected void afterLoadFragments() {
-        //Set up Task list fragment
         taskListFragment.setAdapter(new FindPrimesTaskListAdapter(getContext()));
         taskListFragment.whitelist(FindPrimesTask.class, CheckPrimalityTask.class);
     }
@@ -248,7 +247,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
                     final FindPrimesTask.SearchOptions searchOptions = data.getExtras().getParcelable("searchOptions");
                     if (searchOptions != null) {
                         if (task == null) {
-                            startTask(searchOptions);
+                            startTask(new FindPrimesTask(searchOptions));
                         } else {
                             task.setOptions(searchOptions);
                         }
@@ -302,35 +301,6 @@ public class FindPrimesFragment extends ModuleHostFragment {
         Crashlytics.setLong("availableHeapMB", availHeapSizeInMB);
 
         return requiredMB <= availHeapSizeInMB;
-    }
-
-    private void startTask(final FindPrimesTask.SearchOptions searchOptions) {
-        final FindPrimesTask task = new FindPrimesTask(searchOptions);
-        task.addTaskListener(new TaskAdapter() {
-
-            @Override
-            public void onTaskStopped() {
-                if (task.getSearchOptions().isAutoSave()) {
-                    new Thread(() -> {
-                        final boolean success = FileManager.getInstance().savePrimes(task.getStartValue(), task.getEndValue(), task.getSortedPrimes());
-                        new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show());
-                    }).start();
-                }
-
-                if (task.getSearchOptions().isNotifyWhenFinished()) {
-                    com.tycho.app.primenumberfinder.utils.NotificationManager.displayNotification(getActivity(), "default", task, com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_PRIMES, "Task \"Primes from " + NUMBER_FORMAT.format(task.getStartValue()) + " to " + NUMBER_FORMAT.format(task.getEndValue()) + "\" finished.");
-                }
-                task.removeTaskListener(this);
-            }
-        });
-        taskListFragment.addTask(task);
-        PrimeNumberFinder.getTaskManager().registerTask(task);
-
-        //Start the task
-        task.startOnNewThread();
-        Utils.logTaskStarted(getContext(), task);
-
-        taskListFragment.setSelected(task);
     }
 
     private BigInteger getPrimalityInput() {
@@ -397,7 +367,6 @@ public class FindPrimesFragment extends ModuleHostFragment {
     @Override
     public void onSavePressed(Task task) {
         if (task instanceof FindPrimesTask) {
-            Crashlytics.log(Log.DEBUG, TAG, "Save button clicked\nActivity: " + getActivity() + "\nView: " + taskListFragment.getView());
             findPrimesResultsFragment.saveTask((FindPrimesTask) task, getActivity());
         }
     }

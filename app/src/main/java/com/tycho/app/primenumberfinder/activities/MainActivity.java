@@ -12,6 +12,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +29,7 @@ import com.tycho.app.primenumberfinder.modules.about.AboutPageFragment;
 import com.tycho.app.primenumberfinder.modules.findfactors.fragments.FindFactorsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesFragment;
 import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
+import com.tycho.app.primenumberfinder.modules.lcm.fragments.LeastCommonMultipleFragment;
 import com.tycho.app.primenumberfinder.modules.primefactorization.fragments.PrimeFactorizationFragment;
 import com.tycho.app.primenumberfinder.modules.savedfiles.SavedFilesFragment;
 import com.tycho.app.primenumberfinder.settings.SettingsFragment;
@@ -35,6 +37,9 @@ import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.OneToOneMap;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
@@ -60,7 +65,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
     private NavigationView navigationView;
 
     /**
-     * The current fragment being displayed.
+     * The current {@link Fragment} being displayed.
      */
     private Fragment currentFragment;
 
@@ -71,12 +76,23 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
     private FloatingActionButton floatingActionButton;
 
     /**
-     * Maps drawer item ids to the corresponding fragment tag. The ids and tags are used to find
-     * the corresponding fragment when a new drawer item is selected.
+     * List of modules that can be selected from the drawer.
      */
-    private OneToOneMap<Integer, String> fragmentIds = new OneToOneMap<>();
+    private final List<Module> modules = new ArrayList<>();
 
     private final int defaultDrawerIconTint = Color.BLACK;
+
+    private class Module{
+        private final int drawerId;
+        private final String tag;
+        private final Class<? extends Fragment> fragmentClass;
+
+        public Module(int drawerId, String tag, Class<? extends Fragment> fragmentClass) {
+            this.drawerId = drawerId;
+            this.tag = tag;
+            this.fragmentClass = fragmentClass;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,12 +106,13 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Initialize the fragment IDs
-        fragmentIds.put(R.id.drawer_item_find_primes, "findPrimes");
-        fragmentIds.put(R.id.drawer_item_find_factors, "findFactors");
-        fragmentIds.put(R.id.drawer_item_factor_tree, "primeFactorization");
-        fragmentIds.put(R.id.drawer_item_saved_files, "savedFiles");
-        fragmentIds.put(R.id.drawer_item_settings, "settings");
-        fragmentIds.put(R.id.drawer_item_about, "about");
+        modules.add(new Module(R.id.drawer_item_find_primes, "findPrimes", FindPrimesFragment.class));
+        modules.add(new Module(R.id.drawer_item_find_factors, "findFactors", FindFactorsFragment.class));
+        modules.add(new Module(R.id.drawer_item_factor_tree, "primeFactorization", PrimeFactorizationFragment.class));
+        modules.add(new Module(R.id.drawer_item_lcm, "lcm", LeastCommonMultipleFragment.class));
+        modules.add(new Module(R.id.drawer_item_saved_files, "savedFiles", SavedFilesFragment.class));
+        modules.add(new Module(R.id.drawer_item_settings, "settings", SettingsFragment.class));
+        modules.add(new Module(R.id.drawer_item_about, "about", AboutPageFragment.class));
 
         //Set up navigation drawer
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -137,7 +154,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
             //Restore fragment
             final String currentFragmentTag = savedInstanceState.getString("currentFragmentTag");
             currentFragment = getFragment(currentFragmentTag);
-            selectDrawerItem(navigationView.getMenu().findItem(fragmentIds.getKey(currentFragment.getTag())));
+            selectDrawerItem(navigationView.getMenu().findItem(findModule(currentFragment.getTag()).drawerId));
         } else {
             selectDrawerItem(getIntent().getIntExtra("taskType", 0));
         }
@@ -161,7 +178,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString("currentFragmentTag", currentFragment.getTag());
+        if (currentFragment != null) outState.putString("currentFragmentTag", currentFragment.getTag());
     }
 
     @Override
@@ -235,25 +252,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
     private Fragment getFragment(final String tag) {
         //Check if fragment exists already
         if (getSupportFragmentManager().findFragmentByTag(tag) == null) {
-            switch (tag) {
-                case "findPrimes":
-                    return new FindPrimesFragment();
-
-                case "findFactors":
-                    return new FindFactorsFragment();
-
-                case "primeFactorization":
-                    return new PrimeFactorizationFragment();
-
-                case "savedFiles":
-                    return new SavedFilesFragment();
-
-                case "settings":
-                    return new SettingsFragment();
-
-                case "about":
-                    return new AboutPageFragment();
-            }
+            return Fragment.instantiate(this, findModule(tag).fragmentClass.getName());
         }
 
         return getSupportFragmentManager().findFragmentByTag(tag);
@@ -269,16 +268,23 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
             fragmentTransaction.hide(currentFragment);
         }
 
-        //Get the new fragment
-        currentFragment = getFragment(fragmentIds.get(menuItem.getItemId()));
+        //Find the correct module
+        final Module module = findModule(menuItem.getItemId());
+        if (module != null){
+            //Get the new fragment
+            currentFragment = getFragment(module.tag);
 
-        //Add the new fragment if it doesn't exist yet
-        if (getSupportFragmentManager().findFragmentByTag(fragmentIds.get(menuItem.getItemId())) == null) {
-            fragmentTransaction.add(R.id.main_content_frame, currentFragment, fragmentIds.get(menuItem.getItemId()));
+            //Add the new fragment if it doesn't exist yet
+            if (getSupportFragmentManager().findFragmentByTag(module.tag) == null) {
+                fragmentTransaction.add(R.id.main_content_frame, currentFragment, module.tag);
+            }
+
+            //Show the new fragment
+            fragmentTransaction.show(currentFragment);
+        }else{
+            currentFragment = null;
+            Log.e(TAG, "Module \"" + menuItem.getTitle() + "\" not found!");
         }
-
-        //Show the new fragment
-        fragmentTransaction.show(currentFragment);
 
         //Commit changes
         fragmentTransaction.commitNow();
@@ -291,53 +297,54 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
             floatingActionButton.setVisibility(View.GONE);
         }
 
+        setTitle(menuItem.getTitle());
+
         //Apply theme to activity based on current fragment
         switch (menuItem.getItemId()) {
 
             default:
-                setTitle(fragmentIds.get(menuItem.getItemId()));
                 navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.accent)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.primary_dark), ContextCompat.getColor(this, R.color.primary));
                 break;
 
             case R.id.drawer_item_find_primes:
-                setTitle(getString(R.string.title_find_primes));
                 navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.purple)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.purple_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));
                 break;
 
             case R.id.drawer_item_find_factors:
-                setTitle(getString(R.string.title_find_factors));
                 navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.orange)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.orange_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.orange_dark), ContextCompat.getColor(this, R.color.orange));
                 break;
 
             case R.id.drawer_item_factor_tree:
-                setTitle(getString(R.string.title_factor_tree));
                 navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.green)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.green_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
                 break;
 
+            case R.id.drawer_item_lcm:
+                navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.yellow)));
+                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.yellow_dark)));
+                Utils.applyTheme(this, ContextCompat.getColor(this, R.color.yellow_dark), ContextCompat.getColor(this, R.color.yellow));
+                break;
+
             case R.id.drawer_item_saved_files:
-                setTitle(getString(R.string.title_saved_files));
                 navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.accent)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.primary_dark), ContextCompat.getColor(this, R.color.primary));
                 break;
 
             case R.id.drawer_item_settings:
-                setTitle(getString(R.string.title_settings));
                 navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.accent)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.primary_dark), ContextCompat.getColor(this, R.color.primary));
                 break;
 
             case R.id.drawer_item_about:
-                setTitle(getString(R.string.title_about));
                 navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.accent)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.primary_dark), ContextCompat.getColor(this, R.color.primary));
@@ -362,4 +369,25 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
                         selectedColor
                 });
     }
+
+    private Module findModule(final int id){
+        for (Module module : modules){
+            if (module.drawerId == id) return module;
+        }
+        return null;
+    }
+
+    private Module findModule(final String tag){
+        for (Module module : modules){
+            if (module.tag.equals(tag)) return module;
+        }
+        return null;
+    }
+
+   /* private Module findModule(final int id){
+        for (Module module : modules){
+            if (module.drawerId == id) return module;
+        }
+        return null;
+    }*/
 }

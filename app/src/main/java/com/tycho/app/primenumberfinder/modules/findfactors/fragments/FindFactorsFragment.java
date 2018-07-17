@@ -101,7 +101,7 @@ public class FindFactorsFragment extends ModuleHostFragment{
                 //Create a new task
                 searchOptions.setNumber(getNumberToFactor().longValue());
                 try {
-                    startTask((FindFactorsTask.SearchOptions) searchOptions.clone());
+                    startTask(new FindFactorsTask((FindFactorsTask.SearchOptions) searchOptions.clone()));
                 }catch (CloneNotSupportedException e){
                     e.printStackTrace();
                 }
@@ -119,13 +119,12 @@ public class FindFactorsFragment extends ModuleHostFragment{
 
     @Override
     protected void loadFragments() {
-        taskListFragment = (TaskListFragment) addFragment("Tasks", TaskListFragment.class);
-        resultsFragment = (FindFactorsResultsFragment) addFragment("Results", FindFactorsResultsFragment.class);
+        super.loadFragments();
+        setResultsFragment(FindFactorsResultsFragment.class);
     }
 
     @Override
     protected void afterLoadFragments() {
-        //Set up Task list fragment
         taskListFragment.setAdapter(new FindFactorsTaskListAdapter(getContext()));
         taskListFragment.whitelist(FindFactorsTask.class);
     }
@@ -143,8 +142,6 @@ public class FindFactorsFragment extends ModuleHostFragment{
         ((FindFactorsResultsFragment) resultsFragment).saveTask((FindFactorsTask) task, getActivity());
     }
 
-    private static final int REQUEST_CODE_NEW_TASK = 0;
-
     @Override
     public void onClick(View view) {
         final Intent intent = new Intent(getActivity(), FindFactorsConfigurationActivity.class);
@@ -161,45 +158,13 @@ public class FindFactorsFragment extends ModuleHostFragment{
                     final FindFactorsTask.SearchOptions searchOptions = data.getExtras().getParcelable("searchOptions");
                     final FindFactorsTask task = (FindFactorsTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) data.getExtras().get("taskId"));
                     if (task == null) {
-                        startTask(searchOptions);
+                        startTask(new FindFactorsTask(searchOptions));
                     } else {
                         task.setSearchOptions(searchOptions);
                     }
                 }
                 break;
         }
-    }
-
-    private void startTask(final FindFactorsTask.SearchOptions searchOptions){
-        final FindFactorsTask task = new FindFactorsTask(searchOptions);
-        task.addTaskListener(new TaskAdapter() {
-
-            @Override
-            public void onTaskStopped() {
-
-                //Auto-save
-                if (task.getSearchOptions().isAutoSave()) {
-                    new Thread(() -> {
-                        final boolean success = FileManager.getInstance().saveFactors(task.getFactors(), task.getNumber());
-                        new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show());
-                    }).start();
-                }
-
-                //Notify when finished
-                if (task.getSearchOptions().isNotifyWhenFinished()) {
-                    com.tycho.app.primenumberfinder.utils.NotificationManager.displayNotification(getActivity(), "default", task, com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_FACTORS, "Task \"Factors of " + NUMBER_FORMAT.format(task.getNumber()) + "\" finished.");
-                }
-                task.removeTaskListener(this);
-            }
-        });
-        taskListFragment.addTask(task);
-        PrimeNumberFinder.getTaskManager().registerTask(task);
-
-        //Start the task
-        task.startOnNewThread();
-        Utils.logTaskStarted(getContext(), task);
-
-        taskListFragment.setSelected(task);
     }
 
     private BigInteger getNumberToFactor() {

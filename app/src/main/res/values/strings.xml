@@ -23,6 +23,7 @@
     <string name="title_find_primes">Find Primes</string>
     <string name="title_find_factors">Find Factors</string>
     <string name="title_factor_tree">Prime Factorization</string>
+    <string name="title_lcm">Least Common Multiple</string>
     <string name="title_saved_files">Saved Files</string>
     <string name="title_settings">Settings</string>
     <string name="title_about">About</string>
@@ -79,6 +80,13 @@
         <item quantity="one">%1$s has %2$s prime factor.</item>
         <item quantity="other">%1$s has %2$s prime factors.</item>
     </plurals>
+
+    <!-- Least Common Multiple page -->
+    <string name="lcm_input_description">Enter one number in each box to calculate their least common multiple.</string>
+    <string name="calculate_lcm_button">Calculate</string>
+    <string name="lcm_task_list_item_title">LCM of %1$s</string>
+    <string name="lcm_result">LCM is %1$s.</string>
+    <string name="lcm_subtitle">Finding LCM of %1$s.</string>
 
     <!-- Saved files page -->
     <string name="no_saved_files_message">You have no saved files.</string>

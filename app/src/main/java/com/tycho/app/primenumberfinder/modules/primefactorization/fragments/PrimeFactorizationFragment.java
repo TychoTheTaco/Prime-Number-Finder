@@ -87,28 +87,25 @@ public class PrimeFactorizationFragment extends ModuleHostFragment {
         });
 
         //Set up start button
-        rootView.findViewById(R.id.button_generate_factor_tree).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        rootView.findViewById(R.id.button_generate_factor_tree).setOnClickListener(v -> {
 
-                //Check if the number is valid
-                if (Validator.isValidFactorInput(getNumberToFactor())) {
+            //Check if the number is valid
+            if (Validator.isValidFactorInput(getNumberToFactor())) {
 
-                    //Create a new task
-                    searchOptions.setNumber(getNumberToFactor().longValue());
-                    try {
-                        startTask((PrimeFactorizationTask.SearchOptions) searchOptions.clone());
-                    } catch (CloneNotSupportedException e) {
-                    }
-
-                    hideKeyboard(getActivity());
-                    taskListFragment.scrollToBottom();
-
-                } else {
-                    Toast.makeText(getActivity(), "Invalid number", Toast.LENGTH_SHORT).show();
+                //Create a new task
+                searchOptions.setNumber(getNumberToFactor().longValue());
+                try {
+                    startTask(new PrimeFactorizationTask((PrimeFactorizationTask.SearchOptions) searchOptions.clone()));
+                } catch (CloneNotSupportedException e) {
                 }
 
+                hideKeyboard(getActivity());
+                taskListFragment.scrollToBottom();
+
+            } else {
+                Toast.makeText(getActivity(), "Invalid number", Toast.LENGTH_SHORT).show();
             }
+
         });
 
         return rootView;
@@ -116,13 +113,12 @@ public class PrimeFactorizationFragment extends ModuleHostFragment {
 
     @Override
     protected void loadFragments() {
-        taskListFragment = (TaskListFragment) addFragment("Tasks", TaskListFragment.class);
-        resultsFragment = (PrimeFactorizationResultsFragment) addFragment("Results", PrimeFactorizationResultsFragment.class);
+        super.loadFragments();
+        setResultsFragment(PrimeFactorizationResultsFragment.class);
     }
 
     @Override
     protected void afterLoadFragments() {
-        //Set up Task list fragment
         taskListFragment.setAdapter(new PrimeFactorizationTaskListAdapter(getContext()));
         taskListFragment.whitelist(PrimeFactorizationTask.class);
     }
@@ -130,8 +126,6 @@ public class PrimeFactorizationFragment extends ModuleHostFragment {
     private BigInteger getNumberToFactor() {
         return Utils.textToNumber(editTextInput.getText().toString());
     }
-
-    private static final int REQUEST_CODE_NEW_TASK = 0;
 
     @Override
     public void onClick(View view) {
@@ -141,15 +135,13 @@ public class PrimeFactorizationFragment extends ModuleHostFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         switch (requestCode) {
-
             case REQUEST_CODE_NEW_TASK:
                 if (data != null && data.getExtras() != null) {
                     final PrimeFactorizationTask.SearchOptions searchOptions = data.getExtras().getParcelable("searchOptions");
                     final PrimeFactorizationTask task = (PrimeFactorizationTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) data.getExtras().get("taskId"));
                     if (task == null) {
-                        startTask(searchOptions);
+                        startTask(new PrimeFactorizationTask(searchOptions));
                     } else {
                         task.setSearchOptions(searchOptions);
                     }
@@ -169,37 +161,5 @@ public class PrimeFactorizationFragment extends ModuleHostFragment {
     @Override
     public void onSavePressed(Task task) {
         ((PrimeFactorizationResultsFragment) resultsFragment).saveTask((PrimeFactorizationTask) task, getActivity());
-    }
-
-    private void startTask(final PrimeFactorizationTask.SearchOptions searchOptions) {
-        final PrimeFactorizationTask task = new PrimeFactorizationTask(searchOptions);
-        task.addTaskListener(new TaskAdapter() {
-
-            @Override
-            public void onTaskStopped() {
-
-                //Auto-save
-                if (task.getSearchOptions().isAutoSave()) {
-                    new Thread(() -> {
-                        final boolean success = FileManager.getInstance().saveTree(task.getFactorTree());
-                        new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show());
-                    }).start();
-                }
-
-                //Notify when finished
-                if (task.getSearchOptions().isNotifyWhenFinished()) {
-                    com.tycho.app.primenumberfinder.utils.NotificationManager.displayNotification(getActivity(), "default", task, com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_PRIME_FACTORIZATION, "Task \"Prime factorization of " + NUMBER_FORMAT.format(task.getNumber()) + "\" finished.");
-                }
-                task.removeTaskListener(this);
-            }
-        });
-        taskListFragment.addTask(task);
-        PrimeNumberFinder.getTaskManager().registerTask(task);
-
-        //Start the task
-        task.startOnNewThread();
-        Utils.logTaskStarted(getContext(), task);
-
-        taskListFragment.setSelected(task);
     }
 }

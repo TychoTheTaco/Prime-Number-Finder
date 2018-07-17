@@ -50,6 +50,11 @@
             android:label="Configure Task"/>
 
         <activity
+            android:theme="@style/LCM.Activity"
+            android:name=".modules.lcm.LCMConfigurationActivity"
+            android:label="Configure Task"/>
+
+        <activity
             android:theme="@style/FindFactors.Activity"
             android:windowSoftInputMode="adjustPan"
             android:name=".modules.findfactors.DisplayFactorsActivity"

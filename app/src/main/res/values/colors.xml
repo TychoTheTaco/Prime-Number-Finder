@@ -33,6 +33,13 @@
     <color name="green">#4CAF50</color> <!-- 500 -->
     <color name="green_dark">#2E7D32</color> <!-- 800 -->
 
+    <!-- Least Common Multiple (Yellow) -->
+    <color name="yellow_very_light">#FFFDE7</color> <!-- 50 -->
+    <color name="yellow_light">#FFF176</color> <!-- 300 -->
+    <color name="yellow">#FFEB3B</color> <!-- 500 -->
+    <color name="yellow_dark">#F9A825</color> <!-- 800 -->
+    <color name="yellow_inverse">#BAD85F</color>
+
     <!-- Text colors -->
     <color name="primary_text">#212121</color>
     <color name="primary_text_light">#FFFFFF</color>

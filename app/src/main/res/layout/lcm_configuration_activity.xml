@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:id="@+id/root"
     android:orientation="vertical">
 
     <include layout="@layout/app_bar" />
@@ -11,22 +12,33 @@
     <TextView
         android:id="@+id/number_input_label"
         style="@style/DefaultText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/prime_factorization_input_number_description" />
-
-    <com.tycho.app.primenumberfinder.ui.ValidEditText
-        android:id="@+id/number_input"
-        style="@style/NumberInput"
+        android:paddingTop="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minWidth="200dp"
-        android:imeOptions="actionDone"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp" />
+        android:labelFor="@+id/editText_input_number"
+        android:paddingEnd="8dp"
+        android:paddingStart="8dp"
+        android:text="@string/lcm_input_description" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingEnd="8dp"
+        android:gravity="center_horizontal"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingStart="8dp">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/numbers_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clipToPadding="true"
+            android:clipChildren="true"
+            android:scrollbars="horizontal" />
+
+    </LinearLayout>
 
     <!-- Thread count -->
     <!--<LinearLayout

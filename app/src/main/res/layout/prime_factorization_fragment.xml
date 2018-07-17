@@ -16,7 +16,7 @@
 
         <!-- Number input -->
         <TextView
-            android:id="@+id/input_number_label"
+            android:id="@+id/number_input_label"
             style="@style/DefaultText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -52,22 +52,7 @@
 
         </LinearLayout>
 
-        <!-- Tab layout-->
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tab_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            app:tabGravity="fill"
-            app:tabMode="fixed" />
-
-        <!-- Main view pager -->
-        <android.support.v4.view.ViewPager
-            android:id="@+id/view_pager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        <include layout="@layout/tab_layout"/>
 
     </LinearLayout>
 

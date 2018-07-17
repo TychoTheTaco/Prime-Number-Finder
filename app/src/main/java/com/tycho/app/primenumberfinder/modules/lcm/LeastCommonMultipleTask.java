@@ -23,6 +23,8 @@ public class LeastCommonMultipleTask extends Task {
 
     private final List<Long> numbers = new ArrayList<>();
 
+    private long lcm;
+
     public LeastCommonMultipleTask(final List<Long> numbers){
         this.numbers.addAll(numbers);
     }
@@ -46,5 +48,18 @@ public class LeastCommonMultipleTask extends Task {
                 }
             }
         }
+
+        lcm = 1;
+        for (Long l : occurrences.keySet()){
+            lcm *= l;
+        }
+    }
+
+    public long getLcm() {
+        return lcm;
+    }
+
+    public List<Long> getNumbers() {
+        return numbers;
     }
 }

@@ -56,7 +56,7 @@ public class PrimeFactorizationTask extends Task implements Savable{
         status = "findFactors";
         //final FindFactorsTask findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number));
         //findFactorsTask.start();
-        //final List<Long> factors = findFactorsTask.getFactors();
+        //final List<Long> factors = findFactorsTask.getNumbers();
 
         /*status = "checkPrimality";
 
