@@ -2,7 +2,7 @@
 <resources>
 
     <dimen name="drawer_header_height">150dp</dimen>
-    <dimen name="navigation_drawer_width">240dp</dimen>
+    <dimen name="navigation_drawer_width">250dp</dimen>
 
 
     <dimen name="fab_margin">16dp</dimen>
@@ -40,5 +40,7 @@
 
 
     <dimen name="expanded_toolbar_height">104dp</dimen>
+
+    <dimen name="export_option_height">38dp</dimen>
 
 </resources>

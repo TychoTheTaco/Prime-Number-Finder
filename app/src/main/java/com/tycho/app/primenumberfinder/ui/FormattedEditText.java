@@ -10,6 +10,8 @@ import android.util.AttributeSet;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -26,15 +28,12 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
     /**
      * {@linkplain NumberFormat} instance used to format numbers with commas.
      */
-    protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
+    protected final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
     /**
      * {@linkplain DecimalFormat} instance used to format numbers with a decimal point.
      */
-    protected static final DecimalFormat DECIMAL_FORMAT = (DecimalFormat) DecimalFormat.getInstance(Locale.getDefault());
-    static {
-        DECIMAL_FORMAT.setMaximumFractionDigits(1);
-    }
+    protected final DecimalFormat DECIMAL_FORMAT = (DecimalFormat) DecimalFormat.getInstance(Locale.getDefault());
 
     /**
      * If this is set to {@code true}, then this view will allow the user to enter the number '0'.
@@ -60,7 +59,7 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
 
     private void init(final AttributeSet attributeSet) {
         //Get xml attributes
-        TypedArray typedArray = getContext().obtainStyledAttributes(
+        final TypedArray typedArray = getContext().obtainStyledAttributes(
                 attributeSet,
                 R.styleable.FormattedEditText,
                 0, 0);
@@ -70,6 +69,9 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
         } finally {
             typedArray.recycle();
         }
+
+        DECIMAL_FORMAT.setMaximumFractionDigits(1);
+        DECIMAL_FORMAT.setRoundingMode(RoundingMode.DOWN);
 
         addTextChangedListener(textWatcher);
     }
@@ -87,20 +89,27 @@ public class FormattedEditText extends android.support.v7.widget.AppCompatEditTe
 
         @Override
         public void afterTextChanged(Editable editable) {
-
-            //Format text
             if (isDecimalInput()) {
+                final String decimalSeparator = String.valueOf(DECIMAL_FORMAT.getDecimalFormatSymbols().getDecimalSeparator());
 
-                //Log.d(TAG, "Decimal separator is '" + DECIMAL_FORMAT.getDecimalFormatSymbols().getDecimalSeparator() + "'");
-
-                //If the text ends with a decimal, don't modify it
+                //If the text ends with a character that isn't a digit or the decimal separator, replace it
                 final Pattern pattern = Pattern.compile("[^\\d]$");
-                final Matcher matcher = pattern.matcher(editable);
-                if (matcher.find()) {
+                final Matcher matcher = pattern.matcher(editable.toString());
+                if (matcher.find() && matcher.group().charAt(0) != decimalSeparator.charAt(0)){
+                    setText(editable.toString().replace(matcher.group().charAt(0), decimalSeparator.charAt(0)), true);
                     return;
                 }
 
-                final String formatted = DECIMAL_FORMAT.format(Utils.textToDecimal(getText().toString(), DECIMAL_FORMAT.getDecimalFormatSymbols().getDecimalSeparator()));
+                //If the text ends with a decimal, don't modify it
+                if (editable.toString().endsWith(decimalSeparator)) return;
+
+                //If the text contains a decimal and ends with a zero, don't modify it
+                if (getText().toString().contains(decimalSeparator) && getText().toString().endsWith("0")){
+                    return;
+                }
+
+                final BigDecimal bigDecimal = Utils.textToDecimal(getText().toString(), DECIMAL_FORMAT.getDecimalFormatSymbols().getDecimalSeparator());
+                final String formatted = DECIMAL_FORMAT.format(bigDecimal);
                 if (editable.length() > 0 && !editable.toString().equals(formatted)) {
                     setText(formatted, formatted.length() > 1);
                 } else if (!allowZeroInput && editable.toString().equals(DECIMAL_FORMAT.format(0))) {

@@ -650,18 +650,18 @@ public final class FileManager {
         final Matcher matcher = pattern.matcher(file.getName());
         for (int i = 0; i < 2; i++){
             if (matcher.find()){
-                range[i] = Integer.valueOf(matcher.group());
+                range[i] = Long.valueOf(matcher.group());
             }
         }
 
         return range;
     }
 
-    public static int getNumberFromTitle(final File file){
+    public static long getNumberFromTitle(final File file){
         final Pattern pattern = Pattern.compile("\\d+");
         final Matcher matcher = pattern.matcher(file.getName());
         if (matcher.find()){
-            return Integer.valueOf(matcher.group());
+            return Long.valueOf(matcher.group());
         }
         return 0;
     }

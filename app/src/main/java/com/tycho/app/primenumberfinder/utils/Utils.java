@@ -2,9 +2,11 @@ package com.tycho.app.primenumberfinder.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -16,11 +18,15 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.DecimalFormat;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,18 +36,14 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import easytasks.Task;
+
 /**
  * This class contains lots of random utility methods.
  * <p>
  * Created by tycho on 11/13/2017.
  */
 public final class Utils {
-
-    /*static {
-        System.loadLibrary("native-utils");
-    }
-
-    public native static void compact();*/
 
     /**
      * Tag used for logging and debugging.
@@ -267,47 +269,21 @@ public final class Utils {
     }
 
     public static BigDecimal textToDecimal(String text, final char decimalSeparator) {
-        Crashlytics.log("Raw input: '" + text + "'");
-        Log.d(TAG, "Raw input: '" + text + "'");
+        Crashlytics.log(Log.DEBUG, TAG, "Raw input: '" + text + "'");
 
         if (text.length() == 0) {
             return BigDecimal.ZERO;
         }
 
-        Pattern pattern;
-        Matcher matcher;
-
-        //Find the last non-digit character. Assume this is the decimal point
-        pattern = Pattern.compile("[^\\d]");
-        matcher = pattern.matcher(text);
-        int matchIndex = -1;
+        final Pattern pattern = Pattern.compile("\\d+|" + Pattern.quote(String.valueOf(decimalSeparator)));
+        final Matcher matcher = pattern.matcher(text);
+        final StringBuilder stringBuilder = new StringBuilder("0"); //Prepend 0 in case input starts with decimal point
         while (matcher.find()) {
-            matchIndex = matcher.start();
+            stringBuilder.append(matcher.group().replace(decimalSeparator, '.'));
         }
-
-        final StringBuilder numberString = new StringBuilder();
-        if (matchIndex != -1) {
-            final int posFromEnd = text.length() - 1 - matchIndex;
-            Log.d(TAG, "Last Index: " + posFromEnd);
-
-            //Extract all digits from the input
-            pattern = Pattern.compile("\\d+");
-            matcher = pattern.matcher(text);
-            while (matcher.find()) {
-                numberString.append(matcher.group());
-            }
-
-            //Put the decimal point back
-            numberString.insert(numberString.length() - posFromEnd, '.');
-            Log.w(TAG, "After insert: " + numberString);
-        } else {
-            numberString.append(text);
-        }
-
-        DecimalFormat decimalFormat = (DecimalFormat) DecimalFormat.getInstance(Locale.ENGLISH);
-        decimalFormat.setParseBigDecimal(true);
-
-        return new BigDecimal(numberString.toString());
+        BigDecimal bigDecimal = new BigDecimal(stringBuilder.toString());
+        bigDecimal = bigDecimal.setScale(2, RoundingMode.FLOOR);
+        return bigDecimal;
     }
 
     public static int getAccentColor(final Context context) {
@@ -339,10 +315,10 @@ public final class Utils {
         }
 
         //Replace all the numbers
-        String replaceNumbers = input.replaceAll("[0-9]+", "<number>");
+        String replaceNumbers = input.replaceAll("\\d+", "<number>");
 
         //Replace all the text
-        String onlyNumbers = input.replaceAll("[^0-9]+", "<text>");
+        String onlyNumbers = input.replaceAll("[^\\d]+", "<text>");
 
         //Get all numbers from the string
         try {
@@ -373,5 +349,29 @@ public final class Utils {
                 View.MeasureSpec.makeMeasureSpec(view.getMeasuredWidth(), View.MeasureSpec.EXACTLY),
                 View.MeasureSpec.makeMeasureSpec(view.getMeasuredHeight(), View.MeasureSpec.EXACTLY));
         view.layout(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
+    }
+
+    public static void logTaskStarted(final Context context, final Task task) {
+        final Bundle bundle = new Bundle();
+        bundle.putString("type", task.getClass().getSimpleName());
+        if (task instanceof FindPrimesTask) {
+            bundle.putLong("start", ((FindPrimesTask) task).getStartValue());
+            bundle.putLong("end", ((FindPrimesTask) task).getEndValue());
+            bundle.putString("method", ((FindPrimesTask) task).getSearchOptions().getSearchMethod().name());
+            bundle.putInt("threads", ((FindPrimesTask) task).getThreadCount());
+        } else if (task instanceof FindFactorsTask) {
+            bundle.putLong("number", ((FindFactorsTask) task).getNumber());
+        } else if (task instanceof PrimeFactorizationTask) {
+            bundle.putLong("number", ((PrimeFactorizationTask) task).getNumber());
+        }
+        FirebaseAnalytics.getInstance(context).logEvent("task_started", bundle);
+    }
+
+    public static ColorStateList generateColorStateList(final int[] states, final int[] colors) {
+        final int[][] stateArray = new int[states.length][];
+        for (int i = 0; i < states.length; i++){
+            stateArray[i] = new int[]{states[i]};
+        }
+        return new ColorStateList(stateArray, colors);
     }
 }

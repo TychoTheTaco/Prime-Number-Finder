@@ -5,11 +5,9 @@ import android.os.Parcelable;
 
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -37,18 +35,16 @@ public class PrimeFactorizationTask extends Task implements Savable{
 
     private int total;
 
-    private String status;
+    private String status = "";
 
     private SearchOptions searchOptions;
 
-    final FindFactorsTask findFactorsTask;
-
-    private final CopyOnWriteArrayList<SavableCallbacks> savableCallbacks = new CopyOnWriteArrayList<>();
+    //final FindFactorsTask findFactorsTask;
 
     public PrimeFactorizationTask(final SearchOptions searchOptions){
         this.number = searchOptions.getNumber();
         this.searchOptions = searchOptions;
-        findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number));
+        //findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number));
     }
 
     @Override
@@ -56,10 +52,10 @@ public class PrimeFactorizationTask extends Task implements Savable{
 
         status = "findFactors";
         //final FindFactorsTask findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number));
-        findFactorsTask.start();
-        final List<Long> factors = findFactorsTask.getFactors();
+        //findFactorsTask.start();
+        //final List<Long> factors = findFactorsTask.getFactors();
 
-        status = "checkPrimality";
+        /*status = "checkPrimality";
 
         for (long n : factors){
             final CheckPrimalityTask checkPrimalityTask = new CheckPrimalityTask(n);
@@ -71,65 +67,23 @@ public class PrimeFactorizationTask extends Task implements Savable{
             if (shouldStop()){
                 return;
             }
-        }
+        }*/
         status = "generatingTree";
         this.factorTree = generateTree(number);
         status = "";
     }
 
     @Override
-    public void pause() {
-        synchronized (STATE_LOCK){
-            if (findFactorsTask.getState() != State.STOPPED){
-                try {
-                    findFactorsTask.pauseAndWait();
-                }catch (InterruptedException e){
-                    e.printStackTrace();
-                }
-                dispatchPaused();
-            }else{
-                super.pause();
-            }
-        }
-    }
-
-    @Override
-    public void resume() {
-        synchronized (STATE_LOCK){
-            if (findFactorsTask.getState() == State.PAUSED){
-                try {
-                    findFactorsTask.resumeAndWait();
-                }catch (InterruptedException e){
-                    e.printStackTrace();
-                }
-                dispatchResumed();
-            }else{
-                super.resume();
-            }
-        }
-    }
-
-    @Override
-    public void stop() {
-        findFactorsTask.stop();
-        super.stop();
-    }
-
-    @Override
     public float getProgress() {
-        switch (status){
-            case "findFactors":
-                setProgress(0.33f * (findFactorsTask.getProgress()));
-                break;
-
+        /*switch (status){
             case "checkPrimality":
                 setProgress(0.33f);
                 break;
 
             case "generatingTree":
-                setProgress(0.67f);
+                setProgress(0.5f);
                 break;
-        }
+        }*/
         return super.getProgress();
     }
 
@@ -174,7 +128,7 @@ public class PrimeFactorizationTask extends Task implements Savable{
                 number2 = findFactorsTask.getFactors().get((size / 2));
             }
 
-            //setProgress(primeFactors.size() / total);
+            setProgress((float) number / getNumber());
 
             tree.addNode(generateTree(number1));
             tree.addNode(generateTree(number2));
@@ -252,34 +206,42 @@ public class PrimeFactorizationTask extends Task implements Savable{
         }
     }
 
+    private boolean saved;
+
     @Override
-    public void save() {
-        if (FileManager.getInstance().saveTree(getFactorTree())){
+    public boolean save() {
+        saved = FileManager.getInstance().saveTree(getFactorTree());
+        if (saved){
             sendOnSaved();
         }else{
             sendOnError();
         }
+        return saved;
     }
 
-    public void addSavableCallbacks(final SavableCallbacks callbacks){
-        if (!savableCallbacks.contains(callbacks)){
-            savableCallbacks.add(callbacks);
-        }
+    private CopyOnWriteArrayList<SaveListener> saveListeners = new CopyOnWriteArrayList<>();
+
+    public void addSaveListener(final SaveListener listener){
+        saveListeners.add(listener);
     }
 
-    public void removeSavableCallbacks(final SavableCallbacks callbacks){
-        savableCallbacks.remove(callbacks);
+    public void removeSaveListener(final SaveListener listener){
+        saveListeners.remove(listener);
     }
 
     private void sendOnSaved(){
-        for (SavableCallbacks callbacks : savableCallbacks){
-            callbacks.onSaved();
+        for (SaveListener listener : saveListeners){
+            listener.onSaved();
         }
     }
 
     private void sendOnError(){
-        for (SavableCallbacks callbacks : savableCallbacks){
-            callbacks.onError();
+        for (SaveListener listener : saveListeners){
+            listener.onError();
         }
+    }
+
+    public boolean isSaved(){
+        return saved;
     }
 }

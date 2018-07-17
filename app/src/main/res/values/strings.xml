@@ -83,12 +83,12 @@
     <!-- Saved files page -->
     <string name="no_saved_files_message">You have no saved files.</string>
     <plurals name="saved_files_count">
-        <item quantity="one">You have %1$s saved file using %2$s of storage.</item>
-        <item quantity="other">You have %1$s saved files using %2$s of storage.</item>
+        <item quantity="one">You have %1$s saved file.</item>
+        <item quantity="other">You have %1$s saved files.</item>
     </plurals>
     <plurals name="selected_item_count">
-        <item quantity="one">Selected %1$s file.</item>
-        <item quantity="other">Selected %1$s files.</item>
+        <item quantity="one">Selected %1$s/%2$s file.</item>
+        <item quantity="other">Selected %1$s/%2$s files.</item>
     </plurals>
     <plurals name="delete_warning">
         <item quantity="one">Are you sure you want to delete this file?</item>
@@ -98,8 +98,13 @@
     <string name="scroll_to_bottom">Scroll to bottom</string>
 
     <!-- About page -->
-    <string name="about_description">FindPrime is an application that can be used to find prime numbers and factors of any number. Prime numbers and factors can be saved to a text file for later use.\n\nThis application was created by Tycho Bellers.</string>
-    <string name="about_page_icon_credits">Application icons by&#160;<a href="https://material.io/icons/">Material Icons</a> and&#160;<a href="https://icons8.com/">Icons8</a>.</string>
+    <string name="developed_by_description">This application was developed by Tycho Bellers.</string>
+    <string name="contact_developer">Contact Developer</string>
+    <string name="changelog_title">Changelog</string>
+    <string name="new_in_version">New in version %1$s</string>
+    <string name="view_old_versions">View Older Versions</string>
+    <string name="credits_title">Credits</string>
+    <string name="credits_description">Application icons by&#160;<a href="https://material.io/icons/">Material Icons</a> and&#160;<a href="https://icons8.com/">Icons8</a>.</string>
 
     <!--  -->
     <string name="find_primes_search_method_label">Search Method</string>
@@ -165,5 +170,7 @@
     <string name="loading">Loading&#8230;</string>
     <string name="hex">0x%1$s</string>
     <string name="saved">Saved</string>
+    <string name="open_drawer">Open Navigation Drawer</string>
+    <string name="close_drawer">Close Navigation Drawer</string>
 
 </resources>

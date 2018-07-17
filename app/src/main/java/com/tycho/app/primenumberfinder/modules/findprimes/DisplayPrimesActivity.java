@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.activities.DisplayContentActivity;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.ExportOptionsDialog;
 import com.tycho.app.primenumberfinder.modules.savedfiles.FindNthNumberDialog;
@@ -38,14 +39,12 @@ import java.util.List;
  * Date Created: 11/5/2016
  */
 
-public class DisplayPrimesActivity extends AbstractActivity {
+public class DisplayPrimesActivity extends DisplayContentActivity {
 
     /**
      * Tag used for logging and debugging.
      */
     private static final String TAG = DisplayPrimesActivity.class.getSimpleName();
-
-    private File file;
 
     private TextView headerTextView;
 
@@ -86,12 +85,7 @@ public class DisplayPrimesActivity extends AbstractActivity {
         //Get the intent
         final Intent intent = getIntent();
         if (intent != null) {
-
-            //Get the file path from the extras
-            final String filePath = intent.getStringExtra("filePath");
-            if (filePath != null) {
-
-                file = new File(filePath);
+            if (file != null) {
 
                 //Set a custom title if there is one
                 if (intent.getBooleanExtra("title", true)) {
@@ -315,18 +309,22 @@ public class DisplayPrimesActivity extends AbstractActivity {
         }
     }
 
-    private void loadFile(final File file) {
+    @Override
+    protected void loadFile(final File file) {
         //Load file in another thread
         new Thread(new Runnable() {
             @Override
             public void run() {
 
+                //Count numbers
                 final int totalNumbers = FileManager.countTotalNumbersQuick(file);
                 scrollListener.setTotalNumbers(totalNumbers);
 
+                //Read file
                 final List<Long> numbers = FileManager.readNumbers(file, 0, 1000);
                 primesAdapter.getPrimes().addAll(numbers);
 
+                //Get total range
                 final long[] range;
                 if (getIntent().getLongArrayExtra("range") != null) {
                     range = getIntent().getLongArrayExtra("range");
@@ -339,34 +337,41 @@ public class DisplayPrimesActivity extends AbstractActivity {
                     @Override
                     public void run() {
 
-                        //Set header text
-                        headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.find_primes_subtitle_result, totalNumbers), new String[]{
-                                NUMBER_FORMAT.format(totalNumbers),
-                                NUMBER_FORMAT.format(range[0]),
-                                range[1] == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(range[1]),
-                        }, ContextCompat.getColor(getBaseContext(), R.color.purple_inverse)));
+                        //If there are no numbers, there was probably an error
+                        if (numbers.size() == 0 && totalNumbers > 0){
+                            showLoadingError();
+                        }else {
+                            //Set header text
+                            headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.find_primes_subtitle_result, totalNumbers), new String[]{
+                                    NUMBER_FORMAT.format(totalNumbers),
+                                    NUMBER_FORMAT.format(range[0]),
+                                    range[1] == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(range[1]),
+                            }, ContextCompat.getColor(getBaseContext(), R.color.purple_inverse)));
 
-                        //Set correct height based on the height of the header text view
-                        final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
-                        Utils.reLayoutChildren(collapsingToolbarLayout);
-                        final int defaultHeight = getSupportActionBar().getHeight();
-                        final int textHeight = headerTextView.getHeight();
-                        final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
-                        layoutParams.height = defaultHeight + textHeight;
-                        collapsingToolbarLayout.setLayoutParams(layoutParams);
+                            resizeCollapsingToolbar();
 
-                        //Update adapter
-                        primesAdapter.notifyItemRangeInserted(0, primesAdapter.getItemCount());
+                            //Update adapter
+                            primesAdapter.notifyItemRangeInserted(0, primesAdapter.getItemCount());
+                            recyclerView.post(new Runnable() {
+
+                                /**
+                                 * Minimum number of extra adapter items before displaying the
+                                 * scroll to top and scroll to bottom buttons.
+                                 */
+                                private final int SCROLL_BUTTON_MIN_OVERFLOW = 20;
+
+                                @Override
+                                public void run() {
+                                    final int visibility = ((linearLayoutManager.findLastVisibleItemPosition() - linearLayoutManager.findFirstVisibleItemPosition()) >= scrollListener.totalNumbers - SCROLL_BUTTON_MIN_OVERFLOW) ? View.GONE : View.VISIBLE;
+                                    scrollToTopFab.setVisibility(visibility);
+                                    scrollToBottomFab.setVisibility(visibility);
+                                    findButton.setVisible(enableSearch && visibility == View.VISIBLE);
+                                }
+                            });
+                        }
+
+                        //Dismiss loading dialog
                         progressDialog.dismiss();
-                        recyclerView.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                final int visibility = ((linearLayoutManager.findLastVisibleItemPosition() - linearLayoutManager.findFirstVisibleItemPosition()) == scrollListener.totalNumbers - 1) ? View.GONE : View.VISIBLE;
-                                scrollToTopFab.setVisibility(visibility);
-                                scrollToBottomFab.setVisibility(visibility);
-                                findButton.setVisible(enableSearch && visibility == View.VISIBLE);
-                            }
-                        });
                     }
                 });
             }

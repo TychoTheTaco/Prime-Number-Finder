@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
+import android.view.animation.Transformation;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -24,6 +25,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import easytasks.Task;
+import easytasks.TaskListener;
 
 /**
  * Created by tycho on 11/19/2017.
@@ -57,7 +59,16 @@ public abstract class ResultsFragment extends TaskFragment {
 
     protected TextView timeElapsedTextView;
 
-    protected final RotateAnimation rotate = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+    protected final RotateAnimation rotateAnimation = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f){
+
+        @Override
+        protected void applyTransformation(float interpolatedTime, Transformation t) {
+            rotation = 0 + (360 - 0) * interpolatedTime;
+            super.applyTransformation(interpolatedTime, t);
+        }
+    };
+
+    protected float rotation;
 
     protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
@@ -112,10 +123,8 @@ public abstract class ResultsFragment extends TaskFragment {
      */
     @Override
     public synchronized void setTask(Task task) {
-        if (task == null || task.getState() != Task.State.RUNNING) {
-            uiUpdater.pause();
-        }
         super.setTask(task);
+        switchState();
     }
 
     @Override
@@ -141,6 +150,10 @@ public abstract class ResultsFragment extends TaskFragment {
 
         updateUi();
 
+        switchState();
+    }
+
+    private void switchState(){
         if (getTask() != null) {
             switch (getTask().getState()) {
                 case RUNNING:
@@ -224,10 +237,26 @@ public abstract class ResultsFragment extends TaskFragment {
         timeElapsedTextView = rootView.findViewById(R.id.textView_elapsed_time);
 
         //Set up progress animation
-        rotate.setDuration(3000);
-        rotate.setRepeatCount(Animation.INFINITE);
-        rotate.setRepeatMode(Animation.INFINITE);
-        rotate.setInterpolator(new LinearInterpolator());
+        rotateAnimation.setDuration(3000);
+        rotateAnimation.setRepeatCount(Animation.INFINITE);
+        rotateAnimation.setRepeatMode(Animation.INFINITE);
+        rotateAnimation.setInterpolator(new LinearInterpolator());
+        rotateAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                progressBar.setRotation(progressBar.getRotation() + rotation);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
 
         //Buttons
         pauseButton = rootView.findViewById(R.id.pause_button);
@@ -244,14 +273,11 @@ public abstract class ResultsFragment extends TaskFragment {
         }
 
         //Set up pause button
-        pauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (getTask().getState() == Task.State.RUNNING) {
-                    getTask().pause();
-                } else if (getTask().getState() == Task.State.PAUSED) {
-                    getTask().resume();
-                }
+        pauseButton.setOnClickListener(v -> {
+            if (getTask().getState() == Task.State.RUNNING) {
+                getTask().pause();
+            } else if (getTask().getState() == Task.State.PAUSED) {
+                getTask().resume();
             }
         });
     }
@@ -262,31 +288,7 @@ public abstract class ResultsFragment extends TaskFragment {
             //Reset view states
             onResetViews();
 
-            switch (getTask().getState()) {
-                case RUNNING:
-                    onTaskStarted();
-                    break;
-
-                case PAUSING:
-                    onTaskPausing();
-                    break;
-
-                case PAUSED:
-                    onTaskPaused();
-                    break;
-
-                case RESUMING:
-                    onTaskResuming();
-                    break;
-
-                case STOPPING:
-                    onTaskStopping();
-                    break;
-
-                case STOPPED:
-                    onTaskStopped();
-                    break;
-            }
+            switchState();
 
         } else {
             noTaskView.setVisibility(View.VISIBLE);

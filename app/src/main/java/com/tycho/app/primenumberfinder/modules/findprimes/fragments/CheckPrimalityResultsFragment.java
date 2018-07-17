@@ -58,86 +58,74 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     @Override
     public void onTaskStarted() {
         super.onTaskStarted();
-        if (isAdded() && !isDetached() && getTask() != null) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    updateUi();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
 
-                    //Title
-                    title.setText(getString(R.string.status_searching));
-                    progressBar.startAnimation(rotate);
+                //Title
+                title.setText(getString(R.string.status_searching));
+                progressBar.startAnimation(rotateAnimation);
 
-                    //Format subtitle
-                    subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_subtitle_searching), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                //Format subtitle
+                subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_subtitle_searching), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
-                    //Buttons
-                    pauseButton.setVisibility(View.VISIBLE);
-                    pauseButton.setEnabled(true);
-                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                }
-            });
-        }
+                //Buttons
+                pauseButton.setVisibility(View.VISIBLE);
+                pauseButton.setEnabled(true);
+                pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+            }
+        });
     }
 
     @Override
     public void onTaskPausing() {
         super.onTaskPausing();
-        if (isAdded() && !isDetached() && getTask() != null) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    updateUi();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
 
-                    //Title
-                    title.setText(getString(R.string.state_pausing));
+                //Title
+                title.setText(getString(R.string.state_pausing));
 
-                    //Format subtitle
-                    subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_subtitle_searching), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                //Format subtitle
+                subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_subtitle_searching), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
-                    //Buttons
-                    pauseButton.setEnabled(false);
-                }
-            });
-        }
+                //Buttons
+                pauseButton.setEnabled(false);
+            }
+        });
     }
 
     @Override
     public void onTaskPaused() {
         super.onTaskPaused();
-        if (isAdded() && !isDetached() && getTask() != null) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    updateUi();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
 
-                    //Title
-                    title.setText(getString(R.string.status_paused));
-                    progressBar.clearAnimation();
+                //Title
+                title.setText(getString(R.string.status_paused));
+                progressBar.clearAnimation();
 
-                    //Buttons
-                    pauseButton.setEnabled(true);
-                    pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                }
-            });
-        }
+                //Buttons
+                pauseButton.setEnabled(true);
+                pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+            }
+        });
     }
 
     @Override
     public void onTaskResuming() {
         super.onTaskResuming();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (isAdded() && !isDetached() && getTask() != null) {
-                    updateUi();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
 
-                    //Title
-                    title.setText(getString(R.string.state_resuming));
+                //Title
+                title.setText(getString(R.string.state_resuming));
 
-                    //Buttons
-                    pauseButton.setEnabled(false);
-                }
+                //Buttons
+                pauseButton.setEnabled(false);
             }
         });
     }
@@ -151,30 +139,27 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
-        if (isAdded() && !isDetached() && getTask() != null) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    updateUi();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
 
-                    //Title
-                    title.setText(getString(R.string.status_finished));
-                    progressBar.clearAnimation();
+                //Title
+                title.setText(getString(R.string.status_finished));
+                progressBar.clearAnimation();
 
-                    //Format subtitle
-                    subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_result), new String[]{
-                            NUMBER_FORMAT.format(getTask().getNumber()),
-                            getTask().isPrime() ? "prime" : "not prime"
-                    }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                //Format subtitle
+                subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_result), new String[]{
+                        NUMBER_FORMAT.format(getTask().getNumber()),
+                        getTask().isPrime() ? "prime" : "not prime"
+                }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
-                    //Statistics
-                    statisticsLayout.setVisibility(View.GONE);
+                //Statistics
+                statisticsLayout.setVisibility(View.GONE);
 
-                    //Buttons
-                    pauseButton.setVisibility(View.GONE);
-                }
-            });
-        }
+                //Buttons
+                pauseButton.setVisibility(View.GONE);
+            }
+        });
     }
 
     @Override

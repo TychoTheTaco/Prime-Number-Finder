@@ -95,7 +95,8 @@ public abstract class SelectableAdapter<H extends SelectableAdapter.ViewHolder> 
         int position = 0;
         for (int i = 0; i < getItemCount(); i++) {
             if (selectedItemIndexes.get(i)) {
-                indexes[position++] = i;
+                indexes[position] = i;
+                position++;
             }
         }
         return indexes;
@@ -150,12 +151,13 @@ public abstract class SelectableAdapter<H extends SelectableAdapter.ViewHolder> 
         private void setSelected(final boolean selected) {
             if (selected && !isSelected()) {
                 selectedItemCount++;
+                selectedItemIndexes.put(getAdapterPosition(), true);
                 sendOnItemSelected();
             } else if (!selected && isSelected()) {
                 selectedItemCount--;
+                selectedItemIndexes.put(getAdapterPosition(), false);
                 sendOnItemDeselected();
             }
-            selectedItemIndexes.put(getAdapterPosition(), selected);
             notifyItemChanged(getAdapterPosition());
         }
 

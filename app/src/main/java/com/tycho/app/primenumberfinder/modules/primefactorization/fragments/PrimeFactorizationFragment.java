@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +48,7 @@ import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
  * Date Created: 3/2/2017
  */
 
-public class PrimeFactorizationFragment extends Fragment implements FloatingActionButtonListener{
+public class PrimeFactorizationFragment extends Fragment implements FloatingActionButtonListener {
 
     /**
      * Tag used for logging and debugging.
@@ -78,7 +79,7 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
             floatingActionButtonHost = (FloatingActionButtonHost) context;
         }
 
-        if (context instanceof ActionViewListener){
+        if (context instanceof ActionViewListener) {
             actionViewListener = (ActionViewListener) context;
         }
     }
@@ -89,7 +90,7 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
         final View rootView = inflater.inflate(R.layout.prime_factorization_fragment, container, false);
 
         //Apply action button color
-        if (floatingActionButtonHost != null){
+        if (floatingActionButtonHost != null) {
             floatingActionButtonHost.getFab(0).setBackgroundTintList(new ColorStateList(
                     new int[][]{
                             new int[]{}
@@ -189,7 +190,8 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
                     searchOptions.setNumber(getNumberToFactor().longValue());
                     try {
                         startTask((PrimeFactorizationTask.SearchOptions) searchOptions.clone());
-                    }catch (CloneNotSupportedException e){}
+                    } catch (CloneNotSupportedException e) {
+                    }
 
                     hideKeyboard(getActivity());
                     taskListFragment.scrollToBottom();
@@ -205,7 +207,7 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
         rootView.requestFocus();
 
         //Scroll to Results fragment if started from a notification
-        if (getActivity().getIntent().getSerializableExtra("taskId") != null){
+        if (getActivity().getIntent().getSerializableExtra("taskId") != null) {
             viewPager.setCurrentItem(1);
         }
 
@@ -214,10 +216,6 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
 
     private BigInteger getNumberToFactor() {
         return Utils.textToNumber(editTextInput.getText().toString());
-    }
-
-    public void addActionViewListener(final ActionViewListener actionViewListener) {
-        taskListFragment.addActionViewListener(actionViewListener);
     }
 
     private static final int REQUEST_CODE_NEW_TASK = 0;
@@ -230,10 +228,10 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
 
     @Override
     public void initFab(View view) {
-        if (fabAnimator != null){
+        if (fabAnimator != null) {
             fabAnimator.onPageScrolled(viewPager.getCurrentItem(), 0, 0);
 
-            if (getView() != null){
+            if (getView() != null) {
                 floatingActionButtonHost.getFab(0).setBackgroundTintList(new ColorStateList(
                         new int[][]{
                                 new int[]{}
@@ -265,7 +263,7 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
         }
     }
 
-    private void startTask(final PrimeFactorizationTask.SearchOptions searchOptions){
+    private void startTask(final PrimeFactorizationTask.SearchOptions searchOptions) {
         final PrimeFactorizationTask task = new PrimeFactorizationTask(searchOptions);
         task.addTaskListener(new TaskAdapter() {
 
@@ -300,13 +298,8 @@ public class PrimeFactorizationFragment extends Fragment implements FloatingActi
 
         //Start the task
         task.startOnNewThread();
+        Utils.logTaskStarted(getContext(), task);
 
-        //Post to a handler because "java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState"
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                taskListFragment.setSelected(task);
-            }
-        });
+        taskListFragment.setSelected(task);
     }
 }

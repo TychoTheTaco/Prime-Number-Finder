@@ -1,6 +1,5 @@
 package com.tycho.app.primenumberfinder.modules.findprimes;
 
-import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
@@ -26,6 +25,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import easytasks.MultithreadedTask;
 import easytasks.Task;
+import easytasks.TaskAdapter;
 
 import static com.tycho.app.primenumberfinder.utils.FileManager.EXTENSION;
 
@@ -66,8 +66,6 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
 
     private SearchOptions searchOptions;
 
-    private final CopyOnWriteArrayList<SavableCallbacks> savableCallbacks = new CopyOnWriteArrayList<>();
-
     /**
      * Create a new {@linkplain FindPrimesTask}.
      *
@@ -82,7 +80,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
         this.searchMethod = searchMethod;
     }
 
-    public FindPrimesTask(final SearchOptions searchOptions, final Context context) {
+    public FindPrimesTask(final SearchOptions searchOptions) {
         this(searchOptions.getStartValue(), searchOptions.getEndValue(), searchOptions.getThreadCount(), searchOptions.getSearchMethod());
         this.searchOptions = searchOptions;
     }
@@ -105,41 +103,75 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
     }
 
     private void searchBruteForce() {
-        //Create worker tasks
-        for (int i = 0; i < threadCount; i++) {
-            long s = startValue + (2 * i + 1);
-            if (s % 2 == 0) {
-                s -= 1;
+        Log.w(TAG, "Start task: " + endValue);
+
+        final long[] startValues = new long[threadCount];
+        int increment = threadCount * 2;
+
+        startValues[0] = (startValue % 2 == 0) ? (startValue + 1) : startValue;
+        for (int i = 0; i < startValues.length; i++) {
+            long s = i == 0 ? startValues[0] : startValues[i - 1] + 2;
+            while (true){
+                if (s % 2 == 0) {
+                    s -= 1;
+                }
+
+                /*if (threadCount != 1 && s % threadCount == 0 && increment % threadCount == 0){
+                    s += 2;
+                    increment += 2;
+                    continue;
+                }*/
+
+                break;
             }
-            final BruteForceTask task = new BruteForceTask(s, endValue, threadCount * 2);
+            startValues[i] = s;
+        }
+
+        /*final long partition = (endValue - startValue) / threadCount;
+        for (int i = 0; i < startValues.length; i++) {
+            startValues[i] = startValue + (i * partition);
+            if (startValues[i] % 2 == 0){
+                startValues[i]++;
+            }
+        }
+        increment = 2;*/
+
+        for (int i = 0; i < startValues.length; i++) {
+            String pattern = "";
+            for (int x = 0; x < 5; x++){
+                pattern += (startValues[i] + (increment * x)) + " ";
+            }
+            Log.d(TAG, "Pattern: " + pattern);
+        }
+
+        //Create worker tasks
+        for (long start : startValues){
+            final BruteForceTask task = new BruteForceTask(start, endValue, increment);
+            task.addTaskListener(new TaskAdapter(){
+                @Override
+                public void onTaskStopped() {
+                    Log.e(TAG, "Task " + task.startValue + " stopped.");
+                }
+            });
             task.bufferSize = searchOptions.bufferSize / threadCount;
             addTask(task);
         }
 
-        /*final long partition = (endValue - startValue) / threadCount;
-        for (int i = 0; i < threadCount; i++){
-            long start = partition * i;
-            if (start % 2 == 0){
-                start++;
-            }
-            addTask(new BruteForceTask(start, partition * (i + 1), 2));
-        }*/
+        /*
+        Partitions:
+        1,000,000 : 7.3 sec | 4.4 sec |  3.1 sec |  2.6 sec
+        10,000,000:                     89   sec | 73   sec
+
+        Increments:
+        1,000,000 : 7.6 sec | 3.9 sec |  3.6 sec |  2.4 sec
+        10,000,000:                   | 95  sec  | 56   sec
+
+        1 9  17 25
+        3 13 21 29
+        5 15 23 31
+         */
 
         executeTasks();
-
-        /*
-        NEW VERSION
-        10,000,000 - 4 threads: 65 sec
-        10,000,000 - 3 threads: 84 sec
-        1,000,000 - 4 threads: 2.7 sec
-        1,000,000 - 3 threads: 3.1 sec
-
-        OLD VERSION
-        10,000,000 - 4 threads: 55 sec
-        10,000,000 - 3 threads: 98 sec
-        1,000,000 - 4 threads: 2.6 sec
-        1,000,000 - 3 threads: 3.7 sec
-         */
 
         //Execute all tasks
 /*        final List<Thread> threads = new ArrayList<>();
@@ -408,7 +440,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
                 }
 
                 int li = 0;
-                long lowest = 0;
+                long lowest;
                 do {
                     lowest = 0;
                     for (int i = 0; i < getTasks().size(); i++) {
@@ -459,14 +491,6 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
         return lowest;
     }
 
-    /*public long getNumbersPerSecond(){
-        long total = 0;
-        for (Task task : getTasks()) {
-            total += ((BruteForceTask) task).getCurrentValue();
-        }
-        return total;
-    }*/
-
     public void setOptions(final SearchOptions searchOptions) {
         this.searchOptions = searchOptions;
     }
@@ -492,8 +516,6 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
         private final List<Long> primes = new ArrayList<>();
         private final BlockingQueue<Long> queue = new LinkedBlockingQueue<>();
 
-        private int totalDistance = 0;
-
         private final Object QUEUE_LOCK = new Object();
 
         private int bufferSize = -1;
@@ -517,27 +539,27 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
 
             boolean running = true;
 
-            while (running && (currentNumber <= endValue || endValue == -1)) {
+            while (running && (currentNumber <= endValue || endValue == INFINITY)) {
 
                 /*
-                 * Get the square root of the number. We only need to calculate up to the square
-                 * root to determine if the number is prime. The square root of a long will
-                 * always fit inside the value range of an int.
+                Get the square root of the number. We only need to calculate up to the square root
+                to determine if the number is prime. The square root of a long will always fit
+                inside the value range of an int.
                  */
                 final int sqrtMax = (int) Math.sqrt(currentNumber);
 
                 // Assume the number is prime
                 boolean isPrime = true;
 
-                /*
-                 * Check if the number is divisible by every odd number below it's square root.
-                 */
+                // Check if the number is divisible by every odd number below it's square root.
                 for (int i = 3; i <= sqrtMax; i += 2) {
 
-                    // Check if we should pause
-                    // Ideally, this check should go after the check for primality so it does not get
-                    // called every iteration. For now, this will remain here in case a thread
-                    // never finds a prime number.
+                    /*
+                    TODO: Optimization
+                    Ideally, this check should go after the check for primality so it does not get
+                    called every iteration. For now, this will remain here in case a thread never
+                    finds a prime number.
+                     */
                     tryPause();
                     if (shouldStop()) {
                         running = false;
@@ -558,8 +580,6 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
 
                 currentNumber += increment;
             }
-
-            //Log.e(TAG, "SubTask: " + this + " finished. (" + startValue + ", " + endValue + ")");
         }
 
         @Override
@@ -709,7 +729,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
         /**
          * The maximum size of prime numbers in memory. If more numbers are found, the entire list will be saved onto the disk first.
          */
-        private int bufferSize = 100_000;
+        private int bufferSize = 1_000_000;
 
         public SearchOptions(final long startValue, final long endValue, final SearchMethod searchMethod, final int threadCount, final boolean notifyWhenFinished, final boolean autoSave) {
             super(threadCount, notifyWhenFinished, autoSave);
@@ -779,36 +799,45 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
         }
     }
 
+    private boolean saved = false;
+
     @Override
-    public void save() {
+    public boolean save() {
         try {
             FileManager.copy(saveToFile(), new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getStartValue() + " to " + (getEndValue() == FindPrimesTask.INFINITY ? getCurrentValue() : getEndValue()) + EXTENSION));
+            saved = true;
             sendOnSaved();
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
-            sendOnError();
         }
+        sendOnError();
+        return false;
     }
 
-    public void addSavableCallbacks(final SavableCallbacks callbacks){
-        if (!savableCallbacks.contains(callbacks)){
-            savableCallbacks.add(callbacks);
-        }
+    private CopyOnWriteArrayList<SaveListener> saveListeners = new CopyOnWriteArrayList<>();
+
+    public void addSaveListener(final SaveListener listener){
+        saveListeners.add(listener);
     }
 
-    public void removeSavableCallbacks(final SavableCallbacks callbacks){
-        savableCallbacks.remove(callbacks);
+    public void removeSaveListener(final SaveListener listener){
+        saveListeners.remove(listener);
     }
 
     private void sendOnSaved(){
-        for (SavableCallbacks callbacks : savableCallbacks){
-            callbacks.onSaved();
+        for (SaveListener listener : saveListeners){
+            listener.onSaved();
         }
     }
 
     private void sendOnError(){
-        for (SavableCallbacks callbacks : savableCallbacks){
-            callbacks.onError();
+        for (SaveListener listener : saveListeners){
+            listener.onError();
         }
+    }
+
+    public boolean isSaved(){
+        return saved;
     }
 }

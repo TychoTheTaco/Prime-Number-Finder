@@ -49,8 +49,6 @@ public class FindFactorsTask extends Task implements Savable{
 
     private SearchOptions searchOptions;
 
-    private final CopyOnWriteArrayList<SavableCallbacks> savableCallbacks = new CopyOnWriteArrayList<>();
-
     private long i;
 
     final int sqrtMax;
@@ -173,34 +171,42 @@ public class FindFactorsTask extends Task implements Savable{
         return number;
     }
 
+    private boolean saved;
+
     @Override
-    public void save() {
-        if (FileManager.getInstance().saveFactors(getFactors(), getNumber())){
+    public boolean save() {
+        saved = FileManager.getInstance().saveFactors(getFactors(), getNumber());
+        if (saved){
             sendOnSaved();
         }else{
             sendOnError();
         }
+        return saved;
     }
 
-    public void addSavableCallbacks(final SavableCallbacks callbacks){
-        if (!savableCallbacks.contains(callbacks)){
-            savableCallbacks.add(callbacks);
-        }
+    private CopyOnWriteArrayList<SaveListener> saveListeners = new CopyOnWriteArrayList<>();
+
+    public void addSaveListener(final SaveListener listener){
+        saveListeners.add(listener);
     }
 
-    public void removeSavableCallbacks(final SavableCallbacks callbacks){
-        savableCallbacks.remove(callbacks);
+    public void removeSaveListener(final SaveListener listener){
+        saveListeners.remove(listener);
     }
 
     private void sendOnSaved(){
-        for (SavableCallbacks callbacks : savableCallbacks){
-            callbacks.onSaved();
+        for (SaveListener listener : saveListeners){
+            listener.onSaved();
         }
     }
 
     private void sendOnError(){
-        for (SavableCallbacks callbacks : savableCallbacks){
-            callbacks.onError();
+        for (SaveListener listener : saveListeners){
+            listener.onError();
         }
+    }
+
+    public boolean isSaved(){
+        return saved;
     }
 }

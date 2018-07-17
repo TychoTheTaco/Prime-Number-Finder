@@ -133,16 +133,12 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-
-                Crashlytics.log("Editable: '" + editable + "'");
-
                 //Check if infinity
                 if (!editable.toString().equals(getString(R.string.infinity_text))) {
 
                     //Format text
                     final String formatted = NUMBER_FORMAT.format(getEndValue());
                     if (editable.length() > 0 && !editable.toString().equals(formatted)) {
-                        Crashlytics.log("Setting text: '" + formatted + "'");
                         editTextSearchRangeEnd.setText(formatted, formatted.length() > 1);
                         applyConfig(searchOptions);
                     } else if (editable.toString().equals(NUMBER_FORMAT.format(0))) {
@@ -151,8 +147,6 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
                 }
 
                 searchOptions.setEndValue(getEndValue().longValue());
-
-                Crashlytics.log("Checking valid...");
 
                 //Check if the number is valid
                 editTextSearchRangeStart.setValid(editTextSearchRangeStart.length() > 0);

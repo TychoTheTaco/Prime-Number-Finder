@@ -1,10 +1,9 @@
 package com.tycho.app.primenumberfinder;
 
 public interface Savable {
+    boolean save();
 
-    void save();
-
-    interface SavableCallbacks{
+    interface SaveListener{
         void onSaved();
         void onError();
     }

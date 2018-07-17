@@ -1,22 +1,28 @@
 package com.tycho.app.primenumberfinder.modules.savedfiles;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableStringBuilder;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesListAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SelectableAdapter;
+import com.tycho.app.primenumberfinder.modules.savedfiles.sort.SortPopupWindow;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.FileType;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
@@ -36,10 +42,16 @@ public class SavedFilesListActivity extends AbstractActivity {
     private static final String TAG = SavedFilesListActivity.class.getSimpleName();
 
     private TextView subTitleTextView;
+    private TextView totalSizeTextView;
 
     SavedFilesListAdapter adapterSavedFilesList;
 
+    private AppBarLayout appBarLayout;
+    private CollapsingToolbarLayout collapsingToolbarLayout;
+
     private Menu menu;
+
+    private FileType fileType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +59,8 @@ public class SavedFilesListActivity extends AbstractActivity {
 
         //Apply custom theme depending on directory
         final File directory = (File) getIntent().getSerializableExtra("directory");
-        switch (FileManager.getFileType(directory)) {
+        fileType = FileManager.getFileType(directory);
+        switch (fileType) {
             case PRIMES:
                 setTheme(R.style.FindPrimes_Activity);
                 break;
@@ -67,9 +80,18 @@ public class SavedFilesListActivity extends AbstractActivity {
         //Set up adapter
         adapterSavedFilesList = new SavedFilesListAdapter(this, directory);
         adapterSavedFilesList.addOnSelectionStateChangedListener(new SelectableAdapter.OnSelectionStateChangedListener() {
+
+            private int defaultScrollFlags;
+
+            private boolean locked = false;
+
             @Override
             public void onStartSelection() {
+                getSupportActionBar().setHomeAsUpIndicator(R.drawable.round_clear_24);
                 menu.findItem(R.id.delete).setVisible(true);
+                menu.findItem(R.id.sort).setVisible(false);
+                appBarLayout.addOnOffsetChangedListener(onOffsetChangedListener);
+                appBarLayout.setExpanded(true);
             }
 
             @Override
@@ -84,36 +106,54 @@ public class SavedFilesListActivity extends AbstractActivity {
 
             @Override
             public void onStopSelection() {
+                getSupportActionBar().setHomeAsUpIndicator(0);
                 menu.findItem(R.id.delete).setVisible(false);
+                menu.findItem(R.id.sort).setVisible(true);
                 updateSubtitle();
+
+                //Restore scroll flags
+                appBarLayout.removeOnOffsetChangedListener(onOffsetChangedListener);
+                final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
+                layoutParams.setScrollFlags(defaultScrollFlags);
+                collapsingToolbarLayout.setLayoutParams(layoutParams);
+                locked = false;
             }
+
+            private final AppBarLayout.OnOffsetChangedListener onOffsetChangedListener = new AppBarLayout.OnOffsetChangedListener() {
+                @Override
+                public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                    if (verticalOffset == 0 && !locked){
+                        //Lock action bar
+                        final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
+                        defaultScrollFlags = layoutParams.getScrollFlags();
+                        layoutParams.setScrollFlags(0);
+                        collapsingToolbarLayout.setLayoutParams(layoutParams);
+                        locked = true;
+                    }
+                }
+            };
         });
 
         //Set the actionbar to a custom toolbar
+        appBarLayout = findViewById(R.id.app_bar);
+        collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Set up subtitle
         subTitleTextView = findViewById(R.id.subtitle);
-        toolbar.post(new Runnable() {
-            @Override
-            public void run() {
-                updateSubtitle();
-            }
-        });
+        totalSizeTextView = findViewById(R.id.right_message);
+        toolbar.post(this::updateSubtitle);
 
         //Set up toolbar animation
-        ((AppBarLayout) findViewById(R.id.app_bar)).addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                final int height = appBarLayout.getTotalScrollRange();
-                subTitleTextView.setAlpha(1.0f - ((float) -verticalOffset) / height);
-            }
+        final ViewGroup expandedLayout = findViewById(R.id.expanded_layout);
+        ((AppBarLayout) findViewById(R.id.app_bar)).addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
+            final int height = appBarLayout.getTotalScrollRange();
+            expandedLayout.setAlpha(1.0f - ((float) -verticalOffset) / height);
         });
 
-        switch (FileManager.getFileType(directory)) {
+        switch (fileType) {
             case PRIMES:
                 setTitle("Prime Numbers");
                 toolbar.setPopupTheme(R.style.FindPrimes_PopupOverlay);
@@ -145,64 +185,107 @@ public class SavedFilesListActivity extends AbstractActivity {
         return true;
     }
 
+    private SortPopupWindow.SortMethod lastSortMethod;
+    private boolean lasSortAscending;
+
+    private SortPopupWindow sortPopupWindow;
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
-            case R.id.sort_date:
-                adapterSavedFilesList.sortDate(false);
-                break;
+            case R.id.sort:
+                final int color;
 
-            case R.id.sort_size:
-                adapterSavedFilesList.sortSize(false);
-                break;
+                final List<SortPopupWindow.SortMethod> sortMethods = new ArrayList<>();
+                sortMethods.add(SortPopupWindow.SortMethod.DATE);
+                sortMethods.add(SortPopupWindow.SortMethod.FILE_SIZE);
 
-            case R.id.sort_search_range:
-                adapterSavedFilesList.sortSearchRange(false);
-                break;
+                switch (fileType) {
+                    case PRIMES:
+                        color = ContextCompat.getColor(this, R.color.purple_light);
+                        sortMethods.add(SortPopupWindow.SortMethod.SEARCH_RANGE_START);
+                        break;
 
-            case R.id.sort_number:
-                adapterSavedFilesList.sortNumber(false);
+                    case FACTORS:
+                        color = ContextCompat.getColor(this, R.color.orange_light);
+                        sortMethods.add(SortPopupWindow.SortMethod.NUMBER);
+                        break;
+
+                    case TREE:
+                        color = ContextCompat.getColor(this, R.color.green_light);
+                        sortMethods.add(SortPopupWindow.SortMethod.NUMBER);
+                        break;
+
+                    default:
+                        color = ContextCompat.getColor(this, R.color.primary_light);
+                        break;
+                }
+
+                sortPopupWindow = new SortPopupWindow(this, color, sortMethods) {
+                    @Override
+                    protected void onSortMethodSelected(SortMethod sortMethod, boolean ascending) {
+                        switch (sortMethod) {
+                            case DATE:
+                                adapterSavedFilesList.sortDate(ascending);
+                                break;
+
+                            case FILE_SIZE:
+                                adapterSavedFilesList.sortSize(ascending);
+                                break;
+
+                            case SEARCH_RANGE_START:
+                                adapterSavedFilesList.sortSearchRange(ascending);
+                                break;
+
+                            case NUMBER:
+                                adapterSavedFilesList.sortNumber(ascending);
+                                break;
+                        }
+                        lastSortMethod = sortMethod;
+                        lasSortAscending = ascending;
+                    }
+                };
+                sortPopupWindow.getContentView().measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+                sortPopupWindow.showAsDropDown(findViewById(R.id.sort), -(sortPopupWindow.getContentView().getMeasuredWidth() - (int) Utils.dpToPx(this, 45)), (int) Utils.dpToPx(this, -48));
+                sortPopupWindow.setSearchMethod(lastSortMethod != null ? lastSortMethod : SortPopupWindow.SortMethod.DATE, lasSortAscending);
                 break;
 
             case R.id.delete:
-
                 //Show warning dialog
                 final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
                 alertDialog.setTitle("Warning");
                 alertDialog.setMessage(getResources().getQuantityString(R.plurals.delete_warning, adapterSavedFilesList.getSelectedItemCount(), adapterSavedFilesList.getSelectedItemCount()));
                 alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Delete",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
+                        (dialog, which) -> {
 
-                                //Get the files to be deleted
-                                final int[] selectedItemIndexes = adapterSavedFilesList.getSelectedItemIndexes();
-                                final List<File> files = new ArrayList<>();
-                                for (int i : selectedItemIndexes) {
-                                    files.add(adapterSavedFilesList.getFiles().get(i));
-                                }
+                            //Get the files to be deleted
+                            final int[] selectedItemIndexes = adapterSavedFilesList.getSelectedItemIndexes();
+                            final List<File> files = new ArrayList<>();
+                            for (int i : selectedItemIndexes) {
+                                files.add(adapterSavedFilesList.getFiles().get(i));
+                            }
 
-                                final Iterator<File> iterator = files.iterator();
-                                int position = 0;
-                                while (iterator.hasNext()) {
-                                    final File file = iterator.next();
+                            final Iterator<File> iterator = files.iterator();
+                            int position = 0;
+                            while (iterator.hasNext()) {
+                                final File file = iterator.next();
 
-                                    //Delete the file
-                                    file.delete();
-                                    adapterSavedFilesList.getFiles().remove(file);
-                                    adapterSavedFilesList.notifyItemRemoved(selectedItemIndexes[position] - position);
-                                    position++;
-                                }
-                                adapterSavedFilesList.setSelectionMode(false);
-                                alertDialog.dismiss();
+                                //Delete the file
+                                file.delete();
+                                adapterSavedFilesList.getFiles().remove(file);
+                                adapterSavedFilesList.notifyItemRemoved(selectedItemIndexes[position] - position);
+                                position++;
+                            }
+                            adapterSavedFilesList.setSelectionMode(false);
+                            alertDialog.dismiss();
+
+                            if (adapterSavedFilesList.getItemCount() == 0){
+                                finish();
                             }
                         });
                 alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                alertDialog.dismiss();
-                            }
-                        });
+                        (dialog, which) -> alertDialog.dismiss());
                 alertDialog.show();
                 break;
 
@@ -216,26 +299,35 @@ public class SavedFilesListActivity extends AbstractActivity {
 
     @Override
     public void onBackPressed() {
+        //Cancel selection mode
         if (adapterSavedFilesList.isSelectionMode()) {
             adapterSavedFilesList.setSelectionMode(false);
-        } else {
-            super.onBackPressed();
+            return;
         }
+
+        super.onBackPressed();
     }
 
     private void updateSubtitle() {
-        String subtitle = getResources().getQuantityString(R.plurals.saved_files_count, adapterSavedFilesList.getItemCount(), NUMBER_FORMAT.format(adapterSavedFilesList.getItemCount()), Utils.humanReadableByteCount(adapterSavedFilesList.getTotalStorage(), true));
         if (adapterSavedFilesList.isSelectionMode()) {
-            subtitle += ' ' + getResources().getQuantityString(R.plurals.selected_item_count, adapterSavedFilesList.getSelectedItemCount(), NUMBER_FORMAT.format(adapterSavedFilesList.getSelectedItemCount()));
+            subTitleTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.selected_item_count, adapterSavedFilesList.getItemCount()), new String[]{
+                    NUMBER_FORMAT.format(adapterSavedFilesList.getSelectedItemCount()),
+                    NUMBER_FORMAT.format(adapterSavedFilesList.getItemCount())
+            }, Color.WHITE));
+            totalSizeTextView.setText(Utils.humanReadableByteCount(adapterSavedFilesList.getSelectedSize(), true) + " / " + Utils.humanReadableByteCount(adapterSavedFilesList.getTotalStorage(), true));
+        } else {
+            subTitleTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.saved_files_count, adapterSavedFilesList.getItemCount()), new String[]{
+                    NUMBER_FORMAT.format(adapterSavedFilesList.getItemCount())
+            }, Color.WHITE));
+            totalSizeTextView.setText(Utils.humanReadableByteCount(adapterSavedFilesList.getTotalStorage(), true));
         }
-        subTitleTextView.setText(subtitle);
 
         //Set correct height based on the height of the header text view
         final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         Utils.reLayoutChildren(collapsingToolbarLayout);
         final int defaultHeight = getSupportActionBar().getHeight();
         final int textHeight = subTitleTextView.getHeight();
-        final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) collapsingToolbarLayout.getLayoutParams();
+        final ViewGroup.LayoutParams layoutParams = collapsingToolbarLayout.getLayoutParams();
         layoutParams.height = defaultHeight + textHeight;
         collapsingToolbarLayout.setLayoutParams(layoutParams);
     }

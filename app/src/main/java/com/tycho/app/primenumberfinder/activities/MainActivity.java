@@ -1,8 +1,8 @@
 package com.tycho.app.primenumberfinder.activities;
 
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -10,15 +10,13 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.core.CrashlyticsCore;
 import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
@@ -36,8 +34,6 @@ import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.OneToOneMap;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
-
-import io.fabric.sdk.android.Fabric;
 
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
@@ -79,17 +75,12 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
      */
     private OneToOneMap<Integer, String> fragmentIds = new OneToOneMap<>();
 
+    private final int defaultDrawerIconTint = Color.BLACK;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
-
-        //Initialize analytics
-        if (PreferenceManager.getBoolean(PreferenceManager.Preference.ALLOW_ANALYTICS)) {
-            Fabric.with(this, new Crashlytics());
-        } else {
-            Fabric.with(this, new Crashlytics.Builder().core(new CrashlyticsCore.Builder().disabled(true).build()).build());
-        }
 
         //Set the actionbar to a custom toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);
@@ -110,28 +101,33 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         navigationView = findViewById(R.id.navigation_view);
         ((TextView) navigationView.getHeaderView(0).findViewById(R.id.app_version)).setText(getString(R.string.app_version_name, PrimeNumberFinder.getVersionName(this)));
         for (int i = 0; i < navigationView.getMenu().size(); i++) {
+            //Apply icon tint
+            /*if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
+                navigationView.setItemIconTintList(createColorStateList(Color.BLACK, ContextCompat.getColor(this, R.color.accent)));
+            }*/
+
+            //Hide action view
             try {
                 setActionViewVisibility(navigationView.getMenu().getItem(i), false);
             } catch (NullPointerException e) {
                 //Ignore NPE because there is no action view
             }
         }
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                selectDrawerItem(item);
-                return true;
-            }
+        navigationView.setNavigationItemSelectedListener(item -> {
+            selectDrawerItem(item);
+            return true;
         });
+
+        //Set up drawer icon animation
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_drawer, R.string.close_drawer);
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();
 
         //Set up floating action button
         floatingActionButton = findViewById(R.id.fab);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (currentFragment instanceof FloatingActionButtonListener) {
-                    ((FloatingActionButtonListener) currentFragment).onClick(v);
-                }
+        floatingActionButton.setOnClickListener(v -> {
+            if (currentFragment instanceof FloatingActionButtonListener) {
+                ((FloatingActionButtonListener) currentFragment).onClick(v);
             }
         });
 
@@ -151,15 +147,12 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
             progressDialog.setTitle("Updating...");
             progressDialog.show();
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    //Update file system
-                    FileManager.getInstance().updateFileSystem(getBaseContext());
-                    FileManager.getInstance().upgradeTo1_3_0();
+            new Thread(() -> {
+                //Update file system
+                FileManager.getInstance().updateFileSystem(getBaseContext());
+                FileManager.getInstance().upgradeTo1_3_0();
 
-                    progressDialog.dismiss();
-                }
+                progressDialog.dismiss();
             }).start();
         }
     }
@@ -216,12 +209,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
     @Override
     public void onTaskStatesChanged(final int taskType, final boolean active) {
         if (navigationView != null) {
-            navigationView.post(new Runnable() {
-                @Override
-                public void run() {
-                    setActionViewVisibility(navigationView.getMenu().getItem(taskType), active);
-                }
-            });
+            navigationView.post(() -> setActionViewVisibility(navigationView.getMenu().getItem(taskType), active));
         }
     }
 
@@ -307,49 +295,49 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
 
             default:
                 setTitle(fragmentIds.get(menuItem.getItemId()));
-                navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.accent)));
+                navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.accent)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.primary_dark), ContextCompat.getColor(this, R.color.primary));
                 break;
 
             case R.id.drawer_item_find_primes:
                 setTitle(getString(R.string.title_find_primes));
-                navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.purple)));
+                navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.purple)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.purple_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));
                 break;
 
             case R.id.drawer_item_find_factors:
                 setTitle(getString(R.string.title_find_factors));
-                navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.orange)));
+                navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.orange)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.orange_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.orange_dark), ContextCompat.getColor(this, R.color.orange));
                 break;
 
             case R.id.drawer_item_factor_tree:
                 setTitle(getString(R.string.title_factor_tree));
-                navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.green)));
+                navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.green)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.green_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
                 break;
 
             case R.id.drawer_item_saved_files:
                 setTitle(getString(R.string.title_saved_files));
-                navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.accent)));
+                navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.accent)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.primary_dark), ContextCompat.getColor(this, R.color.primary));
                 break;
 
             case R.id.drawer_item_settings:
                 setTitle(getString(R.string.title_settings));
-                navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.accent)));
+                navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.accent)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.primary_dark), ContextCompat.getColor(this, R.color.primary));
                 break;
 
             case R.id.drawer_item_about:
                 setTitle(getString(R.string.title_about));
-                navigationView.setItemIconTintList(createColorStateList(ContextCompat.getColor(this, R.color.gray), ContextCompat.getColor(this, R.color.accent)));
+                navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.accent)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.primary_dark), ContextCompat.getColor(this, R.color.primary));
                 break;

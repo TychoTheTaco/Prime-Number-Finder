@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
@@ -27,7 +28,6 @@ import java.util.List;
 import java.util.UUID;
 
 import easytasks.Task;
-import easytasks.TaskAdapter;
 
 /**
  * Created by tycho on 11/16/2017.
@@ -46,25 +46,24 @@ public class FindPrimesTaskListFragment extends Fragment {
 
     private RecyclerView recyclerView;
 
-    private final List<AbstractTaskListAdapter.EventListener> eventListeners = new ArrayList<>();
-    private final List<ActionViewListener> actionViewListeners = new ArrayList<>();
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         taskListAdapter = new FindPrimesTaskListAdapter(context);
-        for (AbstractTaskListAdapter.EventListener eventListener : eventListeners) {
-            taskListAdapter.addEventListener(eventListener);
+
+        if (context instanceof ActionViewListener) {
+            taskListAdapter.addActionViewListener((ActionViewListener) context);
         }
-        for (ActionViewListener actionViewListener : actionViewListeners) {
-            taskListAdapter.addActionViewListener(actionViewListener);
+
+        if (getParentFragment() instanceof AbstractTaskListAdapter.EventListener) {
+            taskListAdapter.addEventListener((AbstractTaskListAdapter.EventListener) getParentFragment());
         }
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.find_primes_task_list_fragment, container, false);
+        final View rootView = inflater.inflate(R.layout.task_list_fragment, container, false);
 
         //Set up the task list
         recyclerView = rootView.findViewById(R.id.task_list);
@@ -80,11 +79,14 @@ public class FindPrimesTaskListFragment extends Fragment {
         for (Task task : PrimeNumberFinder.getTaskManager().getTasks()) {
             if (task instanceof FindPrimesTask || task instanceof CheckPrimalityTask) {
                 addTask(task);
+                if (task instanceof FindPrimesTask){
+                    taskListAdapter.setSaved(task, ((FindPrimesTask) task).isSaved());
+                }
             }
         }
         taskListAdapter.sortByTimeCreated();
 
-        //Select correct task
+        //Restore saved instance
         if (savedInstanceState != null) {
             taskListAdapter.setSelected(savedInstanceState.getInt("selectedItemPosition"));
 
@@ -120,7 +122,7 @@ public class FindPrimesTaskListFragment extends Fragment {
 
     public void addTask(final Task task) {
         if (task instanceof FindPrimesTask) {
-            ((FindPrimesTask) task).addSavableCallbacks(new Savable.SavableCallbacks() {
+            ((FindPrimesTask) task).addSaveListener(new Savable.SaveListener() {
                 @Override
                 public void onSaved() {
                     taskListAdapter.postSetSaved(task, true);
@@ -147,21 +149,5 @@ public class FindPrimesTaskListFragment extends Fragment {
 
     public void setSelected(final Task task) {
         taskListAdapter.setSelected(task);
-    }
-
-    public void addEventListener(final AbstractTaskListAdapter.EventListener eventListener) {
-        if (taskListAdapter == null) {
-            eventListeners.add(eventListener);
-        } else {
-            taskListAdapter.addEventListener(eventListener);
-        }
-    }
-
-    public void addActionViewListener(final ActionViewListener actionViewListener) {
-        if (taskListAdapter == null) {
-            actionViewListeners.add(actionViewListener);
-        } else {
-            taskListAdapter.addActionViewListener(actionViewListener);
-        }
     }
 }

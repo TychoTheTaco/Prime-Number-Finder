@@ -109,65 +109,48 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             }
         }
 
-        viewAllButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        viewAllButton.setOnClickListener(v -> {
+            final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setTitle("Loading...");
+            progressDialog.show();
 
-                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                progressDialog.setTitle("Loading...");
-                progressDialog.show();
+            new Thread(() -> {
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
+                //Pause the task
+                final Task.State state = getTask().getState();
+                try {
+                    getTask().pauseAndWait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
-                        //Pause the task
-                        final Task.State state = getTask().getState();
-                        try {
-                            getTask().pauseAndWait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                final File file;
 
-                        final File file;
+                //Check if cached file exists
+                final File cached = new File(FileManager.getInstance().getTaskCacheDirectory(getTask()) + File.separator + "primes");
+                if (cached.exists() && getTask().getState() == Task.State.STOPPED) {
+                    file = cached;
+                } else {
+                    file = getTask().saveToFile();
+                }
 
-                        //Check if cached file exists
-                        final File cached = new File(FileManager.getInstance().getTaskCacheDirectory(getTask()) + File.separator + "primes");
-                        if (cached.exists() && getTask().getState() == Task.State.STOPPED) {
-                            file = cached;
-                        } else {
-                            file = getTask().saveToFile();
-                        }
+                //Resume the task
+                if (state == Task.State.RUNNING) {
+                    getTask().resume();
+                }
 
-                        //Resume the task
-                        if (state == Task.State.RUNNING) {
-                            getTask().resume();
-                        }
+                handler.post(progressDialog::dismiss);
 
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressDialog.dismiss();
-                            }
-                        });
-
-                        final Intent intent = new Intent(getActivity(), DisplayPrimesActivity.class);
-                        intent.putExtra("filePath", file.getAbsolutePath());
-                        intent.putExtra("enableSearch", true);
-                        intent.putExtra("range", new long[]{getTask().getStartValue(), getTask().getState() == Task.State.STOPPED ? getTask().getEndValue() : getTask().getCurrentValue()});
-                        intent.putExtra("title", false);
-                        getActivity().startActivity(intent);
-                    }
-                }).start();
-            }
+                final Intent intent = new Intent(getActivity(), DisplayPrimesActivity.class);
+                intent.putExtra("filePath", file.getAbsolutePath());
+                intent.putExtra("enableSearch", true);
+                intent.putExtra("range", new long[]{getTask().getStartValue(), getTask().getState() == Task.State.STOPPED ? getTask().getEndValue() : getTask().getCurrentValue()});
+                intent.putExtra("title", false);
+                getActivity().startActivity(intent);
+            }).start();
         });
 
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveTask(getTask(), getActivity());
-            }
-        });
+        saveButton.setOnClickListener(v -> saveTask(getTask(), getActivity()));
 
         init();
 
@@ -179,78 +162,57 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         progressDialog.setTitle("Saving...");
         progressDialog.show();
 
-        task.addSavableCallbacks(new Savable.SavableCallbacks() {
-            @Override
-            public void onSaved() {
-                progressDialog.dismiss();
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(context, getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
-                    }
+        new Thread(() -> {
+            if (task.save()) {
+                handler.post(() -> {
+                    Log.d(TAG, "Posted context: " + getContext() + " " + getActivity());
+                    Toast.makeText(context.getApplicationContext(), context.getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
                 });
+            } else {
+                handler.post(() -> Toast.makeText(context.getApplicationContext(), context.getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show());
             }
-
-            @Override
-            public void onError() {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(context, "Error saving file!", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                task.save();
-            }
+            progressDialog.dismiss();
         }).start();
     }
 
     @Override
     public void onTaskStarted() {
         super.onTaskStarted();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (isAdded() && !isDetached() && getTask() != null) {
-                    updateUi();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
 
-                    //Title
-                    title.setText(getString(R.string.status_searching));
-                    progressBar.startAnimation(rotate);
+                //Title
+                title.setText(getString(R.string.status_searching));
+                progressBar.startAnimation(rotateAnimation);
 
-                    //Subtitle
-                    subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_primes_subtitle), new String[]{
-                            NUMBER_FORMAT.format(getTask().getStartValue()),
-                            getTask().getEndValue() == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),
-                            getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE ? "brute force" : "the sieve of Eratosthenes"
-                    }, ContextCompat.getColor(getContext(), R.color.purple_dark)));
+                //Subtitle
+                subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_primes_subtitle), new String[]{
+                        NUMBER_FORMAT.format(getTask().getStartValue()),
+                        getTask().getEndValue() == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),
+                        getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE ? "brute force" : "the sieve of Eratosthenes"
+                }, ContextCompat.getColor(getContext(), R.color.purple_dark)));
 
-                    //Statistics
-                    etaTextView.setVisibility((getTask().getEndValue() == FindPrimesTask.INFINITY) ? View.GONE : View.VISIBLE);
+                //Statistics
+                etaTextView.setVisibility((getTask().getEndValue() == FindPrimesTask.INFINITY) ? View.GONE : View.VISIBLE);
 
-                    //Buttons
-                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                    layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
-                    centerView.setLayoutParams(layoutParams);
-                    pauseButton.setVisibility(View.VISIBLE);
-                    pauseButton.setEnabled(true);
-                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                    switch (getTask().getSearchOptions().getSearchMethod()) {
-                        case BRUTE_FORCE:
-                            viewAllButton.setVisibility(View.VISIBLE);
-                            break;
+                //Buttons
+                final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
+                centerView.setLayoutParams(layoutParams);
+                pauseButton.setVisibility(View.VISIBLE);
+                pauseButton.setEnabled(true);
+                pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                switch (getTask().getSearchOptions().getSearchMethod()) {
+                    case BRUTE_FORCE:
+                        viewAllButton.setVisibility(View.VISIBLE);
+                        break;
 
-                        case SIEVE_OF_ERATOSTHENES:
-                            viewAllButton.setVisibility(View.GONE);
-                            break;
-                    }
-                    saveButton.setVisibility(View.GONE);
+                    case SIEVE_OF_ERATOSTHENES:
+                        viewAllButton.setVisibility(View.GONE);
+                        break;
                 }
+                saveButton.setVisibility(View.GONE);
             }
         });
     }
@@ -258,40 +220,37 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     public void onTaskPausing() {
         super.onTaskPausing();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (isAdded() && !isDetached() && getTask() != null) {
-                    updateUi();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
 
-                    //Title
-                    title.setText(getString(R.string.state_pausing));
+                //Title
+                title.setText(getString(R.string.state_pausing));
 
-                    //Subtitle
-                    subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_primes_subtitle), new String[]{
-                            NUMBER_FORMAT.format(getTask().getStartValue()),
-                            getTask().getEndValue() == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),
-                            getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE ? "brute force" : "the sieve of Eratosthenes"
-                    }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                //Subtitle
+                subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_primes_subtitle), new String[]{
+                        NUMBER_FORMAT.format(getTask().getStartValue()),
+                        getTask().getEndValue() == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),
+                        getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE ? "brute force" : "the sieve of Eratosthenes"
+                }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
-                    //Statistics
-                    etaTextView.setVisibility((getTask().getEndValue() == FindPrimesTask.INFINITY) ? View.GONE : View.VISIBLE);
-                    numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
-                    primesPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.primes_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalPrimesPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                //Statistics
+                etaTextView.setVisibility((getTask().getEndValue() == FindPrimesTask.INFINITY) ? View.GONE : View.VISIBLE);
+                numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                primesPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.primes_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalPrimesPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
-                    //Buttons
-                    pauseButton.setEnabled(false);
-                    switch (getTask().getSearchOptions().getSearchMethod()) {
-                        case BRUTE_FORCE:
-                            saveButton.setVisibility(View.VISIBLE);
-                            viewAllButton.setVisibility(View.VISIBLE);
-                            break;
+                //Buttons
+                pauseButton.setEnabled(false);
+                switch (getTask().getSearchOptions().getSearchMethod()) {
+                    case BRUTE_FORCE:
+                        saveButton.setVisibility(View.VISIBLE);
+                        viewAllButton.setVisibility(View.VISIBLE);
+                        break;
 
-                        case SIEVE_OF_ERATOSTHENES:
-                            saveButton.setVisibility(View.GONE);
-                            viewAllButton.setVisibility(View.GONE);
-                            break;
-                    }
+                    case SIEVE_OF_ERATOSTHENES:
+                        saveButton.setVisibility(View.GONE);
+                        viewAllButton.setVisibility(View.GONE);
+                        break;
                 }
             }
         });
@@ -300,45 +259,42 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     public void onTaskPaused() {
         super.onTaskPaused();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (isAdded() && !isDetached() && getTask() != null) {
-                    updateUi();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
 
-                    //Title
-                    title.setText(getString(R.string.status_paused));
-                    progressBar.clearAnimation();
+                //Title
+                title.setText(getString(R.string.status_paused));
+                progressBar.clearAnimation();
 
-                    //Subtitle
-                    subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_primes_subtitle), new String[]{
-                            NUMBER_FORMAT.format(getTask().getStartValue()),
-                            getTask().getEndValue() == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),
-                            getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE ? "brute force" : "the sieve of Eratosthenes"
-                    }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                //Subtitle
+                subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_primes_subtitle), new String[]{
+                        NUMBER_FORMAT.format(getTask().getStartValue()),
+                        getTask().getEndValue() == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),
+                        getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE ? "brute force" : "the sieve of Eratosthenes"
+                }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
-                    //Statistics
-                    etaTextView.setVisibility((getTask().getEndValue() == FindPrimesTask.INFINITY) ? View.GONE : View.VISIBLE);
-                    numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
-                    primesPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.primes_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalPrimesPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                //Statistics
+                etaTextView.setVisibility((getTask().getEndValue() == FindPrimesTask.INFINITY) ? View.GONE : View.VISIBLE);
+                numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                primesPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.primes_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalPrimesPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
-                    //Buttons
-                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                    layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
-                    centerView.setLayoutParams(layoutParams);
-                    pauseButton.setEnabled(true);
-                    pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                    switch (getTask().getSearchOptions().getSearchMethod()) {
-                        case BRUTE_FORCE:
-                            saveButton.setVisibility(View.VISIBLE);
-                            viewAllButton.setVisibility(View.VISIBLE);
-                            break;
+                //Buttons
+                final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
+                centerView.setLayoutParams(layoutParams);
+                pauseButton.setEnabled(true);
+                pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+                switch (getTask().getSearchOptions().getSearchMethod()) {
+                    case BRUTE_FORCE:
+                        saveButton.setVisibility(View.VISIBLE);
+                        viewAllButton.setVisibility(View.VISIBLE);
+                        break;
 
-                        case SIEVE_OF_ERATOSTHENES:
-                            saveButton.setVisibility(View.GONE);
-                            viewAllButton.setVisibility(View.GONE);
-                            break;
-                    }
+                    case SIEVE_OF_ERATOSTHENES:
+                        saveButton.setVisibility(View.GONE);
+                        viewAllButton.setVisibility(View.GONE);
+                        break;
                 }
             }
         });
@@ -347,40 +303,37 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     public void onTaskResuming() {
         super.onTaskResuming();
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (isAdded() && !isDetached() && getTask() != null) {
-                    updateUi();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
 
-                    //Title
-                    title.setText(getString(R.string.state_resuming));
+                //Title
+                title.setText(getString(R.string.state_resuming));
 
-                    //Subtitle
-                    subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_primes_subtitle), new String[]{
-                            NUMBER_FORMAT.format(getTask().getStartValue()),
-                            getTask().getEndValue() == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),
-                            getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE ? "brute force" : "the sieve of Eratosthenes"
-                    }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                //Subtitle
+                subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_primes_subtitle), new String[]{
+                        NUMBER_FORMAT.format(getTask().getStartValue()),
+                        getTask().getEndValue() == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),
+                        getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE ? "brute force" : "the sieve of Eratosthenes"
+                }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
-                    //Statistics
-                    etaTextView.setVisibility((getTask().getEndValue() == FindPrimesTask.INFINITY) ? View.GONE : View.VISIBLE);
-                    numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
-                    primesPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.primes_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalPrimesPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                //Statistics
+                etaTextView.setVisibility((getTask().getEndValue() == FindPrimesTask.INFINITY) ? View.GONE : View.VISIBLE);
+                numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                primesPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.primes_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalPrimesPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
-                    //Buttons
-                    pauseButton.setEnabled(false);
-                    switch (getTask().getSearchOptions().getSearchMethod()) {
-                        case BRUTE_FORCE:
-                            saveButton.setVisibility(View.VISIBLE);
-                            viewAllButton.setVisibility(View.VISIBLE);
-                            break;
+                //Buttons
+                pauseButton.setEnabled(false);
+                switch (getTask().getSearchOptions().getSearchMethod()) {
+                    case BRUTE_FORCE:
+                        saveButton.setVisibility(View.VISIBLE);
+                        viewAllButton.setVisibility(View.VISIBLE);
+                        break;
 
-                        case SIEVE_OF_ERATOSTHENES:
-                            saveButton.setVisibility(View.GONE);
-                            viewAllButton.setVisibility(View.GONE);
-                            break;
-                    }
+                    case SIEVE_OF_ERATOSTHENES:
+                        saveButton.setVisibility(View.GONE);
+                        viewAllButton.setVisibility(View.GONE);
+                        break;
                 }
             }
         });
@@ -396,40 +349,37 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     public void onTaskStopped() {
         super.onTaskStopped();
         if (isAdded() && !isDetached() && getTask() != null) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    updateUi();
+            handler.post(() -> {
+                updateUi();
 
-                    //Title
-                    title.setText(getString(R.string.status_finished));
-                    progressBar.clearAnimation();
+                //Title
+                title.setText(getString(R.string.status_finished));
+                progressBar.clearAnimation();
 
-                    //Subtitle
-                    subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getResources().getQuantityString(R.plurals.find_primes_subtitle_result, getTask().getPrimeCount()), new String[]{
-                            NUMBER_FORMAT.format(getTask().getPrimeCount()),
-                            NUMBER_FORMAT.format(getTask().getStartValue()),
-                            getTask().getEndValue() == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),
-                    }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                //Subtitle
+                subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getResources().getQuantityString(R.plurals.find_primes_subtitle_result, getTask().getPrimeCount()), new String[]{
+                        NUMBER_FORMAT.format(getTask().getPrimeCount()),
+                        NUMBER_FORMAT.format(getTask().getStartValue()),
+                        getTask().getEndValue() == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),
+                }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
-                    //Body
-                    bodyTextView.setVisibility(View.GONE);
+                //Body
+                bodyTextView.setVisibility(View.GONE);
 
-                    //Statistics
-                    etaTextView.setVisibility(View.GONE);
-                    double elapsed = (double) getTask().getElapsedTime() / 1000;
-                    if (elapsed <= 0) {
-                        elapsed = 1;
-                    }
-                    numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_numbers_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getEndValue() / elapsed))}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
-                    primesPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_primes_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getPrimeCount() / elapsed))}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
-
-                    //Buttons
-                    centerView.getLayoutParams().width = 0;
-                    pauseButton.setVisibility(View.GONE);
-                    viewAllButton.setVisibility(View.VISIBLE);
-                    saveButton.setVisibility(View.VISIBLE);
+                //Statistics
+                etaTextView.setVisibility(View.GONE);
+                double elapsed = (double) getTask().getElapsedTime() / 1000;
+                if (elapsed <= 0) {
+                    elapsed = 1;
                 }
+                numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_numbers_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getEndValue() / elapsed))}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                primesPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_primes_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getPrimeCount() / elapsed))}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+
+                //Buttons
+                centerView.getLayoutParams().width = 0;
+                pauseButton.setVisibility(View.GONE);
+                viewAllButton.setVisibility(View.VISIBLE);
+                saveButton.setVisibility(View.VISIBLE);
             });
         }
     }

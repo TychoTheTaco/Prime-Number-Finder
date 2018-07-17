@@ -6,13 +6,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.LocaleSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.text.style.SuperscriptSpan;
@@ -23,17 +21,14 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.activities.DisplayContentActivity;
+import com.tycho.app.primenumberfinder.modules.primefactorization.export.FactorTreeExportOptionsActivity;
 import com.tycho.app.primenumberfinder.ui.TreeView;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -43,7 +38,7 @@ import simpletrees.Tree;
  * Created by tycho on 11/12/2017.
  */
 
-public class DisplayPrimeFactorizationActivity extends AbstractActivity {
+public class DisplayPrimeFactorizationActivity extends DisplayContentActivity {
 
     /**
      * Tag used for logging and debugging.
@@ -116,7 +111,8 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity {
 
     }
 
-    private void loadFile(final File file) {
+    @Override
+    protected void loadFile(final File file) {
         //Load file in another thread
         new Thread(new Runnable() {
             @Override
@@ -128,6 +124,12 @@ public class DisplayPrimeFactorizationActivity extends AbstractActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+
+                        if (factorTree == null){
+                            showLoadingError();
+                            return;
+                        }
+                        
                         treeView.setTree(factorTree.formatNumbers());
 
                         final Map<Long, Integer> map = new TreeMap<>();
