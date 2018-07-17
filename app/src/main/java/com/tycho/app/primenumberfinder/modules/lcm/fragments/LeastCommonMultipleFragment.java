@@ -1,14 +1,12 @@
 package com.tycho.app.primenumberfinder.modules.lcm.fragments;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.design.widget.TabLayout;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -17,16 +15,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.tycho.app.primenumberfinder.ActionViewListener;
-import com.tycho.app.primenumberfinder.FabAnimator;
-import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
-import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
+import com.tycho.app.primenumberfinder.modules.ModuleHostFragment;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
-import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsTaskListAdapter;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
@@ -37,7 +30,6 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.UUID;
 
-import easytasks.Task;
 import easytasks.TaskAdapter;
 
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
@@ -50,7 +42,7 @@ import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
  * @author Tycho Bellers
  *         Date Created: 11/12/2016
  */
-public class LeastCommonMultipleFragment extends Fragment implements FloatingActionButtonListener{
+public class LeastCommonMultipleFragment extends ModuleHostFragment{
 
     /**
      * Tag used for logging and debugging.
@@ -63,98 +55,10 @@ public class LeastCommonMultipleFragment extends Fragment implements FloatingAct
 
     private final FindFactorsTask.SearchOptions searchOptions = new FindFactorsTask.SearchOptions(0);
 
-    private LeastCommonMultipleTaskListFragment taskListFragment;
-    private LeastCommonMultipleResultsFragment resultsFragment;
-
-    private ViewPager viewPager;
-    private FabAnimator fabAnimator;
-
-    private FloatingActionButtonHost floatingActionButtonHost;
-
-    private ActionViewListener actionViewListener;
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof FloatingActionButtonHost) {
-            floatingActionButtonHost = (FloatingActionButtonHost) context;
-        }
-        if (context instanceof ActionViewListener){
-            actionViewListener = (ActionViewListener) context;
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.find_factors_fragment, viewGroup, false);
-
-        //Apply action button color
-        if (floatingActionButtonHost != null){
-            floatingActionButtonHost.getFab(0).setBackgroundTintList(new ColorStateList(
-                    new int[][]{
-                            new int[]{}
-                    },
-                    new int[]{
-                            Utils.getAccentColor(rootView.getContext())
-                    }));
-        }
-
-        //Set fragment adapter
-        final SimpleFragmentAdapter simpleFragmentAdapter = new SimpleFragmentAdapter(getChildFragmentManager(), getContext());
-        viewPager = rootView.findViewById(R.id.view_pager);
-
-        //Add fragments to adapter
-        simpleFragmentAdapter.add("Tasks", LeastCommonMultipleTaskListFragment.class);
-        simpleFragmentAdapter.add("Results", LeastCommonMultipleResultsFragment.class);
-
-        //Instantiate fragments now to save a reference to them
-        simpleFragmentAdapter.startUpdate(viewPager);
-        taskListFragment = (LeastCommonMultipleTaskListFragment) simpleFragmentAdapter.instantiateItem(viewPager, 0);
-        resultsFragment = (LeastCommonMultipleResultsFragment) simpleFragmentAdapter.instantiateItem(viewPager, 1);
-        simpleFragmentAdapter.finishUpdate(viewPager);
-
-        //Set up Task list fragment
-        taskListFragment.addActionViewListener(actionViewListener);
-        taskListFragment.addEventListener(new FindFactorsTaskListAdapter.EventListener() {
-            @Override
-            public void onTaskSelected(Task task) {
-                resultsFragment.setTask(task);
-            }
-
-            @Override
-            public void onPausePressed(Task task) {
-
-            }
-
-            @Override
-            public void onTaskRemoved(Task task) {
-                if (resultsFragment.getTask() == task) {
-                    resultsFragment.setTask(null);
-                }
-
-                taskListFragment.update();
-            }
-
-            @Override
-            public void onEditPressed(Task task) {
-                final Intent intent = new Intent(getActivity(), FindFactorsConfigurationActivity.class);
-                intent.putExtra("searchOptions", ((FindFactorsTask) task).getSearchOptions());
-                intent.putExtra("taskId", task.getId());
-                startActivityForResult(intent, 0);
-            }
-
-            @Override
-            public void onSavePressed(Task task) {
-                resultsFragment.saveTask((FindFactorsTask) task, getActivity());
-            }
-        });
-
-        //Set up view pager
-        viewPager.setAdapter(simpleFragmentAdapter);
-        fabAnimator = new FabAnimator(floatingActionButtonHost.getFab(0));
-        viewPager.addOnPageChangeListener(fabAnimator);
-        final TabLayout tabLayout = rootView.findViewById(R.id.tab_layout);
-        tabLayout.setupWithViewPager(viewPager);
+    protected View createView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        final View rootView = inflater.inflate(R.layout.find_factors_fragment, container, false);
 
         //Set up factor input
         editTextNumberToFactor = rootView.findViewById(R.id.editText_input_number);
@@ -199,15 +103,17 @@ public class LeastCommonMultipleFragment extends Fragment implements FloatingAct
             }
         });
 
-        //Give the root view focus to prevent EditTexts from initially getting focus
-        rootView.requestFocus();
-
-        //Scroll to Results fragment if started from a notification
-        if (getActivity().getIntent().getSerializableExtra("taskId") != null){
-            viewPager.setCurrentItem(1);
-        }
-
         return rootView;
+    }
+
+    @Override
+    protected void loadFragments() {
+
+    }
+
+    @Override
+    protected void afterLoadFragments() {
+        super.afterLoadFragments();
     }
 
     private static final int REQUEST_CODE_NEW_TASK = 0;
@@ -216,24 +122,6 @@ public class LeastCommonMultipleFragment extends Fragment implements FloatingAct
     public void onClick(View view) {
         final Intent intent = new Intent(getActivity(), FindFactorsConfigurationActivity.class);
         startActivityForResult(intent, REQUEST_CODE_NEW_TASK);
-    }
-
-    @Override
-    public void initFab(View view) {
-        if (fabAnimator != null){
-            fabAnimator.onPageScrolled(viewPager.getCurrentItem(), 0, 0);
-
-            if (getView() != null){
-                floatingActionButtonHost.getFab(0).setBackgroundTintList(new ColorStateList(
-                        new int[][]{
-                                new int[]{}
-                        },
-                        new int[]{
-                                Utils.getAccentColor(getView().getContext())
-                        })
-                );
-            }
-        }
     }
 
     @Override
