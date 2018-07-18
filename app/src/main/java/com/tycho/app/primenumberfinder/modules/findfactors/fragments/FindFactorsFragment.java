@@ -3,8 +3,12 @@ package com.tycho.app.primenumberfinder.modules.findfactors.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +30,10 @@ import java.util.UUID;
 
 import easytasks.Task;
 
+import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.DELETE;
+import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.PAUSE;
+import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.SAVE;
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_FACTORS;
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
 /**
@@ -105,7 +113,31 @@ public class FindFactorsFragment extends ModuleHostFragment{
 
     @Override
     protected void afterLoadFragments() {
-        taskListFragment.setAdapter(new AbstractTaskListAdapter(getContext()));
+        taskListFragment.setAdapter(new AbstractTaskListAdapter<FindFactorsTask>(getContext(), SAVE, PAUSE, DELETE){
+
+            @Override
+            protected CharSequence getTitle(FindFactorsTask task) {
+                return context.getString(R.string.find_factors_task_list_item_title, NUMBER_FORMAT.format(task.getNumber()));
+            }
+
+            @Override
+            protected CharSequence getSubtitle(FindFactorsTask task) {
+                if (task.getState() == Task.State.STOPPED){
+                    final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+                    spannableStringBuilder.append(context.getString(R.string.status_finished));
+                    spannableStringBuilder.append(": ");
+                    spannableStringBuilder.append(context.getString(R.string.find_factors_result, NUMBER_FORMAT.format((task.getFactors().size()))));
+                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accent_dark)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                    return spannableStringBuilder;
+                }
+                return super.getSubtitle(task);
+            }
+
+            @Override
+            protected int getTaskType() {
+                return TASK_TYPE_FIND_FACTORS;
+            }
+        });
         taskListFragment.whitelist(FindFactorsTask.class);
     }
 

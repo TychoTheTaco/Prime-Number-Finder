@@ -273,6 +273,13 @@ public class AbstractTaskListAdapter<T extends Task> extends RecyclerView.Adapte
                 }
                 break;
         }
+
+        //Show saved
+        if (isSaved(task)){
+            if (holder.saveButton != null) holder.saveButton.setVisibility(View.GONE);
+            holder.progress.setVisibility(View.VISIBLE);
+            holder.progress.setText(context.getString(R.string.saved));
+        }
     }
 
     private TaskListener getUiUpdaterDebugListener(final ViewHolder holder){
@@ -723,7 +730,7 @@ public class AbstractTaskListAdapter<T extends Task> extends RecyclerView.Adapte
     }
 
     protected void onUpdate(final ViewHolder viewHolder) {
-        notifyItemChanged(viewHolder.getAdapterPosition());
+
     }
 
     protected Item getItem(final Task task) {
@@ -752,6 +759,7 @@ public class AbstractTaskListAdapter<T extends Task> extends RecyclerView.Adapte
                     //Make sure the view holder is still visible
                     if (viewHolder.getAdapterPosition() != -1) {
                         onUpdate(viewHolder);
+                        notifyItemChanged(viewHolder.getAdapterPosition());
                     }else{
                         Log.e(TAG, "Posted an invalid update on " + viewHolder);
                     }

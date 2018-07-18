@@ -4,8 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +36,10 @@ import java.util.UUID;
 
 import easytasks.Task;
 
+import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.DELETE;
+import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.PAUSE;
+import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.SAVE;
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_PRIMES;
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
 /**
@@ -228,7 +237,69 @@ public class FindPrimesFragment extends ModuleHostFragment {
 
     @Override
     protected void afterLoadFragments() {
-        taskListFragment.setAdapter(new AbstractTaskListAdapter(getContext()));
+        taskListFragment.setAdapter(new AbstractTaskListAdapter<Task>(getContext(), SAVE, PAUSE, DELETE){
+
+            /*@Override
+            public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+                super.onBindViewHolder(holder, position);
+
+                if (getTask(position) instanceof CheckPrimalityTask){
+                    holder.saveButton.setVisibility(View.GONE);
+                    holder.editButton.setVisibility(View.GONE);
+                }
+            }*/
+
+            @Override
+            protected CharSequence getTitle(Task task) {
+                if (task instanceof FindPrimesTask) {
+                    final long endValue = ((FindPrimesTask) task).getEndValue();
+                    return context.getString(R.string.find_primes_task_list_item_title, NUMBER_FORMAT.format(((FindPrimesTask) task).getStartValue()), endValue == FindPrimesTask.INFINITY ? context.getString(R.string.infinity_text) : NUMBER_FORMAT.format(endValue));
+                } else if (task instanceof CheckPrimalityTask) {
+                   return context.getString(R.string.check_primality_task_list_title, NUMBER_FORMAT.format(((CheckPrimalityTask) task).getNumber()));
+                }
+                return super.getTitle(task);
+            }
+
+            @Override
+            protected CharSequence getSubtitle(Task task) {
+                if (task.getState() == Task.State.STOPPED){
+                    final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+                    spannableStringBuilder.append(context.getString(R.string.status_finished));
+                    spannableStringBuilder.append(": ");
+                    if (task instanceof FindPrimesTask){
+                        spannableStringBuilder.append(context.getString(R.string.find_primes_result, NUMBER_FORMAT.format(((FindPrimesTask) task).getPrimeCount())));
+                        spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accent_dark)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                    }else if (task instanceof CheckPrimalityTask){
+                        spannableStringBuilder.append(context.getString(R.string.check_primality_result, NUMBER_FORMAT.format(((CheckPrimalityTask) task).getNumber()), ((CheckPrimalityTask) task).isPrime() ? "prime" : "not prime"));
+                        spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accent_dark)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                    }
+                   return spannableStringBuilder;
+                }
+                return super.getSubtitle(task);
+            }
+
+            @Override
+            protected void onUpdate(AbstractTaskListAdapter.ViewHolder holder) {
+                final Task task = getTask(holder.getAdapterPosition());
+
+                //Set progress
+                if (holder.getAdapterPosition() != -1){
+                    if (task.getState() == Task.State.STOPPED || task instanceof FindPrimesTask && ((FindPrimesTask) task).getEndValue() == FindPrimesTask.INFINITY){
+                        holder.progress.setVisibility(View.GONE);
+                    }else if (task.getState() != Task.State.STOPPED){
+                        holder.progress.setVisibility(View.VISIBLE);
+                        holder.progress.setText(context.getString(R.string.task_progress, DECIMAL_FORMAT.format(task.getProgress() * 100)));
+                    }
+                }else{
+                    Log.w(TAG, "Warning: Adapter position was -1");
+                }
+            }
+
+            @Override
+            protected int getTaskType() {
+                return TASK_TYPE_FIND_PRIMES;
+            }
+        });
         taskListFragment.whitelist(FindPrimesTask.class, CheckPrimalityTask.class);
     }
 
