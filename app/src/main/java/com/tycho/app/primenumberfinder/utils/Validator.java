@@ -1,11 +1,19 @@
 package com.tycho.app.primenumberfinder.utils;
 
+import android.util.Log;
+
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.ui.ValidEditText;
 
 import java.math.BigInteger;
 import java.util.List;
 
 public class Validator {
+
+    /**
+     * Tag used for logging and debugging.
+     */
+    private static final String TAG = Validator.class.getSimpleName();
 
     public static boolean isPrimalityInputValid(final BigInteger input) {
 
@@ -95,6 +103,10 @@ public class Validator {
     }
 
     public static boolean isValidLCMInput(final List<Long> numbers) {
+        //Must be at least 2 numbers
+        if (numbers.size() < 2) return false;
+
+        //Validate individual numbers
         for (Long number : numbers) {
             if (!isValidLCMInput(number)) return false;
         }

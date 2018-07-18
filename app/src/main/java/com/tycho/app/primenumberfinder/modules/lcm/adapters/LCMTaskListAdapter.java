@@ -1,11 +1,13 @@
 package com.tycho.app.primenumberfinder.modules.lcm.adapters;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,11 +49,16 @@ public class LCMTaskListAdapter extends AbstractTaskListAdapter<LCMTaskListAdapt
         final LeastCommonMultipleTask task = (LeastCommonMultipleTask) getTask(position);
 
         //Set title
-        String title = "";
-        for (Long number : task.getNumbers()){
-            title += NUMBER_FORMAT.format(number) + "; ";
+        final StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < task.getNumbers().size(); i++){
+            stringBuilder.append(NUMBER_FORMAT.format(task.getNumbers().get(i)));
+            if (i == task.getNumbers().size() - 2){
+                stringBuilder.append("; and ");
+            }else if (i != task.getNumbers().size() - 1){
+                stringBuilder.append("; ");
+            }
         }
-        holder.title.setText(context.getString(R.string.lcm_task_list_item_title, title));
+        holder.title.setText(context.getString(R.string.lcm_task_list_item_title, stringBuilder.toString()));
 
         manageStandardViews(task, holder);
 

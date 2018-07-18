@@ -52,7 +52,7 @@
         android:layout_height="72dp"
         android:layout_marginBottom="4dp">
 
-        <ImageButton
+        <!--<ImageButton
             android:id="@+id/view_all_button"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -65,7 +65,7 @@
             android:elevation="2dp"
             android:visibility="gone"
             android:src="@drawable/ic_list_white_24dp"
-            android:tooltipText="@string/view_all" />
+            android:tooltipText="@string/view_all" />-->
 
         <View
             android:id="@+id/center"
@@ -88,7 +88,7 @@
             android:src="@drawable/ic_pause_white_24dp"
             android:tooltipText="Pause / Resume" />
 
-        <ImageButton
+        <!--<ImageButton
             android:id="@+id/save_button"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -100,7 +100,7 @@
             android:contentDescription="@string/save"
             android:elevation="2dp"
             android:src="@drawable/ic_save_white_24dp"
-            android:tooltipText="@string/save" />
+            android:tooltipText="@string/save" />-->
 
     </RelativeLayout>
 </LinearLayout>

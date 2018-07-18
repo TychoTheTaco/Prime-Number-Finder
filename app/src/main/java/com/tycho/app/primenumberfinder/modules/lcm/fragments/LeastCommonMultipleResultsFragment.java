@@ -75,46 +75,10 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
         statisticsLayout.add("eta", R.drawable.ic_timer_white_24dp);
         statisticsLayout.inflate();
 
-        /*saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveTask(getTask(), getActivity());
-            }
-        });*/
-
         init();
 
         return rootView;
     }
-
-    /*public void saveTask(final FindFactorsTask task, final Context context) {
-        final ProgressDialog progressDialog = new ProgressDialog(context);
-        progressDialog.setTitle("Saving...");
-        progressDialog.show();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (task.save()) {
-                    progressDialog.dismiss();
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.d(TAG, "Posted context: " + getContext() + " " + getActivity());
-                            Toast.makeText(context.getApplicationContext(), context.getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                } else {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(context.getApplicationContext(), context.getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            }
-        }).start();
-    }*/
 
     @Override
     protected void postDefaults() {
@@ -152,9 +116,6 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
             //Elapsed time
             timeElapsedTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime(), 2));
 
-            //Body
-            //bodyTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_body_text), new String[]{NUMBER_FORMAT.format(getTask().getFactors().size())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
-
             //Time remaining
             statisticsLayout.set("eta", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
         }
@@ -189,7 +150,7 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
             spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumbers().get(i)), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.yellow_dark)), 0);
             spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
             if (i == getTask().getNumbers().size() - 2){
-                spannableStringBuilder.append(" and ");
+                spannableStringBuilder.append(", and ");
             }else if (i != getTask().getNumbers().size() - 1){
                 spannableStringBuilder.append(", ");
             }
@@ -203,7 +164,7 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
         for (int i = 0; i < getTask().getNumbers().size(); i++){
             spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumbers().get(i)), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.yellow_dark)), 0);
             if (i == getTask().getNumbers().size() - 2){
-                spannableStringBuilder.append(" and ");
+                spannableStringBuilder.append(", and ");
             }else if (i != getTask().getNumbers().size() - 1){
                 spannableStringBuilder.append(", ");
             }

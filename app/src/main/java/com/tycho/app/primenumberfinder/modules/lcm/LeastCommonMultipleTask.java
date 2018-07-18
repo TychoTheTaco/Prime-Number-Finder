@@ -7,6 +7,7 @@ import android.util.Log;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,7 @@ public class LeastCommonMultipleTask extends Task {
 
     private final List<Long> numbers = new ArrayList<>();
 
-    private long lcm;
+    private BigInteger lcm;
 
     private SearchOptions searchOptions;
 
@@ -49,14 +50,14 @@ public class LeastCommonMultipleTask extends Task {
         }
 
 
-        lcm = 1;
+        lcm = BigInteger.ONE;
         Log.e(TAG, "Occurences: " + occurrences);
         for (Long number : occurrences.keySet()){
-            lcm *= Math.pow(number, occurrences.get(number));
+            lcm = lcm.multiply(BigInteger.valueOf((long) Math.pow(number, occurrences.get(number))));
         }
     }
 
-    public long getLcm() {
+    public BigInteger getLcm() {
         return lcm;
     }
 

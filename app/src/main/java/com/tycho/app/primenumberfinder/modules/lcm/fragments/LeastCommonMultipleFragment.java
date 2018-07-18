@@ -121,7 +121,7 @@ public class LeastCommonMultipleFragment extends ModuleHostFragment{
     private List<Long> getNumbers(){
         final List<Long> numbers = new ArrayList<>();
         for (ValidEditText editText : inputs){
-            if (editText.isValid()) numbers.add(editText.getLongValue());
+            if (editText.isValid() && editText.getLongValue() > 1) numbers.add(editText.getLongValue());
         }
         return numbers;
     }
