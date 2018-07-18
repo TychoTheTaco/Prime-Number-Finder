@@ -87,7 +87,7 @@
     <string name="calculate_lcm_button">Calculate</string>
     <string name="lcm_task_list_item_title">LCM of %1$s</string>
     <string name="lcm_result">LCM is %1$s.</string>
-    <string name="lcm_subtitle">Finding LCM of %1$s.</string>
+    <string name="lcm_subtitle">Finding the least common multiple of %1$s.</string>
 
     <!-- Saved files page -->
     <string name="no_saved_files_message">You have no saved files.</string>

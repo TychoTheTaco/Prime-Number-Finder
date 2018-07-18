@@ -7,23 +7,17 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
 import java.math.BigInteger;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * @author Tycho Bellers
@@ -60,9 +54,9 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
         if (position == getItemCount() - 1){
             holder.input.setBackgroundTintList(Utils.generateColorStateList(
                     new int[]{},
-                    new int[]{Color.YELLOW}
+                    new int[]{Color.LTGRAY}
             ));
-            holder.input.setHint("Add");
+            holder.input.setHint("+");
         }else{
             holder.input.setBackgroundTintList(null);
             holder.input.setHint("");
@@ -117,7 +111,9 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
             input.addOnTouchListener((v, event) -> {
                 if (getAdapterPosition() == getItemCount() - 1){
                     numbers.add(0L);
-                    notifyDataSetChanged();
+                    notifyItemInserted(getItemCount());
+                    notifyItemChanged(getItemCount() - 2);
+                    input.requestFocus();
                 }
                 return false;
             });

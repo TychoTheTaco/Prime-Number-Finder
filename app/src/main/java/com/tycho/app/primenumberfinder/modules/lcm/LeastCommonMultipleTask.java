@@ -8,11 +8,8 @@ import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactoriza
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import easytasks.Task;
@@ -51,9 +48,11 @@ public class LeastCommonMultipleTask extends Task {
             setProgress((float) numbers.indexOf(number) / numbers.size());
         }
 
+
         lcm = 1;
-        for (Long l : occurrences.keySet()){
-            lcm *= l;
+        Log.e(TAG, "Occurences: " + occurrences);
+        for (Long number : occurrences.keySet()){
+            lcm *= Math.pow(number, occurrences.get(number));
         }
     }
 
