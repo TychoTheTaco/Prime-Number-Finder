@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
+import com.tycho.app.primenumberfinder.modules.StatisticsLayout;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
@@ -32,8 +33,7 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     private TextView subtitle;
 
     //Statistics
-    private ViewGroup statisticsLayout;
-    private TextView etaTextView;
+    private StatisticsLayout statisticsLayout;
 
     private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
@@ -47,8 +47,9 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
         subtitle = rootView.findViewById(R.id.subtitle);
 
         //Statistics
-        statisticsLayout = rootView.findViewById(R.id.statistics_layout);
-        etaTextView = rootView.findViewById(R.id.textView_eta); //TODO: Might have incorrect tint api < 23
+        statisticsLayout = new StatisticsLayout(rootView.findViewById(R.id.statistics_layout));
+        statisticsLayout.add("eta", R.drawable.ic_timer_white_24dp);
+        statisticsLayout.inflate();
 
         init();
 
@@ -97,7 +98,7 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
             timeElapsedTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime(), 2));
 
             //Time remaining
-            etaTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+            statisticsLayout.set("eta", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
         }
     }
 

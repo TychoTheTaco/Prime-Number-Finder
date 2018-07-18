@@ -20,6 +20,7 @@ import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
+import com.tycho.app.primenumberfinder.modules.StatisticsLayout;
 import com.tycho.app.primenumberfinder.modules.findprimes.DisplayPrimesActivity;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.utils.FileManager;
@@ -47,10 +48,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     private TextView bodyTextView;
 
     //Statistics
-    private ViewGroup statisticsLayout;
-    private TextView etaTextView;
-    private TextView numbersPerSecondTextView;
-    private TextView primesPerSecondTextView;
+    private StatisticsLayout statisticsLayout;
 
     private boolean showStatistics = true;
 
@@ -85,29 +83,11 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         bodyTextView = rootView.findViewById(R.id.text);
 
         //Statistics
-        statisticsLayout = rootView.findViewById(R.id.statistics_layout);
-        etaTextView = rootView.findViewById(R.id.textView_eta);
-        numbersPerSecondTextView = rootView.findViewById(R.id.textView_numbers_per_second);
-        primesPerSecondTextView = rootView.findViewById(R.id.textView_primes_per_second);
-
-        //Apply black tint to icons
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            for (Drawable drawable : etaTextView.getCompoundDrawables()) {
-                if (drawable != null) {
-                    drawable.mutate().setTint(ContextCompat.getColor(getContext(), R.color.black));
-                }
-            }
-            for (Drawable drawable : numbersPerSecondTextView.getCompoundDrawables()) {
-                if (drawable != null) {
-                    drawable.mutate().setTint(ContextCompat.getColor(getContext(), R.color.black));
-                }
-            }
-            for (Drawable drawable : primesPerSecondTextView.getCompoundDrawables()) {
-                if (drawable != null) {
-                    drawable.mutate().setTint(ContextCompat.getColor(getContext(), R.color.black));
-                }
-            }
-        }
+        statisticsLayout = new StatisticsLayout(rootView.findViewById(R.id.statistics_layout));
+        statisticsLayout.add("eta", R.drawable.ic_timer_white_24dp);
+        statisticsLayout.add("nps", R.drawable.ic_trending_up_white_24dp);
+        statisticsLayout.add("pps", R.drawable.ic_trending_up_white_24dp);
+        statisticsLayout.inflate();
 
         viewAllButton.setOnClickListener(v -> {
             final ProgressDialog progressDialog = new ProgressDialog(getActivity());
@@ -187,9 +167,9 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         }, ContextCompat.getColor(getContext(), R.color.purple_dark)));
 
         //Statistics
-        etaTextView.setVisibility((getTask().getEndValue() == FindPrimesTask.INFINITY) ? View.GONE : View.VISIBLE);
-        numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
-        primesPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.primes_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalPrimesPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+        if (getTask().getEndValue() == FindPrimesTask.INFINITY) statisticsLayout.hide("eta");
+        statisticsLayout.set("nps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+        statisticsLayout.set("pps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.primes_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalPrimesPerSecond)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
     }
 
     @Override
@@ -283,13 +263,13 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         bodyTextView.setVisibility(View.GONE);
 
         //Statistics
-        etaTextView.setVisibility(View.GONE);
+        statisticsLayout.hide("eta");
         double elapsed = (double) getTask().getElapsedTime() / 1000;
         if (elapsed <= 0) {
             elapsed = 1;
         }
-        numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_numbers_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getEndValue() / elapsed))}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
-        primesPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_primes_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getPrimeCount() / elapsed))}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+        statisticsLayout.set("nps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_numbers_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getEndValue() / elapsed))}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+        statisticsLayout.set("pps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_primes_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getPrimeCount() / elapsed))}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
 
     }
 
@@ -336,8 +316,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             bodyTextView.setText(Utils.formatSpannable(spannableStringBuilder, text, content, ContextCompat.getColor(getContext(), R.color.purple_dark)));
 
             //Time remaining
-            if (etaTextView.getVisibility() == View.VISIBLE) {
-                etaTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+            if (statisticsLayout.isVisible("eta")) {
+                statisticsLayout.set("eta", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
             }
 
             //Update statistics every second
@@ -346,13 +326,13 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                 //Numbers per second
                 final long currentValue = getTask().getCurrentValue();
                 statisticsMap.get(getTask()).finalNumbersPerSecond = currentValue - statisticsMap.get(getTask()).lastCurrentValue;
-                numbersPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(currentValue - statisticsMap.get(getTask()).lastCurrentValue)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                statisticsLayout.set("nps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(currentValue - statisticsMap.get(getTask()).lastCurrentValue)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
                 statisticsMap.get(getTask()).lastCurrentValue = currentValue;
 
                 //Primes per second
                 final long primeCount = getTask().getPrimeCount();
                 statisticsMap.get(getTask()).finalPrimesPerSecond = primeCount - statisticsMap.get(getTask()).lastPrimeCount;
-                primesPerSecondTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.primes_per_second), new String[]{NUMBER_FORMAT.format(primeCount - statisticsMap.get(getTask()).lastPrimeCount)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+                statisticsLayout.set("pps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.primes_per_second), new String[]{NUMBER_FORMAT.format(primeCount - statisticsMap.get(getTask()).lastPrimeCount)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
                 statisticsMap.get(getTask()).lastPrimeCount = primeCount;
 
                 statisticsMap.get(getTask()).lastUpdateTime = getTask().getElapsedTime();
@@ -384,7 +364,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         showStatistics = getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE;
         progress.setVisibility(getTask().getEndValue() == FindPrimesTask.INFINITY ? View.GONE : View.VISIBLE);
         bodyTextView.setVisibility(View.VISIBLE);
-        etaTextView.setVisibility(View.VISIBLE);
+        statisticsLayout.show("eta");
         statisticsLayout.setVisibility(showStatistics ? View.VISIBLE : View.GONE);
     }
 }

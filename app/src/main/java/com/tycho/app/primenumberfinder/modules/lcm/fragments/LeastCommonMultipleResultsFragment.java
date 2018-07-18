@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
+import com.tycho.app.primenumberfinder.modules.StatisticsLayout;
 import com.tycho.app.primenumberfinder.modules.findfactors.DisplayFactorsActivity;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
@@ -55,9 +56,7 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
     private TextView bodyTextView;
 
     //Statistics
-    private ViewGroup statisticsLayout;
-    private TextView etaTextView;
-    private TextView numbersPerSecondTextView;
+    private StatisticsLayout statisticsLayout;
 
     private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
@@ -72,18 +71,9 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
         bodyTextView = rootView.findViewById(R.id.text);
 
         //Statistics
-        statisticsLayout = rootView.findViewById(R.id.statistics_layout);
-        etaTextView = rootView.findViewById(R.id.textView_eta);
-        numbersPerSecondTextView = rootView.findViewById(R.id.textView_numbers_per_second);
-
-        //Apply black tint to icons
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            for (Drawable drawable : etaTextView.getCompoundDrawables()) {
-                if (drawable != null) {
-                    drawable.mutate().setTint(ContextCompat.getColor(getActivity(), R.color.black));
-                }
-            }
-        }
+        statisticsLayout = new StatisticsLayout(rootView.findViewById(R.id.statistics_layout));
+        statisticsLayout.add("eta", R.drawable.ic_timer_white_24dp);
+        statisticsLayout.inflate();
 
         /*saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,7 +156,7 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
             //bodyTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_body_text), new String[]{NUMBER_FORMAT.format(getTask().getFactors().size())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
 
             //Time remaining
-            etaTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+            statisticsLayout.set("eta", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
         }
     }
 

@@ -35,36 +35,7 @@
     </LinearLayout>
 
     <!-- Statistics -->
-    <LinearLayout
-        android:id="@+id/statistics_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/statistics_title"
-            android:textColor="@color/primary_text"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <!-- Time remaining-->
-        <TextView
-            android:id="@+id/textView_eta"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:drawableLeft="@drawable/ic_timer_white_24dp"
-            android:drawablePadding="4dp"
-            android:gravity="center_vertical"
-            android:drawableTint="@color/black"
-            android:textColor="@color/primary_text"
-            android:textSize="14sp" />
-
-    </LinearLayout>
+    <include layout="@layout/statistics_layout"/>
 
     <!-- Buttons -->
     <RelativeLayout
