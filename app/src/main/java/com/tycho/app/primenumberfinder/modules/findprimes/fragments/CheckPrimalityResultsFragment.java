@@ -48,7 +48,7 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
 
         //Statistics
         statisticsLayout = rootView.findViewById(R.id.statistics_layout);
-        etaTextView = rootView.findViewById(R.id.textView_eta);
+        etaTextView = rootView.findViewById(R.id.textView_eta); //TODO: Might have incorrect tint api < 23
 
         init();
 
@@ -56,119 +56,34 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     }
 
     @Override
-    public void onTaskStarted() {
-        super.onTaskStarted();
-        handler.post(() -> {
-            if (isAdded() && !isDetached() && getTask() != null) {
-                updateUi();
+    protected void postDefaults() {
+        //Format subtitle
+        subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_subtitle_searching), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getContext(), R.color.purple_dark)));
 
-                //Title
-                title.setText(getString(R.string.status_searching));
-                progressBar.startAnimation(rotateAnimation);
-
-                //Format subtitle
-                subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_subtitle_searching), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
-
-                //Buttons
-                pauseButton.setVisibility(View.VISIBLE);
-                pauseButton.setEnabled(true);
-                pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-            }
-        });
+        //Statistics
+        statisticsLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void onTaskPausing() {
-        super.onTaskPausing();
-        handler.post(() -> {
-            if (isAdded() && !isDetached() && getTask() != null) {
-                updateUi();
+    protected void onPostStopped() {
+        super.onPostStopped();
 
-                //Title
-                title.setText(getString(R.string.state_pausing));
+        //Format subtitle
+        if (getTask().isPrime()){
+            subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_result), new String[]{
+                    NUMBER_FORMAT.format(getTask().getNumber()),
+                    "prime"
+            }, ContextCompat.getColor(getContext(), R.color.purple_dark)));
+        }else{
+            subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_result_negative), new String[]{
+                    NUMBER_FORMAT.format(getTask().getNumber()),
+                    "not prime",
+                    NUMBER_FORMAT.format(getTask().getFactor())
+            }, ContextCompat.getColor(getContext(), R.color.purple_dark)));
+        }
 
-                //Format subtitle
-                subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_subtitle_searching), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
-
-                //Buttons
-                pauseButton.setEnabled(false);
-            }
-        });
-    }
-
-    @Override
-    public void onTaskPaused() {
-        super.onTaskPaused();
-        handler.post(() -> {
-            if (isAdded() && !isDetached() && getTask() != null) {
-                updateUi();
-
-                //Title
-                title.setText(getString(R.string.status_paused));
-                progressBar.clearAnimation();
-
-                //Buttons
-                pauseButton.setEnabled(true);
-                pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-            }
-        });
-    }
-
-    @Override
-    public void onTaskResuming() {
-        super.onTaskResuming();
-        handler.post(() -> {
-            if (isAdded() && !isDetached() && getTask() != null) {
-                updateUi();
-
-                //Title
-                title.setText(getString(R.string.state_resuming));
-
-                //Buttons
-                pauseButton.setEnabled(false);
-            }
-        });
-    }
-
-    @Override
-    public void onTaskResumed() {
-        super.onTaskResumed();
-        onTaskStarted();
-    }
-
-    @Override
-    public void onTaskStopped() {
-        super.onTaskStopped();
-        handler.post(() -> {
-            if (isAdded() && !isDetached() && getTask() != null) {
-                updateUi();
-
-                //Title
-                title.setText(getString(R.string.status_finished));
-                progressBar.clearAnimation();
-
-                //Format subtitle
-                if (getTask().isPrime()){
-                    subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_result), new String[]{
-                            NUMBER_FORMAT.format(getTask().getNumber()),
-                            "prime"
-                    }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
-                }else{
-                    subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_result_negative), new String[]{
-                            NUMBER_FORMAT.format(getTask().getNumber()),
-                            "not prime",
-                            NUMBER_FORMAT.format(getTask().getFactor())
-                    }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
-                }
-
-
-                //Statistics
-                statisticsLayout.setVisibility(View.GONE);
-
-                //Buttons
-                pauseButton.setVisibility(View.GONE);
-            }
-        });
+        //Statistics
+        statisticsLayout.setVisibility(View.GONE);
     }
 
     @Override

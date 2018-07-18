@@ -2,6 +2,7 @@ package com.tycho.app.primenumberfinder.modules.primefactorization;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
@@ -76,9 +77,9 @@ public class PrimeFactorizationTask extends Task implements Savable{
         status = "";
     }
 
-    @Override
+    /*@Override
     public float getProgress() {
-        /*switch (status){
+        switch (status){
             case "checkPrimality":
                 setProgress(0.33f);
                 break;
@@ -86,9 +87,9 @@ public class PrimeFactorizationTask extends Task implements Savable{
             case "generatingTree":
                 setProgress(0.5f);
                 break;
-        }*/
+        }
         return super.getProgress();
-    }
+    }*/
 
     private Tree<Long> generateTree(long number) {
 
@@ -98,6 +99,8 @@ public class PrimeFactorizationTask extends Task implements Savable{
         findFactorsTask.start();
 
         final int size = findFactorsTask.getFactors().size();
+
+        setProgress((float) getNumber() / number);
 
         if (size == 1){
             primeFactors.put(1L, 1);
@@ -130,8 +133,6 @@ public class PrimeFactorizationTask extends Task implements Savable{
                 number1 = findFactorsTask.getFactors().get((size / 2));
                 number2 = findFactorsTask.getFactors().get((size / 2));
             }
-
-            setProgress((float) number / getNumber());
 
             tree.addNode(generateTree(number1));
             tree.addNode(generateTree(number2));

@@ -53,7 +53,8 @@
     <string name="no_tasks_message">No tasks. Start one with the buttons above or the floating action button.</string>
     <string name="no_task_selected_message">Select a task to view its status and results.</string>
     <string name="find_primes_task_list_item_title">Primes from %1$s to %2$s</string>
-    <string name="check_primality_subtitle_searching">Primality of %1$s</string>
+    <string name="check_primality_subtitle_searching">Checking primality of %1$s.</string>
+    <string name="check_primality_task_list_title">Primality of %1$s</string>
     <string name="primes_list_toast_message">%1$s is the %2$s number.</string>
 
     <!-- Find factors page -->
@@ -87,6 +88,7 @@
     <string name="calculate_lcm_button">Calculate</string>
     <string name="lcm_task_list_item_title">LCM of %1$s</string>
     <string name="lcm_result">LCM is %1$s.</string>
+    <string name="lcm_result_long">The least common multiple of %1$s is %2$s.</string>
     <string name="lcm_subtitle">Finding the least common multiple of %1$s.</string>
 
     <!-- Saved files page -->
@@ -147,6 +149,7 @@
     <string name="state_pausing">Pausing&#8230;</string>
     <string name="status_paused">Paused</string>
     <string name="state_resuming">Resuming&#8230;</string>
+    <string name="status_stopping">Stopping</string>
     <string name="status_stopped">Stopped</string>
     <string name="status_finished">Finished</string>
 

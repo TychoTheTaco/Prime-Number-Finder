@@ -58,7 +58,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:drawableLeft="@drawable/ic_timer_white_24dp"
-            android:drawablePadding="2dp"
+            android:drawablePadding="4dp"
+            android:gravity="center_vertical"
             android:drawableTint="@color/black"
             android:textColor="@color/primary_text"
             android:textSize="14sp" />

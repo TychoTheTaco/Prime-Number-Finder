@@ -99,181 +99,67 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     }
 
     @Override
-    public void onTaskStarted() {
-        super.onTaskStarted();
-            handler.post(() -> {
-                if (isAdded() && !isDetached() && getTask() != null) {
-                    updateUi();
+    protected void postDefaults() {
+        super.postDefaults();
 
-                    //Title
-                    title.setText(getString(R.string.status_searching));
-                    progressBar.startAnimation(rotateAnimation);
-
-                    //Subtitle
-                    subtitle.setText(Utils.formatSpannable(spannableStringBuilder,
-                            getString(R.string.prime_factorization_subtitle),
-                            new String[]{NUMBER_FORMAT.format(getTask().getNumber())},
-                            ContextCompat.getColor(getActivity(), R.color.green_dark)
-                    ));
-
-                    //Buttons
-                    centerView.getLayoutParams().width = (int) Utils.dpToPx(getActivity(), 64);
-                    pauseButton.setVisibility(View.VISIBLE);
-                    pauseButton.setEnabled(true);
-                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                    //viewAllButton.setVisibility(View.GONE);
-                    saveButton.setVisibility(View.GONE);
-                }
-            });
+        //Subtitle
+        subtitle.setText(Utils.formatSpannable(spannableStringBuilder,
+                getString(R.string.prime_factorization_subtitle),
+                new String[]{NUMBER_FORMAT.format(getTask().getNumber())},
+                ContextCompat.getColor(getContext(), R.color.green_dark)
+        ));
     }
 
     @Override
-    public void onTaskPausing() {
-        super.onTaskPausing();
-        handler.post(() -> {
-            if (isAdded() && !isDetached() && getTask() != null) {
-                updateUi();
+    protected void onPostStopped() {
+        super.onPostStopped();
 
-                //Title
-                title.setText(getString(R.string.state_pausing));
+        //Subtitle
+        subtitle.setText(Utils.formatSpannable(spannableStringBuilder,
+                getResources().getQuantityString(R.plurals.prime_factorization_subtitle_results, getTask().getPrimeFactors().size()),
+                new String[]{NUMBER_FORMAT.format(getTask().getNumber()), NUMBER_FORMAT.format(getTask().getPrimeFactors().size())},
+                ContextCompat.getColor(getActivity(), R.color.green_dark)
+        ));
 
-                //Subtitle
-                subtitle.setText(Utils.formatSpannable(spannableStringBuilder,
-                        getString(R.string.prime_factorization_subtitle),
-                        new String[]{NUMBER_FORMAT.format(getTask().getNumber())},
-                        ContextCompat.getColor(getActivity(), R.color.green_dark)
-                ));
+        //Body
+        spannableStringBuilder.clear();
+        spannableStringBuilder.clearSpans();
+        spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumber()));
+        spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.green_dark)), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        int position = spannableStringBuilder.length();
+        spannableStringBuilder.append(" = ");
+        spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        final Map map = getTask().getPrimeFactors();
+        for (Object factor : map.keySet()){
+            position = spannableStringBuilder.length();
+            String content = NUMBER_FORMAT.format(factor);
+            spannableStringBuilder.append(content);
+            spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.green_dark)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 
-                //Buttons
-                pauseButton.setVisibility(View.VISIBLE);
-                pauseButton.setEnabled(false);
-                pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                saveButton.setVisibility(View.GONE);
-                //viewAllButton.setVisibility(View.GONE);
-            }
-        });
-    }
+            position = spannableStringBuilder.length();
+            content = NUMBER_FORMAT.format(map.get(factor));
+            spannableStringBuilder.append(content);
+            spannableStringBuilder.setSpan(new SuperscriptSpan(), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            spannableStringBuilder.setSpan(new RelativeSizeSpan(0.8f), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 
-    @Override
-    public void onTaskPaused() {
-        super.onTaskPaused();
-        if (isAdded() && !isDetached() && getTask() != null){
-            handler.post(() -> {
-                updateUi();
-
-                //Title
-                title.setText(getString(R.string.status_paused));
-                progressBar.clearAnimation();
-
-                //Subtitle
-                subtitle.setText(Utils.formatSpannable(spannableStringBuilder,
-                        getString(R.string.prime_factorization_subtitle),
-                        new String[]{NUMBER_FORMAT.format(getTask().getNumber())},
-                        ContextCompat.getColor(getActivity(), R.color.green_dark)
-                ));
-
-                //Buttons
-                pauseButton.setVisibility(View.VISIBLE);
-                pauseButton.setEnabled(true);
-                pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                saveButton.setVisibility(View.GONE);
-                //viewAllButton.setVisibility(View.GONE);
-            });
+            position = spannableStringBuilder.length();
+            content = " \u00D7 "; //Multiplication sign
+            spannableStringBuilder.append(content);
+            spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         }
-    }
+        spannableStringBuilder.delete(spannableStringBuilder.length() - 3, spannableStringBuilder.length());
+        bodyTextView.setVisibility(View.VISIBLE);
+        bodyTextView.setText(spannableStringBuilder);
 
-    @Override
-    public void onTaskResuming() {
-        super.onTaskResuming();
-        handler.post(() -> {
-            if (isAdded() && !isDetached() && getTask() != null) {
-                updateUi();
+        //Tree
+        treeView.setVisibility(View.VISIBLE);
+        treeView.setTree(getTask().getFactorTree().formatNumbers());
 
-                //Title
-                title.setText(getString(R.string.state_resuming));
-
-                //Subtitle
-                subtitle.setText(Utils.formatSpannable(spannableStringBuilder,
-                        getString(R.string.prime_factorization_subtitle),
-                        new String[]{NUMBER_FORMAT.format(getTask().getNumber())},
-                        ContextCompat.getColor(getActivity(), R.color.green_dark)
-                ));
-
-                //Buttons
-                pauseButton.setEnabled(false);
-            }
-        });
-    }
-
-    @Override
-    public void onTaskResumed() {
-        super.onTaskResumed();
-        onTaskStarted();
-    }
-
-    @Override
-    public void onTaskStopped() {
-        super.onTaskStopped();
-        if (isAdded() && !isDetached() && getTask() != null){
-            handler.post(() -> {
-                updateUi();
-
-                //Title
-                title.setText(getString(R.string.status_finished));
-                progressBar.clearAnimation();
-
-                //Subtitle
-                subtitle.setText(Utils.formatSpannable(spannableStringBuilder,
-                        getResources().getQuantityString(R.plurals.prime_factorization_subtitle_results, getTask().getPrimeFactors().size()),
-                        new String[]{NUMBER_FORMAT.format(getTask().getNumber()), NUMBER_FORMAT.format(getTask().getPrimeFactors().size())},
-                        ContextCompat.getColor(getActivity(), R.color.green_dark)
-                ));
-
-                //Body
-                spannableStringBuilder.clear();
-                spannableStringBuilder.clearSpans();
-                spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumber()));
-                spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.green_dark)), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                int position = spannableStringBuilder.length();
-                spannableStringBuilder.append(" = ");
-                spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                final Map map = getTask().getPrimeFactors();
-                for (Object factor : map.keySet()){
-                    position = spannableStringBuilder.length();
-                    String content = NUMBER_FORMAT.format(factor);
-                    spannableStringBuilder.append(content);
-                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.green_dark)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                    spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-
-                    position = spannableStringBuilder.length();
-                    content = NUMBER_FORMAT.format(map.get(factor));
-                    spannableStringBuilder.append(content);
-                    spannableStringBuilder.setSpan(new SuperscriptSpan(), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                    spannableStringBuilder.setSpan(new RelativeSizeSpan(0.8f), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-
-                    position = spannableStringBuilder.length();
-                    content = " \u00D7 "; //Multiplication sign
-                    spannableStringBuilder.append(content);
-                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                }
-                spannableStringBuilder.delete(spannableStringBuilder.length() - 3, spannableStringBuilder.length());
-                bodyTextView.setVisibility(View.VISIBLE);
-                bodyTextView.setText(spannableStringBuilder);
-
-                //Tree
-                treeView.setVisibility(View.VISIBLE);
-                treeView.setTree(getTask().getFactorTree().formatNumbers());
-
-                //Buttons
-                centerView.setVisibility(View.GONE);
-                pauseButton.setVisibility(View.GONE);
-                final RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) saveButton.getLayoutParams();
-                layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                saveButton.setLayoutParams(layoutParams);
-                saveButton.setVisibility(View.VISIBLE);
-            });
-        }
+        final RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) saveButton.getLayoutParams();
+        layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        saveButton.setLayoutParams(layoutParams);
     }
 
     private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();

@@ -58,7 +58,7 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
             final long endValue = ((FindPrimesTask) task).getEndValue();
             holder.title.setText(context.getString(R.string.find_primes_task_list_item_title, NumberFormat.getInstance(Locale.getDefault()).format(((FindPrimesTask) task).getStartValue()), endValue == FindPrimesTask.INFINITY ? context.getString(R.string.infinity_text) : NumberFormat.getInstance(Locale.getDefault()).format(endValue)));
         } else if (task instanceof CheckPrimalityTask) {
-            holder.title.setText(context.getString(R.string.check_primality_subtitle_searching, NumberFormat.getInstance(Locale.getDefault()).format(((CheckPrimalityTask) task).getNumber())));
+            holder.title.setText(context.getString(R.string.check_primality_task_list_title, NumberFormat.getInstance(Locale.getDefault()).format(((CheckPrimalityTask) task).getNumber())));
         }
 
         manageStandardViews(task, holder);

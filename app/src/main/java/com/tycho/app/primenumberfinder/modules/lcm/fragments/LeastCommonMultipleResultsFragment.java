@@ -2,6 +2,7 @@ package com.tycho.app.primenumberfinder.modules.lcm.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,7 +12,10 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -123,158 +127,28 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
     }*/
 
     @Override
-    public void onTaskStarted() {
-        super.onTaskStarted();
-        handler.post(() -> {
-            if (isAdded() && !isDetached() && getTask() != null) {
-                updateUi();
+    protected void postDefaults() {
+        super.postDefaults();
 
-                //Title
-                title.setText(getString(R.string.status_searching));
-                progressBar.startAnimation(rotateAnimation);
+        //Subtitle
+        subtitleTextView.setText(generateSubtitle());
 
-                //Subtitle
-                String title = "";
-                for (Long number : getTask().getNumbers()){
-                    title += NUMBER_FORMAT.format(number) + "; ";
-                }
-                subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.lcm_subtitle), new String[]{title}, ContextCompat.getColor(getActivity(), R.color.yellow_dark)));
-
-                //Buttons
-                final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
-                centerView.setLayoutParams(layoutParams);
-                pauseButton.setVisibility(View.VISIBLE);
-                pauseButton.setEnabled(true);
-                pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                //viewAllButton.setVisibility(View.VISIBLE);
-                saveButton.setVisibility(View.GONE);
-            }
-        });
+        //Statistics
+        statisticsLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void onTaskPausing() {
-        super.onTaskPausing();
-        handler.post(() -> {
-            if (isAdded() && !isDetached() && getTask() != null) {
-                updateUi();
+    protected void onPostStopped() {
+        super.onPostStopped();
 
-                //Title
-                title.setText(getString(R.string.state_pausing));
+        //Subtitle
+        subtitleTextView.setText(generateResultSubtitle());
 
-                //Subtitle
-                //subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+        //Body
+        bodyTextView.setVisibility(View.GONE);
 
-                //Buttons
-                final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
-                centerView.setLayoutParams(layoutParams);
-                pauseButton.setVisibility(View.VISIBLE);
-                pauseButton.setEnabled(false);
-                pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                viewAllButton.setVisibility(View.VISIBLE);
-                saveButton.setVisibility(View.GONE);
-            }
-        });
-    }
-
-    @Override
-    public void onTaskPaused() {
-        super.onTaskPaused();
-        handler.post(() -> {
-            if (isAdded() && !isDetached() && getTask() != null) {
-
-                updateUi();
-
-                //Title
-                title.setText(getString(R.string.status_paused));
-                progressBar.clearAnimation();
-
-                //Subtitle
-                //subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
-
-                //Buttons
-                final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
-                centerView.setLayoutParams(layoutParams);
-                pauseButton.setVisibility(View.VISIBLE);
-                pauseButton.setEnabled(true);
-                pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                viewAllButton.setVisibility(View.VISIBLE);
-                saveButton.setVisibility(View.GONE);
-            }
-        });
-    }
-
-    @Override
-    public void onTaskResuming() {
-        super.onTaskResuming();
-        handler.post(() -> {
-            if (isAdded() && !isDetached() && getTask() != null) {
-                updateUi();
-
-                //Title
-                title.setText(getString(R.string.state_resuming));
-
-                //Subtitle
-                //subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
-
-                //Buttons
-                final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                layoutParams.width = (int) Utils.dpToPx(getActivity(), 64);
-                centerView.setLayoutParams(layoutParams);
-                pauseButton.setVisibility(View.VISIBLE);
-                pauseButton.setEnabled(false);
-                pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                viewAllButton.setVisibility(View.VISIBLE);
-                saveButton.setVisibility(View.GONE);
-            }
-        });
-    }
-
-    @Override
-    public void onTaskResumed() {
-        super.onTaskResumed();
-        onTaskStarted();
-    }
-
-    @Override
-    public void onTaskStopped() {
-        super.onTaskStopped();
-        if (isAdded() && !isDetached() && getTask() != null) {
-            handler.post(() -> {
-                updateUi();
-
-                //Title
-                title.setText(getString(R.string.status_finished));
-                progressBar.clearAnimation();
-
-                //Subtitle
-                /*Utils.formatSpannable(spannableStringBuilder, getResources().getQuantityString(R.plurals.find_factors_subtitle_results, getTask().getFactors().size()), new String[]{NUMBER_FORMAT.format(getTask().getNumber()), NUMBER_FORMAT.format(getTask().getFactors().size())}, ContextCompat.getColor(getActivity(), R.color.orange_dark));
-                if (getTask().getFactors().size() != 2) {
-                    subtitleTextView.setText(spannableStringBuilder);
-                } else {
-                    final SpannableStringBuilder ssb = new SpannableStringBuilder();
-                    Utils.formatSpannable(ssb, getResources().getString(R.string.find_factors_subtitle_results_extension), new String[]{"prime"}, ContextCompat.getColor(getActivity(), R.color.orange_dark));
-                    subtitleTextView.setText(TextUtils.concat(spannableStringBuilder, " ", ssb));
-                }*/
-
-                //Body
-                bodyTextView.setVisibility(View.GONE);
-
-                //Statistics
-                etaTextView.setVisibility(View.GONE);
-
-                //Buttons
-                final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                layoutParams.width = 0;
-                centerView.setLayoutParams(layoutParams);
-                pauseButton.setVisibility(View.GONE);
-                viewAllButton.setVisibility(View.VISIBLE);
-                saveButton.setVisibility(View.VISIBLE);
-            });
-        }
+        //Statistics
+        statisticsLayout.setVisibility(View.GONE);
     }
 
     @Override
@@ -313,6 +187,41 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
     protected void onResetViews() {
         super.onResetViews();
         bodyTextView.setVisibility(View.VISIBLE);
-        etaTextView.setVisibility(View.VISIBLE);
+        statisticsLayout.setVisibility(View.VISIBLE);
+    }
+
+    private SpannableStringBuilder generateSubtitle(){
+        final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+        int position;
+        spannableStringBuilder.append(getString(R.string.lcm_subtitle).split("%\\d+\\$s")[0]);
+        for (int i = 0; i < getTask().getNumbers().size(); i++){
+            position = spannableStringBuilder.length();
+            spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumbers().get(i)), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.yellow_dark)), 0);
+            spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            if (i == getTask().getNumbers().size() - 2){
+                spannableStringBuilder.append(" and ");
+            }else if (i != getTask().getNumbers().size() - 1){
+                spannableStringBuilder.append(", ");
+            }
+        }
+        return spannableStringBuilder.append('.');
+    }
+
+    private SpannableStringBuilder generateResultSubtitle(){
+        final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+        spannableStringBuilder.append(getString(R.string.lcm_result_long).split("%\\d+\\$s")[0]);
+        for (int i = 0; i < getTask().getNumbers().size(); i++){
+            spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumbers().get(i)), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.yellow_dark)), 0);
+            if (i == getTask().getNumbers().size() - 2){
+                spannableStringBuilder.append(" and ");
+            }else if (i != getTask().getNumbers().size() - 1){
+                spannableStringBuilder.append(", ");
+            }
+        }
+        spannableStringBuilder.append(getString(R.string.lcm_result_long).split("%\\d+\\$s")[1]);
+        final int position = spannableStringBuilder.length();
+        spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getLcm()),  new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.yellow_dark)), 0);
+        spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        return spannableStringBuilder.append('.');
     }
 }

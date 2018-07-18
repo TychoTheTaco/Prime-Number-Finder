@@ -84,36 +84,273 @@ public abstract class ResultsFragment extends TaskFragment {
         } else {
             uiUpdater.resume();
         }
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
+
+                //Title
+                title.setText(getString(R.string.status_searching));
+                progressBar.startAnimation(rotateAnimation);
+
+                //Buttons
+                if (centerView != null){
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = (int) Utils.dpToPx(getContext(), 64);
+                    centerView.setLayoutParams(layoutParams);
+                }
+                if (pauseButton != null){
+                    pauseButton.setVisibility(View.VISIBLE);
+                    pauseButton.setEnabled(true);
+                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                }
+                if (viewAllButton != null){
+                    viewAllButton.setVisibility(View.VISIBLE);
+                }
+                if (saveButton != null){
+                    saveButton.setVisibility(View.GONE);
+                }
+
+                onPostStarted();
+            }
+        });
     }
 
     @Override
     public void onTaskPausing() {
         super.onTaskPausing();
         uiUpdater.resume();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
+
+                //Title
+                title.setText(getString(R.string.state_pausing));
+
+                //Buttons
+                if (centerView != null){
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = (int) Utils.dpToPx(getContext(), 64);
+                    centerView.setLayoutParams(layoutParams);
+                }
+                if (pauseButton != null){
+                    pauseButton.setVisibility(View.VISIBLE);
+                    pauseButton.setEnabled(false);
+                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                }
+                if (viewAllButton != null){
+                    viewAllButton.setVisibility(View.VISIBLE);
+                }
+                if (saveButton != null){
+                    saveButton.setVisibility(View.GONE);
+                }
+
+                onPostPausing();
+            }
+        });
     }
 
     @Override
     public void onTaskPaused() {
         super.onTaskPaused();
         uiUpdater.pause();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
+
+                //Title
+                title.setText(getString(R.string.status_paused));
+                progressBar.clearAnimation();
+
+                //Buttons
+                if (centerView != null){
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = (int) Utils.dpToPx(getContext(), 64);
+                    centerView.setLayoutParams(layoutParams);
+                }
+                if (pauseButton != null){
+                    pauseButton.setVisibility(View.VISIBLE);
+                    pauseButton.setEnabled(true);
+                    pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+                }
+                if (viewAllButton != null){
+                    viewAllButton.setVisibility(View.VISIBLE);
+                }
+                if (saveButton != null){
+                    saveButton.setVisibility(View.GONE);
+                }
+
+                onPostPaused();
+            }
+        });
     }
 
     @Override
     public void onTaskResuming() {
         super.onTaskResuming();
         uiUpdater.resume();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
+
+                //Title
+                title.setText(getString(R.string.state_resuming));
+
+                //Buttons
+                if (centerView != null){
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = (int) Utils.dpToPx(getContext(), 64);
+                    centerView.setLayoutParams(layoutParams);
+                }
+                if (pauseButton != null){
+                    pauseButton.setVisibility(View.VISIBLE);
+                    pauseButton.setEnabled(false);
+                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                }
+                if (viewAllButton != null){
+                    viewAllButton.setVisibility(View.VISIBLE);
+                }
+                if (saveButton != null){
+                    saveButton.setVisibility(View.GONE);
+                }
+
+                onPostResuming();
+            }
+        });
     }
 
     @Override
     public void onTaskResumed() {
         super.onTaskResumed();
         uiUpdater.resume();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
+
+                //Title
+                title.setText(getString(R.string.status_searching));
+                progressBar.startAnimation(rotateAnimation);
+
+                //Buttons
+                if (centerView != null){
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = (int) Utils.dpToPx(getContext(), 64);
+                    centerView.setLayoutParams(layoutParams);
+                }
+                if (pauseButton != null){
+                    pauseButton.setVisibility(View.VISIBLE);
+                    pauseButton.setEnabled(true);
+                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                }
+                if (viewAllButton != null){
+                    viewAllButton.setVisibility(View.VISIBLE);
+                }
+                if (saveButton != null){
+                    saveButton.setVisibility(View.GONE);
+                }
+
+                onPostResumed();
+            }
+        });
+    }
+
+    @Override
+    public void onTaskStopping() {
+        super.onTaskStopping();
+        uiUpdater.resume();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
+
+                //Title
+                title.setText(getString(R.string.status_stopping));
+                //progressBar.startAnimation(rotateAnimation);
+
+                //Buttons
+                if (centerView != null){
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = (int) Utils.dpToPx(getContext(), 64);
+                    centerView.setLayoutParams(layoutParams);
+                }
+                if (pauseButton != null){
+                    pauseButton.setVisibility(View.VISIBLE);
+                    pauseButton.setEnabled(false);
+                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                }
+                if (viewAllButton != null){
+                    viewAllButton.setVisibility(View.VISIBLE);
+                }
+                if (saveButton != null){
+                    saveButton.setVisibility(View.GONE);
+                }
+
+                onPostStopping();
+            }
+        });
     }
 
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
         uiUpdater.pause();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
+
+                //Title
+                title.setText(getString(R.string.status_finished));
+                progressBar.clearAnimation();
+
+                //Buttons
+                if (centerView != null){
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = 0;
+                    centerView.setLayoutParams(layoutParams);
+                }
+                if (pauseButton != null){
+                    pauseButton.setVisibility(View.GONE);
+                }
+                if (viewAllButton != null){
+                    viewAllButton.setVisibility(View.VISIBLE);
+                }
+                if (saveButton != null){
+                    saveButton.setVisibility(View.VISIBLE);
+                }
+
+                onPostStopped();
+            }
+        });
+    }
+
+    protected void onPostStarted(){
+        postDefaults();
+    }
+
+    protected void onPostPausing(){
+        postDefaults();
+    }
+
+    protected void onPostPaused(){
+        postDefaults();
+    }
+
+    protected void onPostResuming(){
+        postDefaults();
+    }
+
+    protected void onPostResumed(){
+        postDefaults();
+    }
+
+    protected void onPostStopping(){
+        postDefaults();
+    }
+
+    protected void onPostStopped(){
+        postDefaults();
+    }
+
+    protected void postDefaults(){
+
     }
 
     /**
