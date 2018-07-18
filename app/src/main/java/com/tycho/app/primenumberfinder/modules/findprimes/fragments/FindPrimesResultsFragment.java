@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -289,7 +290,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             timeElapsedTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime(), 2));
 
             //Body
-            String text = "";
+            String text = null;
             String[] content = new String[]{NUMBER_FORMAT.format(getTask().getPrimeCount())};
             switch (getTask().getSearchOptions().getSearchMethod()) {
                 case BRUTE_FORCE:
@@ -307,13 +308,17 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                             break;
 
                         case "searching":
-                            text = "Marking all non-primes...";
-                            content = new String[0];
+                            spannableStringBuilder.clear();
+                            spannableStringBuilder.clearSpans();
+                            spannableStringBuilder.append("Marking factors of ");
+                            spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getCurrentFactor()), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.purple_dark)), 0);
+                            spannableStringBuilder.append("...");
+                            bodyTextView.setText(spannableStringBuilder);
                             break;
                     }
                     break;
             }
-            bodyTextView.setText(Utils.formatSpannable(spannableStringBuilder, text, content, ContextCompat.getColor(getContext(), R.color.purple_dark)));
+            if (text != null) bodyTextView.setText(Utils.formatSpannable(spannableStringBuilder, text, content, ContextCompat.getColor(getContext(), R.color.purple_dark)));
 
             //Time remaining
             if (statisticsLayout.isVisible("eta")) {

@@ -99,14 +99,6 @@ public class LeastCommonMultipleFragment extends ModuleHostFragment{
                 LeastCommonMultipleTask task = new LeastCommonMultipleTask(new LeastCommonMultipleTask.SearchOptions(getNumbers()));
                 startTask(task);
 
-               /* //Create a new task
-                searchOptions.setNumber(getNumberToFactor().longValue());
-                try {
-                    startTask((FindFactorsTask.SearchOptions) searchOptions.clone());
-                }catch (CloneNotSupportedException e){
-                    e.printStackTrace();
-                }*/
-
                 hideKeyboard(getActivity());
                 taskListFragment.scrollToBottom();
 
@@ -136,6 +128,7 @@ public class LeastCommonMultipleFragment extends ModuleHostFragment{
     protected void afterLoadFragments() {
         super.afterLoadFragments();
         taskListFragment.setAdapter(new LCMTaskListAdapter(getContext()));
+        taskListFragment.whitelist(LeastCommonMultipleTask.class);
     }
 
     @Override

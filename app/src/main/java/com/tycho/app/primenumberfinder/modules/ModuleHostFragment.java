@@ -28,6 +28,7 @@ import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findfactors.fragments.FindFactorsResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
@@ -41,6 +42,7 @@ import easytasks.TaskAdapter;
 
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_FACTORS;
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_PRIMES;
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_LCM;
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_PRIME_FACTORIZATION;
 
 public abstract class ModuleHostFragment extends Fragment implements FloatingActionButtonListener, AbstractTaskListAdapter.EventListener {
@@ -212,6 +214,8 @@ public abstract class ModuleHostFragment extends Fragment implements FloatingAct
                     searchOptions = ((FindFactorsTask) task).getSearchOptions();
                 }else if (task instanceof PrimeFactorizationTask){
                     searchOptions = ((PrimeFactorizationTask) task).getSearchOptions();
+                }else if (task instanceof LeastCommonMultipleTask){
+                    searchOptions = ((LeastCommonMultipleTask) task).getSearchOptions();
                 }else{
                     return;
                 }
@@ -237,6 +241,9 @@ public abstract class ModuleHostFragment extends Fragment implements FloatingAct
                     }else if (task instanceof PrimeFactorizationTask){
                         taskType = TASK_TYPE_PRIME_FACTORIZATION;
                         content = "Task \"Prime factorization of " + NUMBER_FORMAT.format(((PrimeFactorizationTask) task).getNumber()) + "\" finished.";
+                    }else if (task instanceof LeastCommonMultipleTask){
+                        taskType = TASK_TYPE_LCM;
+                        content = "Task \"LCM is " + NUMBER_FORMAT.format(((LeastCommonMultipleTask) task).getLcm()) + "\" finished.";
                     }else{
                         return;
                     }

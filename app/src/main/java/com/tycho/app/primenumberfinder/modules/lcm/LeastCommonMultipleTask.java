@@ -33,6 +33,10 @@ public class LeastCommonMultipleTask extends Task {
         this.numbers.addAll(searchOptions.getNumbers());
     }
 
+    public SearchOptions getSearchOptions() {
+        return searchOptions;
+    }
+
     @Override
     protected void run() {
         final Map<Long, Integer> occurrences = new TreeMap<>();

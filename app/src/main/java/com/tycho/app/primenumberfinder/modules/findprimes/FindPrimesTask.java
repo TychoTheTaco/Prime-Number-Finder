@@ -688,6 +688,14 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
             }
             return super.getProgress();
         }
+
+        public int getFactor() {
+            return factor;
+        }
+    }
+
+    public int getCurrentFactor(){
+        return ((SieveTask) getTasks().get(0)).getFactor();
     }
 
     private void searchSieve() {

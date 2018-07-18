@@ -63,7 +63,6 @@ public class LCMConfigurationActivity extends AbstractActivity {
     private NumbersListAdapter numbersListAdapter;
 
     private CheckBox notifyWhenFinishedCheckbox;
-    private CheckBox autoSaveCheckbox;
 
     private LeastCommonMultipleTask task;
 
@@ -93,10 +92,6 @@ public class LCMConfigurationActivity extends AbstractActivity {
         notifyWhenFinishedCheckbox = findViewById(R.id.notify_when_finished);
         notifyWhenFinishedCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             //searchOptions.setNotifyWhenFinished(isChecked);
-        });
-        autoSaveCheckbox = findViewById(R.id.auto_save);
-        autoSaveCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            //searchOptions.setAutoSave(isChecked);
         });
 
         //Get search options from intent
@@ -142,7 +137,9 @@ public class LCMConfigurationActivity extends AbstractActivity {
             case R.id.start:
                 if (Validator.isValidLCMInput(numbersListAdapter.getValidNumbers())) {
                     final Intent intent = new Intent();
-                    intent.putExtra("searchOptions", new LeastCommonMultipleTask.SearchOptions(numbersListAdapter.getValidNumbers()));
+                    final LeastCommonMultipleTask.SearchOptions searchOptions = new LeastCommonMultipleTask.SearchOptions(numbersListAdapter.getValidNumbers());
+                    searchOptions.setNotifyWhenFinished(notifyWhenFinishedCheckbox.isChecked());
+                    intent.putExtra("searchOptions", searchOptions);
                     if (task != null) intent.putExtra("taskId", task.getId());
                     setResult(0, intent);
                     finish();
