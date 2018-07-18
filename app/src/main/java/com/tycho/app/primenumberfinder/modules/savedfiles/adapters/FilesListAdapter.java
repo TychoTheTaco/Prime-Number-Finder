@@ -99,19 +99,16 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.View
             icon = itemView.findViewById(R.id.icon);
             fileName = itemView.findViewById(R.id.file_name);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    final FileType fileType = FileManager.getFileType(directory);
-                    if (fileType.getOpeningClass() != null){
-                        final Intent intent = new Intent(context, fileType.getOpeningClass());
-                        intent.putExtra("filePath", files.get(getAdapterPosition()).getAbsolutePath());
-                        intent.putExtra("allowExport", true);
-                        intent.putExtra("enableSearch", true);
-                        intent.putExtra("allowDelete", true);
-                        intent.putExtra("title", true);
-                        context.startActivity(intent);
-                    }
+            itemView.setOnClickListener(v -> {
+                final FileType fileType = FileManager.getFileType(directory);
+                if (fileType.getOpeningClass() != null){
+                    final Intent intent = new Intent(context, fileType.getOpeningClass());
+                    intent.putExtra("filePath", files.get(getAdapterPosition()).getAbsolutePath());
+                    intent.putExtra("allowExport", true);
+                    intent.putExtra("enableSearch", true);
+                    intent.putExtra("allowDelete", true);
+                    intent.putExtra("title", true);
+                    context.startActivity(intent);
                 }
             });
         }

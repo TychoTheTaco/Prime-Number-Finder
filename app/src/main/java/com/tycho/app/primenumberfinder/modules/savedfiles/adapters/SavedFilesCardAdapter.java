@@ -102,13 +102,10 @@ public class SavedFilesCardAdapter extends RecyclerView.Adapter<SavedFilesCardAd
             bottomBar = itemView.findViewById(R.id.layout_bottomBar);
 
             viewAllButton = itemView.findViewById(R.id.button);
-            viewAllButton.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View view){
-                    final Intent intent = new Intent(context, SavedFilesListActivity.class);
-                    intent.putExtra("directory", cards.get(getAdapterPosition()).getDirectory());
-                    context.startActivity(intent);
-                }
+            viewAllButton.setOnClickListener(view -> {
+                final Intent intent = new Intent(context, SavedFilesListActivity.class);
+                intent.putExtra("directory", cards.get(getAdapterPosition()).getDirectory());
+                context.startActivity(intent);
             });
 
         }

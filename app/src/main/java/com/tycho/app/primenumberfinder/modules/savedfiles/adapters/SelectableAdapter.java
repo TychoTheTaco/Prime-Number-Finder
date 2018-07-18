@@ -106,20 +106,12 @@ public abstract class SelectableAdapter<H extends SelectableAdapter.ViewHolder> 
 
         ViewHolder(final View itemView) {
             super(itemView);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ViewHolder.this.onClick(v);
-                    addToSelection(false);
-                }
+            itemView.setOnClickListener(v -> {
+                ViewHolder.this.onClick(v);
+                addToSelection(false);
             });
 
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    return addToSelection(true)|| ViewHolder.this.onLongClick(v);
-                }
-            });
+            itemView.setOnLongClickListener(v -> addToSelection(true)|| ViewHolder.this.onLongClick(v));
         }
 
         /**

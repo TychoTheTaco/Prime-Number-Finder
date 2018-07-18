@@ -24,7 +24,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -148,22 +147,12 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
     }
 
     public void sortSearchRange(final boolean ascending){
-        Collections.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(File file0, File file1) {
-                return (ascending ? 1 : -1) * Long.compare(getRangeFromFileName(file0)[0], getRangeFromFileName(file1)[0]);
-            }
-        });
+        Collections.sort(files, (file0, file1) -> (ascending ? 1 : -1) * Long.compare(getRangeFromFileName(file0)[0], getRangeFromFileName(file1)[0]));
         notifyDataSetChanged();
     }
 
     public void sortNumber(final boolean ascending){
-        Collections.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(File file0, File file1) {
-                return (ascending ? 1 : -1) * Long.compare(getNumberFromFileName(file0), getNumberFromFileName(file1));
-            }
-        });
+        Collections.sort(files, (file0, file1) -> (ascending ? 1 : -1) * Long.compare(getNumberFromFileName(file0), getNumberFromFileName(file1)));
         notifyDataSetChanged();
     }
 
@@ -221,12 +210,9 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
             scaleAnimation.setRepeatCount(1);
             scaleAnimation.setRepeatMode(Animation.REVERSE);
 
-            icon.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    icon.startAnimation(scaleAnimation);
-                    iconImage.setVisibility(addToSelection(true) ? View.VISIBLE : View.GONE);
-                }
+            icon.setOnClickListener(v -> {
+                icon.startAnimation(scaleAnimation);
+                iconImage.setVisibility(addToSelection(true) ? View.VISIBLE : View.GONE);
             });
         }
 
