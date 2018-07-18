@@ -256,7 +256,7 @@ public class SavedFilesListActivity extends AbstractActivity {
                 final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
                 alertDialog.setTitle("Warning");
                 alertDialog.setMessage(getResources().getQuantityString(R.plurals.delete_warning, adapterSavedFilesList.getSelectedItemCount(), adapterSavedFilesList.getSelectedItemCount()));
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Delete",
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "DELETE",
                         (dialog, which) -> {
 
                             //Get the files to be deleted
@@ -271,7 +271,7 @@ public class SavedFilesListActivity extends AbstractActivity {
                             while (iterator.hasNext()) {
                                 final File file = iterator.next();
 
-                                //Delete the file
+                                //DELETE the file
                                 file.delete();
                                 adapterSavedFilesList.getFiles().remove(file);
                                 adapterSavedFilesList.notifyItemRemoved(selectedItemIndexes[position] - position);

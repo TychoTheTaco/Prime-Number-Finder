@@ -2,13 +2,10 @@ package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,14 +16,12 @@ import android.widget.Toast;
 import com.crashlytics.android.Crashlytics;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.ModuleHostFragment;
-import com.tycho.app.primenumberfinder.modules.TaskListFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
-import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
@@ -35,7 +30,6 @@ import java.util.Random;
 import java.util.UUID;
 
 import easytasks.Task;
-import easytasks.TaskAdapter;
 
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
@@ -234,7 +228,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
 
     @Override
     protected void afterLoadFragments() {
-        taskListFragment.setAdapter(new FindPrimesTaskListAdapter(getContext()));
+        taskListFragment.setAdapter(new AbstractTaskListAdapter(getContext()));
         taskListFragment.whitelist(FindPrimesTask.class, CheckPrimalityTask.class);
     }
 

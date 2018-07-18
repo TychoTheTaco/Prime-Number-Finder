@@ -1,3 +1,4 @@
+/*
 package com.tycho.app.primenumberfinder.modules.findprimes.adapters;
 
 import android.content.Context;
@@ -12,28 +13,29 @@ import android.view.ViewGroup;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
-import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import easytasks.Task;
 
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_PRIMES;
 
+*/
 /**
  * Created by tycho on 11/16/2017.
- */
+ *//*
+
 
 public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrimesTaskListAdapter.Dummy>{
 
-    /**
+    */
+/**
      * Tag used for logging and debugging.
-     */
+     *//*
+
     private static final String TAG = FindPrimesTaskListAdapter.class.getSimpleName();
 
     public FindPrimesTaskListAdapter(final Context context) {
@@ -79,7 +81,7 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
                 spannableStringBuilder.append(context.getString(R.string.check_primality_result, NUMBER_FORMAT.format(((CheckPrimalityTask) task).getNumber()), ((CheckPrimalityTask) task).isPrime() ? "prime" : "not prime"));
                 spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accent_dark)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
             }
-            holder.state.setText(spannableStringBuilder);
+            holder.subtitle.setText(spannableStringBuilder);
         }
 
         onUpdate(holder);
@@ -125,4 +127,4 @@ public class FindPrimesTaskListAdapter extends AbstractTaskListAdapter<FindPrime
             }
         }
     }
-}
+}*/

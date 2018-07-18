@@ -258,7 +258,7 @@ public class TreeView extends View {
                     lastTouchX = x;
                     lastTouchY = y;
 
-                    // Save the ID of this pointer
+                    // SAVE the ID of this pointer
                     mActivePointerId = event.getPointerId(0);
                     break;
                 }

@@ -6,7 +6,9 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -17,8 +19,8 @@ import com.tycho.app.primenumberfinder.R;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -34,7 +36,7 @@ import easytasks.TaskListener;
  * Created by tycho on 12/12/2017.
  */
 
-public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.ViewHolder> extends RecyclerView.Adapter<H> implements TaskListener{
+public class AbstractTaskListAdapter<T extends Task> extends RecyclerView.Adapter<AbstractTaskListAdapter.ViewHolder> implements TaskListener{
 
     /**
      * Tag used for logging and debugging.
@@ -76,15 +78,15 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
 
     protected final Context context;
 
-    private class Item {
-        private final Task task;
+    protected class Item {
+        private final T task;
         private boolean saved;
 
-        public Item(final Task task) {
+        public Item(final T task) {
             this.task = task;
         }
 
-        public Task getTask() {
+        public T getTask() {
             return task;
         }
 
@@ -97,13 +99,27 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
         }
     }
 
+    private final List<Button> buttons = new ArrayList<>();
+
     public AbstractTaskListAdapter(final Context context) {
         this.context = context;
     }
 
+    public AbstractTaskListAdapter(final Context context, Button... buttons) {
+        this(context);
+        this.buttons.addAll(Arrays.asList(buttons));
+    }
+
+    @NonNull
     @Override
-    public void onBindViewHolder(@NonNull H holder, int position) {
-        final Task task = items.get(position).getTask();
+    public AbstractTaskListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new AbstractTaskListAdapter.ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.task_list_item, parent, false), buttons);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull AbstractTaskListAdapter.ViewHolder holder, int position) {
+        final Item item = items.get(position);
+        final Task task = item.getTask();
         customEventListeners.get(task).setViewHolder(holder);
 
         //Start the UI updater if it hasn't been started yet
@@ -115,7 +131,148 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
             }
         }
 
-        doOnBindViewHolder(holder, position);
+        //Check if this item should be selected
+        holder.itemView.setSelected(holder.getAdapterPosition() == getSelectedItemPosition());
+
+        holder.title.setText(getTitle(item));
+        holder.subtitle.setText(getSubtitle(item));
+        holder.progress.setText(context.getString(R.string.task_progress, DECIMAL_FORMAT.format(getProgress(item) * 100)));
+
+        //Manage button visibility
+        switch (task.getState()) {
+            case RUNNING:
+                //Pause button
+                if (holder.pauseButton != null){
+                    holder.pauseButton.setEnabled(true);
+                    holder.pauseButton.setVisibility(View.VISIBLE);
+                    holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                }
+
+                //Edit button
+                if (holder.editButton != null){
+                    holder.editButton.setEnabled(false);
+                    holder.editButton.setVisibility(View.VISIBLE);
+                }
+
+                //Delete button
+                if (holder.deleteButton != null){
+                    holder.deleteButton.setEnabled(false);
+                    holder.deleteButton.setVisibility(View.VISIBLE);
+                }
+
+                //Save button
+                if (holder.saveButton != null){
+                    holder.saveButton.setVisibility(View.GONE);
+                }
+                break;
+
+            case PAUSING:
+                //Pause button
+                if (holder.pauseButton != null){
+                    holder.pauseButton.setEnabled(false);
+                    holder.pauseButton.setVisibility(View.VISIBLE);
+                    holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                }
+
+                //Edit button
+                if (holder.editButton != null){
+                    holder.editButton.setEnabled(false);
+                    holder.editButton.setVisibility(View.VISIBLE);
+                }
+
+                //Delete button
+                if (holder.deleteButton != null){
+                    holder.deleteButton.setEnabled(false);
+                    holder.deleteButton.setVisibility(View.VISIBLE);
+                }
+
+                //Save button
+                if (holder.saveButton != null){
+                    holder.saveButton.setVisibility(View.GONE);
+                }
+                break;
+
+            case PAUSED:
+                //Pause button
+                if (holder.pauseButton != null){
+                    holder.pauseButton.setEnabled(true);
+                    holder.pauseButton.setVisibility(View.VISIBLE);
+                    holder.pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+                }
+
+                //Edit button
+                if (holder.editButton != null){
+                    holder.editButton.setEnabled(true);
+                    holder.editButton.setVisibility(View.VISIBLE);
+                }
+
+                //Delete button
+                if (holder.deleteButton != null){
+                    holder.deleteButton.setEnabled(true);
+                    holder.deleteButton.setVisibility(View.VISIBLE);
+                }
+
+                //Save button
+                if (holder.saveButton != null){
+                    holder.saveButton.setVisibility(View.GONE);
+                }
+                break;
+
+            case RESUMING:
+                //Pause button
+                if (holder.pauseButton != null){
+                    holder.pauseButton.setEnabled(false);
+                    holder.pauseButton.setVisibility(View.VISIBLE);
+                    holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                }
+
+                //Edit button
+                if (holder.editButton != null){
+                    holder.editButton.setEnabled(false);
+                    holder.editButton.setVisibility(View.VISIBLE);
+                }
+
+                //Delete button
+                if (holder.deleteButton != null){
+                    holder.deleteButton.setEnabled(false);
+                    holder.deleteButton.setVisibility(View.VISIBLE);
+                }
+
+                //Save button
+                if (holder.saveButton != null){
+                    holder.saveButton.setVisibility(View.GONE);
+                }
+                break;
+
+            case STOPPED:
+                //Pause button
+                if (holder.pauseButton != null){
+                    holder.pauseButton.setVisibility(View.GONE);
+                }
+
+                //Edit button
+                if (holder.editButton != null){
+                    holder.editButton.setVisibility(View.GONE);
+                }
+
+                //Delete button
+                if (holder.deleteButton != null){
+                    holder.deleteButton.setEnabled(true);
+                    holder.deleteButton.setVisibility(View.VISIBLE);
+                }
+
+                //Save button
+                if (holder.saveButton != null){
+                    holder.saveButton.setEnabled(true);
+                    holder.saveButton.setVisibility(View.VISIBLE);
+                }
+
+                //Hide progress if task is complete
+                if (task.getProgress() == 1){
+                    holder.progress.setVisibility(View.GONE);
+                }
+                break;
+        }
     }
 
     private TaskListener getUiUpdaterDebugListener(final ViewHolder holder){
@@ -197,113 +354,49 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
         sendTaskStatesChanged();
     }
 
-    protected void manageStandardViews(final Task task, final H holder) {
+    protected CharSequence getTitle(final Item item){
+        return getTitle(item.getTask());
+    }
 
-        //Check if this item should be selected
-        holder.itemView.setSelected(holder.getAdapterPosition() == getSelectedItemPosition());
+    protected CharSequence getTitle(final T task){
+        return task.getClass().getSimpleName();
+    }
 
-        //Manage button visibility
+    protected CharSequence getSubtitle(final Item item){
+        return getSubtitle(item.getTask());
+    }
+
+    protected CharSequence getSubtitle(final T task){
         switch (task.getState()) {
+            default:
+                return "";
+
             case RUNNING:
-                //State
-                holder.state.setText(context.getString(R.string.status_searching));
-
-                //Pause button
-                holder.pauseButton.setEnabled(true);
-                holder.pauseButton.setVisibility(View.VISIBLE);
-                holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-
-                //Edit button
-                holder.editButton.setVisibility(View.VISIBLE);
-                holder.editButton.setEnabled(false);
-
-                //Delete button
-                holder.deleteButton.setEnabled(false);
-
-                //Save button
-                holder.saveButton.setVisibility(View.GONE);
-                break;
+                return context.getString(R.string.status_searching);
 
             case PAUSING:
-                //State
-                holder.state.setText(context.getString(R.string.state_pausing));
-
-                //Pause button
-                holder.pauseButton.setEnabled(false);
-                holder.pauseButton.setVisibility(View.VISIBLE);
-                holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-
-                //Edit button
-                holder.editButton.setEnabled(false);
-
-                //Delete button
-                holder.deleteButton.setEnabled(false);
-
-                //Save button
-                holder.saveButton.setVisibility(View.GONE);
-                break;
+                return context.getString(R.string.state_pausing);
 
             case PAUSED:
-                //State
-                holder.state.setText(context.getString(R.string.status_paused));
-
-                //Pause button
-                holder.pauseButton.setEnabled(true);
-                holder.pauseButton.setVisibility(View.VISIBLE);
-                holder.pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-
-                //Edit button
-                holder.editButton.setEnabled(true);
-
-                //Delete button
-                holder.deleteButton.setEnabled(true);
-
-                //Save button
-                holder.saveButton.setVisibility(View.GONE);
-                break;
+                return context.getString(R.string.status_paused);
 
             case RESUMING:
-                //State
-                holder.state.setText(context.getString(R.string.state_resuming));
-
-                //Pause button
-                holder.pauseButton.setEnabled(false);
-                holder.pauseButton.setVisibility(View.VISIBLE);
-                holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-
-                //Edit button
-                holder.editButton.setEnabled(false);
-
-                //Delete button
-                holder.deleteButton.setEnabled(false);
-
-                //Save button
-                holder.saveButton.setVisibility(View.GONE);
-                break;
+                return context.getString(R.string.state_resuming);
 
             case STOPPED:
-                //State
-                holder.state.setText(context.getString(R.string.status_finished));
-
-                //Pause button
-                holder.pauseButton.setVisibility(View.GONE);
-
-                //Edit button
-                holder.editButton.setVisibility(View.GONE);
-
-                //Delete button
-                holder.deleteButton.setEnabled(true);
-
-                //Save button
-                holder.saveButton.setEnabled(true);
-                holder.saveButton.setVisibility(View.VISIBLE);
-                break;
+                return context.getString(R.string.status_finished);
         }
     }
 
-    protected abstract void doOnBindViewHolder(H holder, int position);
+    protected float getProgress(final T task){
+        return task.getProgress();
+    }
 
-    public void addTask(final Task task) {
+    protected float getProgress(final Item item){
+        return getProgress(item.getTask());
+    }
+
+    public void addTask(final T task) {
         final CustomTaskEventListener customTaskEventListener = new CustomTaskEventListener() {
             @Override
             public void onTaskStarted() {
@@ -474,28 +567,49 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
         return items.get(position).getTask();
     }
 
-    public abstract class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         public final TextView title;
-        public final TextView state;
+        public final TextView subtitle;
         public final TextView progress;
-        public final ImageButton pauseButton;
-        public final ImageButton editButton;
-        public final ImageButton deleteButton;
-        public final ImageButton saveButton;
+        public ImageButton pauseButton;
+        public ImageButton editButton;
+        public ImageButton deleteButton;
+        public ImageButton saveButton;
 
         protected final UiUpdater uiUpdater = new UiUpdater(this);
 
-        public ViewHolder(View itemView) {
+        private final List<Button> buttons = new ArrayList<>();
+
+        public ViewHolder(View itemView, final List<Button> buttons) {
             super(itemView);
+            this.buttons.clear();
+            this.buttons.addAll(buttons);
 
             title = itemView.findViewById(R.id.title);
-            state = itemView.findViewById(R.id.state);
-            progress = itemView.findViewById(R.id.textView_search_progress);
+            subtitle = itemView.findViewById(R.id.task_state);
+            progress = itemView.findViewById(R.id.search_progress);
             pauseButton = itemView.findViewById(R.id.pause_button);
             editButton = itemView.findViewById(R.id.edit_button);
             deleteButton = itemView.findViewById(R.id.delete_button);
             saveButton = itemView.findViewById(R.id.save_button);
+
+            if (!buttons.contains(Button.PAUSE)){
+                pauseButton.setVisibility(View.GONE);
+                pauseButton = null;
+            }
+            if (!buttons.contains(Button.EDIT)){
+                editButton.setVisibility(View.GONE);
+                editButton = null;
+            }
+            if (!buttons.contains(Button.DELETE)){
+                deleteButton.setVisibility(View.GONE);
+                deleteButton = null;
+            }
+            if (!buttons.contains(Button.SAVE)){
+                saveButton.setVisibility(View.GONE);
+                saveButton = null;
+            }
 
             itemView.setOnClickListener(v -> {
                 if (selectedItemPosition == getAdapterPosition()) {
@@ -506,55 +620,62 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
             });
 
             //Set button listeners
-            pauseButton.setOnClickListener(v -> {
-                switch (items.get(getAdapterPosition()).getTask().getState()) {
+            if (pauseButton != null){
+                pauseButton.setOnClickListener(v -> {
+                    switch (items.get(getAdapterPosition()).getTask().getState()) {
 
-                    case PAUSED:
-                        getTask(getAdapterPosition()).resume();
-                        break;
+                        case PAUSED:
+                            getTask(getAdapterPosition()).resume();
+                            break;
 
-                    case RUNNING:
-                        getTask(getAdapterPosition()).pause();
-                        break;
-                }
+                        case RUNNING:
+                            getTask(getAdapterPosition()).pause();
+                            break;
+                    }
 
-                onPausePressed();
-                sendOnPausePressed(getTask(getAdapterPosition()));
-            });
+                    onPausePressed();
+                    sendOnPausePressed(getTask(getAdapterPosition()));
+                });
+            }
 
-            editButton.setOnClickListener(v -> sendOnEditClicked(getTask(getAdapterPosition())));
+            if (editButton != null){
+                editButton.setOnClickListener(v -> sendOnEditClicked(getTask(getAdapterPosition())));
+            }
 
-            deleteButton.setOnClickListener(v -> {
+            if (deleteButton != null){
+                deleteButton.setOnClickListener(v -> {
 
-                //Pause the UI updater. It will be re-used by other ViewHolders
-                getTask(getAdapterPosition()).pause();
+                    //PAUSE the UI updater. It will be re-used by other ViewHolders
+                    getTask(getAdapterPosition()).pause();
 
-                if (getAdapterPosition() < selectedItemPosition) {
-                    selectedItemPosition--;
-                } else if (getAdapterPosition() == selectedItemPosition) {
-                    selectedItemPosition = -1;
-                    sendOnTaskSelected(null);
-                }
+                    if (getAdapterPosition() < selectedItemPosition) {
+                        selectedItemPosition--;
+                    } else if (getAdapterPosition() == selectedItemPosition) {
+                        selectedItemPosition = -1;
+                        sendOnTaskSelected(null);
+                    }
 
-                //Remove the task from the list
-                final int position = getAdapterPosition();
-                final Task task = getTask(position);
-                customEventListeners.remove(task);
-                items.remove(position);
-                notifyItemRemoved(position);
+                    //Remove the task from the list
+                    final int position = getAdapterPosition();
+                    final Task task = getTask(position);
+                    customEventListeners.remove(task);
+                    items.remove(position);
+                    notifyItemRemoved(position);
 
-                PrimeNumberFinder.getTaskManager().unregisterTask(task);
+                    PrimeNumberFinder.getTaskManager().unregisterTask(task);
 
-                //Notify listeners
-                onDeletePressed();
-                sendOnDeletePressed(task);
-            });
+                    //Notify listeners
+                    onDeletePressed();
+                    sendOnDeletePressed(task);
+                });
+            }
 
-            //Save button
-            saveButton.setOnClickListener(v -> {
-                saveButton.setEnabled(false);
-                sendOnSavePressed(getTask(getAdapterPosition()));
-            });
+            if (saveButton != null){
+                saveButton.setOnClickListener(v -> {
+                    saveButton.setEnabled(false);
+                    sendOnSavePressed(getTask(getAdapterPosition()));
+                });
+            }
         }
 
         protected void onPausePressed(){}
@@ -675,5 +796,14 @@ public abstract class AbstractTaskListAdapter<H extends AbstractTaskListAdapter.
         }
     }
 
-    protected abstract int getTaskType();
+    protected int getTaskType(){
+        return -1;
+    }
+
+    public enum Button{
+        SAVE,
+        PAUSE,
+        EDIT,
+        DELETE
+    }
 }

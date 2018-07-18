@@ -36,7 +36,7 @@ public class TaskManager {
     }
 
     /**
-     * Pause all tasks.
+     * PAUSE all tasks.
      */
     public void pauseAllTasks() {
         for (Task task : tasks.keySet()) {

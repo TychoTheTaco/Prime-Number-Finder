@@ -421,7 +421,7 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
                 final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
                 alertDialog.setTitle("Warning");
                 alertDialog.setMessage("Are you sure you want to delete this saved file?");
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Delete",
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "DELETE",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 file.delete();

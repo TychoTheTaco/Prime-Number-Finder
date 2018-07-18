@@ -97,7 +97,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
             new Thread(() -> {
 
-                //Pause the task
+                //PAUSE the task
                 final Task.State state = getTask().getState();
                 try {
                     getTask().pauseAndWait();

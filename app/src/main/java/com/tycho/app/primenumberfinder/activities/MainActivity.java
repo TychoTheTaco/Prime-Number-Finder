@@ -28,13 +28,11 @@ import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.about.AboutPageFragment;
 import com.tycho.app.primenumberfinder.modules.findfactors.fragments.FindFactorsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesFragment;
-import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
 import com.tycho.app.primenumberfinder.modules.lcm.fragments.LeastCommonMultipleFragment;
 import com.tycho.app.primenumberfinder.modules.primefactorization.fragments.PrimeFactorizationFragment;
 import com.tycho.app.primenumberfinder.modules.savedfiles.SavedFilesFragment;
 import com.tycho.app.primenumberfinder.settings.SettingsFragment;
 import com.tycho.app.primenumberfinder.utils.FileManager;
-import com.tycho.app.primenumberfinder.utils.OneToOneMap;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
@@ -226,7 +224,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
 
     @Override
     public void onTaskStatesChanged(final int taskType, final boolean active) {
-        if (navigationView != null) {
+        if (navigationView != null && taskType != -1) {
             navigationView.post(() -> setActionViewVisibility(navigationView.getMenu().getItem(taskType), active));
         }
     }

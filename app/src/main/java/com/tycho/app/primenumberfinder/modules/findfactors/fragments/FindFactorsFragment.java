@@ -1,16 +1,8 @@
 package com.tycho.app.primenumberfinder.modules.findfactors.fragments;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -19,32 +11,20 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.tycho.app.primenumberfinder.ActionViewListener;
-import com.tycho.app.primenumberfinder.FabAnimator;
-import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
-import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
+import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.ModuleHostFragment;
-import com.tycho.app.primenumberfinder.modules.ResultsFragment;
-import com.tycho.app.primenumberfinder.modules.TaskListFragment;
-import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
-import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
-import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsTaskListAdapter;
-import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
 import java.math.BigInteger;
-import java.text.NumberFormat;
-import java.util.Locale;
 import java.util.UUID;
 
 import easytasks.Task;
-import easytasks.TaskAdapter;
 
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
@@ -125,7 +105,7 @@ public class FindFactorsFragment extends ModuleHostFragment{
 
     @Override
     protected void afterLoadFragments() {
-        taskListFragment.setAdapter(new FindFactorsTaskListAdapter(getContext()));
+        taskListFragment.setAdapter(new AbstractTaskListAdapter(getContext()));
         taskListFragment.whitelist(FindFactorsTask.class);
     }
 

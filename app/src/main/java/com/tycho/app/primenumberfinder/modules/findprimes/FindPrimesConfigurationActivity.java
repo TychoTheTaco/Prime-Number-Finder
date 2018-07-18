@@ -361,7 +361,7 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
             autoSaveCheckbox.setEnabled(true);
         }
 
-        //Task state dependent
+        //Task subtitle dependent
         if (task != null) {
             if (task.getState() != Task.State.NOT_STARTED) {
                 editTextSearchRangeStart.setEnabled(false);

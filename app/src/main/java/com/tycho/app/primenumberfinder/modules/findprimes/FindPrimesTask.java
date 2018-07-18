@@ -230,7 +230,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
                             }
                         }
                         if (((BruteForceTask) getTasks().get(lowestIndex)).queue.isEmpty()){
-                            //Log.d(TAG, "Index " + lowestIndex + " still empty. state: " + getTasks().get(lowestIndex).getState());
+                            //Log.d(TAG, "Index " + lowestIndex + " still empty. subtitle: " + getTasks().get(lowestIndex).getState());
                             heads.set(lowestIndex, -1L);
                         }else{
                             //Log.d(TAG, "Taking from " + ((BruteForceTask) getTasks().get(lowestIndex)).queue);
@@ -334,7 +334,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
                 dataInputStream.close();
             }
 
-            //Save from lists
+            //SAVE from lists
             final List<List<Long>> lists = new ArrayList<>();
             for (Task task : getTasks()) {
                 lists.add(((BruteForceTask) task).primes);
@@ -374,7 +374,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
 
             dataOutputStream.close();
 
-            //Delete files and clear lists
+            //DELETE files and clear lists
             if (delete) {
                 for (File file : FileManager.getInstance().getTaskCacheDirectory(this).listFiles()) {
                     if (!file.getAbsolutePath().contains("primes")) {

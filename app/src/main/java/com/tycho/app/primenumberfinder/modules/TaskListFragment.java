@@ -95,7 +95,7 @@ public class TaskListFragment extends Fragment {
         if (savedInstanceState != null) {
             taskListAdapter.setSelected(savedInstanceState.getInt("selectedItemPosition"));
 
-            //Restore saved state
+            //Restore saved subtitle
             final ArrayList<Integer> savedItemPositions = savedInstanceState.getIntegerArrayList("savedItemPositions");
             if (savedItemPositions != null) {
                 for (int i : savedItemPositions) {

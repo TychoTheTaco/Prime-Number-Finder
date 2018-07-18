@@ -1,3 +1,4 @@
+/*
 package com.tycho.app.primenumberfinder.modules.primefactorization.adapters;
 
 import android.content.Context;
@@ -12,25 +13,23 @@ import android.view.ViewGroup;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
-import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import easytasks.Task;
 
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_PRIME_FACTORIZATION;
 
+*/
 /**
  * Created by tycho on 11/16/2017.
- */
+ *//*
+
 
 public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<PrimeFactorizationTaskListAdapter.Dummy> {
 
-    /**
+    */
+/**
      * Tag used for logging and debugging.
-     */
+     *//*
+
     private static final String TAG = PrimeFactorizationTaskListAdapter.class.getSimpleName();
 
     public PrimeFactorizationTaskListAdapter(final Context context) {
@@ -55,7 +54,7 @@ public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<P
 
         manageStandardViews(task, holder);
 
-        //Set state and buttons
+        //Set subtitle and buttons
         switch (task.getState()) {
             case RUNNING:
                 //Progress
@@ -87,7 +86,7 @@ public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<P
                 spannableStringBuilder.append(": ");
                 spannableStringBuilder.append(context.getString(R.string.prime_factorization_result, NUMBER_FORMAT.format((task.getPrimeFactors().size()))));
                 spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accent_dark)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                holder.state.setText(spannableStringBuilder);
+                holder.subtitle.setText(spannableStringBuilder);
 
                 //Progress
                 holder.progress.setVisibility(View.GONE);
@@ -112,4 +111,4 @@ public class PrimeFactorizationTaskListAdapter extends AbstractTaskListAdapter<P
             super(itemView);
         }
     }
-}
+}*/
