@@ -19,7 +19,7 @@ public class ChangelogActivity extends AppCompatActivity {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "ChangelogActivity";
+    private static final String TAG = ChangelogActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

@@ -2,7 +2,6 @@ package com.tycho.app.primenumberfinder.modules.primefactorization;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
@@ -37,10 +36,6 @@ public class PrimeFactorizationTask extends Task implements Savable{
      */
     private Map<Long, Integer> primeFactors = new TreeMap<>();
 
-    private int total;
-
-    private String status = "";
-
     private SearchOptions searchOptions;
 
     //final FindFactorsTask findFactorsTask;
@@ -53,49 +48,25 @@ public class PrimeFactorizationTask extends Task implements Savable{
 
     @Override
     public void run() {
-
-        status = "findFactors";
-        //final FindFactorsTask findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number));
-        //findFactorsTask.start();
-        //final List<Long> factors = findFactorsTask.getNumbers();
-
-        /*status = "checkPrimality";
-
-        for (long n : factors){
-            final CheckPrimalityTask checkPrimalityTask = new CheckPrimalityTask(n);
-            checkPrimalityTask.start();
-            if (checkPrimalityTask.isPrime()){
-                total++;
-            }
-            tryPause();
-            if (shouldStop()){
-                return;
-            }
-        }*/
-        status = "generatingTree";
         this.factorTree = generateTree(number);
-        status = "";
     }
 
-    /*@Override
-    public float getProgress() {
-        switch (status){
-            case "checkPrimality":
-                setProgress(0.33f);
-                break;
+    private FindFactorsTask findFactorsTask;
 
-            case "generatingTree":
-                setProgress(0.5f);
-                break;
+    @Override
+    public float getProgress() {
+        //TODO: Dont do this
+        if (findFactorsTask != null){
+            setProgress(findFactorsTask.getProgress());
         }
         return super.getProgress();
-    }*/
+    }
 
     private Tree<Long> generateTree(long number) {
 
         final Tree<Long> tree = new Tree<>(number);
 
-        final FindFactorsTask findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number));
+        findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number));
         findFactorsTask.start();
 
         final int size = findFactorsTask.getFactors().size();

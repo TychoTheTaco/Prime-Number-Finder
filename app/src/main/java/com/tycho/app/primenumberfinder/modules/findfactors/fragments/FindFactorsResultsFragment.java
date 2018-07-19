@@ -211,7 +211,7 @@ public class FindFactorsResultsFragment extends ResultsFragment {
                 //Numbers per second
                 final long currentValue = getTask().getCurrentValue();
                 statisticsMap.get(getTask()).finalNumbersPerSecond = currentValue - statisticsMap.get(getTask()).lastCurrentValue;
-                statisticsLayout.set("nps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(currentValue - statisticsMap.get(getTask()).lastCurrentValue)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+                statisticsLayout.set("nps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
                 statisticsMap.get(getTask()).lastCurrentValue = currentValue;
 
                 statisticsMap.get(getTask()).lastUpdateTime = getTask().getElapsedTime();

@@ -1,17 +1,13 @@
 package com.tycho.app.primenumberfinder.activities;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v7.app.AppCompatActivity;
 
 import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.modules.findfactors.DisplayFactorsActivity;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
@@ -57,11 +53,9 @@ public abstract class DisplayContentActivity extends AbstractActivity {
         alertDialog.setMessage("An unknown error occurred while reading this file.");
         alertDialog.setCancelable(false);
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Okay",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        alertDialog.dismiss();
-                        finish();
-                    }
+                (dialog, which) -> {
+                    alertDialog.dismiss();
+                    finish();
                 });
         alertDialog.show();
     }

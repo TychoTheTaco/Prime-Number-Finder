@@ -30,13 +30,10 @@ public class AboutPageFragment extends Fragment {
         //Set version
         ((TextView) rootView.findViewById(R.id.app_version)).setText(getString(R.string.app_version_name, PrimeNumberFinder.getVersionName(getActivity())));
         ((TextView) rootView.findViewById(R.id.new_version_name)).setText("New in version " + PrimeNumberFinder.getVersionName(getActivity()));
-        rootView.findViewById(R.id.contact_developer_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto","tycho.developer@gmail.com", null));
-                intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name) + " Feedback (Version " + PrimeNumberFinder.getVersionName(getActivity()) + ")");
-                startActivity(Intent.createChooser(intent, "Send email..."));
-            }
+        rootView.findViewById(R.id.contact_developer_button).setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto","tycho.developer@gmail.com", null));
+            intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name) + " Feedback (Version " + PrimeNumberFinder.getVersionName(getActivity()) + ")");
+            startActivity(Intent.createChooser(intent, "Send email..."));
         });
 
         //Read changelog
@@ -44,12 +41,9 @@ public class AboutPageFragment extends Fragment {
 
         //Set changelog data
         ((TextView) rootView.findViewById(R.id.changelog)).setText(changelog.getLatestRelease().concatenate());
-        rootView.findViewById(R.id.view_changelog_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Intent intent = new Intent(getActivity(), ChangelogActivity.class);
-                getActivity().startActivity(intent);
-            }
+        rootView.findViewById(R.id.view_changelog_button).setOnClickListener(v -> {
+            final Intent intent = new Intent(getActivity(), ChangelogActivity.class);
+            getActivity().startActivity(intent);
         });
 
         //Set credits
