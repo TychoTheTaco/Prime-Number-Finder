@@ -100,6 +100,25 @@
         <item name="android:textColor">@android:color/black</item>
     </style>
 
+    <!-- Greatest Common Factor themes-->
+    <style name="GCF" parent="Default.NoActionBar">
+        <item name="colorPrimary">@color/lt_blue</item>
+        <item name="colorPrimaryDark">@color/blue_light</item>
+        <item name="colorAccent">@color/lt_blue</item>
+    </style>
+    <style name="GCF.Activity">
+        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
+    </style>
+    <style name="GCF.Dialog" parent="Default.Dialog">
+        <item name="colorPrimary">@color/lt_blue</item>
+        <item name="colorPrimaryDark">@color/blue_dark</item>
+        <item name="colorAccent">@color/lt_blue</item>
+    </style>
+    <style name="GCF.PopupOverlay">
+        <item name="android:colorBackground">@color/blue_light</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
 
     <style name="DefaultText">
         <item name="android:textSize">14sp</item>

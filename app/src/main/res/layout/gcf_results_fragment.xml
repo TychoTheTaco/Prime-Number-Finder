@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:orientation="vertical"
+    android:theme="@style/GCF">
+
+    <!-- Message to display when no active task -->
+    <TextView
+        android:id="@+id/empty_message"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/no_task_selected_message"
+        android:visibility="visible" />
+
+    <LinearLayout
+        android:id="@+id/results_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <!-- Top bar -->
+        <include layout="@layout/progress_banner" />
+
+        <TextView
+            android:id="@+id/subtitle"
+            style="@style/DefaultText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:id="@+id/text"
+            style="@style/DefaultText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+
+    <!-- Statistics -->
+    <include layout="@layout/statistics_layout"/>
+
+    <!-- Buttons -->
+    <RelativeLayout
+        android:id="@+id/button_layout"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_marginBottom="4dp">
+
+        <!--<ImageButton
+            android:id="@+id/view_all_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="2dp"
+            android:layout_toStartOf="@id/center"
+            android:background="@drawable/circle_white"
+            android:backgroundTint="@color/button_color"
+            android:contentDescription="@string/view_all"
+            android:elevation="2dp"
+            android:visibility="gone"
+            android:src="@drawable/ic_list_white_24dp"
+            android:tooltipText="@string/view_all" />-->
+
+        <View
+            android:id="@+id/center"
+            android:layout_width="56dp"
+            android:layout_height="0dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true" />
+
+        <ImageButton
+            android:id="@+id/pause_button"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="4dp"
+            android:background="@drawable/circle_white"
+            android:backgroundTint="@color/button_color"
+            android:contentDescription="Pause / Resume"
+            android:elevation="2dp"
+            android:src="@drawable/ic_pause_white_24dp"
+            android:tooltipText="Pause / Resume" />
+
+        <!--<ImageButton
+            android:id="@+id/save_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="2dp"
+            android:layout_toEndOf="@id/center"
+            android:background="@drawable/circle_white"
+            android:backgroundTint="@color/button_color"
+            android:contentDescription="@string/save"
+            android:elevation="2dp"
+            android:src="@drawable/ic_save_white_24dp"
+            android:tooltipText="@string/save" />-->
+
+    </RelativeLayout>
+</LinearLayout>

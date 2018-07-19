@@ -1,35 +1,34 @@
-package com.tycho.app.primenumberfinder.modules.lcm;
+package com.tycho.app.primenumberfinder.modules.gcf;
 
 import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
 
 import com.tycho.app.primenumberfinder.SearchOptions;
-import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
+import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import easytasks.Task;
 
-public class LeastCommonMultipleTask extends Task implements SearchOptions {
+public class GreatestCommonFactorTask extends Task implements SearchOptions {
 
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = LeastCommonMultipleTask.class.getSimpleName();
+    private static final String TAG = GreatestCommonFactorTask.class.getSimpleName();
 
     private final List<Long> numbers = new ArrayList<>();
 
-    private BigInteger lcm;
+    private long gcf;
 
     private SearchOptions searchOptions;
 
-    public LeastCommonMultipleTask(final SearchOptions searchOptions){
+    public GreatestCommonFactorTask(final SearchOptions searchOptions){
         this.searchOptions = searchOptions;
         this.numbers.addAll(searchOptions.getNumbers());
     }
@@ -42,29 +41,32 @@ public class LeastCommonMultipleTask extends Task implements SearchOptions {
     protected void run() {
         final Map<Long, Integer> occurrences = new TreeMap<>();
         for (Long number : numbers){
-            //TODO: To support BigInteger input, PrimeFactorizationTask also needs to accept BigInteger input
-            final PrimeFactorizationTask primeFactorizationTask = new PrimeFactorizationTask(new PrimeFactorizationTask.SearchOptions(number));
-            primeFactorizationTask.start();
-            final Map<Long, Integer> treeMap = primeFactorizationTask.getPrimeFactors();
-            for (Long l : treeMap.keySet()){
-                if (!occurrences.containsKey(l) || occurrences.get(l) < treeMap.get(l)){
-                    occurrences.put(l, treeMap.get(l));
+            final FindFactorsTask findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number));
+            findFactorsTask.start();
+            for (Long f : findFactorsTask.getFactors()){
+                if (occurrences.containsKey(f)){
+                    occurrences.put(f, occurrences.get(f) + 1);
+                }else{
+                    occurrences.put(f, 1);
                 }
             }
-            Log.d(TAG, "setProgress: " + ((float) numbers.indexOf(number) / numbers.size()));
-            setProgress((float) numbers.indexOf(number) / numbers.size());
         }
 
+        Log.d(TAG, "Occurrences: " + occurrences);
 
-        lcm = BigInteger.ONE;
-        Log.e(TAG, "Occurences: " + occurrences);
-        for (Long number : occurrences.keySet()){
-            lcm = lcm.multiply(BigInteger.valueOf((long) Math.pow(number, occurrences.get(number))));
+        final List<Long> keys = new ArrayList<>(occurrences.keySet());
+        Collections.reverse(keys);
+        Log.d(TAG, "Keys: " + keys);
+        for (Long number : keys){
+            if (occurrences.get(number) == numbers.size()){
+                gcf = number;
+                break;
+            }
         }
     }
 
-    public BigInteger getLcm() {
-        return lcm;
+    public long getGcf() {
+        return gcf;
     }
 
     public List<Long> getNumbers() {
@@ -86,7 +88,7 @@ public class LeastCommonMultipleTask extends Task implements SearchOptions {
             dest.writeList(numbers);
         }
 
-        public static final Parcelable.Creator<SearchOptions> CREATOR = new Parcelable.Creator<SearchOptions>() {
+        public static final Creator<SearchOptions> CREATOR = new Creator<SearchOptions>() {
 
             @Override
             public SearchOptions createFromParcel(Parcel in) {

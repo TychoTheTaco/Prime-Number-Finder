@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import android.util.Log;
 
 import com.tycho.app.primenumberfinder.Savable;
+import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 
@@ -29,7 +30,7 @@ import easytasks.TaskAdapter;
 
 import static com.tycho.app.primenumberfinder.utils.FileManager.EXTENSION;
 
-public class FindPrimesTask extends MultithreadedTask implements Savable {
+public class FindPrimesTask extends MultithreadedTask implements Savable, SearchOptions {
 
     /**
      * Tag used for logging and debugging.

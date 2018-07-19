@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.tycho.app.primenumberfinder.Savable;
+import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
@@ -20,7 +21,7 @@ import simpletrees.Tree;
  *         Date Created: 3/3/2017
  */
 
-public class PrimeFactorizationTask extends Task implements Savable{
+public class PrimeFactorizationTask extends Task implements Savable, SearchOptions {
 
     /**
      * Tag used for logging and debugging.

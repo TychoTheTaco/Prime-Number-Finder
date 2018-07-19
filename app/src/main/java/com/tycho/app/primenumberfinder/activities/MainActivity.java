@@ -28,6 +28,7 @@ import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.about.AboutPageFragment;
 import com.tycho.app.primenumberfinder.modules.findfactors.fragments.FindFactorsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesFragment;
+import com.tycho.app.primenumberfinder.modules.gcf.fragments.GreatestCommonFactorFragment;
 import com.tycho.app.primenumberfinder.modules.lcm.fragments.LeastCommonMultipleFragment;
 import com.tycho.app.primenumberfinder.modules.primefactorization.fragments.PrimeFactorizationFragment;
 import com.tycho.app.primenumberfinder.modules.savedfiles.SavedFilesFragment;
@@ -103,11 +104,12 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        //Initialize the fragment IDs
+        //Initialize modules
         modules.add(new Module(R.id.drawer_item_find_primes, "findPrimes", FindPrimesFragment.class));
         modules.add(new Module(R.id.drawer_item_find_factors, "findFactors", FindFactorsFragment.class));
         modules.add(new Module(R.id.drawer_item_factor_tree, "primeFactorization", PrimeFactorizationFragment.class));
         modules.add(new Module(R.id.drawer_item_lcm, "lcm", LeastCommonMultipleFragment.class));
+        modules.add(new Module(R.id.drawer_item_gcf, "gcf", GreatestCommonFactorFragment.class));
         modules.add(new Module(R.id.drawer_item_saved_files, "savedFiles", SavedFilesFragment.class));
         modules.add(new Module(R.id.drawer_item_settings, "settings", SettingsFragment.class));
         modules.add(new Module(R.id.drawer_item_about, "about", AboutPageFragment.class));
@@ -382,10 +384,10 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         return null;
     }
 
-   /* private Module findModule(final int id){
+    private Module findModule(final Class<? extends Fragment> cls){
         for (Module module : modules){
-            if (module.drawerId == id) return module;
+            if (module.fragmentClass == cls) return module;
         }
         return null;
-    }*/
+    }
 }

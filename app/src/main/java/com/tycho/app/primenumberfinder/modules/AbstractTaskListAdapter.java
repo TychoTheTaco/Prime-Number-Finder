@@ -44,7 +44,7 @@ public class AbstractTaskListAdapter<T extends Task> extends RecyclerView.Adapte
     private static final String TAG = AbstractTaskListAdapter.class.getSimpleName();
 
     /**
-     * List of tasks in the adapter.
+     * List of items in the adapter.
      */
     protected final List<Item> items = new ArrayList<>();
 
@@ -761,7 +761,7 @@ public class AbstractTaskListAdapter<T extends Task> extends RecyclerView.Adapte
                         onUpdate(viewHolder);
                         notifyItemChanged(viewHolder.getAdapterPosition());
                     }else{
-                        Log.e(TAG, "Posted an invalid update on " + viewHolder);
+                        Log.w(TAG, "Posted an invalid update on " + viewHolder);
                     }
                 });
 

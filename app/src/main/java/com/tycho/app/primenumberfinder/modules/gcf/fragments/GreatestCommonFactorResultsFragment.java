@@ -1,4 +1,4 @@
-package com.tycho.app.primenumberfinder.modules.lcm.fragments;
+package com.tycho.app.primenumberfinder.modules.gcf.fragments;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -17,7 +17,7 @@ import android.widget.TextView;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.StatisticsLayout;
-import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
+import com.tycho.app.primenumberfinder.modules.gcf.GreatestCommonFactorTask;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import easytasks.Task;
@@ -26,12 +26,12 @@ import easytasks.Task;
  * Created by tycho on 11/19/2017.
  */
 
-public class LeastCommonMultipleResultsFragment extends ResultsFragment {
+public class GreatestCommonFactorResultsFragment extends ResultsFragment {
 
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = LeastCommonMultipleResultsFragment.class.getSimpleName();
+    private static final String TAG = GreatestCommonFactorResultsFragment.class.getSimpleName();
 
     //Views
     private TextView subtitleTextView;
@@ -45,7 +45,7 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.lcm_results_fragment, container, false);
+        final View rootView = inflater.inflate(R.layout.gcf_results_fragment, container, false);
 
         initStandardViews(rootView);
 
@@ -101,8 +101,8 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
     }
 
     @Override
-    public synchronized LeastCommonMultipleTask getTask() {
-        return (LeastCommonMultipleTask) super.getTask();
+    public synchronized GreatestCommonFactorTask getTask() {
+        return (GreatestCommonFactorTask) super.getTask();
     }
 
     @Override
@@ -152,7 +152,7 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
         }
         spannableStringBuilder.append(getString(R.string.lcm_result_long).split("%\\d+\\$s")[1]);
         final int position = spannableStringBuilder.length();
-        spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getLcm()),  new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.yellow_dark)), 0);
+        spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getGcf()),  new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.yellow_dark)), 0);
         spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         return spannableStringBuilder.append('.');
     }

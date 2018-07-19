@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,14 +22,12 @@ import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Savable;
+import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
-import com.tycho.app.primenumberfinder.modules.findfactors.fragments.FindFactorsResultsFragment;
-import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
-import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
@@ -208,47 +205,44 @@ public abstract class ModuleHostFragment extends Fragment implements FloatingAct
             public void onTaskStopped() {
 
                 final GeneralSearchOptions searchOptions;
-                if (task instanceof FindPrimesTask){
-                    searchOptions = ((FindPrimesTask) task).getSearchOptions();
-                }else if (task instanceof FindFactorsTask){
-                    searchOptions = ((FindFactorsTask) task).getSearchOptions();
-                }else if (task instanceof PrimeFactorizationTask){
-                    searchOptions = ((PrimeFactorizationTask) task).getSearchOptions();
-                }else if (task instanceof LeastCommonMultipleTask){
-                    searchOptions = ((LeastCommonMultipleTask) task).getSearchOptions();
+                if (task instanceof SearchOptions){
+                    searchOptions = ((SearchOptions) task).getSearchOptions();
                 }else{
-                    return;
+                    searchOptions = null;
                 }
 
-                //Auto-save
-                if (task instanceof Savable && searchOptions.isAutoSave()){
-                    new Thread(() -> {
-                        final boolean success = ((Savable) task).save();
-                        new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show());
-                    }).start();
-                }
-
-                //Notify when finished
-                if (searchOptions.isNotifyWhenFinished()) {
-                    final String content;
-                    final int taskType;
-                    if (task instanceof FindPrimesTask){
-                        taskType = TASK_TYPE_FIND_PRIMES;
-                        content = "Task \"Primes from " + NUMBER_FORMAT.format(((FindPrimesTask) task).getStartValue()) + " to " + NUMBER_FORMAT.format(((FindPrimesTask) task).getEndValue()) + "\" finished.";
-                    }else if (task instanceof FindFactorsTask){
-                        taskType = TASK_TYPE_FIND_FACTORS;
-                        content = "Task \"Factors of " + NUMBER_FORMAT.format(((FindFactorsTask) task).getNumber()) + "\" finished.";
-                    }else if (task instanceof PrimeFactorizationTask){
-                        taskType = TASK_TYPE_PRIME_FACTORIZATION;
-                        content = "Task \"Prime factorization of " + NUMBER_FORMAT.format(((PrimeFactorizationTask) task).getNumber()) + "\" finished.";
-                    }else if (task instanceof LeastCommonMultipleTask){
-                        taskType = TASK_TYPE_LCM;
-                        content = "Task \"LCM is " + NUMBER_FORMAT.format(((LeastCommonMultipleTask) task).getLcm()) + "\" finished.";
-                    }else{
-                        return;
+                if (searchOptions != null){
+                    //Auto-save
+                    if (task instanceof Savable && searchOptions.isAutoSave()){
+                        new Thread(() -> {
+                            final boolean success = ((Savable) task).save();
+                            new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show());
+                        }).start();
                     }
-                    com.tycho.app.primenumberfinder.utils.NotificationManager.displayNotification(getActivity(), "default", task, taskType, content);
+
+                    //Notify when finished
+                    if (searchOptions.isNotifyWhenFinished()) {
+                        final String content;
+                        final int taskType;
+                        if (task instanceof FindPrimesTask){
+                            taskType = TASK_TYPE_FIND_PRIMES;
+                            content = "Task \"Primes from " + NUMBER_FORMAT.format(((FindPrimesTask) task).getStartValue()) + " to " + NUMBER_FORMAT.format(((FindPrimesTask) task).getEndValue()) + "\" finished.";
+                        }else if (task instanceof FindFactorsTask){
+                            taskType = TASK_TYPE_FIND_FACTORS;
+                            content = "Task \"Factors of " + NUMBER_FORMAT.format(((FindFactorsTask) task).getNumber()) + "\" finished.";
+                        }else if (task instanceof PrimeFactorizationTask){
+                            taskType = TASK_TYPE_PRIME_FACTORIZATION;
+                            content = "Task \"Prime factorization of " + NUMBER_FORMAT.format(((PrimeFactorizationTask) task).getNumber()) + "\" finished.";
+                        }else if (task instanceof LeastCommonMultipleTask){
+                            taskType = TASK_TYPE_LCM;
+                            content = "Task \"LCM is " + NUMBER_FORMAT.format(((LeastCommonMultipleTask) task).getLcm()) + "\" finished.";
+                        }else{
+                            return;
+                        }
+                        com.tycho.app.primenumberfinder.utils.NotificationManager.displayNotification(getActivity(), "default", task, taskType, content);
+                    }
                 }
+
                 task.removeTaskListener(this);
             }
         });

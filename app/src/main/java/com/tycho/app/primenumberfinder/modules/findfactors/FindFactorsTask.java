@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.tycho.app.primenumberfinder.Savable;
+import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 
@@ -18,7 +19,7 @@ import easytasks.Task;
  *         Date Created: 3/3/2017
  */
 
-public class FindFactorsTask extends Task implements Savable{
+public class FindFactorsTask extends Task implements Savable, SearchOptions{
 
     /**
      * Tag used for logging and debugging.

@@ -24,6 +24,7 @@
     <string name="title_find_factors">Find Factors</string>
     <string name="title_factor_tree">Prime Factorization</string>
     <string name="title_lcm">Least Common Multiple</string>
+    <string name="title_gcf">Greatest Common Factor</string>
     <string name="title_saved_files">Saved Files</string>
     <string name="title_settings">Settings</string>
     <string name="title_about">About</string>

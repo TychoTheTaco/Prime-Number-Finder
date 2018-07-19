@@ -13,7 +13,7 @@ public class CheckPrimalityTask extends Task{
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "CheckPrimalityTask";
+    private static final String TAG = CheckPrimalityTask.class.getSimpleName();
 
     private final long number;
 

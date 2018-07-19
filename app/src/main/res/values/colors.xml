@@ -40,6 +40,13 @@
     <color name="yellow_dark">#F9A825</color> <!-- 800 -->
     <color name="yellow_inverse">#BAD85F</color>
 
+    <!-- Greatest Common Factor (Light Blue) -->
+    <color name="blue_very_light">#E1F5FE</color> <!-- 50 -->
+    <color name="blue_light">#4FC3F7</color> <!-- 300 -->
+    <color name="lt_blue">#03A9F4</color> <!-- 500 -->
+    <color name="blue_dark">#0277BD</color> <!-- 800 -->
+    <color name="blue_inverse">#BAD85F</color>
+
     <!-- Text colors -->
     <color name="primary_text">#212121</color>
     <color name="primary_text_light">#FFFFFF</color>
