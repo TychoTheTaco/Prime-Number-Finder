@@ -41,6 +41,7 @@ public class LeastCommonMultipleTask extends Task {
     protected void run() {
         final Map<Long, Integer> occurrences = new TreeMap<>();
         for (Long number : numbers){
+            //TODO: To support BigInteger input, PrimeFactorizationTask also needs to accept BigInteger input
             final PrimeFactorizationTask primeFactorizationTask = new PrimeFactorizationTask(new PrimeFactorizationTask.SearchOptions(number));
             primeFactorizationTask.start();
             final Map<Long, Integer> treeMap = primeFactorizationTask.getPrimeFactors();

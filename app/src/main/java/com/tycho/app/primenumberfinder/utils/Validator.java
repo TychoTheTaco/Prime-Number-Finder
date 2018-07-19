@@ -1,9 +1,6 @@
 package com.tycho.app.primenumberfinder.utils;
 
-import android.util.Log;
-
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
-import com.tycho.app.primenumberfinder.ui.ValidEditText;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -102,20 +99,26 @@ public class Validator {
         return true;
     }
 
-    public static boolean isValidLCMInput(final List<Long> numbers) {
+    public static boolean isValidLCMInput(final List<BigInteger> numbers) {
         //Must be at least 2 numbers
         if (numbers.size() < 2) return false;
 
         //Validate individual numbers
-        for (Long number : numbers) {
+        for (BigInteger number : numbers) {
             if (!isValidLCMInput(number)) return false;
         }
 
         return true;
     }
 
-    public static boolean isValidLCMInput(long number) {
-        if (number == 0 || number == 1 || number == -1) {
+    public static boolean isValidLCMInput(final BigInteger number) {
+        //Number must be less than or equal to max long value
+        if (number.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) >= 0) {
+            return false;
+        }
+
+        //Number cannot be 0, 1, or -1
+        if (number.compareTo(BigInteger.ZERO) == 0 || number.compareTo(BigInteger.ONE) == 0 || number.compareTo(BigInteger.valueOf(-1)) == 0){
             return false;
         }
 

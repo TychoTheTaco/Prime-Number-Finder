@@ -25,7 +25,6 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import easytasks.Task;
-import easytasks.TaskListener;
 
 /**
  * Created by tycho on 11/19/2017.
@@ -426,6 +425,11 @@ public abstract class ResultsFragment extends TaskFragment {
      */
     protected synchronized void updateUi() {
         if (isAdded() && !isDetached()) {
+            if (getTask() != null){
+                //Elapsed time
+                timeElapsedTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime(), 2));
+            }
+            
             onUiUpdate();
         } else {
             Log.w(TAG, "Fragment not added or is detached! Dropping UI update: " + this);

@@ -2,8 +2,6 @@ package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,7 +17,6 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.StatisticsLayout;
 import com.tycho.app.primenumberfinder.modules.findprimes.DisplayPrimesActivity;
@@ -285,9 +282,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             } else {
                 progressBar.setProgress(50);
             }
-
-            //Elapsed time
-            timeElapsedTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime(), 2));
 
             //Body
             String text = null;

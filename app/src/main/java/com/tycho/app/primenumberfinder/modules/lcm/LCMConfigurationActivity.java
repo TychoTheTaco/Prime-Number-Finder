@@ -1,53 +1,23 @@
 package com.tycho.app.primenumberfinder.modules.lcm;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.ImageButton;
-import android.widget.RadioButton;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.AbstractActivity;
-import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.lcm.adapters.NumbersListAdapter;
-import com.tycho.app.primenumberfinder.ui.CustomRadioGroup;
-import com.tycho.app.primenumberfinder.ui.ValidEditText;
-import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
 import java.math.BigInteger;
-import java.text.NumberFormat;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
-import java.util.UUID;
-
-import easytasks.Task;
-
-import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.INFINITY;
-import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchMethod.BRUTE_FORCE;
-import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES;
 
 /**
  * Created by tycho on 1/24/2018.
@@ -77,10 +47,10 @@ public class LCMConfigurationActivity extends AbstractActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         numbersListAdapter = new NumbersListAdapter(this);
-        numbersListAdapter.getNumbers().add(0L);
-        numbersListAdapter.getNumbers().add(0L);
-        numbersListAdapter.getNumbers().add(0L);
-        numbersListAdapter.getNumbers().add(0L);
+        numbersListAdapter.getNumbers().add(BigInteger.ZERO);
+        numbersListAdapter.getNumbers().add(BigInteger.ZERO);
+        numbersListAdapter.getNumbers().add(BigInteger.ZERO);
+        numbersListAdapter.getNumbers().add(BigInteger.ZERO);
 
         //Set up number input
         final RecyclerView recyclerView = findViewById(R.id.numbers_list);
@@ -135,7 +105,7 @@ public class LCMConfigurationActivity extends AbstractActivity {
                 break;
 
             case R.id.start:
-                if (Validator.isValidLCMInput(numbersListAdapter.getValidNumbers())) {
+                if (Validator.isValidLCMInput(numbersListAdapter.getNumbers())) {
                     final Intent intent = new Intent();
                     final LeastCommonMultipleTask.SearchOptions searchOptions = new LeastCommonMultipleTask.SearchOptions(numbersListAdapter.getValidNumbers());
                     searchOptions.setNotifyWhenFinished(notifyWhenFinishedCheckbox.isChecked());

@@ -34,7 +34,7 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
     /**
      * List of numbers in this adapter.
      */
-    private List<Long> numbers = new ArrayList<>();
+    private List<BigInteger> numbers = new ArrayList<>();
 
     private final Context context;
 
@@ -68,14 +68,14 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
         return numbers.size();
     }
 
-    public List<Long> getNumbers(){
+    public List<BigInteger> getNumbers(){
         return numbers;
     }
 
     public List<Long> getValidNumbers(){
         final List<Long> numbers = new ArrayList<>();
-        for (Long l : this.numbers){
-            if (Validator.isValidLCMInput(l)) numbers.add(l);
+        for (BigInteger i : this.numbers){
+            if (Validator.isValidLCMInput(i)) numbers.add(i.longValue());
         }
         return numbers;
     }
@@ -103,14 +103,14 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
                     final BigInteger number = getInput();
                     input.setValid(Validator.isValidFactorInput(number));
                     if (input.isValid()){
-                        numbers.set(getAdapterPosition(), number.longValue());
+                        numbers.set(getAdapterPosition(), number);
                     }
                 }
             });
 
             input.addOnTouchListener((v, event) -> {
                 if (getAdapterPosition() == getItemCount() - 1){
-                    numbers.add(0L);
+                    numbers.add(BigInteger.ZERO);
                     notifyItemInserted(getItemCount());
                     notifyItemChanged(getItemCount() - 2);
                     input.requestFocus();

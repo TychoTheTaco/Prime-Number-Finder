@@ -26,6 +26,7 @@ import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -76,7 +77,7 @@ public class LeastCommonMultipleFragment extends ModuleHostFragment{
 
                 @Override
                 public void afterTextChanged(Editable editable) {
-                    editText.setValid(Validator.isValidLCMInput(editText.getLongValue()));
+                    editText.setValid(Validator.isValidLCMInput((BigInteger) editText.getNumberValue()));
                 }
             });
         }
@@ -86,7 +87,7 @@ public class LeastCommonMultipleFragment extends ModuleHostFragment{
         buttonFindFactors.setOnClickListener(v -> {
 
             //Check if the number is valid
-            if (Validator.isValidLCMInput(getNumbers())) {
+            if (Validator.isValidLCMInput(getBigNumbers())) {
 
                 LeastCommonMultipleTask task = new LeastCommonMultipleTask(new LeastCommonMultipleTask.SearchOptions(getNumbers()));
                 startTask(task);
@@ -100,6 +101,14 @@ public class LeastCommonMultipleFragment extends ModuleHostFragment{
         });
 
         return rootView;
+    }
+
+    private List<BigInteger> getBigNumbers(){
+        final List<BigInteger> numbers = new ArrayList<>();
+        for (ValidEditText editText : inputs){
+            if (Validator.isValidLCMInput((BigInteger) editText.getNumberValue())) numbers.add((BigInteger) editText.getNumberValue());
+        }
+        return numbers;
     }
 
     private List<Long> getNumbers(){
