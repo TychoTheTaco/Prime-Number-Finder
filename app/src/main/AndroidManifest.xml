@@ -55,6 +55,11 @@
             android:label="Configure Task"/>
 
         <activity
+            android:theme="@style/GCF.Activity"
+            android:name=".modules.gcf.GCFConfigurationActivity"
+            android:label="Configure Task"/>
+
+        <activity
             android:theme="@style/FindFactors.Activity"
             android:windowSoftInputMode="adjustPan"
             android:name=".modules.findfactors.DisplayFactorsActivity"

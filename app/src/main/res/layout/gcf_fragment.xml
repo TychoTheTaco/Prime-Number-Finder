@@ -22,7 +22,7 @@
             android:labelFor="@+id/editText_input_number"
             android:paddingEnd="8dp"
             android:paddingStart="8dp"
-            android:text="@string/lcm_input_description" />
+            android:text="@string/gcf_input_description" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -43,7 +43,7 @@
                 style="@style/Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/calculate_lcm_button" />
+                android:text="@string/calculate_gcf_button" />
 
         </LinearLayout>
 

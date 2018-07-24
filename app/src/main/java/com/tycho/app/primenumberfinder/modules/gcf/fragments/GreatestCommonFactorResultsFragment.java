@@ -123,10 +123,10 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
     private SpannableStringBuilder generateSubtitle(){
         final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
         int position;
-        spannableStringBuilder.append(getString(R.string.lcm_subtitle).split("%\\d+\\$s")[0]);
+        spannableStringBuilder.append(getString(R.string.gcf_subtitle).split("%\\d+\\$s")[0]);
         for (int i = 0; i < getTask().getNumbers().size(); i++){
             position = spannableStringBuilder.length();
-            spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumbers().get(i)), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.yellow_dark)), 0);
+            spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumbers().get(i)), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_dark)), 0);
             spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
             if (i == getTask().getNumbers().size() - 2){
                 if (i > 1) spannableStringBuilder.append(',');
@@ -140,9 +140,9 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
 
     private SpannableStringBuilder generateResultSubtitle(){
         final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-        spannableStringBuilder.append(getString(R.string.lcm_result_long).split("%\\d+\\$s")[0]);
+        spannableStringBuilder.append(getString(R.string.gcf_result_long).split("%\\d+\\$s")[0]);
         for (int i = 0; i < getTask().getNumbers().size(); i++){
-            spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumbers().get(i)), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.yellow_dark)), 0);
+            spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumbers().get(i)), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_dark)), 0);
             if (i == getTask().getNumbers().size() - 2){
                 if (i > 1) spannableStringBuilder.append(',');
                 spannableStringBuilder.append(" and ");
@@ -150,9 +150,9 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
                 spannableStringBuilder.append(", ");
             }
         }
-        spannableStringBuilder.append(getString(R.string.lcm_result_long).split("%\\d+\\$s")[1]);
+        spannableStringBuilder.append(getString(R.string.gcf_result_long).split("%\\d+\\$s")[1]);
         final int position = spannableStringBuilder.length();
-        spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getGcf()),  new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.yellow_dark)), 0);
+        spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getGcf()),  new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_dark)), 0);
         spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         return spannableStringBuilder.append('.');
     }

@@ -92,6 +92,14 @@
     <string name="lcm_result_long">The least common multiple of %1$s is %2$s.</string>
     <string name="lcm_subtitle">Finding the least common multiple of %1$s.</string>
 
+    <!-- Greatest Common Factor page -->
+    <string name="gcf_input_description">Enter a number in each box to calculate the greatest common factor.</string>
+    <string name="calculate_gcf_button">Calculate</string>
+    <string name="gcf_task_list_item_title">GCF of %1$s</string>
+    <string name="gcf_result">GCF is %1$s.</string>
+    <string name="gcf_result_long">The greatest common factor of %1$s is %2$s.</string>
+    <string name="gcf_subtitle">Finding the greatest common factor of %1$s.</string>
+
     <!-- Saved files page -->
     <string name="no_saved_files_message">You have no saved files.</string>
     <plurals name="saved_files_count">
@@ -171,6 +179,7 @@
     <!-- Error messages -->
     <string name="error_invalid_number">Invalid number!</string>
     <string name="error_invalid_range">Invalid range!</string>
+    <string name="error_invalid_input">Invalid input!</string>
 
     <!-- Miscellaneous -->
     <string name="unicode_bullet">&#8226;</string>

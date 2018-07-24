@@ -378,4 +378,19 @@ public final class Utils {
         }
         return new ColorStateList(stateArray, colors);
     }
+
+    public static String formatNumberList(final List<? extends Number> numbers, final NumberFormat numberFormat, final String separator){
+        final StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < numbers.size(); i++){
+            stringBuilder.append(numberFormat.format(numbers.get(i)));
+            if (i == numbers.size() - 2){
+                if (i > 1) stringBuilder.append(separator);
+                stringBuilder.append(" and ");
+            }else if (i != numbers.size() - 1){
+                stringBuilder.append(separator);
+                stringBuilder.append(' ');
+            }
+        }
+        return stringBuilder.toString();
+    }
 }

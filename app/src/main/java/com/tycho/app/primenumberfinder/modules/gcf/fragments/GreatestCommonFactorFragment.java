@@ -21,10 +21,10 @@ import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.ModuleHostFragment;
+import com.tycho.app.primenumberfinder.modules.gcf.GCFConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.gcf.GreatestCommonFactorTask;
-import com.tycho.app.primenumberfinder.modules.lcm.LCMConfigurationActivity;
-import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
+import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
 import java.math.BigInteger;
@@ -36,7 +36,7 @@ import easytasks.Task;
 
 import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.DELETE;
 import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.PAUSE;
-import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_LCM;
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_GCF;
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
 /**
@@ -84,8 +84,8 @@ public class GreatestCommonFactorFragment extends ModuleHostFragment{
         }
 
         //Set up start button
-        final Button buttonFindFactors = rootView.findViewById(R.id.button_find_factors);
-        buttonFindFactors.setOnClickListener(v -> {
+        final Button startButton = rootView.findViewById(R.id.button_find_factors);
+        startButton.setOnClickListener(v -> {
 
             //Check if the number is valid
             if (Validator.isValidLCMInput(getBigNumbers())) {
@@ -133,16 +133,7 @@ public class GreatestCommonFactorFragment extends ModuleHostFragment{
 
             @Override
             protected CharSequence getTitle(GreatestCommonFactorTask task) {
-                final StringBuilder stringBuilder = new StringBuilder();
-                for (int i = 0; i < task.getNumbers().size(); i++){
-                    stringBuilder.append(NUMBER_FORMAT.format(task.getNumbers().get(i)));
-                    if (i == task.getNumbers().size() - 2){
-                        stringBuilder.append("; and ");
-                    }else if (i != task.getNumbers().size() - 1){
-                        stringBuilder.append("; ");
-                    }
-                }
-                return context.getString(R.string.lcm_task_list_item_title, stringBuilder.toString());
+                return context.getString(R.string.gcf_task_list_item_title, Utils.formatNumberList(task.getNumbers(), NUMBER_FORMAT, ";"));
             }
 
             @Override
@@ -151,7 +142,7 @@ public class GreatestCommonFactorFragment extends ModuleHostFragment{
                     final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
                     spannableStringBuilder.append(context.getString(R.string.status_finished));
                     spannableStringBuilder.append(": ");
-                    spannableStringBuilder.append(context.getString(R.string.lcm_result, NUMBER_FORMAT.format((task.getGcf()))));
+                    spannableStringBuilder.append(context.getString(R.string.gcf_result, NUMBER_FORMAT.format((task.getGcf()))));
                     spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accent_dark)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                     return spannableStringBuilder;
                 }
@@ -160,7 +151,7 @@ public class GreatestCommonFactorFragment extends ModuleHostFragment{
 
             @Override
             protected int getTaskType() {
-                return TASK_TYPE_LCM + 1;
+                return TASK_TYPE_GCF;
             }
         });
         taskListFragment.whitelist(GreatestCommonFactorTask.class);
@@ -168,7 +159,7 @@ public class GreatestCommonFactorFragment extends ModuleHostFragment{
 
     @Override
     public void onClick(View view) {
-        final Intent intent = new Intent(getActivity(), LCMConfigurationActivity.class);
+        final Intent intent = new Intent(getActivity(), GCFConfigurationActivity.class);
         startActivityForResult(intent, REQUEST_CODE_NEW_TASK);
     }
 
@@ -177,10 +168,10 @@ public class GreatestCommonFactorFragment extends ModuleHostFragment{
         switch (requestCode) {
             case REQUEST_CODE_NEW_TASK:
                 if (data != null && data.getExtras() != null) {
-                    final LeastCommonMultipleTask.SearchOptions searchOptions = data.getExtras().getParcelable("searchOptions");
-                    final LeastCommonMultipleTask task = (LeastCommonMultipleTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) data.getExtras().get("taskId"));
+                    final GreatestCommonFactorTask.SearchOptions searchOptions = data.getExtras().getParcelable("searchOptions");
+                    final GreatestCommonFactorTask task = (GreatestCommonFactorTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) data.getExtras().get("taskId"));
                     if (task == null) {
-                        startTask(new LeastCommonMultipleTask(searchOptions));
+                        startTask(new GreatestCommonFactorTask(searchOptions));
                     } else {
                         task.setSearchOptions(searchOptions);
                     }

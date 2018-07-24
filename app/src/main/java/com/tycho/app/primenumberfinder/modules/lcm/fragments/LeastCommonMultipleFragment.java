@@ -24,6 +24,7 @@ import com.tycho.app.primenumberfinder.modules.ModuleHostFragment;
 import com.tycho.app.primenumberfinder.modules.lcm.LCMConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
+import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
 import java.math.BigInteger;
@@ -132,16 +133,7 @@ public class LeastCommonMultipleFragment extends ModuleHostFragment{
 
             @Override
             protected CharSequence getTitle(LeastCommonMultipleTask task) {
-                final StringBuilder stringBuilder = new StringBuilder();
-                for (int i = 0; i < task.getNumbers().size(); i++){
-                    stringBuilder.append(NUMBER_FORMAT.format(task.getNumbers().get(i)));
-                    if (i == task.getNumbers().size() - 2){
-                        stringBuilder.append("; and ");
-                    }else if (i != task.getNumbers().size() - 1){
-                        stringBuilder.append("; ");
-                    }
-                }
-                return context.getString(R.string.lcm_task_list_item_title, stringBuilder.toString());
+                return context.getString(R.string.lcm_task_list_item_title, Utils.formatNumberList(task.getNumbers(), NUMBER_FORMAT, ";"));
             }
 
             @Override

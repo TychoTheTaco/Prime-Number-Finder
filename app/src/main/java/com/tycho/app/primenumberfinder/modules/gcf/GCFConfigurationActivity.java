@@ -1,4 +1,4 @@
-package com.tycho.app.primenumberfinder.modules.lcm;
+package com.tycho.app.primenumberfinder.modules.gcf;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,23 +23,23 @@ import java.math.BigInteger;
  * Created by tycho on 1/24/2018.
  */
 
-public class LCMConfigurationActivity extends AbstractActivity {
+public class GCFConfigurationActivity extends AbstractActivity {
 
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = LCMConfigurationActivity.class.getSimpleName();
+    private static final String TAG = GCFConfigurationActivity.class.getSimpleName();
 
     private NumbersListAdapter numbersListAdapter;
 
     private CheckBox notifyWhenFinishedCheckbox;
 
-    private LeastCommonMultipleTask task;
+    private GreatestCommonFactorTask task;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lcm_configuration_activity);
+        setContentView(R.layout.gcf_configuration_activity);
 
         //Set the actionbar to a custom toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);
@@ -107,7 +107,7 @@ public class LCMConfigurationActivity extends AbstractActivity {
             case R.id.start:
                 if (Validator.isValidLCMInput(numbersListAdapter.getNonZeroNumbers())) {
                     final Intent intent = new Intent();
-                    final LeastCommonMultipleTask.SearchOptions searchOptions = new LeastCommonMultipleTask.SearchOptions(numbersListAdapter.getValidNumbers());
+                    final GreatestCommonFactorTask.SearchOptions searchOptions = new GreatestCommonFactorTask.SearchOptions(numbersListAdapter.getValidNumbers());
                     searchOptions.setNotifyWhenFinished(notifyWhenFinishedCheckbox.isChecked());
                     intent.putExtra("searchOptions", searchOptions);
                     if (task != null) intent.putExtra("taskId", task.getId());

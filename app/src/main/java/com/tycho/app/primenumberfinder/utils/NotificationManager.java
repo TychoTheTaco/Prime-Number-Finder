@@ -20,6 +20,7 @@ public class NotificationManager {
     public static final int TASK_TYPE_FIND_FACTORS = 1;
     public static final int TASK_TYPE_PRIME_FACTORIZATION = 2;
     public static final int TASK_TYPE_LCM = 3;
+    public static final int TASK_TYPE_GCF = 4;
 
     private static int nextNotificationId = 0;
 

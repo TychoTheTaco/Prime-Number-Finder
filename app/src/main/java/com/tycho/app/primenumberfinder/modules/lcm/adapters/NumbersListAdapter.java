@@ -1,6 +1,5 @@
 package com.tycho.app.primenumberfinder.modules.lcm.adapters;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -36,12 +35,6 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
      */
     private List<BigInteger> numbers = new ArrayList<>();
 
-    private final Context context;
-
-    public NumbersListAdapter(final Context context){
-        this.context = context;
-    }
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -69,6 +62,16 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
     }
 
     public List<BigInteger> getNumbers(){
+        return numbers;
+    }
+
+    public List<BigInteger> getNonZeroNumbers(){
+        final List<BigInteger> numbers = new ArrayList<>();
+        for (BigInteger bigInteger : this.numbers){
+            if (bigInteger.compareTo(BigInteger.ZERO) != 0){
+                numbers.add(bigInteger);
+            }
+        }
         return numbers;
     }
 
@@ -102,9 +105,7 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
                 public void afterTextChanged(Editable editable) {
                     final BigInteger number = getInput();
                     input.setValid(Validator.isValidFactorInput(number));
-                    if (input.isValid()){
-                        numbers.set(getAdapterPosition(), number);
-                    }
+                    numbers.set(getAdapterPosition(), number);
                 }
             });
 

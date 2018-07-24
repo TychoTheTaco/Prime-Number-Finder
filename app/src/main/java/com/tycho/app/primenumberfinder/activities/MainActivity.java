@@ -332,18 +332,14 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.yellow_dark), ContextCompat.getColor(this, R.color.yellow));
                 break;
 
+            case R.id.drawer_item_gcf:
+                navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.lt_blue)));
+                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.blue_dark)));
+                Utils.applyTheme(this, ContextCompat.getColor(this, R.color.blue_dark), ContextCompat.getColor(this, R.color.lt_blue));
+                break;
+
             case R.id.drawer_item_saved_files:
-                navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.accent)));
-                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent_dark)));
-                Utils.applyTheme(this, ContextCompat.getColor(this, R.color.primary_dark), ContextCompat.getColor(this, R.color.primary));
-                break;
-
             case R.id.drawer_item_settings:
-                navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.accent)));
-                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent_dark)));
-                Utils.applyTheme(this, ContextCompat.getColor(this, R.color.primary_dark), ContextCompat.getColor(this, R.color.primary));
-                break;
-
             case R.id.drawer_item_about:
                 navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.accent)));
                 navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent_dark)));
