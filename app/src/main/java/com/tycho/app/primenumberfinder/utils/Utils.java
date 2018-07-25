@@ -1,6 +1,8 @@
 package com.tycho.app.primenumberfinder.utils;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
@@ -10,12 +12,14 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -37,6 +41,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import easytasks.Task;
+
+import static android.content.Context.CLIPBOARD_SERVICE;
 
 /**
  * This class contains lots of random utility methods.
@@ -380,17 +386,36 @@ public final class Utils {
     }
 
     public static String formatNumberList(final List<? extends Number> numbers, final NumberFormat numberFormat, final String separator){
-        final StringBuilder stringBuilder = new StringBuilder();
+        final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
         for (int i = 0; i < numbers.size(); i++){
-            stringBuilder.append(numberFormat.format(numbers.get(i)));
-            if (i == numbers.size() - 2){
-                if (i > 1) stringBuilder.append(separator);
-                stringBuilder.append(" and ");
-            }else if (i != numbers.size() - 1){
-                stringBuilder.append(separator);
-                stringBuilder.append(' ');
-            }
+            spannableStringBuilder.append(numberFormat.format(numbers.get(i)));
+            Utils.separateNumbers(spannableStringBuilder, numbers, i, ",");
         }
-        return stringBuilder.toString();
+        return spannableStringBuilder.toString();
+    }
+
+    public static void separateNumbers(final SpannableStringBuilder spannableStringBuilder, final List<? extends Number> numbers, final int index, final String separator){
+        if (index == numbers.size() - 2){
+            if (index > 1) spannableStringBuilder.append(separator);
+            spannableStringBuilder.append(" and ");
+        }else if (index != numbers.size() - 1){
+            spannableStringBuilder.append(separator);
+            spannableStringBuilder.append(' ');
+        }
+    }
+
+    public static void applyCopySpan(final SpannableStringBuilder spannableStringBuilder, final int start, final int end, final Context context){
+        spannableStringBuilder.setSpan(new ClickableSpan(){
+            @Override
+            public void onClick(View view){
+                final ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                final char[] chars = new char[end - start];
+                spannableStringBuilder.getChars(start, end, chars, 0);
+                final String text = new String(chars);
+                final ClipData clip = ClipData.newPlainText(text, text);
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(context, "Text Copied!", Toast.LENGTH_SHORT).show();
+            }
+        }, start, end, 0);
     }
 }

@@ -128,12 +128,7 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
             position = spannableStringBuilder.length();
             spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumbers().get(i)), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.yellow_dark)), 0);
             spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-            if (i == getTask().getNumbers().size() - 2){
-                if (i > 1) spannableStringBuilder.append(',');
-                spannableStringBuilder.append(" and ");
-            }else if (i != getTask().getNumbers().size() - 1){
-                spannableStringBuilder.append(", ");
-            }
+            Utils.separateNumbers(spannableStringBuilder, getTask().getNumbers(), i, ",");
         }
         return spannableStringBuilder.append('.');
     }
@@ -143,12 +138,7 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
         spannableStringBuilder.append(getString(R.string.lcm_result_long).split("%\\d+\\$s")[0]);
         for (int i = 0; i < getTask().getNumbers().size(); i++){
             spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumbers().get(i)), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.yellow_dark)), 0);
-            if (i == getTask().getNumbers().size() - 2){
-                if (i > 1) spannableStringBuilder.append(',');
-                spannableStringBuilder.append(" and ");
-            }else if (i != getTask().getNumbers().size() - 1){
-                spannableStringBuilder.append(", ");
-            }
+            Utils.separateNumbers(spannableStringBuilder, getTask().getNumbers(), i, ",");
         }
         spannableStringBuilder.append(getString(R.string.lcm_result_long).split("%\\d+\\$s")[1]);
         final int position = spannableStringBuilder.length();

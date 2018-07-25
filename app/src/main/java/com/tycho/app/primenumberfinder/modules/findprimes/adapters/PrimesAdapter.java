@@ -115,80 +115,66 @@ public class PrimesAdapter extends RecyclerView.Adapter<PrimesAdapter.ViewHolder
             number = view.findViewById(R.id.number);
             background = view.findViewById(R.id.background);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(context, context.getString(R.string.primes_list_toast_message,
-                            NUMBER_FORMAT.format(primes.get(getAdapterPosition())),
-                            Utils.formatNumberOrdinal(getAdapterPosition() + 1 + offset)),
-                            Toast.LENGTH_SHORT).show();
-                }
-            });
+            itemView.setOnClickListener(v -> Toast.makeText(context, context.getString(R.string.primes_list_toast_message,
+                    NUMBER_FORMAT.format(primes.get(getAdapterPosition())),
+                    Utils.formatNumberOrdinal(getAdapterPosition() + 1 + offset)),
+                    Toast.LENGTH_SHORT).show());
 
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    final ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
-                    final ClipData clip = ClipData.newPlainText(NUMBER_FORMAT.format(primes.get(getAdapterPosition())), String.valueOf(primes.get(getAdapterPosition())));
-                    clipboard.setPrimaryClip(clip);
-                    Toast.makeText(context, "Number Copied!", Toast.LENGTH_SHORT).show();
-                    return true;
-                }
+            itemView.setOnLongClickListener(v -> {
+                final ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                final ClipData clip = ClipData.newPlainText(NUMBER_FORMAT.format(primes.get(getAdapterPosition())), String.valueOf(primes.get(getAdapterPosition())));
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(context, "Number Copied!", Toast.LENGTH_SHORT).show();
+                return true;
             });
         }
 
         private void animate() {
             if (getAdapterPosition() != lastAnimatedPosition) {
-                itemView.post(new Runnable() {
-                    @Override
-                    public void run() {
+                itemView.post(() -> {
 
-                        //Make sure the background has the correct size
-                        final RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) background.getLayoutParams();
-                        layoutParams.height = itemView.getHeight();
-                        background.setLayoutParams(layoutParams);
+                    //Make sure the background has the correct size
+                    final RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) background.getLayoutParams();
+                    layoutParams.height = itemView.getHeight();
+                    background.setLayoutParams(layoutParams);
 
-                        //Find the center of the view
-                        int centerX = itemView.getWidth() / 2;
-                        int centerY = itemView.getHeight() / 2;
+                    //Find the center of the view
+                    int centerX = itemView.getWidth() / 2;
+                    int centerY = itemView.getHeight() / 2;
 
-                        //Get the two side lengths for calculating the end radius
-                        double sideOne = itemView.getWidth() - centerX;
-                        double sideTwo = itemView.getHeight() - centerY;
+                    //Get the two side lengths for calculating the end radius
+                    double sideOne = itemView.getWidth() - centerX;
+                    double sideTwo = itemView.getHeight() - centerY;
 
-                        //Calculate start and end radius
-                        float startRadius = 0;
-                        float endRadius = (float) Math.hypot(sideOne, sideTwo);
+                    //Calculate start and end radius
+                    float startRadius = 0;
+                    float endRadius = (float) Math.hypot(sideOne, sideTwo);
 
-                        //Make sure the view is visible before we start animating it
-                        background.setVisibility(View.VISIBLE);
-                        background.setAlpha(1);
+                    //Make sure the view is visible before we start animating it
+                    background.setVisibility(View.VISIBLE);
+                    background.setAlpha(1);
 
-                        //Create and start the animation
-                        final Animator animator = ViewAnimationUtils.createCircularReveal(background, centerX, centerY, startRadius, endRadius);
-                        animator.setDuration(ANIMATION_DURATION_MILLIS);
-                        animator.start();
+                    //Create and start the animation
+                    final Animator animator = ViewAnimationUtils.createCircularReveal(background, centerX, centerY, startRadius, endRadius);
+                    animator.setDuration(ANIMATION_DURATION_MILLIS);
+                    animator.start();
 
-                        //Create and start the fade out animation
-                        background.animate().alpha(0.35f).setDuration(ANIMATION_DURATION_MILLIS).start();
+                    //Create and start the fade out animation
+                    background.animate().alpha(0.35f).setDuration(ANIMATION_DURATION_MILLIS).start();
 
-                        lastAnimatedPosition = getAdapterPosition();
-                    }
+                    lastAnimatedPosition = getAdapterPosition();
                 });
             } else {
-                itemView.post(new Runnable() {
-                    @Override
-                    public void run() {
+                itemView.post(() -> {
 
-                        //Make sure the background has the correct size
-                        final RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) background.getLayoutParams();
-                        layoutParams.height = itemView.getHeight();
-                        background.setLayoutParams(layoutParams);
+                    //Make sure the background has the correct size
+                    final RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) background.getLayoutParams();
+                    layoutParams.height = itemView.getHeight();
+                    background.setLayoutParams(layoutParams);
 
-                        //Make sure the view is visible and set the alpha value
-                        background.setVisibility(View.VISIBLE);
-                        background.setAlpha(0.35f);
-                    }
+                    //Make sure the view is visible and set the alpha value
+                    background.setVisibility(View.VISIBLE);
+                    background.setAlpha(0.35f);
                 });
             }
         }

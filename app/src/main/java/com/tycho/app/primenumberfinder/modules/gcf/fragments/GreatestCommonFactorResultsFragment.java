@@ -128,12 +128,8 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
             position = spannableStringBuilder.length();
             spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumbers().get(i)), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_dark)), 0);
             spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-            if (i == getTask().getNumbers().size() - 2){
-                if (i > 1) spannableStringBuilder.append(',');
-                spannableStringBuilder.append(" and ");
-            }else if (i != getTask().getNumbers().size() - 1){
-                spannableStringBuilder.append(", ");
-            }
+            //Utils.applyCopySpan(spannableStringBuilder, position, spannableStringBuilder.length(), getContext());
+            Utils.separateNumbers(spannableStringBuilder, getTask().getNumbers(), i, ",");
         }
         return spannableStringBuilder.append('.');
     }
@@ -143,17 +139,14 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
         spannableStringBuilder.append(getString(R.string.gcf_result_long).split("%\\d+\\$s")[0]);
         for (int i = 0; i < getTask().getNumbers().size(); i++){
             spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumbers().get(i)), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_dark)), 0);
-            if (i == getTask().getNumbers().size() - 2){
-                if (i > 1) spannableStringBuilder.append(',');
-                spannableStringBuilder.append(" and ");
-            }else if (i != getTask().getNumbers().size() - 1){
-                spannableStringBuilder.append(", ");
-            }
+            Utils.separateNumbers(spannableStringBuilder, getTask().getNumbers(), i, ",");
         }
         spannableStringBuilder.append(getString(R.string.gcf_result_long).split("%\\d+\\$s")[1]);
         final int position = spannableStringBuilder.length();
         spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getGcf()),  new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_dark)), 0);
         spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        //TODO: Copy span shows text underlined and also still isnt clickable. probably because text view isnt focusable
+        //Utils.applyCopySpan(spannableStringBuilder, position, spannableStringBuilder.length(), getContext());
         return spannableStringBuilder.append('.');
     }
 }

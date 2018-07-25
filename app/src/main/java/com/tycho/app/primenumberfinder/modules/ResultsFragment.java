@@ -38,7 +38,7 @@ public abstract class ResultsFragment extends TaskFragment {
     private static final String TAG = ResultsFragment.class.getSimpleName();
 
     /**
-     * This UI updater is responsible for updating the UI. It its life cycle is managed by this
+     * This UI updater is responsible for updating the UI. Its life cycle is managed by this
      * abstract class.
      */
     private final UIUpdater uiUpdater = new UIUpdater();

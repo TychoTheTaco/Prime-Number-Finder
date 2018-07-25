@@ -33,6 +33,11 @@
     <string name="tasks_tab_title">Tasks</string>
     <string name="results_tab_title">Results</string>
 
+    <!-- Search Options -->
+    <string name="thread_count">Threads</string>
+    <string name="notify_when_finished">Notify when finished.</string>
+    <string name="auto_save">Auto-save when finished.</string>
+
     <!-- Find Primes page -->
     <string name="check_primality_button">Check primality</string>
     <string name="input_number_description">Enter a number to check if it is prime.</string>
