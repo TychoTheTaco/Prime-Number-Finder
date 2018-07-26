@@ -6,13 +6,14 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.style.ClickableSpan;
+import android.text.TextPaint;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.tycho.app.primenumberfinder.LongClickableSpan;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
@@ -405,9 +407,9 @@ public final class Utils {
     }
 
     public static void applyCopySpan(final SpannableStringBuilder spannableStringBuilder, final int start, final int end, final Context context){
-        spannableStringBuilder.setSpan(new ClickableSpan(){
+        spannableStringBuilder.setSpan(new LongClickableSpan(){
             @Override
-            public void onClick(View view){
+            public void onLongClick(View view){
                 final ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
                 final char[] chars = new char[end - start];
                 spannableStringBuilder.getChars(start, end, chars, 0);
@@ -415,6 +417,17 @@ public final class Utils {
                 final ClipData clip = ClipData.newPlainText(text, text);
                 clipboard.setPrimaryClip(clip);
                 Toast.makeText(context, "Text Copied!", Toast.LENGTH_SHORT).show();
+
+                final int spanStart = spannableStringBuilder.getSpanStart(LongClickableSpan.class);
+                final int spanEnd = spannableStringBuilder.getSpanEnd(LongClickableSpan.class);
+                spannableStringBuilder.setSpan(new ForegroundColorSpan(Color.RED), start, end, 0);
+                view.invalidate();
+            }
+
+            @Override
+            public void updateDrawState(TextPaint ds){
+                super.updateDrawState(ds);
+                ds.setUnderlineText(false);
             }
         }, start, end, 0);
     }
