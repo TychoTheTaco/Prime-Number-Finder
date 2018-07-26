@@ -20,6 +20,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
@@ -418,10 +419,14 @@ public final class Utils {
                 clipboard.setPrimaryClip(clip);
                 Toast.makeText(context, "Text Copied!", Toast.LENGTH_SHORT).show();
 
-                final int spanStart = spannableStringBuilder.getSpanStart(LongClickableSpan.class);
-                final int spanEnd = spannableStringBuilder.getSpanEnd(LongClickableSpan.class);
-                spannableStringBuilder.setSpan(new ForegroundColorSpan(Color.RED), start, end, 0);
-                view.invalidate();
+                //Apply highlight span
+                final ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.RED);
+                spannableStringBuilder.setSpan(foregroundColorSpan, start, end, 0);
+                ((TextView) view).setText(spannableStringBuilder);
+                view.postDelayed(() -> {
+                    spannableStringBuilder.removeSpan(foregroundColorSpan);
+                    ((TextView) view).setText(spannableStringBuilder);
+                }, 1000);
             }
 
             @Override

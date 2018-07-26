@@ -147,7 +147,6 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
         final int position = spannableStringBuilder.length();
         spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getGcf()),  new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_dark)), 0);
         spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-        //TODO: Copy span shows text underlined and also still isnt clickable. probably because text view isnt focusable
         Utils.applyCopySpan(spannableStringBuilder, position, spannableStringBuilder.length(), getContext());
         return spannableStringBuilder.append('.');
     }
