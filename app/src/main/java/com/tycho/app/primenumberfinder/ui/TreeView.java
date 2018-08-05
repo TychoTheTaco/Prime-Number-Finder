@@ -27,7 +27,7 @@ public class TreeView extends View {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "FactorTreeView";
+    private static final String TAG = TreeView.class.getSimpleName();
 
     /**
      * The {@linkplain Tree} object displayed by this view.
@@ -40,7 +40,7 @@ public class TreeView extends View {
     private final Paint paint = new Paint();
 
     /**
-     * The horizontal spacing between items in each level
+     * The horizontal spacing between items in each level.
      */
     private float[] horizontalSpacing;
 
@@ -441,7 +441,6 @@ public class TreeView extends View {
 
         return itemTree;
     }
-
 
     private void drawContents(final Tree<Item> itemTree, final Canvas canvas, final ExportOptions options) {
 
