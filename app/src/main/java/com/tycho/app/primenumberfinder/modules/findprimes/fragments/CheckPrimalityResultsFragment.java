@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.StatisticsLayout;
@@ -45,6 +46,7 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
         initStandardViews(rootView);
 
         subtitle = rootView.findViewById(R.id.subtitle);
+        subtitle.setMovementMethod(LongClickLinkMovementMethod.getInstance());
 
         //Statistics
         statisticsLayout = new StatisticsLayout(rootView.findViewById(R.id.statistics_layout));
@@ -59,7 +61,7 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     @Override
     protected void postDefaults() {
         //Format subtitle
-        subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_subtitle_searching), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getContext(), R.color.purple_dark)));
+        subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_subtitle_searching), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, new boolean[]{true}, ContextCompat.getColor(getContext(), R.color.purple_dark), getActivity()));
 
         //Statistics
         statisticsLayout.setVisibility(View.VISIBLE);
@@ -74,13 +76,20 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
             subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_result), new String[]{
                     NUMBER_FORMAT.format(getTask().getNumber()),
                     "prime"
-            }, ContextCompat.getColor(getContext(), R.color.purple_dark)));
+            }, new boolean[]{
+                    true,
+                    false
+            }, ContextCompat.getColor(getContext(), R.color.purple_dark), getActivity()));
         }else{
             subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_result_negative), new String[]{
                     NUMBER_FORMAT.format(getTask().getNumber()),
                     "not prime",
                     NUMBER_FORMAT.format(getTask().getFactor())
-            }, ContextCompat.getColor(getContext(), R.color.purple_dark)));
+            }, new boolean[]{
+                    true,
+                    false,
+                    true
+            }, ContextCompat.getColor(getContext(), R.color.purple_dark), getActivity()));
         }
 
         //Statistics

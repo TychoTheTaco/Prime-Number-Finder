@@ -3,9 +3,6 @@ package com.tycho.app.primenumberfinder.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import static com.tycho.app.primenumberfinder.utils.PreferenceManager.Preference.ALLOW_ANALYTICS;
-import static com.tycho.app.primenumberfinder.utils.PreferenceManager.Preference.FILE_VERSION;
-
 /**
  * Saves user preferences using Android's {@link SharedPreferences} implementation.
  *

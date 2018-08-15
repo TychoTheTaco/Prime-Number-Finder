@@ -37,7 +37,6 @@ import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -205,21 +204,11 @@ public final class Utils {
      * @param ascending
      */
     public static void sortByDate(final List<File> files, final boolean ascending) {
-        Collections.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(File file0, File file1) {
-                return (ascending ? 1 : -1) * Long.compare(file0.lastModified(), file1.lastModified());
-            }
-        });
+        Collections.sort(files, (file0, file1) -> (ascending ? 1 : -1) * Long.compare(file0.lastModified(), file1.lastModified()));
     }
 
     public static void sortBySize(final List<File> files, final boolean ascending) {
-        Collections.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(File file0, File file1) {
-                return (ascending ? 1 : -1) * Long.compare(file0.length(), file1.length());
-            }
-        });
+        Collections.sort(files, (file0, file1) -> (ascending ? 1 : -1) * Long.compare(file0.length(), file1.length()));
     }
 
     public static SpannableStringBuilder formatSpannable(final SpannableStringBuilder spannableStringBuilder, final String raw, final String[] content, final int color) {
@@ -227,6 +216,18 @@ public final class Utils {
         for (int i = 0; i < spanPositions.length; i += 2) {
             spannableStringBuilder.setSpan(new ForegroundColorSpan(color), spanPositions[i], spanPositions[i + 1], Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
             spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), spanPositions[i], spanPositions[i + 1], Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        }
+        return spannableStringBuilder;
+    }
+
+    public static SpannableStringBuilder formatSpannable(final SpannableStringBuilder spannableStringBuilder, final String raw, final String[] content, final boolean[] applyCopySpan, final int color, final Context context) {
+        final int[] spanPositions = getSpanPositions(spannableStringBuilder, raw, content);
+        for (int i = 0; i < spanPositions.length; i += 2) {
+            final int start = spanPositions[i];
+            final int end = spanPositions[i + 1];
+            spannableStringBuilder.setSpan(new ForegroundColorSpan(color), start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            if (applyCopySpan[i / 2]) applyCopySpan(spannableStringBuilder, start, end, context);
         }
         return spannableStringBuilder;
     }
@@ -426,7 +427,7 @@ public final class Utils {
                 view.postDelayed(() -> {
                     spannableStringBuilder.removeSpan(foregroundColorSpan);
                     ((TextView) view).setText(spannableStringBuilder);
-                }, 1000);
+                }, 150);
             }
 
             @Override
@@ -434,6 +435,6 @@ public final class Utils {
                 super.updateDrawState(ds);
                 ds.setUnderlineText(false);
             }
-        }, start, end, 0);
+        }, start, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
     }
 }
