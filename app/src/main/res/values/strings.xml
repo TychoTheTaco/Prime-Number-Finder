@@ -52,7 +52,7 @@
     <string name="find_primes_subtitle">Searching for prime numbers between %1$s and %2$s using %3$s.</string>
     <string name="find_primes_body_text">Already found %1$s prime numbers.</string>
     <string name="find_primes_body_text_sieve_counting">Counting primes: %1$s.</string>
-    <string name="find_primes_body_text_sieve">Counting primes: %1$s.</string>
+    <string name="find_primes_body_text_sieve_marking">Marking factors of %1$s&#8230;</string>
     <string name="find_primes_result">%1$s primes found.</string>
     <string name="check_primality_result">%1$s is %2$s.</string>
     <string name="check_primality_result_negative">%1$s is %2$s because it is divisible by %3$s.</string>

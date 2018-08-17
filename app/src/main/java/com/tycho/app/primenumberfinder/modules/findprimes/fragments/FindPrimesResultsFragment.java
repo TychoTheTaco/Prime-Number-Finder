@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.text.SpannableStringBuilder;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
@@ -50,6 +50,12 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
     private boolean showStatistics = true;
 
+    /**
+     * This {@link SpannableStringBuilder} is used to format any text displayed in
+     * {@link FindPrimesResultsFragment#subtitleTextView}.
+     */
+    final SpannableStringBuilder subtitleStringBuilder = new SpannableStringBuilder();
+
     final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
     /**
@@ -78,6 +84,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         initStandardViews(rootView);
 
         subtitleTextView = rootView.findViewById(R.id.subtitle);
+        subtitleTextView.setMovementMethod(LongClickLinkMovementMethod.getInstance());
         bodyTextView = rootView.findViewById(R.id.text);
 
         //Statistics
@@ -158,11 +165,15 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         super.postDefaults();
 
         //Subtitle
-        subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_primes_subtitle), new String[]{
+        subtitleTextView.setText(Utils.formatSpannable(subtitleStringBuilder, getString(R.string.find_primes_subtitle), new String[]{
                 NUMBER_FORMAT.format(getTask().getStartValue()),
                 getTask().getEndValue() == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),
                 getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE ? "brute force" : "the sieve of Eratosthenes"
-        }, ContextCompat.getColor(getContext(), R.color.purple_dark)));
+        }, new boolean[]{
+                true,
+                getTask().getEndValue() != FindPrimesTask.INFINITY,
+                false
+        }, ContextCompat.getColor(getContext(), R.color.purple_dark), getContext()));
 
         //Statistics
         if (getTask().getEndValue() == FindPrimesTask.INFINITY) statisticsLayout.hide("eta");
@@ -251,11 +262,15 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         super.onPostStopped();
 
         //Subtitle
-        subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getResources().getQuantityString(R.plurals.find_primes_subtitle_result, getTask().getPrimeCount()), new String[]{
+        subtitleTextView.setText(Utils.formatSpannable(subtitleStringBuilder, getResources().getQuantityString(R.plurals.find_primes_subtitle_result, getTask().getPrimeCount()), new String[]{
                 NUMBER_FORMAT.format(getTask().getPrimeCount()),
                 NUMBER_FORMAT.format(getTask().getStartValue()),
                 getTask().getEndValue() == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),
-        }, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+        }, new boolean[]{
+                true,
+                true,
+                getTask().getEndValue() != FindPrimesTask.INFINITY
+        }, ContextCompat.getColor(getActivity(), R.color.purple_dark), getContext()));
 
         //Body
         bodyTextView.setVisibility(View.GONE);
@@ -302,17 +317,13 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                             break;
 
                         case "searching":
-                            spannableStringBuilder.clear();
-                            spannableStringBuilder.clearSpans();
-                            spannableStringBuilder.append("Marking factors of ");
-                            spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getCurrentFactor()), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.purple_dark)), 0);
-                            spannableStringBuilder.append("...");
-                            bodyTextView.setText(spannableStringBuilder);
+                            text = getString(R.string.find_primes_body_text_sieve_marking);
+                            content[0] = NUMBER_FORMAT.format(getTask().getCurrentFactor());
                             break;
                     }
                     break;
             }
-            if (text != null) bodyTextView.setText(Utils.formatSpannable(spannableStringBuilder, text, content, ContextCompat.getColor(getContext(), R.color.purple_dark)));
+            bodyTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, text, content, ContextCompat.getColor(getContext(), R.color.purple_dark)));
 
             //Time remaining
             if (statisticsLayout.isVisible("eta")) {

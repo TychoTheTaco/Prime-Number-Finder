@@ -20,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
@@ -52,6 +53,8 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
 
     private TreeView treeView;
 
+    private final SpannableStringBuilder subtitleStringBuilder = new SpannableStringBuilder();
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -65,6 +68,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         initStandardViews(rootView);
 
         subtitle = rootView.findViewById(R.id.subtitle);
+        subtitle.setMovementMethod(LongClickLinkMovementMethod.getInstance());
         bodyTextView = rootView.findViewById(R.id.prime_factorization);
         treeView = rootView.findViewById(R.id.factor_tree);
 
@@ -103,10 +107,13 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         super.postDefaults();
 
         //Subtitle
-        subtitle.setText(Utils.formatSpannable(spannableStringBuilder,
+        //TODO: Why dark is not applied??
+        subtitle.setText(Utils.formatSpannable(subtitleStringBuilder,
                 getString(R.string.prime_factorization_subtitle),
                 new String[]{NUMBER_FORMAT.format(getTask().getNumber())},
-                ContextCompat.getColor(getContext(), R.color.green_dark)
+                new boolean[]{true},
+                ContextCompat.getColor(getContext(), R.color.green_dark),
+                getContext()
         ));
 
         //Statistics
@@ -118,10 +125,12 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         super.onPostStopped();
 
         //Subtitle
-        subtitle.setText(Utils.formatSpannable(spannableStringBuilder,
+        subtitle.setText(Utils.formatSpannable(subtitleStringBuilder,
                 getResources().getQuantityString(R.plurals.prime_factorization_subtitle_results, getTask().getPrimeFactors().size()),
                 new String[]{NUMBER_FORMAT.format(getTask().getNumber()), NUMBER_FORMAT.format(getTask().getPrimeFactors().size())},
-                ContextCompat.getColor(getActivity(), R.color.green_dark)
+                new boolean[]{true, true},
+                ContextCompat.getColor(getActivity(), R.color.green_dark),
+                getContext()
         ));
 
         //Body

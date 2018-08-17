@@ -22,7 +22,6 @@ import easytasks.Task;
 /**
  * Created by tycho on 11/16/2017.
  */
-
 public class CheckPrimalityResultsFragment extends ResultsFragment {
 
     /**

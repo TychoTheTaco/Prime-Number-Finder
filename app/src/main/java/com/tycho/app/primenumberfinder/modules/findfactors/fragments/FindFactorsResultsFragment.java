@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
@@ -56,6 +57,7 @@ public class FindFactorsResultsFragment extends ResultsFragment {
 
     private int lastAdapterSize = 0;
 
+    private final SpannableStringBuilder subtitleStringBuilder = new SpannableStringBuilder();
     private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
     /**
@@ -95,6 +97,7 @@ public class FindFactorsResultsFragment extends ResultsFragment {
         recyclerView.setItemAnimator(null);
 
         subtitleTextView = rootView.findViewById(R.id.subtitle);
+        subtitleTextView.setMovementMethod(LongClickLinkMovementMethod.getInstance());
         bodyTextView = rootView.findViewById(R.id.text);
 
         //Statistics
@@ -159,7 +162,7 @@ public class FindFactorsResultsFragment extends ResultsFragment {
         super.postDefaults();
 
         //Subtitle
-        subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+        subtitleTextView.setText(Utils.formatSpannable(subtitleStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, new boolean[]{true}, ContextCompat.getColor(getActivity(), R.color.orange_dark), getContext()));
 
         //Statistics
         statisticsLayout.set("nps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
@@ -170,13 +173,13 @@ public class FindFactorsResultsFragment extends ResultsFragment {
         super.onPostStopped();
 
         //Subtitle
-        Utils.formatSpannable(spannableStringBuilder, getResources().getQuantityString(R.plurals.find_factors_subtitle_results, getTask().getFactors().size()), new String[]{NUMBER_FORMAT.format(getTask().getNumber()), NUMBER_FORMAT.format(getTask().getFactors().size())}, ContextCompat.getColor(getActivity(), R.color.orange_dark));
+        Utils.formatSpannable(subtitleStringBuilder, getResources().getQuantityString(R.plurals.find_factors_subtitle_results, getTask().getFactors().size()), new String[]{NUMBER_FORMAT.format(getTask().getNumber()), NUMBER_FORMAT.format(getTask().getFactors().size())}, new boolean[]{true, true}, ContextCompat.getColor(getActivity(), R.color.orange_dark), getContext());
         if (getTask().getFactors().size() != 2) {
-            subtitleTextView.setText(spannableStringBuilder);
+            subtitleTextView.setText(subtitleStringBuilder);
         } else {
             final SpannableStringBuilder ssb = new SpannableStringBuilder();
             Utils.formatSpannable(ssb, getResources().getString(R.string.find_factors_subtitle_results_extension), new String[]{"prime"}, ContextCompat.getColor(getActivity(), R.color.orange_dark));
-            subtitleTextView.setText(TextUtils.concat(spannableStringBuilder, " ", ssb));
+            subtitleTextView.setText(TextUtils.concat(subtitleStringBuilder, " ", ssb));
         }
 
         //Body

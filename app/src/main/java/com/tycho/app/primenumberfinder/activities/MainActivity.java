@@ -136,9 +136,19 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
             return true;
         });
 
-        //Set up drawer icon animation
-        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_drawer, R.string.close_drawer);
+        /*
+        Set up the drawer icon animation. Note that this prevents onOptionsItemSelected() from
+        being called for R.id.home. Instead, we can listen for drawer open/close events using a
+        DrawerListener.
+         */
+        final ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_drawer, R.string.close_drawer);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        drawerLayout.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                hideKeyboard(MainActivity.this);
+            }
+        });
         actionBarDrawerToggle.syncState();
 
         //Set up floating action button
@@ -194,25 +204,6 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-
-            //Menu button
-            case android.R.id.home:
-                hideKeyboard(this);
-
-                //Show or hide the drawer
-                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    drawerLayout.closeDrawer(GravityCompat.START);
-                } else {
-                    drawerLayout.openDrawer(GravityCompat.START);
-                }
-                break;
-        }
         return true;
     }
 

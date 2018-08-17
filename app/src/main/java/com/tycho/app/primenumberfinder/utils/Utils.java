@@ -409,25 +409,30 @@ public final class Utils {
     }
 
     public static void applyCopySpan(final SpannableStringBuilder spannableStringBuilder, final int start, final int end, final Context context){
+        final String text = spannableStringBuilder.toString();
         spannableStringBuilder.setSpan(new LongClickableSpan(){
             @Override
             public void onLongClick(View view){
-                final ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
-                final char[] chars = new char[end - start];
-                spannableStringBuilder.getChars(start, end, chars, 0);
-                final String text = new String(chars);
-                final ClipData clip = ClipData.newPlainText(text, text);
-                clipboard.setPrimaryClip(clip);
-                Toast.makeText(context, "Text Copied!", Toast.LENGTH_SHORT).show();
+                if (text.equals(spannableStringBuilder.toString())){
+                    final ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                    final char[] chars = new char[end - start];
+                    spannableStringBuilder.getChars(start, end, chars, 0);
+                    final String text = new String(chars);
+                    final ClipData clip = ClipData.newPlainText(text, text);
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(context, "Text Copied!", Toast.LENGTH_SHORT).show();
 
-                //Apply highlight span
-                final ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.RED);
-                spannableStringBuilder.setSpan(foregroundColorSpan, start, end, 0);
-                ((TextView) view).setText(spannableStringBuilder);
-                view.postDelayed(() -> {
-                    spannableStringBuilder.removeSpan(foregroundColorSpan);
+                    //Apply highlight span
+                    final ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.RED);
+                    spannableStringBuilder.setSpan(foregroundColorSpan, start, end, 0);
                     ((TextView) view).setText(spannableStringBuilder);
-                }, 150);
+                    view.postDelayed(() -> {
+                        spannableStringBuilder.removeSpan(foregroundColorSpan);
+                        ((TextView) view).setText(spannableStringBuilder);
+                    }, 150);
+                }else{
+                    Log.w(TAG, "Cannot copy text: String changed! " + text + " vs " + spannableStringBuilder.toString());
+                }
             }
 
             @Override

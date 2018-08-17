@@ -33,12 +33,12 @@
     <color name="green">#4CAF50</color> <!-- 500 -->
     <color name="green_dark">#2E7D32</color> <!-- 800 -->
 
-    <!-- Least Common Multiple (Yellow) -->
-    <color name="yellow_very_light">#FFFDE7</color> <!-- 50 -->
-    <color name="yellow_light">#FFF176</color> <!-- 300 -->
-    <color name="yellow">#FFEB3B</color> <!-- 500 -->
-    <color name="yellow_dark">#F9A825</color> <!-- 800 -->
-    <color name="yellow_inverse">#BAD85F</color>
+    <!-- Least Common Multiple (Amber) -->
+    <color name="yellow_very_light">#FFF8E1</color> <!-- 50 -->
+    <color name="yellow_light">#FFD54F</color> <!-- 300 -->
+    <color name="yellow">#FFC107</color> <!-- 500 -->
+    <color name="yellow_dark">#FF8F00</color> <!-- 800 -->
+    <color name="yellow_inverse">#0070FF</color>
 
     <!-- Greatest Common Factor (Light Blue) -->
     <color name="blue_very_light">#E1F5FE</color> <!-- 50 -->

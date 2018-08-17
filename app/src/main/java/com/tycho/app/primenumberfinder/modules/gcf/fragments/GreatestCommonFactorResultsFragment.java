@@ -41,6 +41,7 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
     //Statistics
     private StatisticsLayout statisticsLayout;
 
+    private final SpannableStringBuilder subtitleStringBuilder = new SpannableStringBuilder();
     private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
     @Nullable
