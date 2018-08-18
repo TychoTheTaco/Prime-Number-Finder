@@ -162,7 +162,7 @@ public class FindFactorsResultsFragment extends ResultsFragment {
         super.postDefaults();
 
         //Subtitle
-        subtitleTextView.setText(Utils.formatSpannable(subtitleStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, new boolean[]{true}, ContextCompat.getColor(getActivity(), R.color.orange_dark), getContext()));
+        subtitleTextView.setText(Utils.formatSpannable(subtitleStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, new boolean[]{true}, ContextCompat.getColor(getActivity(), R.color.blue), getContext()));
 
         //Statistics
         statisticsLayout.set("nps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));

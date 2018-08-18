@@ -221,6 +221,8 @@ public final class Utils {
     }
 
     public static SpannableStringBuilder formatSpannable(final SpannableStringBuilder spannableStringBuilder, final String raw, final String[] content, final boolean[] applyCopySpan, final int color, final Context context) {
+        spannableStringBuilder.clear();
+        spannableStringBuilder.clearSpans();
         final int[] spanPositions = getSpanPositions(spannableStringBuilder, raw, content);
         for (int i = 0; i < spanPositions.length; i += 2) {
             final int start = spanPositions[i];

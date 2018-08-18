@@ -147,7 +147,7 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
         spannableStringBuilder.append(getString(R.string.gcf_result_long).split("%\\d+\\$s")[1]);
         final int position = spannableStringBuilder.length();
         spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getGcf()),  new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_dark)), 0);
-        spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         Utils.applyCopySpan(spannableStringBuilder, position, spannableStringBuilder.length(), getContext());
         return spannableStringBuilder.append('.');
     }
