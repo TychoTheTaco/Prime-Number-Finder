@@ -413,6 +413,10 @@ public final class Utils {
         spannableStringBuilder.setSpan(new LongClickableSpan() {
             @Override
             public void onLongClick(View view) {
+                //Make sure setting is enabled
+                if (!PreferenceManager.getBoolean(PreferenceManager.Preference.QUICK_COPY)) {
+                    return;
+                }
                 if (!original.equals(spannableStringBuilder.toString())) {
                     Log.w(TAG, "SpannableStringBuilder was modified since last touch!\nOriginal: " + original + "\nUpdated: " + spannableStringBuilder.toString());
                 }
@@ -420,7 +424,10 @@ public final class Utils {
                 final ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
                 final char[] chars = new char[end - start];
                 spannableStringBuilder.getChars(start, end, chars, 0);
-                final String text = new String(chars);
+                String text = new String(chars);
+                if (!PreferenceManager.getBoolean(PreferenceManager.Preference.QUICK_COPY_KEEP_FORMATTING)) {
+                    text = textToNumber(text).toString();
+                }
                 final ClipData clip = ClipData.newPlainText(text, text);
                 clipboard.setPrimaryClip(clip);
                 Toast.makeText(context, "Text Copied!", Toast.LENGTH_SHORT).show();

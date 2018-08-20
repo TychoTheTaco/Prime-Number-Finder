@@ -134,3 +134,4 @@
 - Added least common multiple finder
 - Added greatest common factor finder
 - UI improvements
+- Add Quick Copy feature

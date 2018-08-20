@@ -2,6 +2,7 @@ package com.tycho.app.primenumberfinder.settings;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v14.preference.SwitchPreference;
 import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
@@ -41,6 +42,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             case "allowAnalytics":
                 PreferenceManager.set(PreferenceManager.Preference.ALLOW_ANALYTICS, ((CheckBoxPreference) preference).isChecked());
                 Toast.makeText(getActivity(), "You must restart the app for changes to take effect.", Toast.LENGTH_LONG).show();
+                break;
+
+            case "quickCopy":
+                PreferenceManager.set(PreferenceManager.Preference.QUICK_COPY, ((SwitchPreference) preference).isChecked());
+                break;
+
+            case "quickCopyKeepFormatting":
+                PreferenceManager.set(PreferenceManager.Preference.QUICK_COPY_KEEP_FORMATTING, ((CheckBoxPreference) preference).isChecked());
                 break;
         }
     }
