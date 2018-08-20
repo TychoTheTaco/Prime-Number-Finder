@@ -7,7 +7,7 @@
 
     <android.support.design.widget.CollapsingToolbarLayout
         android:id="@+id/collapsing_toolbar"
-        app:contentScrim="?attr/colorPrimary"
+        app:contentScrim="?android:attr/colorPrimary"
         app:layout_scrollFlags="scroll|exitUntilCollapsed|snap|enterAlways"
         app:titleEnabled="false"
         android:layout_width="match_parent"
@@ -18,9 +18,9 @@
             android:id="@+id/toolbar"
             app:layout_collapseMode="pin"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:popupTheme="@style/Default.PopupOverlay"
-            android:theme="@style/Default.Toolbar" />
+            android:layout_height="?android:attr/actionBarSize"
+            app:popupTheme="@style/Light.PopupOverlay"
+            android:theme="@style/Light.Toolbar" />
 
         <RelativeLayout
             android:id="@+id/expanded_layout"
@@ -30,7 +30,6 @@
 
             <TextView
                 android:id="@+id/subtitle"
-                style="@style/DefaultText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
@@ -41,7 +40,6 @@
 
             <TextView
                 android:id="@+id/right_message"
-                style="@style/DefaultText"
                 android:textSize="12sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

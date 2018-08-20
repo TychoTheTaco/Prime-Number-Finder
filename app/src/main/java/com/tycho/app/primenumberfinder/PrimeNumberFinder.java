@@ -2,8 +2,9 @@ package com.tycho.app.primenumberfinder;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -55,6 +56,12 @@ public class PrimeNumberFinder extends Application {
             Log.e(TAG, "Error getting version name!");
             return "unknown";
         }
+    }
+
+    public static void reloadTheme(final ContextWrapper contextWrapper){
+        final Intent intent = contextWrapper.getBaseContext().getPackageManager().getLaunchIntentForPackage(contextWrapper.getBaseContext().getPackageName());
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        contextWrapper.startActivity(intent);
     }
 
     public static TaskManager getTaskManager(){

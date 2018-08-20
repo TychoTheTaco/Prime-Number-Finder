@@ -16,7 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.tycho.app.primenumberfinder.AbstractActivity;
+import com.tycho.app.primenumberfinder.activities.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesListAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SelectableAdapter;
@@ -62,7 +62,7 @@ public class SavedFilesListActivity extends AbstractActivity {
         fileType = FileManager.getFileType(directory);
         switch (fileType) {
             case PRIMES:
-                setTheme(R.style.FindPrimes_Activity);
+                setTheme(R.style.FindPrimes);
                 break;
 
             case FACTORS:

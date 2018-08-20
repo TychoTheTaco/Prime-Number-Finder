@@ -8,6 +8,7 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.widget.Toast;
 
+import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 
@@ -50,6 +51,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
             case "quickCopyKeepFormatting":
                 PreferenceManager.set(PreferenceManager.Preference.QUICK_COPY_KEEP_FORMATTING, ((CheckBoxPreference) preference).isChecked());
+                break;
+
+            case "theme":
+                PreferenceManager.set(PreferenceManager.Preference.THEME, ((CheckBoxPreference) preference).isChecked() ? 1 : 0);
+                //TODO: Don't do this immediately
+                PrimeNumberFinder.reloadTheme(getActivity());
                 break;
         }
     }

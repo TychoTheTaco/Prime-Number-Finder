@@ -29,14 +29,12 @@
 
         <TextView
             android:id="@+id/subtitle"
-            style="@style/DefaultText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp" />
 
         <TextView
             android:id="@+id/prime_factorization"
-            style="@style/DefaultText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp" />

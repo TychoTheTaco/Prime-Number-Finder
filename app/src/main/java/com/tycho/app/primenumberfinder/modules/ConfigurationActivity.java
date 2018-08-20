@@ -3,7 +3,7 @@ package com.tycho.app.primenumberfinder.modules;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.tycho.app.primenumberfinder.AbstractActivity;
+import com.tycho.app.primenumberfinder.activities.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
 
 import easytasks.Task;

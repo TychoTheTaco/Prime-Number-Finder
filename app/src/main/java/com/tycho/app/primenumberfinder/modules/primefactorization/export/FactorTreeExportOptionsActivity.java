@@ -22,7 +22,7 @@ import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.jaredrummler.android.colorpicker.ColorPickerDialog;
-import com.tycho.app.primenumberfinder.AbstractActivity;
+import com.tycho.app.primenumberfinder.activities.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.savedfiles.ColorPickerListener;
 import com.tycho.app.primenumberfinder.ui.TreeView;

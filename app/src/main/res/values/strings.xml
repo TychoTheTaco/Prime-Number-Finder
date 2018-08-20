@@ -17,6 +17,9 @@
     <string name="quick_copy_description">Hold bolded numbers to copy them to the clipboard.</string>
     <string name="quick_copy_keep_formatting_title">Copy Number Formatting</string>
     <string name="quick_copy_keep_formatting_description">Keep the number formatting when copying numbers.</string>
+    <string name="theme">Theme</string>
+    <string name="dark_theme_title">Dark Theme</string>
+    <string name="dark_theme_description">Use the dark theme.</string>
 
     <!-- Action bar items -->
     <string name="action_bar_item_title_delete">Delete</string>

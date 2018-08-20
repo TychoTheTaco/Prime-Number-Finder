@@ -257,9 +257,9 @@ public final class Utils {
         return spanPositions;
     }
 
-    public static void applyTheme(final AppCompatActivity appCompatActivity, final int statusBarColor, final int actionBarColor) {
-        appCompatActivity.getWindow().setStatusBarColor(statusBarColor);
-        appCompatActivity.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(actionBarColor));
+    public static void applyTheme(final AppCompatActivity activity, final int statusBarColor, final int actionBarColor) {
+        activity.getWindow().setStatusBarColor(statusBarColor);
+        activity.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(actionBarColor));
     }
 
     public static BigInteger textToNumber(String text) {
@@ -299,6 +299,14 @@ public final class Utils {
     public static int getAccentColor(final Context context) {
         final TypedValue typedValue = new TypedValue();
         final TypedArray a = context.obtainStyledAttributes(typedValue.data, new int[]{android.R.attr.colorAccent});
+        final int color = a.getColor(0, 0);
+        a.recycle();
+        return color;
+    }
+
+    public static int getColor(final int attr, final Context context) {
+        final TypedValue typedValue = new TypedValue();
+        final TypedArray a = context.obtainStyledAttributes(typedValue.data, new int[]{attr});
         final int color = a.getColor(0, 0);
         a.recycle();
         return color;

@@ -17,4 +17,9 @@
     <declare-styleable name="FormattedEditText">
         <attr name="allowZeroInput" format="boolean"/>
     </declare-styleable>
+
+    <attr name="moduleColorPrimary" format="reference"/>
+    <attr name="moduleColorPrimaryDark" format="reference"/>
+    <attr name="moduleColorAccent" format="reference"/>
+
 </resources>

@@ -10,7 +10,6 @@
     <!-- Number input -->
     <TextView
         android:id="@+id/number_input_label"
-        style="@style/DefaultText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"

@@ -70,7 +70,8 @@ public class PreferenceManager {
         FILE_VERSION("fileVersion", 0),
         ALLOW_ANALYTICS("allowAnalytics", true),
         QUICK_COPY("quickCopy", true),
-        QUICK_COPY_KEEP_FORMATTING("quickCopyKeepFormatting", false);
+        QUICK_COPY_KEEP_FORMATTING("quickCopyKeepFormatting", false),
+        THEME("theme", 1);
 
         private final String key;
 

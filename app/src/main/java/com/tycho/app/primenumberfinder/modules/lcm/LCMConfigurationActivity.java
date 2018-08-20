@@ -12,7 +12,7 @@ import android.view.MenuItem;
 import android.widget.CheckBox;
 import android.widget.Toast;
 
-import com.tycho.app.primenumberfinder.AbstractActivity;
+import com.tycho.app.primenumberfinder.activities.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.lcm.adapters.NumbersListAdapter;
 import com.tycho.app.primenumberfinder.utils.Validator;
