@@ -54,6 +54,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     private TreeView treeView;
 
     private final SpannableStringBuilder subtitleStringBuilder = new SpannableStringBuilder();
+    private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
     @Override
     public void onAttach(Context context) {
@@ -70,6 +71,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         subtitle = rootView.findViewById(R.id.subtitle);
         subtitle.setMovementMethod(LongClickLinkMovementMethod.getInstance());
         bodyTextView = rootView.findViewById(R.id.prime_factorization);
+        bodyTextView.setMovementMethod(LongClickLinkMovementMethod.getInstance());
         treeView = rootView.findViewById(R.id.factor_tree);
 
         //Statistics
@@ -107,7 +109,6 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         super.postDefaults();
 
         //Subtitle
-        //TODO: Why dark is not applied??
         subtitle.setText(Utils.formatSpannable(subtitleStringBuilder,
                 getString(R.string.prime_factorization_subtitle),
                 new String[]{NUMBER_FORMAT.format(getTask().getNumber())},
@@ -139,6 +140,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumber()));
         spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.green_dark)), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        Utils.applyCopySpan(spannableStringBuilder, 0, spannableStringBuilder.length(), getContext());
         int position = spannableStringBuilder.length();
         spannableStringBuilder.append(" = ");
         spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
@@ -149,6 +151,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
             spannableStringBuilder.append(content);
             spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.green_dark)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
             spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            Utils.applyCopySpan(spannableStringBuilder, position, spannableStringBuilder.length(), getContext());
 
             position = spannableStringBuilder.length();
             content = NUMBER_FORMAT.format(map.get(factor));
@@ -177,8 +180,6 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         //Statistics
         statisticsLayout.setVisibility(View.GONE);
     }
-
-    private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
     @Override
     protected void onUiUpdate() {

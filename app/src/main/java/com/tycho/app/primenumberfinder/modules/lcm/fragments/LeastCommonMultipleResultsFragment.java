@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.StatisticsLayout;
@@ -40,6 +41,7 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
     //Statistics
     private StatisticsLayout statisticsLayout;
 
+    private final SpannableStringBuilder subtitleStringBuilder = new SpannableStringBuilder();
     private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
     @Nullable
@@ -50,6 +52,7 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
         initStandardViews(rootView);
 
         subtitleTextView = rootView.findViewById(R.id.subtitle);
+        subtitleTextView.setMovementMethod(LongClickLinkMovementMethod.getInstance());
         bodyTextView = rootView.findViewById(R.id.text);
 
         //Statistics
@@ -128,6 +131,7 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
             position = spannableStringBuilder.length();
             spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumbers().get(i)), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.yellow_dark)), 0);
             spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            Utils.applyCopySpan(spannableStringBuilder, position, spannableStringBuilder.length(), getContext());
             Utils.separateNumbers(spannableStringBuilder, getTask().getNumbers(), i, ",");
         }
         return spannableStringBuilder.append('.');
@@ -137,13 +141,16 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
         final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
         spannableStringBuilder.append(getString(R.string.lcm_result_long).split("%\\d+\\$s")[0]);
         for (int i = 0; i < getTask().getNumbers().size(); i++){
+            final int position = spannableStringBuilder.length();
             spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumbers().get(i)), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.yellow_dark)), 0);
+            Utils.applyCopySpan(spannableStringBuilder, position, spannableStringBuilder.length(), getContext());
             Utils.separateNumbers(spannableStringBuilder, getTask().getNumbers(), i, ",");
         }
         spannableStringBuilder.append(getString(R.string.lcm_result_long).split("%\\d+\\$s")[1]);
         final int position = spannableStringBuilder.length();
         spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getLcm()),  new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.yellow_dark)), 0);
         spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        Utils.applyCopySpan(spannableStringBuilder, position, spannableStringBuilder.length(), getContext());
         return spannableStringBuilder.append('.');
     }
 }

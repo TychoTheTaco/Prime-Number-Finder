@@ -41,6 +41,7 @@ public class LongClickLinkMovementMethod extends LinkMovementMethod {
             handler.postDelayed(() -> {
                 //Make sure that the touch was down for the entire delay duration
                 if (touchDown && (System.currentTimeMillis() - lastClickTime >= clickDelay)) {
+
                     //Get absolute position of the TextView
                     final int[] location = new int[2];
                     widget.getLocationOnScreen(location);

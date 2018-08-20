@@ -221,8 +221,6 @@ public final class Utils {
     }
 
     public static SpannableStringBuilder formatSpannable(final SpannableStringBuilder spannableStringBuilder, final String raw, final String[] content, final boolean[] applyCopySpan, final int color, final Context context) {
-        spannableStringBuilder.clear();
-        spannableStringBuilder.clearSpans();
         final int[] spanPositions = getSpanPositions(spannableStringBuilder, raw, content);
         for (int i = 0; i < spanPositions.length; i += 2) {
             final int start = spanPositions[i];
@@ -381,67 +379,67 @@ public final class Utils {
 
     public static ColorStateList generateColorStateList(final int[] states, final int[] colors) {
         final int[][] stateArray = new int[colors.length][];
-        for (int i = 0; i < stateArray.length; i++){
-            if (i < states.length){
+        for (int i = 0; i < stateArray.length; i++) {
+            if (i < states.length) {
                 stateArray[i] = new int[]{states[i]};
-            }else{
+            } else {
                 stateArray[i] = new int[]{};
             }
         }
         return new ColorStateList(stateArray, colors);
     }
 
-    public static String formatNumberList(final List<? extends Number> numbers, final NumberFormat numberFormat, final String separator){
+    public static String formatNumberList(final List<? extends Number> numbers, final NumberFormat numberFormat, final String separator) {
         final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-        for (int i = 0; i < numbers.size(); i++){
+        for (int i = 0; i < numbers.size(); i++) {
             spannableStringBuilder.append(numberFormat.format(numbers.get(i)));
             Utils.separateNumbers(spannableStringBuilder, numbers, i, ",");
         }
         return spannableStringBuilder.toString();
     }
 
-    public static void separateNumbers(final SpannableStringBuilder spannableStringBuilder, final List<? extends Number> numbers, final int index, final String separator){
-        if (index == numbers.size() - 2){
-            if (index > 1) spannableStringBuilder.append(separator);
+    public static void separateNumbers(final SpannableStringBuilder spannableStringBuilder, final List<? extends Number> numbers, final int index, final String separator) {
+        if (index == numbers.size() - 2) {
+            if (numbers.size() > 2) spannableStringBuilder.append(separator);
             spannableStringBuilder.append(" and ");
-        }else if (index != numbers.size() - 1){
+        } else if (index != numbers.size() - 1) {
             spannableStringBuilder.append(separator);
             spannableStringBuilder.append(' ');
         }
     }
 
-    public static void applyCopySpan(final SpannableStringBuilder spannableStringBuilder, final int start, final int end, final Context context){
-        final String text = spannableStringBuilder.toString();
-        spannableStringBuilder.setSpan(new LongClickableSpan(){
+    public static void applyCopySpan(final SpannableStringBuilder spannableStringBuilder, final int start, final int end, final Context context) {
+        final String original = spannableStringBuilder.toString();
+        spannableStringBuilder.setSpan(new LongClickableSpan() {
             @Override
-            public void onLongClick(View view){
-                if (text.equals(spannableStringBuilder.toString())){
-                    final ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
-                    final char[] chars = new char[end - start];
-                    spannableStringBuilder.getChars(start, end, chars, 0);
-                    final String text = new String(chars);
-                    final ClipData clip = ClipData.newPlainText(text, text);
-                    clipboard.setPrimaryClip(clip);
-                    Toast.makeText(context, "Text Copied!", Toast.LENGTH_SHORT).show();
-
-                    //Apply highlight span
-                    final ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.RED);
-                    spannableStringBuilder.setSpan(foregroundColorSpan, start, end, 0);
-                    ((TextView) view).setText(spannableStringBuilder);
-                    view.postDelayed(() -> {
-                        spannableStringBuilder.removeSpan(foregroundColorSpan);
-                        ((TextView) view).setText(spannableStringBuilder);
-                    }, 150);
-                }else{
-                    Log.w(TAG, "Cannot copy text: String changed! " + text + " vs " + spannableStringBuilder.toString());
+            public void onLongClick(View view) {
+                if (!original.equals(spannableStringBuilder.toString())) {
+                    Log.w(TAG, "SpannableStringBuilder was modified since last touch!\nOriginal: " + original + "\nUpdated: " + spannableStringBuilder.toString());
                 }
+
+                final ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                final char[] chars = new char[end - start];
+                spannableStringBuilder.getChars(start, end, chars, 0);
+                final String text = new String(chars);
+                final ClipData clip = ClipData.newPlainText(text, text);
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(context, "Text Copied!", Toast.LENGTH_SHORT).show();
+
+                //Apply highlight span
+                final ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.RED);
+                spannableStringBuilder.setSpan(foregroundColorSpan, start, end, 0);
+                ((TextView) view).setText(spannableStringBuilder);
+                view.postDelayed(() -> {
+                    spannableStringBuilder.removeSpan(foregroundColorSpan);
+                    ((TextView) view).setText(spannableStringBuilder);
+                }, 150);
             }
 
             @Override
-            public void updateDrawState(TextPaint ds){
+            public void updateDrawState(TextPaint ds) {
                 super.updateDrawState(ds);
                 ds.setUnderlineText(false);
             }
-        }, start, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        }, start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
     }
 }
