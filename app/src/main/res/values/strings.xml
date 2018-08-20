@@ -61,7 +61,7 @@
     <string name="find_primes_result">%1$s primes found.</string>
     <string name="check_primality_result">%1$s is %2$s.</string>
     <string name="check_primality_result_negative">%1$s is %2$s because it is divisible by %3$s.</string>
-    <string name="no_tasks_message">No tasks. Start one with the buttons above or the floating action button.</string>
+    <string name="no_tasks_message">No tasks to display. Start one with the buttons above or the floating action button.</string>
     <string name="no_task_selected_message">Select a task to view its status and results.</string>
     <string name="find_primes_task_list_item_title">Primes from %1$s to %2$s</string>
     <string name="check_primality_subtitle_searching">Checking primality of %1$s.</string>

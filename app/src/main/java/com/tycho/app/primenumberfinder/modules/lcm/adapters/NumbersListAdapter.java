@@ -110,10 +110,12 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
             });
 
             input.addOnTouchListener((v, event) -> {
+                v.performClick();
                 if (getAdapterPosition() == getItemCount() - 1){
                     numbers.add(BigInteger.ZERO);
                     notifyItemInserted(getItemCount());
                     notifyItemChanged(getItemCount() - 2);
+                    v.getParent().requestLayout();
                     input.requestFocus();
                 }
                 return false;
