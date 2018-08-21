@@ -12,6 +12,7 @@
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textColorPrimary">@color/primary_text</item>
+        <item name="android:textColorPrimaryDisableOnly">@color/item_disabled</item>
         <item name="android:textColor">@color/text_color</item>
         <!--<item name="android:navigationBarColor">#010101</item>-->
     </style>
@@ -33,12 +34,17 @@
         <item name="colorPrimaryDark">#161616</item>
         <item name="colorAccent">@color/accent</item>
         <item name="colorControlActivated">?android:attr/colorAccent</item>
+        <item name="colorControlHighlight">@color/black</item>
+
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColorPrimary">@color/primary_text_light</item>
+        <item name="android:textColorSecondary">@color/secondary_text_light</item>
+        <item name="android:textColorPrimaryDisableOnly">@color/item_disabled_dark</item>
+        <item name="android:textColor">@color/text_color</item>
+
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:textColorPrimary">@color/primary_text_light</item>
-        <item name="android:textColor">@color/text_color</item>
         <item name="android:navigationBarColor">#010101</item>
     </style>
     <style name="Dark.NoActionBar">
@@ -70,13 +76,10 @@
     </style>
 
     <!-- Find Factors themes-->
-    <style name="FindFactors" parent="Light.NoActionBar">
+    <style name="FindFactors">
         <item name="colorPrimary">@color/orange</item>
         <item name="colorPrimaryDark">@color/orange_dark</item>
         <item name="colorAccent">@color/orange</item>
-    </style>
-    <style name="FindFactors.Activity">
-        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
     </style>
     <style name="FindFactors.Dialog" parent="Light.Dialog">
         <item name="colorPrimary">@color/orange</item>
@@ -89,13 +92,10 @@
     </style>
 
     <!-- Prime Factorization themes-->
-    <style name="PrimeFactorization" parent="Light.NoActionBar">
+    <style name="PrimeFactorization">
         <item name="colorPrimary">@color/green</item>
         <item name="colorPrimaryDark">@color/green_dark</item>
         <item name="colorAccent">@color/green</item>
-    </style>
-    <style name="PrimeFactorization.Activity">
-        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
     </style>
     <style name="PrimeFactorization.Dialog" parent="Light.Dialog">
         <item name="colorPrimary">@color/green</item>
@@ -108,13 +108,10 @@
     </style>
 
     <!-- Least Common Multiple themes-->
-    <style name="LCM" parent="Light.NoActionBar">
+    <style name="LCM">
         <item name="colorPrimary">@color/yellow</item>
         <item name="colorPrimaryDark">@color/yellow_dark</item>
         <item name="colorAccent">@color/yellow</item>
-    </style>
-    <style name="LCM.Activity">
-        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
     </style>
     <style name="LCM.Dialog" parent="Light.Dialog">
         <item name="colorPrimary">@color/yellow</item>
@@ -127,13 +124,10 @@
     </style>
 
     <!-- Greatest Common Factor themes-->
-    <style name="GCF" parent="Light.NoActionBar">
+    <style name="GCF">
         <item name="colorPrimary">@color/lt_blue</item>
         <item name="colorPrimaryDark">@color/blue_light</item>
         <item name="colorAccent">@color/lt_blue</item>
-    </style>
-    <style name="GCF.Activity">
-        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
     </style>
     <style name="GCF.Dialog" parent="Light.Dialog">
         <item name="colorPrimary">@color/lt_blue</item>
@@ -159,7 +153,6 @@
         <item name="android:inputType">number</item>
         <item name="android:gravity">center_horizontal</item>
         <item name="android:hint">1,000,000</item>
-        <item name="android:textColor">@color/primary_text</item>
     </style>
 
     <style name="Button">

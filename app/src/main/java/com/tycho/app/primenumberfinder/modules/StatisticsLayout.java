@@ -10,8 +10,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -86,11 +86,11 @@ public class StatisticsLayout {
             textView = (TextView) rootView;
             textView.setCompoundDrawablesWithIntrinsicBounds(drawableRes, 0, 0, 0);
 
-            //Apply black tint to icons
+            //Apply tint to icons
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 for (Drawable drawable : textView.getCompoundDrawables()) {
                     if (drawable != null) {
-                        drawable.mutate().setTint(ContextCompat.getColor(context, R.color.black));
+                        drawable.mutate().setTint(ContextCompat.getColor(context, PreferenceManager.getInt(PreferenceManager.Preference.THEME) ==  0 ? R.color.black : R.color.white));
                     }
                 }
             }

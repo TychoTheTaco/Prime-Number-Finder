@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:id="@+id/root"
+    android:theme="@style/LCM"
     android:orientation="vertical">
 
     <include layout="@layout/app_bar" />

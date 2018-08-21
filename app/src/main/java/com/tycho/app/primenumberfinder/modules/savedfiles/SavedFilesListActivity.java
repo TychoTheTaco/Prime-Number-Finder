@@ -66,11 +66,11 @@ public class SavedFilesListActivity extends AbstractActivity {
                 break;
 
             case FACTORS:
-                setTheme(R.style.FindFactors_Activity);
+                setTheme(R.style.FindFactors);
                 break;
 
             case TREE:
-                setTheme(R.style.PrimeFactorization_Activity);
+                setTheme(R.style.PrimeFactorization);
                 break;
         }
 

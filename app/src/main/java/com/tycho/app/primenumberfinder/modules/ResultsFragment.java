@@ -19,6 +19,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.modules.findfactors.fragments.FindFactorsResultsFragment;
+import com.tycho.app.primenumberfinder.modules.findprimes.fragments.CheckPrimalityResultsFragment;
+import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesResultsFragment;
+import com.tycho.app.primenumberfinder.modules.gcf.fragments.GreatestCommonFactorResultsFragment;
+import com.tycho.app.primenumberfinder.modules.lcm.fragments.LeastCommonMultipleResultsFragment;
+import com.tycho.app.primenumberfinder.modules.primefactorization.fragments.PrimeFactorizationResultsFragment;
+import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.text.NumberFormat;
@@ -444,12 +451,7 @@ public abstract class ResultsFragment extends TaskFragment {
         protected void run() {
             while (true) {
 
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateUi();
-                    }
-                });
+                handler.post(() -> updateUi());
 
                 try {
                     Thread.sleep(1000 / 25);
@@ -555,5 +557,39 @@ public abstract class ResultsFragment extends TaskFragment {
                         disabledColor,
                         defaultColor
                 });
+    }
+
+    protected int getTextHighlight(){
+        switch (PreferenceManager.getInt(PreferenceManager.Preference.THEME)){
+            default:
+            case 0:
+                if (this instanceof FindPrimesResultsFragment || this instanceof CheckPrimalityResultsFragment){
+                    return ContextCompat.getColor(getContext(), R.color.purple_dark);
+                }else if (this instanceof FindFactorsResultsFragment){
+                    return ContextCompat.getColor(getContext(), R.color.orange_dark);
+                }else if (this instanceof PrimeFactorizationResultsFragment){
+                    return ContextCompat.getColor(getContext(), R.color.green_dark);
+                }else if (this instanceof LeastCommonMultipleResultsFragment){
+                    return ContextCompat.getColor(getContext(), R.color.yellow_dark);
+                }else if (this instanceof GreatestCommonFactorResultsFragment){
+                    return ContextCompat.getColor(getContext(), R.color.blue_dark);
+                }
+                break;
+
+            case 1:
+                if (this instanceof FindPrimesResultsFragment || this instanceof CheckPrimalityResultsFragment){
+                    return ContextCompat.getColor(getContext(), R.color.purple_light);
+                }else if (this instanceof FindFactorsResultsFragment){
+                    return ContextCompat.getColor(getContext(), R.color.orange_light);
+                }else if (this instanceof PrimeFactorizationResultsFragment){
+                    return ContextCompat.getColor(getContext(), R.color.green_light);
+                }else if (this instanceof LeastCommonMultipleResultsFragment){
+                    return ContextCompat.getColor(getContext(), R.color.yellow_light);
+                }else if (this instanceof GreatestCommonFactorResultsFragment){
+                    return ContextCompat.getColor(getContext(), R.color.blue_light);
+                }
+                break;
+        }
+        return 0;
     }
 }

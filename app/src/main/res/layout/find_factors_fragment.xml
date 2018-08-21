@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/FindFactors"
+    android:fitsSystemWindows="false"
     android:focusableInTouchMode="true"
-    android:fitsSystemWindows="false">
+    android:theme="@style/FindFactors">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,20 +26,20 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingEnd="8dp"
             android:clipChildren="false"
             android:clipToPadding="false"
+            android:orientation="horizontal"
+            android:paddingEnd="8dp"
             android:paddingStart="8dp">
 
             <com.tycho.app.primenumberfinder.ui.ValidEditText
                 android:id="@id/editText_input_number"
                 style="@style/NumberInput"
                 android:layout_width="0dp"
-                android:imeOptions="actionDone"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:imeOptions="actionDone" />
 
             <Button
                 android:id="@+id/button_find_factors"
@@ -51,7 +50,7 @@
 
         </LinearLayout>
 
-        <include layout="@layout/tab_layout"/>
+        <include layout="@layout/tab_layout" />
 
     </LinearLayout>
 

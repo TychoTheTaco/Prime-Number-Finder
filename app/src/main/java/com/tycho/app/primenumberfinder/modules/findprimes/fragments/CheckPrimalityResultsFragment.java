@@ -78,7 +78,7 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
             }, new boolean[]{
                     true,
                     false
-            }, ContextCompat.getColor(getContext(), R.color.purple_dark), getActivity()));
+            }, getTextHighlight(), getActivity()));
         }else{
             subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_result_negative), new String[]{
                     NUMBER_FORMAT.format(getTask().getNumber()),
@@ -88,7 +88,7 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
                     true,
                     false,
                     true
-            }, ContextCompat.getColor(getContext(), R.color.purple_dark), getActivity()));
+            }, getTextHighlight(), getActivity()));
         }
 
         //Statistics
@@ -103,7 +103,7 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
             progressBar.setProgress((int) (getTask().getProgress() * 100));
 
             //Time remaining
-            statisticsLayout.set("eta", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, ContextCompat.getColor(getActivity(), R.color.purple_dark)));
+            statisticsLayout.set("eta", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, getTextHighlight()));
         }
     }
 

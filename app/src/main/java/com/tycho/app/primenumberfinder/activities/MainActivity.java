@@ -78,7 +78,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
      */
     private final List<Module> modules = new ArrayList<>();
 
-    private final int defaultDrawerIconTint = Color.BLACK;
+    private final int defaultDrawerIconTint = PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 0 ? Color.BLACK : Color.WHITE;
 
     private class Module{
         private final int drawerId;
@@ -294,37 +294,37 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
 
             default:
                 navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.accent)));
-                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.accent_dark)));
+                navigationView.setItemTextColor(createColorStateList(Utils.getColor(android.R.attr.textColorPrimary, this), ContextCompat.getColor(this, R.color.accent_dark)));
                 Utils.applyTheme(this, Utils.getColor(android.R.attr.colorPrimaryDark, this), Utils.getColor(android.R.attr.colorPrimary, this));
                 break;
 
             case R.id.drawer_item_find_primes:
                 navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.purple)));
-                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.purple_dark)));
+                navigationView.setItemTextColor(createColorStateList(Utils.getColor(android.R.attr.textColorPrimary, this), ContextCompat.getColor(this, R.color.purple_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));
                 break;
 
             case R.id.drawer_item_find_factors:
                 navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.orange)));
-                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.orange_dark)));
+                navigationView.setItemTextColor(createColorStateList(Utils.getColor(android.R.attr.textColorPrimary, this), ContextCompat.getColor(this, R.color.orange_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.orange_dark), ContextCompat.getColor(this, R.color.orange));
                 break;
 
             case R.id.drawer_item_factor_tree:
                 navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.green)));
-                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.green_dark)));
+                navigationView.setItemTextColor(createColorStateList(Utils.getColor(android.R.attr.textColorPrimary, this), ContextCompat.getColor(this, R.color.green_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
                 break;
 
             case R.id.drawer_item_lcm:
                 navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.yellow)));
-                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.yellow_dark)));
+                navigationView.setItemTextColor(createColorStateList(Utils.getColor(android.R.attr.textColorPrimary, this), ContextCompat.getColor(this, R.color.yellow_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.yellow_dark), ContextCompat.getColor(this, R.color.yellow));
                 break;
 
             case R.id.drawer_item_gcf:
                 navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.lt_blue)));
-                navigationView.setItemTextColor(createColorStateList(ContextCompat.getColor(this, R.color.primary_text), ContextCompat.getColor(this, R.color.blue_dark)));
+                navigationView.setItemTextColor(createColorStateList(Utils.getColor(android.R.attr.textColorPrimary, this), ContextCompat.getColor(this, R.color.blue_dark)));
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.blue_dark), ContextCompat.getColor(this, R.color.lt_blue));
                 break;
         }

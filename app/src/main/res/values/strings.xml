@@ -50,6 +50,7 @@
     <string name="check_primality_button">Check primality</string>
     <string name="input_number_description">Enter a number to check if it is prime.</string>
     <string name="input_range_description">Or enter a range to search for primes.</string>
+    <string name="search_range_inclusive">Search Range (inclusive)</string>
     <string name="to">to</string>
     <string name="infinity_text">infinity</string>
     <string name="find_primes_button">Find primes</string>

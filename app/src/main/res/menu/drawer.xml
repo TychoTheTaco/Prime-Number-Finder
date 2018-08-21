@@ -8,35 +8,35 @@
         <item
             android:id="@+id/drawer_item_find_primes"
             android:icon="@drawable/circle_white"
-            android:iconTint="@color/black"
+            android:iconTint="@color/text_color"
             android:title="@string/title_find_primes"
             app:actionLayout="@layout/navigation_drawer_item" />
 
         <item
             android:id="@+id/drawer_item_find_factors"
             android:icon="@drawable/circle_white"
-            android:iconTint="@color/black"
+            android:iconTint="@color/text_color"
             android:title="@string/title_find_factors"
             app:actionLayout="@layout/navigation_drawer_item" />
 
         <item
             android:id="@+id/drawer_item_factor_tree"
-            android:icon="@drawable/circle_white"
-            android:iconTint="@color/black"
+            android:icon="@drawable/factor_tree"
+            android:iconTint="@color/text_color"
             android:title="@string/title_factor_tree"
             app:actionLayout="@layout/navigation_drawer_item" />
 
         <item
             android:id="@+id/drawer_item_lcm"
             android:icon="@drawable/circle_white"
-            android:iconTint="@color/black"
+            android:iconTint="@color/text_color"
             android:title="@string/title_lcm"
             app:actionLayout="@layout/navigation_drawer_item" />
 
         <item
             android:id="@+id/drawer_item_gcf"
             android:icon="@drawable/circle_white"
-            android:iconTint="@color/black"
+            android:iconTint="@color/text_color"
             android:title="@string/title_gcf"
             app:actionLayout="@layout/navigation_drawer_item" />
 
