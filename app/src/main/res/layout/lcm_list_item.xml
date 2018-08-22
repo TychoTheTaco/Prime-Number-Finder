@@ -15,7 +15,6 @@
         android:inputType="number"
         android:padding="8dp"
         android:imeOptions="actionDone"
-        android:textColor="@color/primary_text"
         android:textSize="14sp" />
 
 </LinearLayout>

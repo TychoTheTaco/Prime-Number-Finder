@@ -5,11 +5,11 @@
     <item>
         <selector>
             <item android:state_selected="true">
-                <color android:color="@color/selected_dark" />
+                <color android:color="@color/background_dark_5" />
             </item>
 
             <item>
-                <color android:color="@color/background_dark" />
+                <color android:color="@color/background_dark_2" />
             </item>
         </selector>
     </item>

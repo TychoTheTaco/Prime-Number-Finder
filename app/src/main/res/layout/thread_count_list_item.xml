@@ -4,7 +4,6 @@
     android:layout_height="match_parent">
 
     <TextView android:id="@+id/text"
-        android:textColor="@color/primary_text"
         android:textSize="14sp"
         android:padding="8dp"
         android:gravity="center_horizontal"

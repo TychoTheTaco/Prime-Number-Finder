@@ -17,6 +17,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/round_rectangle_white"
             android:elevation="1dp"
+            android:backgroundTint="?attr/colorBackgroundFloating"
             android:orientation="vertical">
 
             <TextView
@@ -26,7 +27,6 @@
                 android:paddingStart="16dp"
                 android:paddingTop="16dp"
                 android:text="@string/app_name"
-                android:textColor="@color/primary_text"
                 android:textSize="21sp" />
 
             <TextView
@@ -45,12 +45,11 @@
                 android:paddingEnd="16dp"
                 android:paddingStart="16dp"
                 android:text="@string/developed_by_description"
-                android:textColor="@color/primary_text"
                 android:textSize="14sp" />
 
             <Button
                 android:id="@+id/contact_developer_button"
-                style="?borderlessButtonStyle"
+                style="?android:borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
@@ -63,6 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:background="@drawable/round_rectangle_white"
+            android:backgroundTint="?attr/colorBackgroundFloating"
             android:elevation="1dp"
             android:orientation="vertical">
 
@@ -73,7 +73,6 @@
                 android:paddingStart="16dp"
                 android:paddingTop="16dp"
                 android:text="@string/changelog_title"
-                android:textColor="@color/primary_text"
                 android:textSize="18sp" />
 
             <TextView
@@ -92,7 +91,6 @@
                 android:layout_marginTop="8dp"
                 android:paddingEnd="16dp"
                 android:paddingStart="16dp"
-                android:textColor="@color/primary_text"
                 android:textSize="14sp" />
 
             <Button
@@ -109,6 +107,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:backgroundTint="?attr/colorBackgroundFloating"
             android:background="@drawable/round_rectangle_white"
             android:elevation="1dp"
             android:orientation="vertical">
@@ -120,7 +119,6 @@
                 android:paddingStart="16dp"
                 android:paddingTop="16dp"
                 android:text="@string/credits_title"
-                android:textColor="@color/primary_text"
                 android:textSize="18sp" />
 
             <TextView
@@ -130,7 +128,6 @@
                 android:layout_weight="1"
                 android:padding="16dp"
                 android:text="@string/credits_description"
-                android:textColor="@color/primary_text"
                 android:textSize="14sp" />
         </LinearLayout>
 

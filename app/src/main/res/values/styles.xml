@@ -7,13 +7,15 @@
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
         <item name="colorControlActivated">?android:attr/colorAccent</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+
         <item name="android:textSize">14sp</item>
         <item name="android:textColorPrimary">@color/primary_text</item>
         <item name="android:textColorPrimaryDisableOnly">@color/item_disabled</item>
         <item name="android:textColor">@color/text_color</item>
+
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
         <!--<item name="android:navigationBarColor">#010101</item>-->
     </style>
     <style name="Light.NoActionBar">
@@ -30,11 +32,12 @@
 
     <!-- Dark Theme -->
     <style name="Dark" parent="Theme.AppCompat">
-        <item name="colorPrimary">#1e1e1e</item>
-        <item name="colorPrimaryDark">#161616</item>
+        <item name="colorPrimary">#222222</item>
+        <item name="colorPrimaryDark">#0c0c0c</item>
         <item name="colorAccent">@color/accent</item>
         <item name="colorControlActivated">?android:attr/colorAccent</item>
-        <item name="colorControlHighlight">@color/black</item>
+        <item name="colorControlHighlight">@color/background_dark_5</item>
+        <item name="colorBackgroundFloating">@color/background_dark_3</item>
 
         <item name="android:textSize">14sp</item>
         <item name="android:textColorPrimary">@color/primary_text_light</item>
@@ -43,6 +46,7 @@
         <item name="android:textColor">@color/text_color</item>
 
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@color/background_dark_0</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
         <item name="android:navigationBarColor">#010101</item>

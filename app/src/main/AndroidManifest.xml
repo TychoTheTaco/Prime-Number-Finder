@@ -27,8 +27,7 @@
 
         <activity
             android:name=".modules.savedfiles.SavedFilesListActivity"
-            android:label="Saved Files"
-            android:theme="@style/Light.NoActionBar" />
+            android:label="Saved Files" />
 
         <activity
             android:name=".modules.findprimes.DisplayPrimesActivity"
@@ -66,8 +65,7 @@
 
         <activity
             android:name=".modules.about.ChangelogActivity"
-            android:label="Changelog"
-            android:theme="@style/Light.NoActionBar" />
+            android:label="Changelog" />
 
         <activity
             android:name=".modules.primefactorization.export.FactorTreeExportOptionsActivity"
