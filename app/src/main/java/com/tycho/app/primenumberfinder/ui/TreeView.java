@@ -93,6 +93,7 @@ public class TreeView extends View {
         final TypedArray typedArray = context.getTheme().obtainStyledAttributes(attributeSet, R.styleable.TreeView, 0, 0);
         try {
             touchEnabled = typedArray.getBoolean(R.styleable.TreeView_touchEnabled, true);
+            exportOptions.imageBackgroundColor = typedArray.getColor(R.styleable.TreeView_backgroundColor, Color.WHITE);
         }finally {
             typedArray.recycle();
         }

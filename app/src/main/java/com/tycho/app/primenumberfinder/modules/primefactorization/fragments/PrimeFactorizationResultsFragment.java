@@ -113,7 +113,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                 getString(R.string.prime_factorization_subtitle),
                 new String[]{NUMBER_FORMAT.format(getTask().getNumber())},
                 new boolean[]{true},
-                ContextCompat.getColor(getContext(), R.color.green_dark),
+                getTextHighlight(),
                 getContext()
         ));
 
@@ -130,7 +130,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                 getResources().getQuantityString(R.plurals.prime_factorization_subtitle_results, getTask().getPrimeFactors().size()),
                 new String[]{NUMBER_FORMAT.format(getTask().getNumber()), NUMBER_FORMAT.format(getTask().getPrimeFactors().size())},
                 new boolean[]{true, true},
-                ContextCompat.getColor(getActivity(), R.color.green_dark),
+                getTextHighlight(),
                 getContext()
         ));
 
@@ -138,7 +138,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         spannableStringBuilder.clear();
         spannableStringBuilder.clearSpans();
         spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumber()));
-        spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.green_dark)), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        spannableStringBuilder.setSpan(new ForegroundColorSpan(getTextHighlight()), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         Utils.applyCopySpan(spannableStringBuilder, 0, spannableStringBuilder.length(), getContext());
         int position = spannableStringBuilder.length();
@@ -149,7 +149,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
             position = spannableStringBuilder.length();
             String content = NUMBER_FORMAT.format(factor);
             spannableStringBuilder.append(content);
-            spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.green_dark)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            spannableStringBuilder.setSpan(new ForegroundColorSpan(getTextHighlight()), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
             spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
             Utils.applyCopySpan(spannableStringBuilder, position, spannableStringBuilder.length(), getContext());
 
@@ -189,7 +189,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
             progressBar.setProgress((int) (getTask().getProgress() * 100));
 
             //Time remaining
-            statisticsLayout.set("eta", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, ContextCompat.getColor(getActivity(), R.color.green_dark)));
+            statisticsLayout.set("eta", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, getTextHighlight()));
         }
     }
 

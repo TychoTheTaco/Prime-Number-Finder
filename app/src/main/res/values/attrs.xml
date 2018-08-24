@@ -8,6 +8,7 @@
 
     <declare-styleable name="TreeView">
         <attr name="touchEnabled" format="boolean"/>
+        <attr name="backgroundColor" format="color"/>
     </declare-styleable>
 
     <declare-styleable name="ValidState">

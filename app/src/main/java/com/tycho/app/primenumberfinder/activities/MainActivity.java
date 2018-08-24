@@ -116,6 +116,20 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         //Set up navigation drawer
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
+        switch (PreferenceManager.getInt(PreferenceManager.Preference.THEME)){
+            case 0:
+                //navigationView.setBackgroundColor();
+                break;
+
+            case 1:
+                navigationView.setBackgroundResource(R.color.background_dark_2);
+                break;
+        }
+        if (PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 0){
+
+        }else{
+
+        }
         ((TextView) navigationView.getHeaderView(0).findViewById(R.id.app_version)).setText(getString(R.string.app_version_name, PrimeNumberFinder.getVersionName(this)));
         for (int i = 0; i < navigationView.getMenu().size(); i++) {
             //Apply icon tint

@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 
 public class AboutPageFragment extends Fragment {
 
@@ -26,6 +27,12 @@ public class AboutPageFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.about_page_fragment, container, false);
+
+        if (PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 0){
+            rootView.setBackgroundResource(R.drawable.scroll_background);
+        }else{
+            rootView.setBackgroundResource(R.drawable.peak);
+        }
 
         //Set version
         ((TextView) rootView.findViewById(R.id.app_version)).setText(getString(R.string.app_version_name, PrimeNumberFinder.getVersionName(getActivity())));
