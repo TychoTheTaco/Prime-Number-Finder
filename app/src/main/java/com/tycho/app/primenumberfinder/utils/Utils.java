@@ -18,6 +18,7 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -27,7 +28,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tycho.app.primenumberfinder.LongClickableSpan;
 import com.tycho.app.primenumberfinder.R;
@@ -284,8 +284,6 @@ public final class Utils {
     }
 
     public static BigDecimal textToDecimal(String text, final char decimalSeparator) {
-        Crashlytics.log(Log.DEBUG, TAG, "Raw input: '" + text + "'");
-
         if (text.length() == 0) {
             return BigDecimal.ZERO;
         }
@@ -458,15 +456,15 @@ public final class Utils {
                 Log.w(TAG, "MW: " + popupWindow.getContentView().getMeasuredWidth() + " W: " + popupWindow.getContentView().getWidth() + " S: " + View.MeasureSpec.getSize(View.MeasureSpec.UNSPECIFIED));
 
                 //Apply highlight span
-                final ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.RED);
-                spannableStringBuilder.setSpan(foregroundColorSpan, start, end, 0);
+                final UnderlineSpan span = new UnderlineSpan();
+                spannableStringBuilder.setSpan(span, start, end, 0);
                 ((TextView) view).setText(spannableStringBuilder);
                 view.postDelayed(() -> {
-                    spannableStringBuilder.removeSpan(foregroundColorSpan);
+                    spannableStringBuilder.removeSpan(span);
                     ((TextView) view).setText(spannableStringBuilder);
                     Log.w(TAG, "2 MW: " + popupWindow.getContentView().getMeasuredWidth() + " W: " + popupWindow.getContentView().getWidth());
                     popupWindow.dismiss();
-                }, 700);
+                }, 600);
             }
 
             @Override

@@ -72,7 +72,6 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
         super.onCreate(savedInstanceState);
         setTheme(R.style.PrimeFactorization);
         setContentView(R.layout.factor_tree_export_options_activity);
-        Utils.applyTheme(this, ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
 
         //Get the intent
         final Intent intent = getIntent();
@@ -86,6 +85,7 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                 final Toolbar toolbar = findViewById(R.id.toolbar);
                 setSupportActionBar(toolbar);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                Utils.applyTheme(this, ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
 
                 final EditText fileNameInput = findViewById(R.id.file_name);
                 treeView = findViewById(R.id.factor_tree_preview);

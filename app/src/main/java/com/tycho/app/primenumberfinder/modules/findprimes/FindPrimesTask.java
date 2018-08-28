@@ -665,6 +665,10 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
 
             status = "counting";
 
+            final long start = System.currentTimeMillis();
+            Log.w(TAG, "Count: " + bitSet.cardinality());
+            Log.w(TAG, "Finished in " + (System.currentTimeMillis() - start));
+
             //Count primes
             for (counter = (startValue > 2 ? startValue : 2); counter <= endValue; counter++) {
                 if (bitSet.get((int) counter)) {
@@ -673,6 +677,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
                 }
                 tryPause();
             }
+
             status = String.valueOf(getState());
         }
 

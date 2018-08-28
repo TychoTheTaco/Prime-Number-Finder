@@ -145,7 +145,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         Utils.applyCopySpan(spannableStringBuilder, 0, spannableStringBuilder.length(), getContext());
         int position = spannableStringBuilder.length();
         spannableStringBuilder.append(" = ");
-        spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        spannableStringBuilder.setSpan(new ForegroundColorSpan(Utils.getColor(android.R.attr.textColorSecondary, getContext())), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         final Map map = getTask().getPrimeFactors();
         for (Object factor : map.keySet()){
             position = spannableStringBuilder.length();
@@ -164,7 +164,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
             position = spannableStringBuilder.length();
             content = " \u00D7 "; //Multiplication sign
             spannableStringBuilder.append(content);
-            spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getActivity(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            spannableStringBuilder.setSpan(new ForegroundColorSpan(Utils.getColor(android.R.attr.textColorSecondary, getContext())), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         }
         spannableStringBuilder.delete(spannableStringBuilder.length() - 3, spannableStringBuilder.length());
         bodyTextView.setVisibility(View.VISIBLE);
