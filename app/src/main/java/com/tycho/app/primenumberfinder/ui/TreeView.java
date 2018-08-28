@@ -158,6 +158,11 @@ public class TreeView extends View {
         return this.exportOptions;
     }
 
+    public void setExportOptions(ExportOptions exportOptions) {
+        this.exportOptions = exportOptions;
+        invalidate();
+    }
+
     private boolean threadStarted = false;
 
     private Tree<Item> itemTree;
@@ -210,7 +215,7 @@ public class TreeView extends View {
 
         //Draw view border
         paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(Color.BLACK);
+        paint.setColor(exportOptions.imageBorderColor);
         paint.setStrokeWidth(0);
         canvas.drawRect(0, 0, getWidth(), getHeight(), paint);
     }
@@ -637,6 +642,7 @@ public class TreeView extends View {
     public static class ExportOptions implements Cloneable {
 
         public int imageBackgroundColor;
+        public int imageBorderColor = Color.BLACK;
 
         public int itemTextSize;
         public int itemTextColor;

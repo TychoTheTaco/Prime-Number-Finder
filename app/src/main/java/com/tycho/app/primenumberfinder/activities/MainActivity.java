@@ -122,7 +122,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
                 break;
 
             case 1:
-                navigationView.setBackgroundResource(R.color.background_dark_2);
+                navigationView.setBackgroundResource(R.color.background_dark_3);
                 break;
         }
         if (PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 0){

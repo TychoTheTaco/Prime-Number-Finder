@@ -52,6 +52,7 @@ public class DisplayFactorsActivity extends DisplayContentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.FindFactors);
         setContentView(R.layout.display_factors_activity);
 
         //Set up the toolbar
@@ -59,6 +60,7 @@ public class DisplayFactorsActivity extends DisplayContentActivity {
         toolbar.setPopupTheme(R.style.FindFactors_PopupOverlay);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Utils.applyTheme(this, ContextCompat.getColor(this, R.color.orange_dark), ContextCompat.getColor(this, R.color.orange));
 
         progressDialog = ProgressDialog.show(this, "Loading...", "Loading file.");
 
@@ -181,7 +183,7 @@ public class DisplayFactorsActivity extends DisplayContentActivity {
                     headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.find_factors_subtitle_results, numbers.size()), new String[]{
                             NUMBER_FORMAT.format(numbers.get(numbers.size() - 1)),
                             NUMBER_FORMAT.format(numbers.size()),
-                    }, ContextCompat.getColor(getBaseContext(), R.color.orange_inverse)));
+                    }, ContextCompat.getColor(getBaseContext(), R.color.white)));
 
                     resizeCollapsingToolbar();
 

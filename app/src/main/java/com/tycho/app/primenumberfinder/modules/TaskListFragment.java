@@ -1,6 +1,5 @@
 package com.tycho.app.primenumberfinder.modules;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -9,21 +8,20 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.crashlytics.android.Crashlytics;
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Savable;
+import com.tycho.app.primenumberfinder.VerticalItemDecoration;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
-import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,6 +74,7 @@ public class TaskListFragment extends Fragment {
         recyclerView = rootView.findViewById(R.id.task_list);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.addItemDecoration(new VerticalItemDecoration((int) Utils.dpToPx(getContext(), 8)));
         recyclerView.setAdapter(taskListAdapter);
         recyclerView.setItemAnimator(null);
 

@@ -122,7 +122,7 @@ public class PrimeFactorizationFragment extends ModuleHostFragment {
                     spannableStringBuilder.append(context.getString(R.string.status_finished));
                     spannableStringBuilder.append(": ");
                     spannableStringBuilder.append(context.getString(R.string.prime_factorization_result, NUMBER_FORMAT.format((task.getPrimeFactors().size()))));
-                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accent_dark)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, getTheme() == 0 ? R.color.accent_dark : R.color.accent_light_but_not_that_light)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                     return spannableStringBuilder;
                 }
                 return super.getSubtitle(task);

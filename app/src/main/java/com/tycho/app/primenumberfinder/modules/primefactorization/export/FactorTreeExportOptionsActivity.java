@@ -69,6 +69,7 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.PrimeFactorization);
         setContentView(R.layout.factor_tree_export_options_activity);
 
         //Get the intent

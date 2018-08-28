@@ -49,7 +49,7 @@
 
     <!-- Text colors -->
     <color name="primary_text">#212121</color>
-    <color name="primary_text_light">#e6efef</color>
+    <color name="primary_text_light">#f9ffff</color>
     <color name="secondary_text">#727272</color>
     <color name="secondary_text_light">#9b9b9b</color>
 
@@ -60,11 +60,11 @@
     <color name="blue">#3D5AFE</color>
     <color name="black">#000000</color>
     <color name="background_dark_0">#000000</color>
-    <color name="background_dark_1">#111111</color>
-    <color name="background_dark_2">#1e1e1e</color>
-    <color name="background_dark_3">#2d2d2d</color>
-    <color name="background_dark_5">#3d3d3d</color>
-    <color name="selected_dark">#070707</color>
+    <color name="background_dark_1">#1e1e1e</color>
+    <color name="background_dark_2">#282828</color>
+    <color name="background_dark_3">#404040</color>
+    <color name="background_dark_4">#474747</color>
+    <color name="background_dark_5">#6d6d6d</color>
 
     <!-- Miscellaneous -->
     <color name="divider">#B6B6B6</color>

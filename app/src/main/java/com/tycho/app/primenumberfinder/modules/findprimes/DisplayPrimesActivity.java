@@ -346,7 +346,7 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
                                     NUMBER_FORMAT.format(totalNumbers),
                                     NUMBER_FORMAT.format(range[0]),
                                     range[1] == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(range[1]),
-                            }, ContextCompat.getColor(getBaseContext(), R.color.purple_inverse)));
+                            }, ContextCompat.getColor(getBaseContext(), R.color.white)));
 
                             resizeCollapsingToolbar();
 

@@ -1,6 +1,7 @@
 package com.tycho.app.primenumberfinder.modules.primefactorization.fragments;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -27,6 +28,7 @@ import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.StatisticsLayout;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.ui.TreeView;
+import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.util.Map;
@@ -171,6 +173,16 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         //Tree
         treeView.setVisibility(View.VISIBLE);
         treeView.setTree(getTask().getFactorTree().formatNumbers());
+        if (PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 1){
+            final TreeView.ExportOptions exportOptions = treeView.getDefaultExportOptions();
+            exportOptions.itemTextColor = Color.WHITE;
+            exportOptions.itemBorderColor = ContextCompat.getColor(getContext(), R.color.accent_light_but_not_that_light);
+            exportOptions.branchColor = Color.WHITE;
+            exportOptions.itemBackgroundColor = Color.BLACK;
+            exportOptions.imageBorderColor = Color.WHITE;
+            exportOptions.primeFactorTextColor = ContextCompat.getColor(getContext(), R.color.red);
+            treeView.setExportOptions(exportOptions);
+        }
 
         centerView.setVisibility(View.GONE);
         final RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) saveButton.getLayoutParams();

@@ -8,6 +8,8 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView_savedFiles"
         android:layout_width="match_parent"
+        android:padding="8dp"
+        android:clipToPadding="false"
         android:layout_height="match_parent"
         android:scrollbars="vertical" />
 

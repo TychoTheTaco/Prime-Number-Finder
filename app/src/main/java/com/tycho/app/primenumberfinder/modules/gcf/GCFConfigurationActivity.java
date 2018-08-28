@@ -3,6 +3,7 @@ package com.tycho.app.primenumberfinder.modules.gcf;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -12,9 +13,10 @@ import android.view.MenuItem;
 import android.widget.CheckBox;
 import android.widget.Toast;
 
-import com.tycho.app.primenumberfinder.activities.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.activities.AbstractActivity;
 import com.tycho.app.primenumberfinder.modules.lcm.adapters.NumbersListAdapter;
+import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
 import java.math.BigInteger;
@@ -45,6 +47,7 @@ public class GCFConfigurationActivity extends AbstractActivity {
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Utils.applyTheme(this, ContextCompat.getColor(this, R.color.blue_dark), ContextCompat.getColor(this, R.color.lt_blue));
 
         numbersListAdapter = new NumbersListAdapter();
         numbersListAdapter.getNumbers().add(BigInteger.ZERO);

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
@@ -39,14 +38,6 @@ import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Bu
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_GCF;
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
-/**
- * This {@linkplain Fragment} allows the user to input a number they want to factor. This fragment
- * will display the progress and statistics of the factorization, along with a list of factors that
- * are found.
- *
- * @author Tycho Bellers
- *         Date Created: 11/12/2016
- */
 public class GreatestCommonFactorFragment extends ModuleHostFragment{
 
     /**
@@ -143,7 +134,7 @@ public class GreatestCommonFactorFragment extends ModuleHostFragment{
                     spannableStringBuilder.append(context.getString(R.string.status_finished));
                     spannableStringBuilder.append(": ");
                     spannableStringBuilder.append(context.getString(R.string.gcf_result, NUMBER_FORMAT.format((task.getGcf()))));
-                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accent_dark)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, getTheme() == 0 ? R.color.accent_dark : R.color.accent_light_but_not_that_light)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                     return spannableStringBuilder;
                 }
                 return super.getSubtitle(task);

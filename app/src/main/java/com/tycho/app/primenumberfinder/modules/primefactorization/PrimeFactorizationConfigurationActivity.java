@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -19,9 +20,9 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.tycho.app.primenumberfinder.activities.AbstractActivity;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.activities.AbstractActivity;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
@@ -65,6 +66,7 @@ public class PrimeFactorizationConfigurationActivity extends AbstractActivity {
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Utils.applyTheme(this, ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
 
         //Set up number input
         editTextNumberToFactor = findViewById(R.id.number_input);

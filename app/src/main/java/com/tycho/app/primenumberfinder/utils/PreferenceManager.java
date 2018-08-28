@@ -19,10 +19,6 @@ public class PreferenceManager {
 
     private static SharedPreferences sharedPreferences;
 
-    private boolean allowBackgroundTasks;
-    private int fileVersion;
-    private boolean allowAnalytics;
-
     public static final int CURRENT_VERSION = 1;
 
     public static void initialize(final Context context) {
@@ -71,7 +67,7 @@ public class PreferenceManager {
         ALLOW_ANALYTICS("allowAnalytics", true),
         QUICK_COPY("quickCopy", true),
         QUICK_COPY_KEEP_FORMATTING("quickCopyKeepFormatting", false),
-        THEME("theme", 1);
+        THEME("theme", 0);
 
         private final String key;
 

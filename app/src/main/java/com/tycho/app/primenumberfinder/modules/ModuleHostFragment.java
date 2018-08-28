@@ -29,6 +29,7 @@ import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
+import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.text.NumberFormat;
@@ -254,5 +255,9 @@ public abstract class ModuleHostFragment extends Fragment implements FloatingAct
         Utils.logTaskStarted(getContext(), task);
 
         taskListFragment.setSelected(task);
+    }
+
+    protected int getTheme(){
+        return PreferenceManager.getInt(PreferenceManager.Preference.THEME);
     }
 }

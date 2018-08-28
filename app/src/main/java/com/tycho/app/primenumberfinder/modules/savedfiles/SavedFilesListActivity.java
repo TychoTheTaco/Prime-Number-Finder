@@ -140,6 +140,19 @@ public class SavedFilesListActivity extends AbstractActivity {
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        switch (fileType) {
+            case PRIMES:
+                Utils.applyTheme(this, ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));
+                break;
+
+            case FACTORS:
+                Utils.applyTheme(this, ContextCompat.getColor(this, R.color.orange_dark), ContextCompat.getColor(this, R.color.orange));
+                break;
+
+            case TREE:
+                Utils.applyTheme(this, ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
+                break;
+        }
 
         //Set up subtitle
         subTitleTextView = findViewById(R.id.subtitle);

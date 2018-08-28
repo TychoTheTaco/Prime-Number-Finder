@@ -18,16 +18,14 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
-import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.tycho.app.primenumberfinder.activities.AbstractActivity;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.activities.AbstractActivity;
 import com.tycho.app.primenumberfinder.ui.CustomRadioGroup;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.Utils;
@@ -160,32 +158,26 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
 
         //Set up infinity button
         infinityButton = findViewById(R.id.infinity_button);
-        infinityButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editTextSearchRangeEnd.setText(getString(R.string.infinity_text), false);
-                applyConfig(searchOptions);
-            }
+        infinityButton.setOnClickListener(v -> {
+            editTextSearchRangeEnd.setText(getString(R.string.infinity_text), false);
+            applyConfig(searchOptions);
         });
 
         //Set up search method
         radioGroupSearchMethod = findViewById(R.id.radio_group_search_method);
-        radioGroupSearchMethod.addOnCheckChangedListener(new CustomRadioGroup.OnCheckChangedListener() {
-            @Override
-            public void onChecked(RadioButton radioButton, boolean isChecked) {
-                switch (radioButton.getId()) {
+        radioGroupSearchMethod.addOnCheckChangedListener((radioButton, isChecked) -> {
+            switch (radioButton.getId()) {
 
-                    case R.id.brute_force:
-                        searchOptions.setSearchMethod(BRUTE_FORCE);
-                        break;
+                case R.id.brute_force:
+                    searchOptions.setSearchMethod(BRUTE_FORCE);
+                    break;
 
-                    case R.id.sieve_of_eratosthenes:
-                        searchOptions.setSearchMethod(SIEVE_OF_ERATOSTHENES);
-                        break;
+                case R.id.sieve_of_eratosthenes:
+                    searchOptions.setSearchMethod(SIEVE_OF_ERATOSTHENES);
+                    break;
 
-                }
-                applyConfig(searchOptions);
             }
+            applyConfig(searchOptions);
         });
 
         //Set up thread count
@@ -208,19 +200,9 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
         });
 
         notifyWhenFinishedCheckbox = findViewById(R.id.notify_when_finished);
-        notifyWhenFinishedCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                searchOptions.setNotifyWhenFinished(isChecked);
-            }
-        });
+        notifyWhenFinishedCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> searchOptions.setNotifyWhenFinished(isChecked));
         autoSaveCheckbox = findViewById(R.id.auto_save);
-        autoSaveCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                searchOptions.setAutoSave(isChecked);
-            }
-        });
+        autoSaveCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> searchOptions.setAutoSave(isChecked));
 
         //Get search options from intent
         if (getIntent().getExtras() != null) {
