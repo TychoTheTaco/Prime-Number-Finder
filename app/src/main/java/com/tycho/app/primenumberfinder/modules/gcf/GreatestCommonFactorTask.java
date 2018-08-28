@@ -1,7 +1,6 @@
 package com.tycho.app.primenumberfinder.modules.gcf;
 
 import android.os.Parcel;
-import android.util.Log;
 
 import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
@@ -52,11 +51,8 @@ public class GreatestCommonFactorTask extends Task implements SearchOptions {
             }
         }
 
-        Log.d(TAG, "Occurrences: " + occurrences);
-
         final List<Long> keys = new ArrayList<>(occurrences.keySet());
         Collections.reverse(keys);
-        Log.d(TAG, "Keys: " + keys);
         for (Long number : keys){
             if (occurrences.get(number) == numbers.size()){
                 gcf = number;

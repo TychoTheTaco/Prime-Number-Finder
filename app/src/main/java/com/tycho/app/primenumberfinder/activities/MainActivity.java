@@ -117,18 +117,9 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
         switch (PreferenceManager.getInt(PreferenceManager.Preference.THEME)){
-            case 0:
-                //navigationView.setBackgroundColor();
-                break;
-
             case 1:
                 navigationView.setBackgroundResource(R.color.background_dark_3);
                 break;
-        }
-        if (PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 0){
-
-        }else{
-
         }
         ((TextView) navigationView.getHeaderView(0).findViewById(R.id.app_version)).setText(getString(R.string.app_version_name, PrimeNumberFinder.getVersionName(this)));
         for (int i = 0; i < navigationView.getMenu().size(); i++) {
@@ -305,7 +296,6 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
 
         //Apply theme to activity based on current fragment
         switch (menuItem.getItemId()) {
-
             default:
                 navigationView.setItemIconTintList(createColorStateList(defaultDrawerIconTint, ContextCompat.getColor(this, R.color.accent)));
                 navigationView.setItemTextColor(createColorStateList(Utils.getColor(android.R.attr.textColorPrimary, this), ContextCompat.getColor(this, PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 0 ? R.color.accent_dark : R.color.accent_light)));

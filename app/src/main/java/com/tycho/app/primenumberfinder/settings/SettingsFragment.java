@@ -3,9 +3,12 @@ package com.tycho.app.primenumberfinder.settings;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v14.preference.SwitchPreference;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
@@ -17,6 +20,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.preferences, rootKey);
+
+        final CheckBoxPreference allowBackgroundTasksCheckBox = (CheckBoxPreference) findPreference("allowBackgroundThreads");
+        final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(getText(R.string.preference_summary_allow_background_threads));
+        spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.red)), spannableStringBuilder.toString().indexOf("Warning:"), spannableStringBuilder.toString().lastIndexOf("."), 0);
+        allowBackgroundTasksCheckBox.setSummary(spannableStringBuilder);
     }
 
     @Override

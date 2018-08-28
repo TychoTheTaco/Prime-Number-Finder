@@ -26,9 +26,11 @@ import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.modules.gcf.GreatestCommonFactorTask;
 import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
+import com.tycho.app.primenumberfinder.utils.NotificationManager;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
@@ -40,6 +42,7 @@ import easytasks.TaskAdapter;
 
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_FACTORS;
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_PRIMES;
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_GCF;
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_LCM;
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_PRIME_FACTORIZATION;
 
@@ -237,10 +240,13 @@ public abstract class ModuleHostFragment extends Fragment implements FloatingAct
                         }else if (task instanceof LeastCommonMultipleTask){
                             taskType = TASK_TYPE_LCM;
                             content = "Task \"LCM is " + NUMBER_FORMAT.format(((LeastCommonMultipleTask) task).getLcm()) + "\" finished.";
-                        }else{
+                        }else if (task instanceof GreatestCommonFactorTask){
+                            taskType = TASK_TYPE_GCF;
+                            content = "Task \"GCF is " + NUMBER_FORMAT.format(((GreatestCommonFactorTask) task).getGcf()) + "\" finished.";
+                        } else{
                             return;
                         }
-                        com.tycho.app.primenumberfinder.utils.NotificationManager.displayNotification(getActivity(), "default", task, taskType, content);
+                        NotificationManager.displayNotification(getActivity(), "default", task, taskType, content);
                     }
                 }
 
