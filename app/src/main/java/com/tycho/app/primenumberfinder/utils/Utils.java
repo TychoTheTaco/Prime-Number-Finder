@@ -9,6 +9,8 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableStringBuilder;
@@ -18,14 +20,17 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tycho.app.primenumberfinder.LongClickableSpan;
+import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
@@ -420,7 +425,7 @@ public final class Utils {
         final String original = spannableStringBuilder.toString();
         spannableStringBuilder.setSpan(new LongClickableSpan() {
             @Override
-            public void onLongClick(View view) {
+            public void onLongClick(View view, final int x, final int y) {
                 //Make sure setting is enabled
                 if (!PreferenceManager.getBoolean(PreferenceManager.Preference.QUICK_COPY)) {
                     return;
@@ -438,7 +443,19 @@ public final class Utils {
                 }
                 final ClipData clip = ClipData.newPlainText(text, text);
                 clipboard.setPrimaryClip(clip);
-                Toast.makeText(context, "Text Copied!", Toast.LENGTH_SHORT).show();
+
+                //Show popup
+                final PopupWindow popupWindow = new PopupWindow(LayoutInflater.from(context).inflate(R.layout.text_copied_popup, null, false), ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
+                    for (Drawable drawable : ((TextView) popupWindow.getContentView().findViewById(R.id.text)).getCompoundDrawables()){
+                        drawable.mutate().setTint(Color.WHITE);
+                    }
+                }
+                popupWindow.setBackgroundDrawable(null);
+                popupWindow.setElevation(Utils.dpToPx(context, 4));
+                popupWindow.getContentView().measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+                popupWindow.showAsDropDown(view, x, y);
+                Log.w(TAG, "MW: " + popupWindow.getContentView().getMeasuredWidth() + " W: " + popupWindow.getContentView().getWidth() + " S: " + View.MeasureSpec.getSize(View.MeasureSpec.UNSPECIFIED));
 
                 //Apply highlight span
                 final ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.RED);
@@ -447,7 +464,9 @@ public final class Utils {
                 view.postDelayed(() -> {
                     spannableStringBuilder.removeSpan(foregroundColorSpan);
                     ((TextView) view).setText(spannableStringBuilder);
-                }, 150);
+                    Log.w(TAG, "2 MW: " + popupWindow.getContentView().getMeasuredWidth() + " W: " + popupWindow.getContentView().getWidth());
+                    popupWindow.dismiss();
+                }, 700);
             }
 
             @Override

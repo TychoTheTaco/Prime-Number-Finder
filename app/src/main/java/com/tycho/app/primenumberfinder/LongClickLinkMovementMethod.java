@@ -57,7 +57,7 @@ public class LongClickLinkMovementMethod extends LinkMovementMethod {
 
                     final LongClickableSpan[] link = buffer.getSpans(horizontalOffset, horizontalOffset, LongClickableSpan.class);
                     if (link.length != 0) {
-                        link[0].onLongClick(widget);
+                        link[0].onLongClick(widget, x, y);
                         touchDown = false;
                     }
                 }
