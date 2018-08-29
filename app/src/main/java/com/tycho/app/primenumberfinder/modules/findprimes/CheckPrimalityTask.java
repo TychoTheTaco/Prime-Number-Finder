@@ -19,7 +19,7 @@ public class CheckPrimalityTask extends Task{
 
     private boolean isPrime = false;
 
-    public boolean isFinished = false;
+    private boolean isFinished = false;
 
     /**
      * The factor that was found causing this number not to be prime.

@@ -3,8 +3,6 @@ package com.tycho.app.primenumberfinder.utils;
 import android.content.Context;
 import android.util.Log;
 
-import com.tycho.app.primenumberfinder.PrimeNumberFinder;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -28,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
+import java.util.Queue;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -301,6 +299,25 @@ public final class FileManager {
     }
 
     public boolean writeNumbersQuick(final List<Long> numbers, final File file, final boolean append) {
+
+        try {
+            final DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file, append)));
+
+            for (long number : numbers) {
+                dataOutputStream.writeLong(number);
+            }
+
+            dataOutputStream.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean writeNumbersQuick(final Queue<Long> numbers, final File file, final boolean append) {
 
         try {
             final DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file, append)));

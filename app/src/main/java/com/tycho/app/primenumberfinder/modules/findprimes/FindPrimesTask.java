@@ -17,9 +17,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -460,9 +462,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
                 break;
 
             case SIEVE_OF_ERATOSTHENES:
-                for (int i = 0; i < primeCount - 1; i++) {
-                    primes.add(((SieveTask) getTasks().get(0)).primes.get(i));
-                }
+                primes.addAll(((SieveTask) getTasks().get(0)).primes);
                 break;
         }
 
@@ -631,7 +631,11 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
 
         private String status = "searching";
 
-        private final List<Long> primes = new ArrayList<>();
+        /**
+         * Prime numbers are added to this queue. We are using an {@link ArrayDeque} here because it
+         * has the best performance for inserting elements at the end of the collection.
+         */
+        private final Queue<Long> primes = new ArrayDeque<>();
 
         private final int sqrtMax = (int) Math.sqrt(endValue);
         private int factor;
@@ -642,8 +646,6 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
             //Assume all numbers are prime
             final BitSet bitSet = new BitSet((int) (endValue + 1));
             bitSet.set(0, bitSet.size() - 1, true);
-
-            //final int sqrtMax = (int) Math.sqrt(endValue);
 
             // mark non-primes <= n using Sieve of Eratosthenes
             for (factor = 2; factor <= sqrtMax; factor++) {
@@ -664,10 +666,6 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
             }
 
             status = "counting";
-
-            final long start = System.currentTimeMillis();
-            Log.w(TAG, "Count: " + bitSet.cardinality());
-            Log.w(TAG, "Finished in " + (System.currentTimeMillis() - start));
 
             //Count primes
             for (counter = (startValue > 2 ? startValue : 2); counter <= endValue; counter++) {

@@ -24,7 +24,7 @@ public class FindFactorsTask extends Task implements Savable, SearchOptions{
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "FindFactorsTask";
+    private static final String TAG = FindFactorsTask.class.getSimpleName();
 
     /**
      * The number we are finding factors of.
@@ -46,13 +46,13 @@ public class FindFactorsTask extends Task implements Savable, SearchOptions{
      */
     private final List<Long> inverse = new LinkedList<>();
 
-    public boolean didFinish = false;
+    private boolean isFinished = false;
 
     private SearchOptions searchOptions;
 
     private long i;
 
-    final int sqrtMax;
+    private final int sqrtMax;
 
     public FindFactorsTask(final SearchOptions searchOptions) {
         this.searchOptions = searchOptions;
@@ -62,7 +62,6 @@ public class FindFactorsTask extends Task implements Savable, SearchOptions{
 
     @Override
     public void run() {
-
         for (i = 1; i <= sqrtMax; i++) {
 
             //Check if the number divides perfectly
@@ -77,16 +76,11 @@ public class FindFactorsTask extends Task implements Savable, SearchOptions{
             if (shouldStop()) {
                 return;
             }
-
-            //setProgress((float) i / sqrtMax);
         }
 
         if (!shouldStop()){
-            for (Long n : inverse) {
-                factors.add(n);
-            }
-
-            didFinish = true;
+            factors.addAll(inverse);
+            isFinished = true;
         }
     }
 
