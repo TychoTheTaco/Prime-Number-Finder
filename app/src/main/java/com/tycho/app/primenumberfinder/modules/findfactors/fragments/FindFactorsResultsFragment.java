@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
@@ -148,7 +149,7 @@ public class FindFactorsResultsFragment extends ResultsFragment {
             if (task.save()) {
                 progressDialog.dismiss();
                 handler.post(() -> {
-                    Log.d(TAG, "Posted context: " + getContext() + " " + getActivity());
+                    Crashlytics.log(Log.DEBUG, TAG, "Posted context: " + getContext() + " " + getActivity());
                     Toast.makeText(context.getApplicationContext(), context.getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
                 });
             } else {

@@ -21,6 +21,7 @@ import android.text.style.StyleSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,8 @@ import com.tycho.app.primenumberfinder.LongClickableSpan;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.modules.gcf.GreatestCommonFactorTask;
+import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 
 import java.io.File;
@@ -72,6 +75,10 @@ public final class Utils {
      */
     public static float dpToPx(final Context context, final float dp) {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
+    }
+
+    public static int dpToPx(final Context context, final int dp) {
+        return (int) dpToPx(context, (float) dp);
     }
 
     /**
@@ -373,19 +380,26 @@ public final class Utils {
     }
 
     public static void logTaskStarted(final Context context, final Task task) {
-        final Bundle bundle = new Bundle();
-        bundle.putString("type", task.getClass().getSimpleName());
         if (task instanceof FindPrimesTask) {
+            final Bundle bundle = new Bundle();
             bundle.putLong("start", ((FindPrimesTask) task).getStartValue());
             bundle.putLong("end", ((FindPrimesTask) task).getEndValue());
             bundle.putString("method", ((FindPrimesTask) task).getSearchOptions().getSearchMethod().name());
             bundle.putInt("threads", ((FindPrimesTask) task).getThreadCount());
+            FirebaseAnalytics.getInstance(context).logEvent("find_primes_task_started", bundle);
         } else if (task instanceof FindFactorsTask) {
+            final Bundle bundle = new Bundle();
             bundle.putLong("number", ((FindFactorsTask) task).getNumber());
+            FirebaseAnalytics.getInstance(context).logEvent("find_factors_task_started", bundle);
         } else if (task instanceof PrimeFactorizationTask) {
+            final Bundle bundle = new Bundle();
             bundle.putLong("number", ((PrimeFactorizationTask) task).getNumber());
+            FirebaseAnalytics.getInstance(context).logEvent("prime_factorization_task_started", bundle);
+        }else if (task instanceof LeastCommonMultipleTask) {
+            FirebaseAnalytics.getInstance(context).logEvent("lcm_task_started", null);
+        }else if (task instanceof GreatestCommonFactorTask) {
+            FirebaseAnalytics.getInstance(context).logEvent("gcf_task_started", null);
         }
-        FirebaseAnalytics.getInstance(context).logEvent("task_started", bundle);
     }
 
     public static ColorStateList generateColorStateList(final int[] states, final int[] colors) {
@@ -452,8 +466,12 @@ public final class Utils {
                 popupWindow.setBackgroundDrawable(null);
                 popupWindow.setElevation(Utils.dpToPx(context, 4));
                 popupWindow.getContentView().measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-                popupWindow.showAsDropDown(view, x, y);
+                final int[] coords = new int[2];
+                view.getLocationOnScreen(coords);
+                popupWindow.showAtLocation(view, Gravity.NO_GRAVITY, coords[0] + x, coords[1] - (/*layout height*/0) - Utils.dpToPx(context, 48));
+                Log.w(TAG, "X: " + x + " Y: " + y);
                 Log.w(TAG, "MW: " + popupWindow.getContentView().getMeasuredWidth() + " W: " + popupWindow.getContentView().getWidth() + " S: " + View.MeasureSpec.getSize(View.MeasureSpec.UNSPECIFIED));
+                Log.w(TAG, "MH: " + popupWindow.getContentView().getMeasuredHeight() + " H: " + popupWindow.getContentView().getHeight() + " S: " + View.MeasureSpec.getSize(View.MeasureSpec.UNSPECIFIED));
 
                 //Apply highlight span
                 final UnderlineSpan span = new UnderlineSpan();
@@ -463,6 +481,7 @@ public final class Utils {
                     spannableStringBuilder.removeSpan(span);
                     ((TextView) view).setText(spannableStringBuilder);
                     Log.w(TAG, "2 MW: " + popupWindow.getContentView().getMeasuredWidth() + " W: " + popupWindow.getContentView().getWidth());
+                    Log.w(TAG, "2 MH: " + popupWindow.getContentView().getMeasuredHeight() + " H: " + popupWindow.getContentView().getHeight());
                     popupWindow.dismiss();
                 }, 600);
             }
