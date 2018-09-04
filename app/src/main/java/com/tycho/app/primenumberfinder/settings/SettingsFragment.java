@@ -25,6 +25,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(getText(R.string.preference_summary_allow_background_threads));
         spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.red)), spannableStringBuilder.toString().indexOf("Warning:"), spannableStringBuilder.toString().lastIndexOf("."), 0);
         allowBackgroundTasksCheckBox.setSummary(spannableStringBuilder);
+
+        final CheckBoxPreference checkBoxPreference = (CheckBoxPreference) findPreference("theme");
+        checkBoxPreference.setChecked(PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 1);
     }
 
     @Override

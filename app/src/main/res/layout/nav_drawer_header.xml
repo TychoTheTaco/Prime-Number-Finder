@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/horizon_blur"/>
+        android:src="@drawable/cloudy_peak"/>
 
     <TextView
         android:id="@+id/textView_appTitle"

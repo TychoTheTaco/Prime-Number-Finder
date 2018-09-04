@@ -6,15 +6,14 @@
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
-    <TextView
+    <ImageView
         android:id="@+id/icon"
         android:layout_width="24dp"
         android:layout_height="24dp"
+        android:src="@drawable/circle_white"
+        android:tint="@color/black"
         android:layout_marginEnd="4dp"
-        android:background="@drawable/circle_white"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:textSize="12sp" />
+        android:gravity="center" />
 
     <TextView
         android:id="@+id/file_name"
