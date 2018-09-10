@@ -97,7 +97,7 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
         }
 
         holder.dateCreated.setText(simpleDateFormat.format(new Date(file.lastModified())));
-        holder.fileSize.setText(Utils.humanReadableByteCount(file.length(), true));
+        holder.fileSize.setText(Utils.humanReadableByteCount(file.length(), true).replaceAll("\\.\\d+", ""));
 
         holder.itemView.setSelected(holder.isSelected());
     }

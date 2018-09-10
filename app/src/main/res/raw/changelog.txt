@@ -134,5 +134,5 @@
 - Added least common multiple finder
 - Added greatest common factor finder
 - Added dark theme
-- Add Quick Copy feature
+- Added Quick Copy feature
 - UI improvements

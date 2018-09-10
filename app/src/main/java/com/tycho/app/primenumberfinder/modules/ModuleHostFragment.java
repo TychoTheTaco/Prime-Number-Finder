@@ -228,25 +228,31 @@ public abstract class ModuleHostFragment extends Fragment implements FloatingAct
                     if (searchOptions.isNotifyWhenFinished()) {
                         final String content;
                         final int taskType;
+                        final int smallIconDrawable;
                         if (task instanceof FindPrimesTask){
                             taskType = TASK_TYPE_FIND_PRIMES;
+                            smallIconDrawable = R.drawable.find_primes_icon;
                             content = "Task \"Primes from " + NUMBER_FORMAT.format(((FindPrimesTask) task).getStartValue()) + " to " + NUMBER_FORMAT.format(((FindPrimesTask) task).getEndValue()) + "\" finished.";
                         }else if (task instanceof FindFactorsTask){
                             taskType = TASK_TYPE_FIND_FACTORS;
+                            smallIconDrawable = R.drawable.find_factors_icon;
                             content = "Task \"Factors of " + NUMBER_FORMAT.format(((FindFactorsTask) task).getNumber()) + "\" finished.";
                         }else if (task instanceof PrimeFactorizationTask){
                             taskType = TASK_TYPE_PRIME_FACTORIZATION;
+                            smallIconDrawable = R.drawable.prime_factorization_icon;
                             content = "Task \"Prime factorization of " + NUMBER_FORMAT.format(((PrimeFactorizationTask) task).getNumber()) + "\" finished.";
                         }else if (task instanceof LeastCommonMultipleTask){
                             taskType = TASK_TYPE_LCM;
-                            content = "Task \"LCM is " + NUMBER_FORMAT.format(((LeastCommonMultipleTask) task).getLcm()) + "\" finished.";
+                            smallIconDrawable = R.drawable.lcm_icon;
+                            content = "Task \"LCM of " + Utils.formatNumberList(((LeastCommonMultipleTask) task).getNumbers(), NUMBER_FORMAT, ",") + "\" finished.";
                         }else if (task instanceof GreatestCommonFactorTask){
                             taskType = TASK_TYPE_GCF;
-                            content = "Task \"GCF is " + NUMBER_FORMAT.format(((GreatestCommonFactorTask) task).getGcf()) + "\" finished.";
+                            smallIconDrawable = R.drawable.gcf_icon;
+                            content = "Task \"GCF of " + Utils.formatNumberList(((GreatestCommonFactorTask) task).getNumbers(), NUMBER_FORMAT, ",") + "\" finished.";
                         } else{
                             return;
                         }
-                        NotificationManager.displayNotification(getActivity(), "default", task, taskType, content);
+                        NotificationManager.displayNotification(getActivity(), "default", task, taskType, content, smallIconDrawable);
                     }
                 }
 

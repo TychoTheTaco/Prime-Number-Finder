@@ -24,7 +24,7 @@ public class NotificationManager {
 
     private static int nextNotificationId = 0;
 
-    public static synchronized void displayNotification(final Context context, final String channelId, final Task task, final int taskType, final String contentText){
+    public static synchronized void displayNotification(final Context context, final String channelId, final Task task, final int taskType, final String contentText, final int smallIconDrawable){
 
         //Create notification
         final Intent intent = new Intent(context, MainActivity.class);
@@ -34,7 +34,7 @@ public class NotificationManager {
         final PendingIntent pendingIntent = PendingIntent.getActivity(context, nextNotificationId, intent, FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
-                .setSmallIcon(R.drawable.circle_white)
+                .setSmallIcon(smallIconDrawable)
                 .setContentTitle("Task Finished")
                 .setContentText(contentText)
                 .setContentIntent(pendingIntent)
