@@ -39,13 +39,10 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
 
     //Views
     private TextView subtitleTextView;
-    private TextView bodyTextView;
-    private RecyclerView recyclerView;
 
     //Statistics
     private StatisticsLayout statisticsLayout;
 
-    private final SpannableStringBuilder subtitleStringBuilder = new SpannableStringBuilder();
     private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
     private GCFListAdapter adapter;
@@ -60,14 +57,13 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
         adapter = new GCFListAdapter(getContext());
 
         //Set up recycler view
-        recyclerView = rootView.findViewById(R.id.recyclerView);
+        final RecyclerView recyclerView = rootView.findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(null);
 
         subtitleTextView = rootView.findViewById(R.id.subtitle);
-        bodyTextView = rootView.findViewById(R.id.text);
         subtitleTextView.setMovementMethod(LongClickLinkMovementMethod.getInstance());
 
         //Statistics
@@ -98,21 +94,6 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
         //Subtitle
         subtitleTextView.setText(generateResultSubtitle());
 
-        //Body
-        bodyTextView.setVisibility(View.GONE);
-
-        /*final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-        for (Long number : getTask().getNumbers()){
-            spannableStringBuilder.append(NUMBER_FORMAT.format(number), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_dark)), 0);
-            spannableStringBuilder.append(" = ");
-            final int position = spannableStringBuilder.length();
-            spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getGcf()), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_dark)), 0);
-            spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-            spannableStringBuilder.append(" \u00D7 "); // Multiplication sign
-            spannableStringBuilder.append(NUMBER_FORMAT.format(number / getTask().getGcf()), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_dark)), 0);
-            spannableStringBuilder.append('\n');
-        }
-        bodyTextView.setText(spannableStringBuilder);*/
         adapter.set(getTask().getNumbers(), getTask().getGcf());
 
         //Statistics
@@ -148,7 +129,6 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
     @Override
     protected void onResetViews() {
         super.onResetViews();
-        bodyTextView.setVisibility(View.VISIBLE);
         statisticsLayout.setVisibility(View.VISIBLE);
     }
 

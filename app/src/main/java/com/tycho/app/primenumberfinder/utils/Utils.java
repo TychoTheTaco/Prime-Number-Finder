@@ -463,12 +463,13 @@ public final class Utils {
                         drawable.mutate().setTint(Color.WHITE);
                     }
                 }
+                popupWindow.setAnimationStyle(R.style.PopupWindowAnimationStyle);
                 popupWindow.setBackgroundDrawable(null);
                 popupWindow.setElevation(Utils.dpToPx(context, 4));
-                popupWindow.getContentView().measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+                popupWindow.getContentView().measure(View.MeasureSpec.makeMeasureSpec(9999, View.MeasureSpec.AT_MOST), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
                 final int[] coords = new int[2];
                 view.getLocationOnScreen(coords);
-                popupWindow.showAtLocation(view, Gravity.NO_GRAVITY, coords[0] + x, coords[1] - (/*layout height*/0) - Utils.dpToPx(context, 48));
+                popupWindow.showAtLocation(view, Gravity.NO_GRAVITY, coords[0] + x - (popupWindow.getContentView().getMeasuredWidth() / 2), coords[1] + y - (popupWindow.getContentView().getMeasuredWidth() / 1));
                 Log.w(TAG, "X: " + x + " Y: " + y);
                 Log.w(TAG, "MW: " + popupWindow.getContentView().getMeasuredWidth() + " W: " + popupWindow.getContentView().getWidth() + " S: " + View.MeasureSpec.getSize(View.MeasureSpec.UNSPECIFIED));
                 Log.w(TAG, "MH: " + popupWindow.getContentView().getMeasuredHeight() + " H: " + popupWindow.getContentView().getHeight() + " S: " + View.MeasureSpec.getSize(View.MeasureSpec.UNSPECIFIED));
