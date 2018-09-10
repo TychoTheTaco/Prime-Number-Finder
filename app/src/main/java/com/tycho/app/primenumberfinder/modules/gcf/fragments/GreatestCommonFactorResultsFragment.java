@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -18,6 +20,7 @@ import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.StatisticsLayout;
+import com.tycho.app.primenumberfinder.modules.gcf.GCFListAdapter;
 import com.tycho.app.primenumberfinder.modules.gcf.GreatestCommonFactorTask;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
@@ -37,6 +40,7 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
     //Views
     private TextView subtitleTextView;
     private TextView bodyTextView;
+    private RecyclerView recyclerView;
 
     //Statistics
     private StatisticsLayout statisticsLayout;
@@ -44,12 +48,23 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
     private final SpannableStringBuilder subtitleStringBuilder = new SpannableStringBuilder();
     private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
+    private GCFListAdapter adapter;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.gcf_results_fragment, container, false);
 
         initStandardViews(rootView);
+
+        adapter = new GCFListAdapter(getContext());
+
+        //Set up recycler view
+        recyclerView = rootView.findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setAdapter(adapter);
+        recyclerView.setItemAnimator(null);
 
         subtitleTextView = rootView.findViewById(R.id.subtitle);
         bodyTextView = rootView.findViewById(R.id.text);
@@ -85,6 +100,20 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
 
         //Body
         bodyTextView.setVisibility(View.GONE);
+
+        /*final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+        for (Long number : getTask().getNumbers()){
+            spannableStringBuilder.append(NUMBER_FORMAT.format(number), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_dark)), 0);
+            spannableStringBuilder.append(" = ");
+            final int position = spannableStringBuilder.length();
+            spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getGcf()), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_dark)), 0);
+            spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            spannableStringBuilder.append(" \u00D7 "); // Multiplication sign
+            spannableStringBuilder.append(NUMBER_FORMAT.format(number / getTask().getGcf()), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_dark)), 0);
+            spannableStringBuilder.append('\n');
+        }
+        bodyTextView.setText(spannableStringBuilder);*/
+        adapter.set(getTask().getNumbers(), getTask().getGcf());
 
         //Statistics
         statisticsLayout.setVisibility(View.GONE);

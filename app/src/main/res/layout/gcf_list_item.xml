@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:selectableItemBackground"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/number"
+        android:layout_width="0dp"
+        android:layout_height="26dp"
+        android:layout_weight="1"
+        android:textColor="@color/blue_dark"
+        android:gravity="end|center_vertical" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="26dp"
+        android:text=" = "
+        android:gravity="end|center_vertical" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:gravity="start"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/gcf"
+            android:layout_width="wrap_content"
+            android:textColor="@color/blue_dark"
+            android:layout_height="26dp"
+            android:textStyle="bold"
+            android:gravity="end|center_vertical" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="26dp"
+            android:gravity="center"
+            android:text="@string/factors_list_multiply_separator" />
+
+        <TextView
+            android:id="@+id/factor"
+            android:textColor="@color/blue_dark"
+            android:layout_width="wrap_content"
+            android:layout_height="26dp"
+            android:gravity="start|center_vertical" />
+    </LinearLayout>
+
+</LinearLayout>

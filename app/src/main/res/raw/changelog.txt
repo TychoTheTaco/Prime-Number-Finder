@@ -136,3 +136,4 @@
 - Added dark theme
 - Added Quick Copy feature
 - UI improvements
+- Bug fixes
