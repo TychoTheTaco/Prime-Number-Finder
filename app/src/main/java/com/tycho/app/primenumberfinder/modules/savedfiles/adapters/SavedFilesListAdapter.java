@@ -215,7 +215,21 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
                     intent.putExtra("title", true);
                     context.startActivity(intent);
                 }
+            }else{
+                icon.startAnimation(scaleAnimation);
+                if (!isSelected()){
+                    icon.setImageResource(R.drawable.round_check_24);
+                }
             }
+        }
+
+        @Override
+        protected boolean onLongClick(View view) {
+            icon.startAnimation(scaleAnimation);
+            if (isSelected()){
+                icon.setImageResource(R.drawable.round_check_24);
+            }
+            return super.onLongClick(view);
         }
     }
 }

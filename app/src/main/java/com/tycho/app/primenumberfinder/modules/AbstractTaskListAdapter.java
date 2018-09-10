@@ -280,6 +280,8 @@ public class AbstractTaskListAdapter<T extends Task> extends RecyclerView.Adapte
             holder.progress.setVisibility(View.VISIBLE);
             holder.progress.setText(context.getString(R.string.saved));
         }
+
+        onUpdate(holder);
     }
 
     private TaskListener getUiUpdaterDebugListener(final ViewHolder holder){
