@@ -36,12 +36,10 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
 
     //Views
     private TextView subtitleTextView;
-    private TextView bodyTextView;
 
     //Statistics
     private StatisticsLayout statisticsLayout;
 
-    private final SpannableStringBuilder subtitleStringBuilder = new SpannableStringBuilder();
     private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
     @Nullable
@@ -53,7 +51,6 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
 
         subtitleTextView = rootView.findViewById(R.id.subtitle);
         subtitleTextView.setMovementMethod(LongClickLinkMovementMethod.getInstance());
-        bodyTextView = rootView.findViewById(R.id.text);
 
         //Statistics
         statisticsLayout = new StatisticsLayout(rootView.findViewById(R.id.statistics_layout));
@@ -82,9 +79,6 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
 
         //Subtitle
         subtitleTextView.setText(generateResultSubtitle());
-
-        //Body
-        bodyTextView.setVisibility(View.GONE);
 
         //Statistics
         statisticsLayout.setVisibility(View.GONE);
@@ -119,7 +113,6 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
     @Override
     protected void onResetViews() {
         super.onResetViews();
-        bodyTextView.setVisibility(View.VISIBLE);
         statisticsLayout.setVisibility(View.VISIBLE);
     }
 

@@ -6,16 +6,15 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.FileProvider;
-import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioButton;
 
-import com.tycho.app.primenumberfinder.ui.CustomRadioGroup;
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.ui.CustomRadioGroup;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;
@@ -50,7 +49,6 @@ public class ExportOptionsDialog extends Dialog {
         //Set up the layout
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.export_options_dialog);
-
         setCancelable(true);
 
         //Set up file name
@@ -69,54 +67,45 @@ public class ExportOptionsDialog extends Dialog {
 
         //Set up item separator selection
         final CustomRadioGroup customRadioGroup = findViewById(R.id.item_separator_radio_group);
-        customRadioGroup.addOnCheckChangedListener(new CustomRadioGroup.OnCheckChangedListener() {
-            @Override
-            public void onChecked(RadioButton radioButton, boolean isChecked) {
+        customRadioGroup.addOnCheckChangedListener((radioButton, isChecked) -> {
 
-                //Toggle 'Other' input box
-                itemSeparatorInput.setEnabled(otherButton.isChecked());
-            }
+            //Toggle 'Other' input box
+            itemSeparatorInput.setEnabled(otherButton.isChecked());
         });
         newLineButton.setChecked(true);
 
         final Button exportButton = findViewById(R.id.export_button);
-        exportButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        exportButton.setOnClickListener(v -> {
 
-                //Get item separator
-                final String separator;
-                if (newLineButton.isChecked()){
-                    separator = System.lineSeparator();
-                }else{
-                    separator = itemSeparatorInput.getText().toString().replace("\\n", System.lineSeparator());
-                }
-
-                //Get format options
-                final boolean formatNumber = ((CheckBox) findViewById(R.id.format_number)).isChecked();
-                final NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
-
-                final ProgressDialog progressDialog = new ProgressDialog(context);
-                progressDialog.setTitle("Exporting...");
-                progressDialog.show();
-                dismiss();
-
-                //Convert the file to the requested format
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        final File output = FileManager.getInstance().export(file, fileNameInput.getText().toString().trim() + ".txt", separator, formatNumber ? numberFormat : null);
-                        progressDialog.dismiss();
-
-                        final Uri path = FileProvider.getUriForFile(context, "com.tycho.app.primenumberfinder", output);
-                        final Intent intent = new Intent(Intent.ACTION_SEND);
-                        intent.putExtra(Intent.EXTRA_STREAM, path);
-                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        intent.setType("text/plain");
-                        context.startActivity(intent);
-                    }
-                }).start();
+            //Get item separator
+            final String separator;
+            if (newLineButton.isChecked()){
+                separator = System.lineSeparator();
+            }else{
+                separator = itemSeparatorInput.getText().toString().replace("\\n", System.lineSeparator());
             }
+
+            //Get format options
+            final boolean formatNumber = ((CheckBox) findViewById(R.id.format_number)).isChecked();
+            final NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
+
+            final ProgressDialog progressDialog = new ProgressDialog(context);
+            progressDialog.setTitle("Exporting...");
+            progressDialog.show();
+            dismiss();
+
+            //Convert the file to the requested format
+            new Thread(() -> {
+                final File output = FileManager.getInstance().export(file, fileNameInput.getText().toString().trim() + ".txt", separator, formatNumber ? numberFormat : null);
+                progressDialog.dismiss();
+
+                final Uri path = FileProvider.getUriForFile(context, "com.tycho.app.primenumberfinder", output);
+                final Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.putExtra(Intent.EXTRA_STREAM, path);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.setType("text/plain");
+                context.startActivity(intent);
+            }).start();
         });
     }
 }

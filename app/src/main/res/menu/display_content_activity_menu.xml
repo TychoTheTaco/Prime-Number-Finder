@@ -12,7 +12,7 @@
     <item
         android:id="@+id/export"
         android:orderInCategory="1"
-        app:showAsAction="never"
+        app:showAsAction="ifRoom"
         android:visible="true"
         android:icon="@drawable/ic_file_upload_white_24dp"
         android:title="@string/action_bar_item_title_export"/>
@@ -21,7 +21,6 @@
         android:id="@+id/delete"
         android:orderInCategory="2"
         app:showAsAction="never"
-        android:visible="true"
         android:icon="@drawable/ic_delete_white_24dp"
         android:title="@string/action_bar_item_title_delete"/>
 
