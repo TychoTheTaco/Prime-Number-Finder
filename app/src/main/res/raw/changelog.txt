@@ -130,7 +130,7 @@
 - Minor UI improvements
 - Minor bug fixes
 
-??/??/2018 > Prime Number Finder version 1.3.9
+10/15/2018 > Prime Number Finder version 1.3.9
 - Added least common multiple finder
 - Added greatest common factor finder
 - Added dark theme

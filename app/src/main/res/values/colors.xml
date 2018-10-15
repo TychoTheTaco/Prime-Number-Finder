@@ -12,6 +12,7 @@
     <color name="accent_light_but_not_that_light">#64B5F6</color> <!-- 300 -->
     <color name="accent">#536DFE</color> <!-- A200 -->
     <color name="accent_dark">#3D5AFE</color> <!-- A400 -->
+    <color name="accent_very_dark">#7037474F</color> <!-- ? -->
 
     <!-- Find Primes (Deep Purple) -->
     <color name="purple_very_light">#EDE7F6</color> <!-- 50 -->

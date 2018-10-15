@@ -494,4 +494,8 @@ public final class Utils {
             }
         }, start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
     }
+
+    public static int applyAlpha(final int color, final float alpha){
+        return ((color & 0x00FFFFFF) | ((int) (255 * alpha) << 24));
+    }
 }

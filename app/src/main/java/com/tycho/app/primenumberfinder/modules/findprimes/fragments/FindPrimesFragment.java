@@ -282,6 +282,11 @@ public class FindPrimesFragment extends ModuleHostFragment {
             protected void onUpdate(AbstractTaskListAdapter.ViewHolder holder) {
                 final Task task = getTask(holder.getAdapterPosition());
 
+                if (task instanceof CheckPrimalityTask){
+                    if (holder.saveButton != null) holder.saveButton.setVisibility(View.GONE);
+                    if (holder.editButton != null) holder.editButton.setVisibility(View.GONE);
+                }
+
                 //Set progress
                 if (holder.getAdapterPosition() != -1){
                     if (task.getState() == Task.State.STOPPED || task instanceof FindPrimesTask && ((FindPrimesTask) task).getEndValue() == FindPrimesTask.INFINITY){
