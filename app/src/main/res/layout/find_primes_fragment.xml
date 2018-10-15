@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:theme="@style/FindPrimes"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="false"
     android:focusableInTouchMode="true"
-    android:fitsSystemWindows="false">
+    android:theme="@style/FindPrimes">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,8 +15,7 @@
 
         <!-- Check primality input -->
         <TextView
-            android:id="@+id/input_number_label"
-            style="@style/DefaultText"
+            android:id="@+id/number_input_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:labelFor="@+id/primality_input"
@@ -39,9 +37,9 @@
                 android:id="@id/primality_input"
                 style="@style/NumberInput"
                 android:layout_width="0dp"
-                android:imeOptions="actionDone"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:imeOptions="actionDone" />
 
             <Button
                 android:id="@+id/check_primality_button"
@@ -55,7 +53,6 @@
         <!-- Range input -->
         <TextView
             android:id="@+id/input_range_label"
-            style="@style/DefaultText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:labelFor="@+id/editText_input_number"
@@ -86,13 +83,12 @@
                 <com.tycho.app.primenumberfinder.ui.ValidEditText
                     android:id="@+id/search_range_start"
                     style="@style/NumberInput"
-                    android:imeOptions="actionDone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:imeOptions="actionDone" />
 
                 <TextView
-                    style="@style/DefaultText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/to" />
@@ -100,10 +96,10 @@
                 <com.tycho.app.primenumberfinder.ui.ValidEditText
                     android:id="@+id/search_range_end"
                     style="@style/NumberInput"
-                    android:imeOptions="actionDone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:imeOptions="actionDone" />
 
                 <ImageButton
                     android:id="@+id/infinity_button"
@@ -112,7 +108,7 @@
                     android:background="@drawable/ripple_clear"
                     android:contentDescription="@string/format_numbers_description"
                     android:src="@drawable/ic_infinity_white_24dp"
-                    android:tint="@color/infinity_button_tint" />
+                    android:tint="@color/text_color" />
 
             </LinearLayout>
 
@@ -125,22 +121,7 @@
 
         </LinearLayout>
 
-        <!-- Tab layout-->
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tab_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            app:tabGravity="fill"
-            app:tabMode="fixed" />
-
-        <!-- Main view pager -->
-        <android.support.v4.view.ViewPager
-            android:id="@+id/view_pager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        <include layout="@layout/tab_layout" />
 
     </LinearLayout>
 

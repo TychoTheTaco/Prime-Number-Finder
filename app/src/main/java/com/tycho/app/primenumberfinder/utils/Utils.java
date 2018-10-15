@@ -1,26 +1,41 @@
 package com.tycho.app.primenumberfinder.utils;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 
-import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.tycho.app.primenumberfinder.LongClickableSpan;
+import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.modules.gcf.GreatestCommonFactorTask;
+import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 
 import java.io.File;
@@ -30,13 +45,14 @@ import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import easytasks.Task;
+
+import static android.content.Context.CLIPBOARD_SERVICE;
 
 /**
  * This class contains lots of random utility methods.
@@ -59,6 +75,10 @@ public final class Utils {
      */
     public static float dpToPx(final Context context, final float dp) {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
+    }
+
+    public static int dpToPx(final Context context, final int dp) {
+        return (int) dpToPx(context, (float) dp);
     }
 
     /**
@@ -196,21 +216,11 @@ public final class Utils {
      * @param ascending
      */
     public static void sortByDate(final List<File> files, final boolean ascending) {
-        Collections.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(File file0, File file1) {
-                return (ascending ? 1 : -1) * Long.compare(file0.lastModified(), file1.lastModified());
-            }
-        });
+        Collections.sort(files, (file0, file1) -> (ascending ? 1 : -1) * Long.compare(file0.lastModified(), file1.lastModified()));
     }
 
     public static void sortBySize(final List<File> files, final boolean ascending) {
-        Collections.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(File file0, File file1) {
-                return (ascending ? 1 : -1) * Long.compare(file0.length(), file1.length());
-            }
-        });
+        Collections.sort(files, (file0, file1) -> (ascending ? 1 : -1) * Long.compare(file0.length(), file1.length()));
     }
 
     public static SpannableStringBuilder formatSpannable(final SpannableStringBuilder spannableStringBuilder, final String raw, final String[] content, final int color) {
@@ -218,6 +228,18 @@ public final class Utils {
         for (int i = 0; i < spanPositions.length; i += 2) {
             spannableStringBuilder.setSpan(new ForegroundColorSpan(color), spanPositions[i], spanPositions[i + 1], Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
             spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), spanPositions[i], spanPositions[i + 1], Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        }
+        return spannableStringBuilder;
+    }
+
+    public static SpannableStringBuilder formatSpannable(final SpannableStringBuilder spannableStringBuilder, final String raw, final String[] content, final boolean[] applyCopySpan, final int color, final Context context) {
+        final int[] spanPositions = getSpanPositions(spannableStringBuilder, raw, content);
+        for (int i = 0; i < spanPositions.length; i += 2) {
+            final int start = spanPositions[i];
+            final int end = spanPositions[i + 1];
+            spannableStringBuilder.setSpan(new ForegroundColorSpan(color), start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            if (applyCopySpan[i / 2]) applyCopySpan(spannableStringBuilder, start, end, context);
         }
         return spannableStringBuilder;
     }
@@ -247,9 +269,9 @@ public final class Utils {
         return spanPositions;
     }
 
-    public static void applyTheme(final AppCompatActivity appCompatActivity, final int statusBarColor, final int actionBarColor) {
-        appCompatActivity.getWindow().setStatusBarColor(statusBarColor);
-        appCompatActivity.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(actionBarColor));
+    public static void applyTheme(final AppCompatActivity activity, final int statusBarColor, final int actionBarColor) {
+        activity.getWindow().setStatusBarColor(statusBarColor);
+        activity.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(actionBarColor));
     }
 
     public static BigInteger textToNumber(String text) {
@@ -269,8 +291,6 @@ public final class Utils {
     }
 
     public static BigDecimal textToDecimal(String text, final char decimalSeparator) {
-        Crashlytics.log(Log.DEBUG, TAG, "Raw input: '" + text + "'");
-
         if (text.length() == 0) {
             return BigDecimal.ZERO;
         }
@@ -289,6 +309,14 @@ public final class Utils {
     public static int getAccentColor(final Context context) {
         final TypedValue typedValue = new TypedValue();
         final TypedArray a = context.obtainStyledAttributes(typedValue.data, new int[]{android.R.attr.colorAccent});
+        final int color = a.getColor(0, 0);
+        a.recycle();
+        return color;
+    }
+
+    public static int getColor(final int attr, final Context context) {
+        final TypedValue typedValue = new TypedValue();
+        final TypedArray a = context.obtainStyledAttributes(typedValue.data, new int[]{attr});
         final int color = a.getColor(0, 0);
         a.recycle();
         return color;
@@ -352,26 +380,122 @@ public final class Utils {
     }
 
     public static void logTaskStarted(final Context context, final Task task) {
-        final Bundle bundle = new Bundle();
-        bundle.putString("type", task.getClass().getSimpleName());
         if (task instanceof FindPrimesTask) {
+            final Bundle bundle = new Bundle();
             bundle.putLong("start", ((FindPrimesTask) task).getStartValue());
             bundle.putLong("end", ((FindPrimesTask) task).getEndValue());
             bundle.putString("method", ((FindPrimesTask) task).getSearchOptions().getSearchMethod().name());
             bundle.putInt("threads", ((FindPrimesTask) task).getThreadCount());
+            FirebaseAnalytics.getInstance(context).logEvent("find_primes_task_started", bundle);
         } else if (task instanceof FindFactorsTask) {
+            final Bundle bundle = new Bundle();
             bundle.putLong("number", ((FindFactorsTask) task).getNumber());
+            FirebaseAnalytics.getInstance(context).logEvent("find_factors_task_started", bundle);
         } else if (task instanceof PrimeFactorizationTask) {
+            final Bundle bundle = new Bundle();
             bundle.putLong("number", ((PrimeFactorizationTask) task).getNumber());
+            FirebaseAnalytics.getInstance(context).logEvent("prime_factorization_task_started", bundle);
+        }else if (task instanceof LeastCommonMultipleTask) {
+            FirebaseAnalytics.getInstance(context).logEvent("lcm_task_started", null);
+        }else if (task instanceof GreatestCommonFactorTask) {
+            FirebaseAnalytics.getInstance(context).logEvent("gcf_task_started", null);
         }
-        FirebaseAnalytics.getInstance(context).logEvent("task_started", bundle);
     }
 
     public static ColorStateList generateColorStateList(final int[] states, final int[] colors) {
-        final int[][] stateArray = new int[states.length][];
-        for (int i = 0; i < states.length; i++){
-            stateArray[i] = new int[]{states[i]};
+        final int[][] stateArray = new int[colors.length][];
+        for (int i = 0; i < stateArray.length; i++) {
+            if (i < states.length) {
+                stateArray[i] = new int[]{states[i]};
+            } else {
+                stateArray[i] = new int[]{};
+            }
         }
         return new ColorStateList(stateArray, colors);
+    }
+
+    public static String formatNumberList(final List<? extends Number> numbers, final NumberFormat numberFormat, final String separator) {
+        final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+        for (int i = 0; i < numbers.size(); i++) {
+            spannableStringBuilder.append(numberFormat.format(numbers.get(i)));
+            Utils.separateNumbers(spannableStringBuilder, numbers, i, ",");
+        }
+        return spannableStringBuilder.toString();
+    }
+
+    public static void separateNumbers(final SpannableStringBuilder spannableStringBuilder, final List<? extends Number> numbers, final int index, final String separator) {
+        if (index == numbers.size() - 2) {
+            if (numbers.size() > 2) spannableStringBuilder.append(separator);
+            spannableStringBuilder.append(" and ");
+        } else if (index != numbers.size() - 1) {
+            spannableStringBuilder.append(separator);
+            spannableStringBuilder.append(' ');
+        }
+    }
+
+    public static void applyCopySpan(final SpannableStringBuilder spannableStringBuilder, final int start, final int end, final Context context) {
+        final String original = spannableStringBuilder.toString();
+        spannableStringBuilder.setSpan(new LongClickableSpan() {
+            @Override
+            public void onLongClick(View view, final int x, final int y) {
+                //Make sure setting is enabled
+                if (!PreferenceManager.getBoolean(PreferenceManager.Preference.QUICK_COPY)) {
+                    return;
+                }
+                if (!original.equals(spannableStringBuilder.toString())) {
+                    Log.w(TAG, "SpannableStringBuilder was modified since last touch!\nOriginal: " + original + "\nUpdated: " + spannableStringBuilder.toString());
+                }
+
+                final ClipboardManager clipboard = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+                final char[] chars = new char[end - start];
+                spannableStringBuilder.getChars(start, end, chars, 0);
+                String text = new String(chars);
+                if (!PreferenceManager.getBoolean(PreferenceManager.Preference.QUICK_COPY_KEEP_FORMATTING)) {
+                    text = textToNumber(text).toString();
+                }
+                final ClipData clip = ClipData.newPlainText(text, text);
+                clipboard.setPrimaryClip(clip);
+
+                //Show popup
+                final PopupWindow popupWindow = new PopupWindow(LayoutInflater.from(context).inflate(R.layout.text_copied_popup, null, false), ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
+                    for (Drawable drawable : ((TextView) popupWindow.getContentView().findViewById(R.id.text)).getCompoundDrawables()){
+                        drawable.mutate().setTint(Color.WHITE);
+                    }
+                }
+                popupWindow.setAnimationStyle(R.style.PopupWindowAnimationStyle);
+                popupWindow.setBackgroundDrawable(null);
+                popupWindow.setElevation(Utils.dpToPx(context, 4));
+                popupWindow.getContentView().measure(View.MeasureSpec.makeMeasureSpec(9999, View.MeasureSpec.AT_MOST), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+                final int[] coords = new int[2];
+                view.getLocationOnScreen(coords);
+                popupWindow.showAtLocation(view, Gravity.NO_GRAVITY, coords[0] + x - (popupWindow.getContentView().getMeasuredWidth() / 2), coords[1] + y - (popupWindow.getContentView().getMeasuredWidth() / 1));
+                Log.w(TAG, "X: " + x + " Y: " + y);
+                Log.w(TAG, "MW: " + popupWindow.getContentView().getMeasuredWidth() + " W: " + popupWindow.getContentView().getWidth() + " S: " + View.MeasureSpec.getSize(View.MeasureSpec.UNSPECIFIED));
+                Log.w(TAG, "MH: " + popupWindow.getContentView().getMeasuredHeight() + " H: " + popupWindow.getContentView().getHeight() + " S: " + View.MeasureSpec.getSize(View.MeasureSpec.UNSPECIFIED));
+
+                //Apply highlight span
+                final UnderlineSpan span = new UnderlineSpan();
+                spannableStringBuilder.setSpan(span, start, end, 0);
+                ((TextView) view).setText(spannableStringBuilder);
+                view.postDelayed(() -> {
+                    spannableStringBuilder.removeSpan(span);
+                    ((TextView) view).setText(spannableStringBuilder);
+                    Log.w(TAG, "2 MW: " + popupWindow.getContentView().getMeasuredWidth() + " W: " + popupWindow.getContentView().getWidth());
+                    Log.w(TAG, "2 MH: " + popupWindow.getContentView().getMeasuredHeight() + " H: " + popupWindow.getContentView().getHeight());
+                    popupWindow.dismiss();
+                }, 600);
+            }
+
+            @Override
+            public void updateDrawState(TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setUnderlineText(false);
+            }
+        }, start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+    }
+
+    public static int applyAlpha(final int color, final float alpha){
+        return ((color & 0x00FFFFFF) | ((int) (255 * alpha) << 24));
     }
 }

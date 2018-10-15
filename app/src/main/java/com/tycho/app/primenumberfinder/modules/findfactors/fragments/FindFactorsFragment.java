@@ -1,51 +1,39 @@
 package com.tycho.app.primenumberfinder.modules.findfactors.fragments;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.tycho.app.primenumberfinder.ActionViewListener;
-import com.tycho.app.primenumberfinder.FabAnimator;
-import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
-import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
+import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.ModuleHostFragment;
-import com.tycho.app.primenumberfinder.modules.ResultsFragment;
-import com.tycho.app.primenumberfinder.modules.TaskListFragment;
-import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
-import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
-import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FindFactorsTaskListAdapter;
-import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
 import java.math.BigInteger;
-import java.text.NumberFormat;
-import java.util.Locale;
 import java.util.UUID;
 
 import easytasks.Task;
-import easytasks.TaskAdapter;
 
+import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.DELETE;
+import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.PAUSE;
+import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.SAVE;
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_FACTORS;
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
 /**
@@ -101,7 +89,7 @@ public class FindFactorsFragment extends ModuleHostFragment{
                 //Create a new task
                 searchOptions.setNumber(getNumberToFactor().longValue());
                 try {
-                    startTask((FindFactorsTask.SearchOptions) searchOptions.clone());
+                    startTask(new FindFactorsTask((FindFactorsTask.SearchOptions) searchOptions.clone()));
                 }catch (CloneNotSupportedException e){
                     e.printStackTrace();
                 }
@@ -119,14 +107,37 @@ public class FindFactorsFragment extends ModuleHostFragment{
 
     @Override
     protected void loadFragments() {
-        taskListFragment = (TaskListFragment) addFragment("Tasks", TaskListFragment.class);
-        resultsFragment = (FindFactorsResultsFragment) addFragment("Results", FindFactorsResultsFragment.class);
+        super.loadFragments();
+        setResultsFragment(FindFactorsResultsFragment.class);
     }
 
     @Override
     protected void afterLoadFragments() {
-        //Set up Task list fragment
-        taskListFragment.setAdapter(new FindFactorsTaskListAdapter(getContext()));
+        taskListFragment.setAdapter(new AbstractTaskListAdapter<FindFactorsTask>(getContext(), SAVE, PAUSE, DELETE){
+
+            @Override
+            protected CharSequence getTitle(FindFactorsTask task) {
+                return context.getString(R.string.find_factors_task_list_item_title, NUMBER_FORMAT.format(task.getNumber()));
+            }
+
+            @Override
+            protected CharSequence getSubtitle(FindFactorsTask task) {
+                if (task.getState() == Task.State.STOPPED){
+                    final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+                    spannableStringBuilder.append(context.getString(R.string.status_finished));
+                    spannableStringBuilder.append(": ");
+                    spannableStringBuilder.append(context.getString(R.string.find_factors_result, NUMBER_FORMAT.format((task.getFactors().size()))));
+                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, getTheme() == 0 ? R.color.accent_dark : R.color.accent_light_but_not_that_light)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                    return spannableStringBuilder;
+                }
+                return super.getSubtitle(task);
+            }
+
+            @Override
+            protected int getTaskType() {
+                return TASK_TYPE_FIND_FACTORS;
+            }
+        });
         taskListFragment.whitelist(FindFactorsTask.class);
     }
 
@@ -142,8 +153,6 @@ public class FindFactorsFragment extends ModuleHostFragment{
     public void onSavePressed(Task task) {
         ((FindFactorsResultsFragment) resultsFragment).saveTask((FindFactorsTask) task, getActivity());
     }
-
-    private static final int REQUEST_CODE_NEW_TASK = 0;
 
     @Override
     public void onClick(View view) {
@@ -161,45 +170,13 @@ public class FindFactorsFragment extends ModuleHostFragment{
                     final FindFactorsTask.SearchOptions searchOptions = data.getExtras().getParcelable("searchOptions");
                     final FindFactorsTask task = (FindFactorsTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) data.getExtras().get("taskId"));
                     if (task == null) {
-                        startTask(searchOptions);
+                        startTask(new FindFactorsTask(searchOptions));
                     } else {
                         task.setSearchOptions(searchOptions);
                     }
                 }
                 break;
         }
-    }
-
-    private void startTask(final FindFactorsTask.SearchOptions searchOptions){
-        final FindFactorsTask task = new FindFactorsTask(searchOptions);
-        task.addTaskListener(new TaskAdapter() {
-
-            @Override
-            public void onTaskStopped() {
-
-                //Auto-save
-                if (task.getSearchOptions().isAutoSave()) {
-                    new Thread(() -> {
-                        final boolean success = FileManager.getInstance().saveFactors(task.getFactors(), task.getNumber());
-                        new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show());
-                    }).start();
-                }
-
-                //Notify when finished
-                if (task.getSearchOptions().isNotifyWhenFinished()) {
-                    com.tycho.app.primenumberfinder.utils.NotificationManager.displayNotification(getActivity(), "default", task, com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_FACTORS, "Task \"Factors of " + NUMBER_FORMAT.format(task.getNumber()) + "\" finished.");
-                }
-                task.removeTaskListener(this);
-            }
-        });
-        taskListFragment.addTask(task);
-        PrimeNumberFinder.getTaskManager().registerTask(task);
-
-        //Start the task
-        task.startOnNewThread();
-        Utils.logTaskStarted(getContext(), task);
-
-        taskListFragment.setSelected(task);
     }
 
     private BigInteger getNumberToFactor() {

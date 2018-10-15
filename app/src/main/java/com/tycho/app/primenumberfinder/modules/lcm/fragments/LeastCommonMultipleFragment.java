@@ -2,13 +2,15 @@ package com.tycho.app.primenumberfinder.modules.lcm.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,21 +19,24 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.ModuleHostFragment;
-import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsConfigurationActivity;
-import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
+import com.tycho.app.primenumberfinder.modules.lcm.LCMConfigurationActivity;
+import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
-import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
 import java.math.BigInteger;
-import java.text.NumberFormat;
-import java.util.Locale;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
-import easytasks.TaskAdapter;
+import easytasks.Task;
 
+import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.DELETE;
+import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.PAUSE;
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_LCM;
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
 /**
@@ -47,53 +52,46 @@ public class LeastCommonMultipleFragment extends ModuleHostFragment{
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "LeastCommonMultipleFragment";
+    private static final String TAG = LeastCommonMultipleFragment.class.getSimpleName();
 
-    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
-
-    private ValidEditText editTextNumberToFactor;
-
-    private final FindFactorsTask.SearchOptions searchOptions = new FindFactorsTask.SearchOptions(0);
-
+    final List<ValidEditText> inputs = new ArrayList<>();
 
     @Override
     protected View createView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.find_factors_fragment, container, false);
+        final View rootView = inflater.inflate(R.layout.lcm_fragment, container, false);
 
-        //Set up factor input
-        editTextNumberToFactor = rootView.findViewById(R.id.editText_input_number);
-        editTextNumberToFactor.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        //Set up input
+        inputs.add(rootView.findViewById(R.id.input0).findViewById(R.id.input));
+        inputs.add(rootView.findViewById(R.id.input1).findViewById(R.id.input));
+        inputs.add(rootView.findViewById(R.id.input2).findViewById(R.id.input));
+        for (ValidEditText editText : inputs){
+            editText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-            }
+                }
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-            }
+                }
 
-            @Override
-            public void afterTextChanged(Editable editable) {
-                //Check if the number is valid
-                editTextNumberToFactor.setValid(Validator.isValidFactorInput(getNumberToFactor()));
-            }
-        });
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    editText.setValid(Validator.isValidLCMInput((BigInteger) editText.getNumberValue()));
+                }
+            });
+        }
 
         //Set up start button
         final Button buttonFindFactors = rootView.findViewById(R.id.button_find_factors);
         buttonFindFactors.setOnClickListener(v -> {
 
             //Check if the number is valid
-            if (Validator.isValidFactorInput(getNumberToFactor())) {
+            if (Validator.isValidLCMInput(getBigNumbers())) {
 
-                //Create a new task
-                searchOptions.setNumber(getNumberToFactor().longValue());
-                try {
-                    startTask((FindFactorsTask.SearchOptions) searchOptions.clone());
-                }catch (CloneNotSupportedException e){
-                    e.printStackTrace();
-                }
+                LeastCommonMultipleTask task = new LeastCommonMultipleTask(new LeastCommonMultipleTask.SearchOptions(getNumbers()));
+                startTask(task);
 
                 hideKeyboard(getActivity());
                 taskListFragment.scrollToBottom();
@@ -106,76 +104,79 @@ public class LeastCommonMultipleFragment extends ModuleHostFragment{
         return rootView;
     }
 
+    private List<BigInteger> getBigNumbers(){
+        final List<BigInteger> numbers = new ArrayList<>();
+        for (ValidEditText editText : inputs){
+            if (Validator.isValidLCMInput((BigInteger) editText.getNumberValue())) numbers.add((BigInteger) editText.getNumberValue());
+        }
+        return numbers;
+    }
+
+    private List<Long> getNumbers(){
+        final List<Long> numbers = new ArrayList<>();
+        for (ValidEditText editText : inputs){
+            if (editText.isValid() && editText.getLongValue() > 1) numbers.add(editText.getLongValue());
+        }
+        return numbers;
+    }
+
     @Override
     protected void loadFragments() {
-
+        super.loadFragments();
+        setResultsFragment(LeastCommonMultipleResultsFragment.class);
     }
 
     @Override
     protected void afterLoadFragments() {
         super.afterLoadFragments();
-    }
+        taskListFragment.setAdapter(new AbstractTaskListAdapter<LeastCommonMultipleTask>(getContext(), PAUSE, DELETE){
 
-    private static final int REQUEST_CODE_NEW_TASK = 0;
+            @Override
+            protected CharSequence getTitle(LeastCommonMultipleTask task) {
+                return context.getString(R.string.lcm_task_list_item_title, Utils.formatNumberList(task.getNumbers(), NUMBER_FORMAT, ";"));
+            }
+
+            @Override
+            protected CharSequence getSubtitle(LeastCommonMultipleTask task) {
+                if (task.getState() == Task.State.STOPPED){
+                    final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+                    spannableStringBuilder.append(context.getString(R.string.status_finished));
+                    spannableStringBuilder.append(": ");
+                    spannableStringBuilder.append(context.getString(R.string.lcm_result, NUMBER_FORMAT.format((task.getLcm()))));
+                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, getTheme() == 0 ? R.color.accent_dark : R.color.accent_light_but_not_that_light)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                    return spannableStringBuilder;
+                }
+                return super.getSubtitle(task);
+            }
+
+            @Override
+            protected int getTaskType() {
+                return TASK_TYPE_LCM;
+            }
+        });
+        taskListFragment.whitelist(LeastCommonMultipleTask.class);
+    }
 
     @Override
     public void onClick(View view) {
-        final Intent intent = new Intent(getActivity(), FindFactorsConfigurationActivity.class);
+        final Intent intent = new Intent(getActivity(), LCMConfigurationActivity.class);
         startActivityForResult(intent, REQUEST_CODE_NEW_TASK);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         switch (requestCode) {
-
             case REQUEST_CODE_NEW_TASK:
                 if (data != null && data.getExtras() != null) {
-                    final FindFactorsTask.SearchOptions searchOptions = data.getExtras().getParcelable("searchOptions");
-                    final FindFactorsTask task = (FindFactorsTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) data.getExtras().get("taskId"));
+                    final LeastCommonMultipleTask.SearchOptions searchOptions = data.getExtras().getParcelable("searchOptions");
+                    final LeastCommonMultipleTask task = (LeastCommonMultipleTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) data.getExtras().get("taskId"));
                     if (task == null) {
-                        startTask(searchOptions);
+                        startTask(new LeastCommonMultipleTask(searchOptions));
                     } else {
                         task.setSearchOptions(searchOptions);
                     }
                 }
                 break;
         }
-    }
-
-    private void startTask(final FindFactorsTask.SearchOptions searchOptions){
-        final FindFactorsTask task = new FindFactorsTask(searchOptions);
-        task.addTaskListener(new TaskAdapter() {
-
-            @Override
-            public void onTaskStopped() {
-
-                //Auto-save
-                if (task.getSearchOptions().isAutoSave()) {
-                    new Thread(() -> {
-                        final boolean success = FileManager.getInstance().saveFactors(task.getFactors(), task.getNumber());
-                        new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show());
-                    }).start();
-                }
-
-                //Notify when finished
-                if (task.getSearchOptions().isNotifyWhenFinished()) {
-                    com.tycho.app.primenumberfinder.utils.NotificationManager.displayNotification(getActivity(), "default", task, com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_FACTORS, "Task \"Factors of " + NUMBER_FORMAT.format(task.getNumber()) + "\" finished.");
-                }
-                task.removeTaskListener(this);
-            }
-        });
-        taskListFragment.addTask(task);
-        PrimeNumberFinder.getTaskManager().registerTask(task);
-
-        //Start the task
-        task.startOnNewThread();
-        Utils.logTaskStarted(getContext(), task);
-
-        taskListFragment.setSelected(task);
-    }
-
-    private BigInteger getNumberToFactor() {
-        return Utils.textToNumber(editTextNumberToFactor.getText().toString());
     }
 }

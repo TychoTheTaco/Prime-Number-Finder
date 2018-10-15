@@ -24,7 +24,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -51,34 +50,9 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
 
     private final File directory;
 
-    private ColorStateList iconBackgroundTintList;
-    private String iconText;
-
     public SavedFilesListAdapter(final Context context, final File directory) {
         this.context = context;
         this.directory = directory;
-
-        switch (FileManager.getFileType(directory)) {
-            default:
-                iconText = "?";
-                break;
-
-            case PRIMES:
-                iconBackgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.purple));
-                iconText = "P";
-                break;
-
-            case FACTORS:
-                iconBackgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.orange));
-                iconText = "F";
-                break;
-
-            case TREE:
-                iconBackgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.green));
-                iconText = "T";
-                break;
-        }
-
         refresh();
     }
 
@@ -93,23 +67,37 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
         final File file = files.get(position);
 
         //Format icon
-        holder.icon.setText(iconText);
-        holder.icon.setBackgroundTintList(iconBackgroundTintList);
-        holder.iconImage.setVisibility(holder.isSelected() ? View.VISIBLE : View.GONE);
+        if (!holder.isSelected()){
+            switch (FileManager.getFileType(directory)) {
+                case PRIMES:
+                    holder.icon.setImageResource(R.drawable.find_primes_icon);
+                    holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.purple)));
+                    break;
+
+                case FACTORS:
+                    holder.icon.setImageResource(R.drawable.find_factors_icon);
+                    holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.orange)));
+                    break;
+
+                case TREE:
+                    holder.icon.setImageResource(R.drawable.prime_factorization_icon);
+                    holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.green)));
+                    break;
+            }
+        }
 
         //Set file name
         holder.fileName.setText(Utils.formatTitle(file));
 
         if (holder.isSelected()){
-            holder.icon.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.accent)));
-            holder.icon.setText("");
+            holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.accent)));
             holder.fileSize.setTextColor(ContextCompat.getColor(context, R.color.secondary_text));
         }else{
             holder.fileSize.setTextColor(Color.parseColor("#bebebe"));
         }
 
         holder.dateCreated.setText(simpleDateFormat.format(new Date(file.lastModified())));
-        holder.fileSize.setText(Utils.humanReadableByteCount(file.length(), true));
+        holder.fileSize.setText(Utils.humanReadableByteCount(file.length(), true).replaceAll("\\.\\d+", ""));
 
         holder.itemView.setSelected(holder.isSelected());
     }
@@ -148,22 +136,12 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
     }
 
     public void sortSearchRange(final boolean ascending){
-        Collections.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(File file0, File file1) {
-                return (ascending ? 1 : -1) * Long.compare(getRangeFromFileName(file0)[0], getRangeFromFileName(file1)[0]);
-            }
-        });
+        Collections.sort(files, (file0, file1) -> (ascending ? 1 : -1) * Long.compare(getRangeFromFileName(file0)[0], getRangeFromFileName(file1)[0]));
         notifyDataSetChanged();
     }
 
     public void sortNumber(final boolean ascending){
-        Collections.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(File file0, File file1) {
-                return (ascending ? 1 : -1) * Long.compare(getNumberFromFileName(file0), getNumberFromFileName(file1));
-            }
-        });
+        Collections.sort(files, (file0, file1) -> (ascending ? 1 : -1) * Long.compare(getNumberFromFileName(file0), getNumberFromFileName(file1)));
         notifyDataSetChanged();
     }
 
@@ -201,31 +179,25 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
         private final TextView fileName;
         private final TextView dateCreated;
         private final TextView fileSize;
-        protected final TextView icon;
-        private final ImageView iconImage;
+        protected final ImageView icon;
 
         private final ScaleAnimation scaleAnimation = new ScaleAnimation(1.0f, 1.25f, 1.0f, 1.25f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
 
         ViewHolder(final View itemView) {
             super(itemView);
             icon = itemView.findViewById(R.id.icon);
-            iconImage = itemView.findViewById(R.id.icon_image);
             fileName = itemView.findViewById(R.id.file_name);
             dateCreated =  itemView.findViewById(R.id.textView_dateCreated);
             fileSize = itemView.findViewById(R.id.file_size);
-
-            iconImage.setImageResource(R.drawable.round_check_24);
-            iconImage.setVisibility(View.GONE);
 
             scaleAnimation.setDuration(75);
             scaleAnimation.setRepeatCount(1);
             scaleAnimation.setRepeatMode(Animation.REVERSE);
 
-            icon.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    icon.startAnimation(scaleAnimation);
-                    iconImage.setVisibility(addToSelection(true) ? View.VISIBLE : View.GONE);
+            icon.setOnClickListener(v -> {
+                icon.startAnimation(scaleAnimation);
+                if (addToSelection(true)){
+                    icon.setImageResource(R.drawable.round_check_24);
                 }
             });
         }
@@ -243,7 +215,21 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
                     intent.putExtra("title", true);
                     context.startActivity(intent);
                 }
+            }else{
+                icon.startAnimation(scaleAnimation);
+                if (!isSelected()){
+                    icon.setImageResource(R.drawable.round_check_24);
+                }
             }
+        }
+
+        @Override
+        protected boolean onLongClick(View view) {
+            icon.startAnimation(scaleAnimation);
+            if (isSelected()){
+                icon.setImageResource(R.drawable.round_check_24);
+            }
+            return super.onLongClick(view);
         }
     }
 }

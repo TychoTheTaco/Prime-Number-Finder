@@ -27,7 +27,7 @@ public class TreeView extends View {
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "FactorTreeView";
+    private static final String TAG = TreeView.class.getSimpleName();
 
     /**
      * The {@linkplain Tree} object displayed by this view.
@@ -40,7 +40,7 @@ public class TreeView extends View {
     private final Paint paint = new Paint();
 
     /**
-     * The horizontal spacing between items in each level
+     * The horizontal spacing between items in each level.
      */
     private float[] horizontalSpacing;
 
@@ -93,6 +93,7 @@ public class TreeView extends View {
         final TypedArray typedArray = context.getTheme().obtainStyledAttributes(attributeSet, R.styleable.TreeView, 0, 0);
         try {
             touchEnabled = typedArray.getBoolean(R.styleable.TreeView_touchEnabled, true);
+            exportOptions.imageBackgroundColor = typedArray.getColor(R.styleable.TreeView_backgroundColor, Color.WHITE);
         }finally {
             typedArray.recycle();
         }
@@ -157,6 +158,11 @@ public class TreeView extends View {
         return this.exportOptions;
     }
 
+    public void setExportOptions(ExportOptions exportOptions) {
+        this.exportOptions = exportOptions;
+        invalidate();
+    }
+
     private boolean threadStarted = false;
 
     private Tree<Item> itemTree;
@@ -209,7 +215,7 @@ public class TreeView extends View {
 
         //Draw view border
         paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(Color.BLACK);
+        paint.setColor(exportOptions.imageBorderColor);
         paint.setStrokeWidth(0);
         canvas.drawRect(0, 0, getWidth(), getHeight(), paint);
     }
@@ -258,7 +264,7 @@ public class TreeView extends View {
                     lastTouchX = x;
                     lastTouchY = y;
 
-                    // Save the ID of this pointer
+                    // SAVE the ID of this pointer
                     mActivePointerId = event.getPointerId(0);
                     break;
                 }
@@ -441,7 +447,6 @@ public class TreeView extends View {
 
         return itemTree;
     }
-
 
     private void drawContents(final Tree<Item> itemTree, final Canvas canvas, final ExportOptions options) {
 
@@ -637,6 +642,7 @@ public class TreeView extends View {
     public static class ExportOptions implements Cloneable {
 
         public int imageBackgroundColor;
+        public int imageBorderColor = Color.BLACK;
 
         public int itemTextSize;
         public int itemTextColor;

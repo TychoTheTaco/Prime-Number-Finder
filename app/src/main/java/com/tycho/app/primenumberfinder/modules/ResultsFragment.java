@@ -19,13 +19,19 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.modules.findfactors.fragments.FindFactorsResultsFragment;
+import com.tycho.app.primenumberfinder.modules.findprimes.fragments.CheckPrimalityResultsFragment;
+import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesResultsFragment;
+import com.tycho.app.primenumberfinder.modules.gcf.fragments.GreatestCommonFactorResultsFragment;
+import com.tycho.app.primenumberfinder.modules.lcm.fragments.LeastCommonMultipleResultsFragment;
+import com.tycho.app.primenumberfinder.modules.primefactorization.fragments.PrimeFactorizationResultsFragment;
+import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
 import easytasks.Task;
-import easytasks.TaskListener;
 
 /**
  * Created by tycho on 11/19/2017.
@@ -39,7 +45,7 @@ public abstract class ResultsFragment extends TaskFragment {
     private static final String TAG = ResultsFragment.class.getSimpleName();
 
     /**
-     * This UI updater is responsible for updating the UI. It its life cycle is managed by this
+     * This UI updater is responsible for updating the UI. Its life cycle is managed by this
      * abstract class.
      */
     private final UIUpdater uiUpdater = new UIUpdater();
@@ -84,36 +90,273 @@ public abstract class ResultsFragment extends TaskFragment {
         } else {
             uiUpdater.resume();
         }
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
+
+                //Title
+                title.setText(getString(R.string.status_searching));
+                progressBar.startAnimation(rotateAnimation);
+
+                //Buttons
+                if (centerView != null){
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = (int) Utils.dpToPx(getContext(), 64);
+                    centerView.setLayoutParams(layoutParams);
+                }
+                if (pauseButton != null){
+                    pauseButton.setVisibility(View.VISIBLE);
+                    pauseButton.setEnabled(true);
+                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                }
+                if (viewAllButton != null){
+                    viewAllButton.setVisibility(View.VISIBLE);
+                }
+                if (saveButton != null){
+                    saveButton.setVisibility(View.GONE);
+                }
+
+                onPostStarted();
+            }
+        });
     }
 
     @Override
     public void onTaskPausing() {
         super.onTaskPausing();
         uiUpdater.resume();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
+
+                //Title
+                title.setText(getString(R.string.state_pausing));
+
+                //Buttons
+                if (centerView != null){
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = (int) Utils.dpToPx(getContext(), 64);
+                    centerView.setLayoutParams(layoutParams);
+                }
+                if (pauseButton != null){
+                    pauseButton.setVisibility(View.VISIBLE);
+                    pauseButton.setEnabled(false);
+                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                }
+                if (viewAllButton != null){
+                    viewAllButton.setVisibility(View.VISIBLE);
+                }
+                if (saveButton != null){
+                    saveButton.setVisibility(View.GONE);
+                }
+
+                onPostPausing();
+            }
+        });
     }
 
     @Override
     public void onTaskPaused() {
         super.onTaskPaused();
         uiUpdater.pause();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
+
+                //Title
+                title.setText(getString(R.string.status_paused));
+                progressBar.clearAnimation();
+
+                //Buttons
+                if (centerView != null){
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = (int) Utils.dpToPx(getContext(), 64);
+                    centerView.setLayoutParams(layoutParams);
+                }
+                if (pauseButton != null){
+                    pauseButton.setVisibility(View.VISIBLE);
+                    pauseButton.setEnabled(true);
+                    pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+                }
+                if (viewAllButton != null){
+                    viewAllButton.setVisibility(View.VISIBLE);
+                }
+                if (saveButton != null){
+                    saveButton.setVisibility(View.GONE);
+                }
+
+                onPostPaused();
+            }
+        });
     }
 
     @Override
     public void onTaskResuming() {
         super.onTaskResuming();
         uiUpdater.resume();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
+
+                //Title
+                title.setText(getString(R.string.state_resuming));
+
+                //Buttons
+                if (centerView != null){
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = (int) Utils.dpToPx(getContext(), 64);
+                    centerView.setLayoutParams(layoutParams);
+                }
+                if (pauseButton != null){
+                    pauseButton.setVisibility(View.VISIBLE);
+                    pauseButton.setEnabled(false);
+                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                }
+                if (viewAllButton != null){
+                    viewAllButton.setVisibility(View.VISIBLE);
+                }
+                if (saveButton != null){
+                    saveButton.setVisibility(View.GONE);
+                }
+
+                onPostResuming();
+            }
+        });
     }
 
     @Override
     public void onTaskResumed() {
         super.onTaskResumed();
         uiUpdater.resume();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
+
+                //Title
+                title.setText(getString(R.string.status_searching));
+                progressBar.startAnimation(rotateAnimation);
+
+                //Buttons
+                if (centerView != null){
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = (int) Utils.dpToPx(getContext(), 64);
+                    centerView.setLayoutParams(layoutParams);
+                }
+                if (pauseButton != null){
+                    pauseButton.setVisibility(View.VISIBLE);
+                    pauseButton.setEnabled(true);
+                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                }
+                if (viewAllButton != null){
+                    viewAllButton.setVisibility(View.VISIBLE);
+                }
+                if (saveButton != null){
+                    saveButton.setVisibility(View.GONE);
+                }
+
+                onPostResumed();
+            }
+        });
+    }
+
+    @Override
+    public void onTaskStopping() {
+        super.onTaskStopping();
+        uiUpdater.resume();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
+
+                //Title
+                title.setText(getString(R.string.status_stopping));
+                //progressBar.startAnimation(rotateAnimation);
+
+                //Buttons
+                if (centerView != null){
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = (int) Utils.dpToPx(getContext(), 64);
+                    centerView.setLayoutParams(layoutParams);
+                }
+                if (pauseButton != null){
+                    pauseButton.setVisibility(View.VISIBLE);
+                    pauseButton.setEnabled(false);
+                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                }
+                if (viewAllButton != null){
+                    viewAllButton.setVisibility(View.VISIBLE);
+                }
+                if (saveButton != null){
+                    saveButton.setVisibility(View.GONE);
+                }
+
+                onPostStopping();
+            }
+        });
     }
 
     @Override
     public void onTaskStopped() {
         super.onTaskStopped();
         uiUpdater.pause();
+        handler.post(() -> {
+            if (isAdded() && !isDetached() && getTask() != null) {
+                updateUi();
+
+                //Title
+                title.setText(getString(R.string.status_finished));
+                progressBar.clearAnimation();
+
+                //Buttons
+                if (centerView != null){
+                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
+                    layoutParams.width = 0;
+                    centerView.setLayoutParams(layoutParams);
+                }
+                if (pauseButton != null){
+                    pauseButton.setVisibility(View.GONE);
+                }
+                if (viewAllButton != null){
+                    viewAllButton.setVisibility(View.VISIBLE);
+                }
+                if (saveButton != null){
+                    saveButton.setVisibility(View.VISIBLE);
+                }
+
+                onPostStopped();
+            }
+        });
+    }
+
+    protected void onPostStarted(){
+        postDefaults();
+    }
+
+    protected void onPostPausing(){
+        postDefaults();
+    }
+
+    protected void onPostPaused(){
+        postDefaults();
+    }
+
+    protected void onPostResuming(){
+        postDefaults();
+    }
+
+    protected void onPostResumed(){
+        postDefaults();
+    }
+
+    protected void onPostStopping(){
+        postDefaults();
+    }
+
+    protected void onPostStopped(){
+        postDefaults();
+    }
+
+    protected void postDefaults(){
+
     }
 
     /**
@@ -189,6 +432,11 @@ public abstract class ResultsFragment extends TaskFragment {
      */
     protected synchronized void updateUi() {
         if (isAdded() && !isDetached()) {
+            if (getTask() != null){
+                //Elapsed time
+                timeElapsedTextView.setText(Utils.formatTimeHuman(getTask().getElapsedTime(), 2));
+            }
+            
             onUiUpdate();
         } else {
             Log.w(TAG, "Fragment not added or is detached! Dropping UI update: " + this);
@@ -203,12 +451,7 @@ public abstract class ResultsFragment extends TaskFragment {
         protected void run() {
             while (true) {
 
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateUi();
-                    }
-                });
+                handler.post(() -> updateUi());
 
                 try {
                     Thread.sleep(1000 / 25);
@@ -314,5 +557,39 @@ public abstract class ResultsFragment extends TaskFragment {
                         disabledColor,
                         defaultColor
                 });
+    }
+
+    protected int getTextHighlight(){
+        switch (PreferenceManager.getInt(PreferenceManager.Preference.THEME)){
+            default:
+            case 0:
+                if (this instanceof FindPrimesResultsFragment || this instanceof CheckPrimalityResultsFragment){
+                    return ContextCompat.getColor(getContext(), R.color.purple_dark);
+                }else if (this instanceof FindFactorsResultsFragment){
+                    return ContextCompat.getColor(getContext(), R.color.orange_dark);
+                }else if (this instanceof PrimeFactorizationResultsFragment){
+                    return ContextCompat.getColor(getContext(), R.color.green_dark);
+                }else if (this instanceof LeastCommonMultipleResultsFragment){
+                    return ContextCompat.getColor(getContext(), R.color.yellow_dark);
+                }else if (this instanceof GreatestCommonFactorResultsFragment){
+                    return ContextCompat.getColor(getContext(), R.color.blue_dark);
+                }
+                break;
+
+            case 1:
+                if (this instanceof FindPrimesResultsFragment || this instanceof CheckPrimalityResultsFragment){
+                    return ContextCompat.getColor(getContext(), R.color.purple_light);
+                }else if (this instanceof FindFactorsResultsFragment){
+                    return ContextCompat.getColor(getContext(), R.color.orange_light);
+                }else if (this instanceof PrimeFactorizationResultsFragment){
+                    return ContextCompat.getColor(getContext(), R.color.green_light);
+                }else if (this instanceof LeastCommonMultipleResultsFragment){
+                    return ContextCompat.getColor(getContext(), R.color.yellow_light);
+                }else if (this instanceof GreatestCommonFactorResultsFragment){
+                    return ContextCompat.getColor(getContext(), R.color.blue_light);
+                }
+                break;
+        }
+        return 0;
     }
 }

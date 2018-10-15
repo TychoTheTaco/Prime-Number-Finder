@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -22,8 +23,8 @@ import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.jaredrummler.android.colorpicker.ColorPickerDialog;
-import com.tycho.app.primenumberfinder.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.activities.AbstractActivity;
 import com.tycho.app.primenumberfinder.modules.savedfiles.ColorPickerListener;
 import com.tycho.app.primenumberfinder.ui.TreeView;
 import com.tycho.app.primenumberfinder.utils.FileManager;
@@ -69,6 +70,7 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.PrimeFactorization);
         setContentView(R.layout.factor_tree_export_options_activity);
 
         //Get the intent
@@ -83,6 +85,7 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                 final Toolbar toolbar = findViewById(R.id.toolbar);
                 setSupportActionBar(toolbar);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                Utils.applyTheme(this, ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
 
                 final EditText fileNameInput = findViewById(R.id.file_name);
                 treeView = findViewById(R.id.factor_tree_preview);

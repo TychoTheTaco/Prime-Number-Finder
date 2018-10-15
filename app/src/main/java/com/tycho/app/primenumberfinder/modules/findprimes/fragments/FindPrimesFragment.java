@@ -2,12 +2,14 @@ package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,14 +21,12 @@ import android.widget.Toast;
 import com.crashlytics.android.Crashlytics;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.ModuleHostFragment;
-import com.tycho.app.primenumberfinder.modules.TaskListFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.adapters.FindPrimesTaskListAdapter;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
-import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
@@ -35,8 +35,11 @@ import java.util.Random;
 import java.util.UUID;
 
 import easytasks.Task;
-import easytasks.TaskAdapter;
 
+import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.DELETE;
+import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.PAUSE;
+import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.SAVE;
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_PRIMES;
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
 /**
@@ -208,7 +211,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
                 //Create a new task
                 searchOptions.setThreadCount(1);
                 try {
-                    startTask((FindPrimesTask.SearchOptions) searchOptions.clone());
+                    startTask(new FindPrimesTask((FindPrimesTask.SearchOptions) searchOptions.clone()));
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }
@@ -228,14 +231,80 @@ public class FindPrimesFragment extends ModuleHostFragment {
 
     @Override
     protected void loadFragments() {
-        taskListFragment = (TaskListFragment) addFragment("Tasks", TaskListFragment.class);
-        resultsFragment = (GeneralResultsFragment) addFragment("Results", GeneralResultsFragment.class);
+        super.loadFragments();
+        setResultsFragment(GeneralResultsFragment.class);
     }
 
     @Override
     protected void afterLoadFragments() {
-        //Set up Task list fragment
-        taskListFragment.setAdapter(new FindPrimesTaskListAdapter(getContext()));
+        taskListFragment.setAdapter(new AbstractTaskListAdapter<Task>(getContext(), SAVE, PAUSE, DELETE){
+
+            /*@Override
+            public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+                super.onBindViewHolder(holder, position);
+
+                if (getTask(position) instanceof CheckPrimalityTask){
+                    holder.saveButton.setVisibility(View.GONE);
+                    holder.editButton.setVisibility(View.GONE);
+                }
+            }*/
+
+            @Override
+            protected CharSequence getTitle(Task task) {
+                if (task instanceof FindPrimesTask) {
+                    final long endValue = ((FindPrimesTask) task).getEndValue();
+                    return context.getString(R.string.find_primes_task_list_item_title, NUMBER_FORMAT.format(((FindPrimesTask) task).getStartValue()), endValue == FindPrimesTask.INFINITY ? context.getString(R.string.infinity_text) : NUMBER_FORMAT.format(endValue));
+                } else if (task instanceof CheckPrimalityTask) {
+                   return context.getString(R.string.check_primality_task_list_title, NUMBER_FORMAT.format(((CheckPrimalityTask) task).getNumber()));
+                }
+                return super.getTitle(task);
+            }
+
+            @Override
+            protected CharSequence getSubtitle(Task task) {
+                if (task.getState() == Task.State.STOPPED){
+                    final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+                    spannableStringBuilder.append(context.getString(R.string.status_finished));
+                    spannableStringBuilder.append(": ");
+                    if (task instanceof FindPrimesTask){
+                        spannableStringBuilder.append(context.getString(R.string.find_primes_result, NUMBER_FORMAT.format(((FindPrimesTask) task).getPrimeCount())));
+                        spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, getTheme() == 0 ? R.color.accent_dark : R.color.accent_light_but_not_that_light)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                    }else if (task instanceof CheckPrimalityTask){
+                        spannableStringBuilder.append(context.getString(R.string.check_primality_result, NUMBER_FORMAT.format(((CheckPrimalityTask) task).getNumber()), ((CheckPrimalityTask) task).isPrime() ? "prime" : "not prime"));
+                        spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, getTheme() == 0 ? R.color.accent_dark : R.color.accent_light_but_not_that_light)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                    }
+                   return spannableStringBuilder;
+                }
+                return super.getSubtitle(task);
+            }
+
+            @Override
+            protected void onUpdate(AbstractTaskListAdapter.ViewHolder holder) {
+                final Task task = getTask(holder.getAdapterPosition());
+
+                if (task instanceof CheckPrimalityTask){
+                    if (holder.saveButton != null) holder.saveButton.setVisibility(View.GONE);
+                    if (holder.editButton != null) holder.editButton.setVisibility(View.GONE);
+                }
+
+                //Set progress
+                if (holder.getAdapterPosition() != -1){
+                    if (task.getState() == Task.State.STOPPED || task instanceof FindPrimesTask && ((FindPrimesTask) task).getEndValue() == FindPrimesTask.INFINITY){
+                        holder.progress.setVisibility(View.GONE);
+                    }else if (task.getState() != Task.State.STOPPED){
+                        holder.progress.setVisibility(View.VISIBLE);
+                        holder.progress.setText(context.getString(R.string.task_progress, DECIMAL_FORMAT.format(task.getProgress() * 100)));
+                    }
+                }else{
+                    Log.w(TAG, "Warning: Adapter position was -1");
+                }
+            }
+
+            @Override
+            protected int getTaskType() {
+                return TASK_TYPE_FIND_PRIMES;
+            }
+        });
         taskListFragment.whitelist(FindPrimesTask.class, CheckPrimalityTask.class);
     }
 
@@ -248,7 +317,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
                     final FindPrimesTask.SearchOptions searchOptions = data.getExtras().getParcelable("searchOptions");
                     if (searchOptions != null) {
                         if (task == null) {
-                            startTask(searchOptions);
+                            startTask(new FindPrimesTask(searchOptions));
                         } else {
                             task.setOptions(searchOptions);
                         }
@@ -302,35 +371,6 @@ public class FindPrimesFragment extends ModuleHostFragment {
         Crashlytics.setLong("availableHeapMB", availHeapSizeInMB);
 
         return requiredMB <= availHeapSizeInMB;
-    }
-
-    private void startTask(final FindPrimesTask.SearchOptions searchOptions) {
-        final FindPrimesTask task = new FindPrimesTask(searchOptions);
-        task.addTaskListener(new TaskAdapter() {
-
-            @Override
-            public void onTaskStopped() {
-                if (task.getSearchOptions().isAutoSave()) {
-                    new Thread(() -> {
-                        final boolean success = FileManager.getInstance().savePrimes(task.getStartValue(), task.getEndValue(), task.getSortedPrimes());
-                        new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show());
-                    }).start();
-                }
-
-                if (task.getSearchOptions().isNotifyWhenFinished()) {
-                    com.tycho.app.primenumberfinder.utils.NotificationManager.displayNotification(getActivity(), "default", task, com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_PRIMES, "Task \"Primes from " + NUMBER_FORMAT.format(task.getStartValue()) + " to " + NUMBER_FORMAT.format(task.getEndValue()) + "\" finished.");
-                }
-                task.removeTaskListener(this);
-            }
-        });
-        taskListFragment.addTask(task);
-        PrimeNumberFinder.getTaskManager().registerTask(task);
-
-        //Start the task
-        task.startOnNewThread();
-        Utils.logTaskStarted(getContext(), task);
-
-        taskListFragment.setSelected(task);
     }
 
     private BigInteger getPrimalityInput() {
@@ -397,7 +437,6 @@ public class FindPrimesFragment extends ModuleHostFragment {
     @Override
     public void onSavePressed(Task task) {
         if (task instanceof FindPrimesTask) {
-            Crashlytics.log(Log.DEBUG, TAG, "Save button clicked\nActivity: " + getActivity() + "\nView: " + taskListFragment.getView());
             findPrimesResultsFragment.saveTask((FindPrimesTask) task, getActivity());
         }
     }

@@ -13,6 +13,35 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:title="@string/quick_copy">
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="quickCopy"
+            android:summary="@string/quick_copy_description"
+            android:title="@string/quick_copy_title"/>
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="quickCopyKeepFormatting"
+            android:dependency="quickCopy"
+            android:summary="@string/quick_copy_keep_formatting_description"
+            android:title="@string/quick_copy_keep_formatting_title"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/theme">
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="theme"
+            android:summary="@string/dark_theme_description"
+            android:title="@string/dark_theme_title"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="@string/privacy">
 
         <CheckBoxPreference

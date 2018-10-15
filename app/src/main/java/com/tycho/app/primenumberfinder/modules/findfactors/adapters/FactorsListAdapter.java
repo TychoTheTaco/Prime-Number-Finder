@@ -27,7 +27,7 @@ public class FactorsListAdapter extends RecyclerView.Adapter<FactorsListAdapter.
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "FactorsListAdapter";
+    private static final String TAG = FactorsListAdapter.class.getSimpleName();
 
     /**
      * List of factors in this adapter.
@@ -105,15 +105,10 @@ public class FactorsListAdapter extends RecyclerView.Adapter<FactorsListAdapter.
             factor0 = view.findViewById(R.id.factor0);
             factor1 = view.findViewById(R.id.factor1);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(context, context.getString(R.string.factors_list_toast_message,
-                            numberFormat.format(factors.get(getAdapterPosition())),
-                            Utils.formatNumberOrdinal(getAdapterPosition() + 1)),
-                            Toast.LENGTH_SHORT).show();
-                }
-            });
+            itemView.setOnClickListener(v -> Toast.makeText(context, context.getString(R.string.factors_list_toast_message,
+                    numberFormat.format(factors.get(getAdapterPosition())),
+                    Utils.formatNumberOrdinal(getAdapterPosition() + 1)),
+                    Toast.LENGTH_SHORT).show());
         }
     }
 }

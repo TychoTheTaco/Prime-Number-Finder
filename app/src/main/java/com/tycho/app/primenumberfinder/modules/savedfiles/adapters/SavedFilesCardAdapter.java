@@ -42,7 +42,7 @@ public class SavedFilesCardAdapter extends RecyclerView.Adapter<SavedFilesCardAd
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.card_view_saved_files, parent, false));
+        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.saved_files_card, parent, false));
     }
 
     @Override
@@ -99,16 +99,13 @@ public class SavedFilesCardAdapter extends RecyclerView.Adapter<SavedFilesCardAd
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             recyclerView.setItemAnimator(null);
 
-            bottomBar = itemView.findViewById(R.id.layout_bottomBar);
+            bottomBar = itemView.findViewById(R.id.content_layout);
 
             viewAllButton = itemView.findViewById(R.id.button);
-            viewAllButton.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View view){
-                    final Intent intent = new Intent(context, SavedFilesListActivity.class);
-                    intent.putExtra("directory", cards.get(getAdapterPosition()).getDirectory());
-                    context.startActivity(intent);
-                }
+            viewAllButton.setOnClickListener(view -> {
+                final Intent intent = new Intent(context, SavedFilesListActivity.class);
+                intent.putExtra("directory", cards.get(getAdapterPosition()).getDirectory());
+                context.startActivity(intent);
             });
 
         }

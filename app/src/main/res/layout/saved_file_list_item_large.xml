@@ -2,31 +2,21 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="48dp"
-    android:background="@drawable/selected_item_background"
+    android:background="@drawable/selectable_item_background"
     android:clipChildren="false"
     android:clipToPadding="false"
     android:orientation="horizontal"
     android:padding="8dp">
 
-    <TextView
+    <ImageView
         android:id="@+id/icon"
         android:layout_width="26dp"
         android:layout_height="26dp"
         android:layout_centerVertical="true"
         android:layout_marginEnd="8dp"
-        android:background="@drawable/circle_white"
+        android:src="@drawable/circle_white"
         android:gravity="center"
-        android:textColor="@color/white"
-        android:textSize="12sp" />
-
-    <ImageView
-        android:layout_alignStart="@id/icon"
-        android:layout_alignTop="@id/icon"
-        android:tint="@color/white"
-        android:id="@+id/icon_image"
-        android:layout_width="26dp"
-        android:layout_height="26dp"
-        android:gravity="center" />
+        android:tint="@color/black" />
 
     <TextView
         android:id="@+id/file_name"
@@ -36,7 +26,6 @@
         android:ellipsize="end"
         android:gravity="top"
         android:singleLine="true"
-        android:textColor="@color/primary_text"
         android:textSize="14sp" />
 
     <TextView

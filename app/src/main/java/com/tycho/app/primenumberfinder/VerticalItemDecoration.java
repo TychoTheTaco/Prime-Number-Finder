@@ -13,10 +13,7 @@ public class VerticalItemDecoration extends RecyclerView.ItemDecoration{
 
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state){
-        //outRect.top = space;
-
-        //If this is the first child, add the top padding
-        if (parent.getChildAdapterPosition(view) == 0){
+        if (parent.getChildAdapterPosition(view) != 0){
             outRect.top = space;
         }
     }

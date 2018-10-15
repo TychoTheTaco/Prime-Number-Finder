@@ -3,9 +3,6 @@ package com.tycho.app.primenumberfinder.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import static com.tycho.app.primenumberfinder.utils.PreferenceManager.Preference.ALLOW_ANALYTICS;
-import static com.tycho.app.primenumberfinder.utils.PreferenceManager.Preference.FILE_VERSION;
-
 /**
  * Saves user preferences using Android's {@link SharedPreferences} implementation.
  *
@@ -22,10 +19,6 @@ public class PreferenceManager {
 
     private static SharedPreferences sharedPreferences;
 
-    private boolean allowBackgroundTasks;
-    private int fileVersion;
-    private boolean allowAnalytics;
-
     public static final int CURRENT_VERSION = 1;
 
     public static void initialize(final Context context) {
@@ -34,9 +27,13 @@ public class PreferenceManager {
     }
 
     private static void loadPreferences() {
-        Preference.FILE_VERSION.setValue(sharedPreferences.getInt(Preference.FILE_VERSION.getKey(), (Integer) Preference.FILE_VERSION.getDefaultValue()));
-        Preference.ALLOW_BACKGROUND_TASKS.setValue(sharedPreferences.getBoolean(Preference.ALLOW_BACKGROUND_TASKS.getKey(), (Boolean) Preference.ALLOW_BACKGROUND_TASKS.getDefaultValue()));
-        Preference.ALLOW_ANALYTICS.setValue(sharedPreferences.getBoolean(Preference.ALLOW_ANALYTICS.getKey(), (Boolean) Preference.ALLOW_ANALYTICS.getDefaultValue()));
+        for (Preference preference : Preference.values()){
+            if (preference.getDefaultValue() instanceof Integer){
+                preference.setValue(sharedPreferences.getInt(preference.getKey(), (Integer) preference.getDefaultValue()));
+            }else if (preference.getDefaultValue() instanceof Boolean){
+                preference.setValue(sharedPreferences.getBoolean(preference.getKey(), (Boolean) preference.getDefaultValue()));
+            }
+        }
     }
 
     public static void set(Preference preference, Object value) {
@@ -67,7 +64,10 @@ public class PreferenceManager {
     public enum Preference {
         ALLOW_BACKGROUND_TASKS("allowBackgroundTasks", false),
         FILE_VERSION("fileVersion", 0),
-        ALLOW_ANALYTICS("allowAnalytics", true);
+        ALLOW_ANALYTICS("allowAnalytics", true),
+        QUICK_COPY("quickCopy", true),
+        QUICK_COPY_KEEP_FORMATTING("quickCopyKeepFormatting", false),
+        THEME("theme", 0);
 
         private final String key;
 

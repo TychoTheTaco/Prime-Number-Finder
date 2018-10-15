@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/round_rectangle_white"
+    android:backgroundTint="@color/green_light">
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/round_check_24"
+        android:drawableTint="@color/white"
+        android:paddingEnd="4dp"
+        android:gravity="center_vertical"
+        android:paddingStart="4dp"
+        android:text="Copied!"
+        android:textColor="@color/white" />
+
+</LinearLayout>

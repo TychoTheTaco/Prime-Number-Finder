@@ -2,24 +2,24 @@ package com.tycho.app.primenumberfinder.modules.about;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.activities.AbstractActivity;
 
 /**
  * Created by tycho on 2/7/2018.
  */
 
-public class ChangelogActivity extends AppCompatActivity {
+public class ChangelogActivity extends AbstractActivity {
 
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "ChangelogActivity";
+    private static final String TAG = ChangelogActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,14 +43,11 @@ public class ChangelogActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()){
-
             case android.R.id.home:
                 onBackPressed();
                 break;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }

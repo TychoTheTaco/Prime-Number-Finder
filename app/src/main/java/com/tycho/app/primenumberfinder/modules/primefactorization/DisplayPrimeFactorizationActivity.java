@@ -2,8 +2,8 @@ package com.tycho.app.primenumberfinder.modules.primefactorization;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -26,6 +26,7 @@ import com.tycho.app.primenumberfinder.activities.DisplayContentActivity;
 import com.tycho.app.primenumberfinder.modules.primefactorization.export.FactorTreeExportOptionsActivity;
 import com.tycho.app.primenumberfinder.ui.TreeView;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
@@ -74,6 +75,7 @@ public class DisplayPrimeFactorizationActivity extends DisplayContentActivity {
         toolbar.setPopupTheme(R.style.PrimeFactorization_PopupOverlay);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Utils.applyTheme(this, ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
 
         progressDialog = ProgressDialog.show(this, "Loading...", "Loading file.");
 
@@ -114,68 +116,73 @@ public class DisplayPrimeFactorizationActivity extends DisplayContentActivity {
     @Override
     protected void loadFile(final File file) {
         //Load file in another thread
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+        new Thread(() -> {
 
-                factorTree = FileManager.getInstance().readTree(file);
-                progressDialog.dismiss();
+            factorTree = FileManager.getInstance().readTree(file);
+            progressDialog.dismiss();
 
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
+            runOnUiThread(() -> {
 
-                        if (factorTree == null){
-                            showLoadingError();
-                            return;
-                        }
-                        
-                        treeView.setTree(factorTree.formatNumbers());
+                if (factorTree == null) {
+                    showLoadingError();
+                    return;
+                }
 
-                        final Map<Long, Integer> map = new TreeMap<>();
-                        getPrimeFactors(map, factorTree);
+                treeView.setTree(factorTree.formatNumbers());
+                if (PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 1){
+                    final TreeView.ExportOptions exportOptions = treeView.getDefaultExportOptions();
+                    exportOptions.itemTextColor = Color.WHITE;
+                    exportOptions.itemBorderColor = ContextCompat.getColor(this, R.color.accent_light_but_not_that_light);
+                    exportOptions.branchColor = Color.WHITE;
+                    exportOptions.itemBackgroundColor = Color.BLACK;
+                    exportOptions.imageBorderColor = Color.WHITE;
+                    exportOptions.imageBackgroundColor = Color.BLACK;
+                    exportOptions.primeFactorTextColor = ContextCompat.getColor(this, R.color.red);
+                    treeView.setExportOptions(exportOptions);
+                }
 
-                        //Subtitle
-                        subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder,
-                                getResources().getQuantityString(R.plurals.prime_factorization_subtitle_results, map.keySet().size()),
-                                new String[]{NUMBER_FORMAT.format(factorTree.getValue()), NUMBER_FORMAT.format(map.keySet().size())},
-                                ContextCompat.getColor(getBaseContext(), R.color.green_dark)
-                        ));
+                final Map<Long, Integer> map = new TreeMap<>();
+                getPrimeFactors(map, factorTree);
 
-                        //Body
-                        spannableStringBuilder.clear();
-                        spannableStringBuilder.clearSpans();
-                        spannableStringBuilder.append(NUMBER_FORMAT.format(factorTree.getValue()));
-                        spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), R.color.green_dark)), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                        spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                        int position = spannableStringBuilder.length();
-                        spannableStringBuilder.append(" = ");
-                        spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                        for (Long factor : map.keySet()) {
-                            position = spannableStringBuilder.length();
-                            String content = NUMBER_FORMAT.format(factor);
-                            spannableStringBuilder.append(content);
-                            spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), R.color.green_dark)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                            spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                //Subtitle
+                subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder,
+                        getResources().getQuantityString(R.plurals.prime_factorization_subtitle_results, map.keySet().size()),
+                        new String[]{NUMBER_FORMAT.format(factorTree.getValue()), NUMBER_FORMAT.format(map.keySet().size())},
+                        ContextCompat.getColor(getBaseContext(), PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 0 ? R.color.green_dark : R.color.green_light)
+                ));
 
-                            position = spannableStringBuilder.length();
-                            content = NUMBER_FORMAT.format(map.get(factor));
-                            spannableStringBuilder.append(content);
-                            spannableStringBuilder.setSpan(new SuperscriptSpan(), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                            spannableStringBuilder.setSpan(new RelativeSizeSpan(0.8f), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                //Body
+                spannableStringBuilder.clear();
+                spannableStringBuilder.clearSpans();
+                spannableStringBuilder.append(NUMBER_FORMAT.format(factorTree.getValue()));
+                spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 0 ? R.color.green_dark : R.color.green_light)), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                int position = spannableStringBuilder.length();
+                spannableStringBuilder.append(" = ");
+                spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                for (Long factor : map.keySet()) {
+                    position = spannableStringBuilder.length();
+                    String content = NUMBER_FORMAT.format(factor);
+                    spannableStringBuilder.append(content);
+                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 0 ? R.color.green_dark : R.color.green_light)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                    spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 
-                            position = spannableStringBuilder.length();
-                            content = " \u00D7 "; //Multiplication sign
-                            spannableStringBuilder.append(content);
-                            spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                        }
-                        spannableStringBuilder.delete(spannableStringBuilder.length() - 3, spannableStringBuilder.length());
-                        bodyTextView.setVisibility(View.VISIBLE);
-                        bodyTextView.setText(spannableStringBuilder);
-                    }
-                });
+                    position = spannableStringBuilder.length();
+                    content = NUMBER_FORMAT.format(map.get(factor));
+                    spannableStringBuilder.append(content);
+                    spannableStringBuilder.setSpan(new SuperscriptSpan(), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                    spannableStringBuilder.setSpan(new RelativeSizeSpan(0.8f), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 
-            }
+                    position = spannableStringBuilder.length();
+                    content = " \u00D7 "; //Multiplication sign
+                    spannableStringBuilder.append(content);
+                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                }
+                spannableStringBuilder.delete(spannableStringBuilder.length() - 3, spannableStringBuilder.length());
+                bodyTextView.setVisibility(View.VISIBLE);
+                bodyTextView.setText(spannableStringBuilder);
+            });
+
         }).start();
     }
 
@@ -190,7 +197,6 @@ public class DisplayPrimeFactorizationActivity extends DisplayContentActivity {
             } else {
                 map.put(tree.getValue(), map.get(tree.getValue()) + 1);
             }
-
         }
     }
 
@@ -221,20 +227,14 @@ public class DisplayPrimeFactorizationActivity extends DisplayContentActivity {
                 final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
                 alertDialog.setTitle("Warning");
                 alertDialog.setMessage("Are you sure you want to delete this saved file?");
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Delete",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                file.delete();
-                                alertDialog.dismiss();
-                                finish();
-                            }
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "DELETE",
+                        (dialog, which) -> {
+                            file.delete();
+                            alertDialog.dismiss();
+                            finish();
                         });
                 alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                alertDialog.dismiss();
-                            }
-                        });
+                        (dialog, which) -> alertDialog.dismiss());
                 alertDialog.show();
                 break;
         }

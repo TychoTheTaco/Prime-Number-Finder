@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/horizon_blur"/>
+        android:src="@drawable/cloudy_peak"/>
 
     <TextView
         android:id="@+id/textView_appTitle"
@@ -20,6 +20,8 @@
         android:gravity="center"
         android:shadowColor="#000000"
         android:shadowDx="0.0"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
         android:shadowDy="0.0"
         android:shadowRadius="24.0"
         android:text="@string/app_name"

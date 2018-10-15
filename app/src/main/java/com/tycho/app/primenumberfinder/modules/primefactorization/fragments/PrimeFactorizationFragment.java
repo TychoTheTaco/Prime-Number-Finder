@@ -1,50 +1,39 @@
 package com.tycho.app.primenumberfinder.modules.primefactorization.fragments;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextWatcher;
-import android.util.Log;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.tycho.app.primenumberfinder.ActionViewListener;
-import com.tycho.app.primenumberfinder.FabAnimator;
-import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
-import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
+import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.ModuleHostFragment;
-import com.tycho.app.primenumberfinder.modules.TaskListFragment;
-import com.tycho.app.primenumberfinder.modules.findprimes.fragments.GeneralResultsFragment;
-import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
-import com.tycho.app.primenumberfinder.modules.primefactorization.adapters.PrimeFactorizationTaskListAdapter;
-import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
 import java.math.BigInteger;
-import java.text.NumberFormat;
-import java.util.Locale;
 import java.util.UUID;
 
 import easytasks.Task;
-import easytasks.TaskAdapter;
 
+import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.DELETE;
+import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.PAUSE;
+import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.SAVE;
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_PRIME_FACTORIZATION;
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
 /**
@@ -87,28 +76,25 @@ public class PrimeFactorizationFragment extends ModuleHostFragment {
         });
 
         //Set up start button
-        rootView.findViewById(R.id.button_generate_factor_tree).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        rootView.findViewById(R.id.button_generate_factor_tree).setOnClickListener(v -> {
 
-                //Check if the number is valid
-                if (Validator.isValidFactorInput(getNumberToFactor())) {
+            //Check if the number is valid
+            if (Validator.isValidFactorInput(getNumberToFactor())) {
 
-                    //Create a new task
-                    searchOptions.setNumber(getNumberToFactor().longValue());
-                    try {
-                        startTask((PrimeFactorizationTask.SearchOptions) searchOptions.clone());
-                    } catch (CloneNotSupportedException e) {
-                    }
-
-                    hideKeyboard(getActivity());
-                    taskListFragment.scrollToBottom();
-
-                } else {
-                    Toast.makeText(getActivity(), "Invalid number", Toast.LENGTH_SHORT).show();
+                //Create a new task
+                searchOptions.setNumber(getNumberToFactor().longValue());
+                try {
+                    startTask(new PrimeFactorizationTask((PrimeFactorizationTask.SearchOptions) searchOptions.clone()));
+                } catch (CloneNotSupportedException e) {
                 }
 
+                hideKeyboard(getActivity());
+                taskListFragment.scrollToBottom();
+
+            } else {
+                Toast.makeText(getActivity(), "Invalid number", Toast.LENGTH_SHORT).show();
             }
+
         });
 
         return rootView;
@@ -116,22 +102,43 @@ public class PrimeFactorizationFragment extends ModuleHostFragment {
 
     @Override
     protected void loadFragments() {
-        taskListFragment = (TaskListFragment) addFragment("Tasks", TaskListFragment.class);
-        resultsFragment = (PrimeFactorizationResultsFragment) addFragment("Results", PrimeFactorizationResultsFragment.class);
+        super.loadFragments();
+        setResultsFragment(PrimeFactorizationResultsFragment.class);
     }
 
     @Override
     protected void afterLoadFragments() {
-        //Set up Task list fragment
-        taskListFragment.setAdapter(new PrimeFactorizationTaskListAdapter(getContext()));
+        taskListFragment.setAdapter(new AbstractTaskListAdapter<PrimeFactorizationTask>(getContext(), SAVE, PAUSE, DELETE){
+
+            @Override
+            protected CharSequence getTitle(PrimeFactorizationTask task) {
+               return context.getString(R.string.prime_factorization_task_list_item_title, NUMBER_FORMAT.format(task.getNumber()));
+            }
+
+            @Override
+            protected CharSequence getSubtitle(PrimeFactorizationTask task) {
+                if (task.getState() == Task.State.STOPPED){
+                    final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+                    spannableStringBuilder.append(context.getString(R.string.status_finished));
+                    spannableStringBuilder.append(": ");
+                    spannableStringBuilder.append(context.getString(R.string.prime_factorization_result, NUMBER_FORMAT.format((task.getPrimeFactors().size()))));
+                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, getTheme() == 0 ? R.color.accent_dark : R.color.accent_light_but_not_that_light)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                    return spannableStringBuilder;
+                }
+                return super.getSubtitle(task);
+            }
+
+            @Override
+            protected int getTaskType() {
+                return TASK_TYPE_PRIME_FACTORIZATION;
+            }
+        });
         taskListFragment.whitelist(PrimeFactorizationTask.class);
     }
 
     private BigInteger getNumberToFactor() {
         return Utils.textToNumber(editTextInput.getText().toString());
     }
-
-    private static final int REQUEST_CODE_NEW_TASK = 0;
 
     @Override
     public void onClick(View view) {
@@ -141,15 +148,13 @@ public class PrimeFactorizationFragment extends ModuleHostFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         switch (requestCode) {
-
             case REQUEST_CODE_NEW_TASK:
                 if (data != null && data.getExtras() != null) {
                     final PrimeFactorizationTask.SearchOptions searchOptions = data.getExtras().getParcelable("searchOptions");
                     final PrimeFactorizationTask task = (PrimeFactorizationTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) data.getExtras().get("taskId"));
                     if (task == null) {
-                        startTask(searchOptions);
+                        startTask(new PrimeFactorizationTask(searchOptions));
                     } else {
                         task.setSearchOptions(searchOptions);
                     }
@@ -169,37 +174,5 @@ public class PrimeFactorizationFragment extends ModuleHostFragment {
     @Override
     public void onSavePressed(Task task) {
         ((PrimeFactorizationResultsFragment) resultsFragment).saveTask((PrimeFactorizationTask) task, getActivity());
-    }
-
-    private void startTask(final PrimeFactorizationTask.SearchOptions searchOptions) {
-        final PrimeFactorizationTask task = new PrimeFactorizationTask(searchOptions);
-        task.addTaskListener(new TaskAdapter() {
-
-            @Override
-            public void onTaskStopped() {
-
-                //Auto-save
-                if (task.getSearchOptions().isAutoSave()) {
-                    new Thread(() -> {
-                        final boolean success = FileManager.getInstance().saveTree(task.getFactorTree());
-                        new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show());
-                    }).start();
-                }
-
-                //Notify when finished
-                if (task.getSearchOptions().isNotifyWhenFinished()) {
-                    com.tycho.app.primenumberfinder.utils.NotificationManager.displayNotification(getActivity(), "default", task, com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_PRIME_FACTORIZATION, "Task \"Prime factorization of " + NUMBER_FORMAT.format(task.getNumber()) + "\" finished.");
-                }
-                task.removeTaskListener(this);
-            }
-        });
-        taskListFragment.addTask(task);
-        PrimeNumberFinder.getTaskManager().registerTask(task);
-
-        //Start the task
-        task.startOnNewThread();
-        Utils.logTaskStarted(getContext(), task);
-
-        taskListFragment.setSelected(task);
     }
 }

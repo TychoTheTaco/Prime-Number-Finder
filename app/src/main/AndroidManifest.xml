@@ -1,84 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.tycho.app.primenumberfinder"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.tycho.app.primenumberfinder">
 
     <application
         android:name=".PrimeNumberFinder"
         android:allowBackup="false"
-        android:largeHeap="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Default.NoActionBar">
+        android:largeHeap="true"
+        android:theme="@style/Light.NoActionBar">
 
         <!-- Disable automatic analytics-->
-        <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="false" />
 
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <activity
-            android:theme="@style/Default.NoActionBar"
             android:name=".modules.savedfiles.SavedFilesListActivity"
-            android:label="Saved Files"/>
+            android:label="Saved Files" />
 
         <activity
-            android:theme="@style/FindPrimes.Activity"
-            android:windowSoftInputMode="adjustPan"
             android:name=".modules.findprimes.DisplayPrimesActivity"
-            android:label="Primes"/>
+            android:label="Primes"
+            android:windowSoftInputMode="adjustPan" />
 
         <activity
-            android:theme="@style/FindPrimes.Activity"
             android:name=".modules.findprimes.FindPrimesConfigurationActivity"
-            android:label="Configure Task"/>
+            android:label="Configure Task" />
 
         <activity
-            android:theme="@style/FindFactors.Activity"
             android:name=".modules.findfactors.FindFactorsConfigurationActivity"
-            android:label="Configure Task"/>
+            android:label="Configure Task" />
 
         <activity
-            android:theme="@style/PrimeFactorization.Activity"
             android:name=".modules.primefactorization.PrimeFactorizationConfigurationActivity"
-            android:label="Configure Task"/>
+            android:label="Configure Task" />
 
         <activity
-            android:theme="@style/FindFactors.Activity"
-            android:windowSoftInputMode="adjustPan"
+            android:name=".modules.lcm.LCMConfigurationActivity"
+            android:label="Configure Task" />
+
+        <activity
+            android:name=".modules.gcf.GCFConfigurationActivity"
+            android:label="Configure Task" />
+
+        <activity
             android:name=".modules.findfactors.DisplayFactorsActivity"
-            android:label="Factors"/>
+            android:label="Factors"
+            android:windowSoftInputMode="adjustPan" />
 
         <activity
-            android:theme="@style/PrimeFactorization.Activity"
             android:name=".modules.primefactorization.DisplayPrimeFactorizationActivity"
-            android:label="Prime Factorization"/>
+            android:label="Prime Factorization" />
 
         <activity
-            android:theme="@style/Default.NoActionBar"
             android:name=".modules.about.ChangelogActivity"
-            android:label="Changelog"/>
+            android:label="Changelog" />
 
         <activity
-            android:theme="@style/PrimeFactorization.Activity"
             android:name=".modules.primefactorization.export.FactorTreeExportOptionsActivity"
-            android:windowSoftInputMode="adjustPan"
-            android:label="Export Options"/>
+            android:label="Export Options"
+            android:windowSoftInputMode="adjustPan" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.tycho.app.primenumberfinder"
-            android:grantUriPermissions="true"
-            android:exported="false">
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_provider_paths"/>
+                android:resource="@xml/file_provider_paths" />
         </provider>
     </application>
 

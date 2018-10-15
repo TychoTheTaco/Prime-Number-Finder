@@ -11,7 +11,6 @@
         android:layout_height="26dp"
         android:layout_weight="1"
         android:gravity="end|center_vertical"
-        android:textColor="#000000"
         android:textSize="14sp" />
 
     <TextView

@@ -1,10 +1,6 @@
 package com.tycho.app.primenumberfinder.modules.findprimes;
 
 
-import com.tycho.app.primenumberfinder.Savable;
-
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import easytasks.Task;
 
 /**
@@ -17,13 +13,18 @@ public class CheckPrimalityTask extends Task{
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = "CheckPrimalityTask";
+    private static final String TAG = CheckPrimalityTask.class.getSimpleName();
 
     private final long number;
 
     private boolean isPrime = false;
 
-    public boolean finishedSearch = false;
+    private boolean isFinished = false;
+
+    /**
+     * The factor that was found causing this number not to be prime.
+     */
+    private int factor = 0;
 
     public CheckPrimalityTask(final long number){
         this.number = number;
@@ -34,8 +35,6 @@ public class CheckPrimalityTask extends Task{
 
     @Override
     public void run(){
-
-        boolean isFinished = true;
 
         if (number > 2){
 
@@ -52,36 +51,33 @@ public class CheckPrimalityTask extends Task{
                 //Assume the number is prime
                 isPrime = true;
 
-                /*
-                 * Check if the number is divisible by every odd number below it's square root.
-                 */
+                //Check if the number is divisible by every odd number below it's square root.
                 for (i = 3; i <= sqrtMax; i += 2){
 
                     //Check if the number divides perfectly
                     if (number % i == 0){
                         isPrime = false;
+                        factor = i;
                         break;
                     }
-
-                    //setProgress((float) i / sqrtMax);
 
                     //Check if we should pause
                     tryPause();
                     if (shouldStop()){
-                        //running = false;
-                        isFinished = false;
-                        break;
+                        return;
                     }
                 }
+            }else{
+                factor = 2;
             }
+        }else{
+            factor = 1;
         }
 
         if (number == 2) isPrime = true;
 
         //The task has finished
-        if (isFinished){
-            finishedSearch = true;
-        }
+        isFinished = true;
     }
 
     @Override
@@ -98,5 +94,9 @@ public class CheckPrimalityTask extends Task{
 
     public long getNumber() {
         return number;
+    }
+
+    public int getFactor() {
+        return factor;
     }
 }

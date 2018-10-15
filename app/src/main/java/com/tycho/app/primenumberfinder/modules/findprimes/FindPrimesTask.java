@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import android.util.Log;
 
 import com.tycho.app.primenumberfinder.Savable;
+import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 
@@ -16,9 +17,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -29,7 +32,7 @@ import easytasks.TaskAdapter;
 
 import static com.tycho.app.primenumberfinder.utils.FileManager.EXTENSION;
 
-public class FindPrimesTask extends MultithreadedTask implements Savable {
+public class FindPrimesTask extends MultithreadedTask implements Savable, SearchOptions {
 
     /**
      * Tag used for logging and debugging.
@@ -230,7 +233,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
                             }
                         }
                         if (((BruteForceTask) getTasks().get(lowestIndex)).queue.isEmpty()){
-                            //Log.d(TAG, "Index " + lowestIndex + " still empty. state: " + getTasks().get(lowestIndex).getState());
+                            //Log.d(TAG, "Index " + lowestIndex + " still empty. subtitle: " + getTasks().get(lowestIndex).getState());
                             heads.set(lowestIndex, -1L);
                         }else{
                             //Log.d(TAG, "Taking from " + ((BruteForceTask) getTasks().get(lowestIndex)).queue);
@@ -334,7 +337,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
                 dataInputStream.close();
             }
 
-            //Save from lists
+            //SAVE from lists
             final List<List<Long>> lists = new ArrayList<>();
             for (Task task : getTasks()) {
                 lists.add(((BruteForceTask) task).primes);
@@ -374,7 +377,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
 
             dataOutputStream.close();
 
-            //Delete files and clear lists
+            //DELETE files and clear lists
             if (delete) {
                 for (File file : FileManager.getInstance().getTaskCacheDirectory(this).listFiles()) {
                     if (!file.getAbsolutePath().contains("primes")) {
@@ -459,9 +462,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
                 break;
 
             case SIEVE_OF_ERATOSTHENES:
-                for (int i = 0; i < primeCount - 1; i++) {
-                    primes.add(((SieveTask) getTasks().get(0)).primes.get(i));
-                }
+                primes.addAll(((SieveTask) getTasks().get(0)).primes);
                 break;
         }
 
@@ -630,7 +631,11 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
 
         private String status = "searching";
 
-        private final List<Long> primes = new ArrayList<>();
+        /**
+         * Prime numbers are added to this queue. We are using an {@link ArrayDeque} here because it
+         * has the best performance for inserting elements at the end of the collection.
+         */
+        private final Queue<Long> primes = new ArrayDeque<>();
 
         private final int sqrtMax = (int) Math.sqrt(endValue);
         private int factor;
@@ -641,8 +646,6 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
             //Assume all numbers are prime
             final BitSet bitSet = new BitSet((int) (endValue + 1));
             bitSet.set(0, bitSet.size() - 1, true);
-
-            //final int sqrtMax = (int) Math.sqrt(endValue);
 
             // mark non-primes <= n using Sieve of Eratosthenes
             for (factor = 2; factor <= sqrtMax; factor++) {
@@ -672,6 +675,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
                 }
                 tryPause();
             }
+
             status = String.valueOf(getState());
         }
 
@@ -688,6 +692,14 @@ public class FindPrimesTask extends MultithreadedTask implements Savable {
             }
             return super.getProgress();
         }
+
+        public int getFactor() {
+            return factor;
+        }
+    }
+
+    public int getCurrentFactor(){
+        return ((SieveTask) getTasks().get(0)).getFactor();
     }
 
     private void searchSieve() {

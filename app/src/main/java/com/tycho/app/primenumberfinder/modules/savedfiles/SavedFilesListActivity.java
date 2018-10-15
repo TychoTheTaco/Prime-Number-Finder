@@ -16,7 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.tycho.app.primenumberfinder.AbstractActivity;
+import com.tycho.app.primenumberfinder.activities.AbstractActivity;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesListAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SelectableAdapter;
@@ -62,15 +62,15 @@ public class SavedFilesListActivity extends AbstractActivity {
         fileType = FileManager.getFileType(directory);
         switch (fileType) {
             case PRIMES:
-                setTheme(R.style.FindPrimes_Activity);
+                setTheme(R.style.FindPrimes);
                 break;
 
             case FACTORS:
-                setTheme(R.style.FindFactors_Activity);
+                setTheme(R.style.FindFactors);
                 break;
 
             case TREE:
-                setTheme(R.style.PrimeFactorization_Activity);
+                setTheme(R.style.PrimeFactorization);
                 break;
         }
 
@@ -140,6 +140,19 @@ public class SavedFilesListActivity extends AbstractActivity {
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        switch (fileType) {
+            case PRIMES:
+                Utils.applyTheme(this, ContextCompat.getColor(this, R.color.purple_dark), ContextCompat.getColor(this, R.color.purple));
+                break;
+
+            case FACTORS:
+                Utils.applyTheme(this, ContextCompat.getColor(this, R.color.orange_dark), ContextCompat.getColor(this, R.color.orange));
+                break;
+
+            case TREE:
+                Utils.applyTheme(this, ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
+                break;
+        }
 
         //Set up subtitle
         subTitleTextView = findViewById(R.id.subtitle);

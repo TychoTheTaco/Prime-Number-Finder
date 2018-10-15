@@ -19,10 +19,12 @@ public class NotificationManager {
     public static final int TASK_TYPE_FIND_PRIMES = 0;
     public static final int TASK_TYPE_FIND_FACTORS = 1;
     public static final int TASK_TYPE_PRIME_FACTORIZATION = 2;
+    public static final int TASK_TYPE_LCM = 3;
+    public static final int TASK_TYPE_GCF = 4;
 
     private static int nextNotificationId = 0;
 
-    public static synchronized void displayNotification(final Context context, final String channelId, final Task task, final int taskType, final String contentText){
+    public static synchronized void displayNotification(final Context context, final String channelId, final Task task, final int taskType, final String contentText, final int smallIconDrawable){
 
         //Create notification
         final Intent intent = new Intent(context, MainActivity.class);
@@ -32,7 +34,7 @@ public class NotificationManager {
         final PendingIntent pendingIntent = PendingIntent.getActivity(context, nextNotificationId, intent, FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
-                .setSmallIcon(R.drawable.circle_white)
+                .setSmallIcon(smallIconDrawable)
                 .setContentTitle("Task Finished")
                 .setContentText(contentText)
                 .setContentIntent(pendingIntent)

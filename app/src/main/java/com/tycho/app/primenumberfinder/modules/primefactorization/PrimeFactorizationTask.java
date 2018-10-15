@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.tycho.app.primenumberfinder.Savable;
+import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
@@ -20,7 +21,7 @@ import simpletrees.Tree;
  *         Date Created: 3/3/2017
  */
 
-public class PrimeFactorizationTask extends Task implements Savable{
+public class PrimeFactorizationTask extends Task implements Savable, SearchOptions {
 
     /**
      * Tag used for logging and debugging.
@@ -36,10 +37,6 @@ public class PrimeFactorizationTask extends Task implements Savable{
      */
     private Map<Long, Integer> primeFactors = new TreeMap<>();
 
-    private int total;
-
-    private String status = "";
-
     private SearchOptions searchOptions;
 
     //final FindFactorsTask findFactorsTask;
@@ -52,41 +49,17 @@ public class PrimeFactorizationTask extends Task implements Savable{
 
     @Override
     public void run() {
-
-        status = "findFactors";
-        //final FindFactorsTask findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number));
-        //findFactorsTask.start();
-        //final List<Long> factors = findFactorsTask.getFactors();
-
-        /*status = "checkPrimality";
-
-        for (long n : factors){
-            final CheckPrimalityTask checkPrimalityTask = new CheckPrimalityTask(n);
-            checkPrimalityTask.start();
-            if (checkPrimalityTask.isPrime()){
-                total++;
-            }
-            tryPause();
-            if (shouldStop()){
-                return;
-            }
-        }*/
-        status = "generatingTree";
         this.factorTree = generateTree(number);
-        status = "";
     }
+
+    private FindFactorsTask findFactorsTask;
 
     @Override
     public float getProgress() {
-        /*switch (status){
-            case "checkPrimality":
-                setProgress(0.33f);
-                break;
-
-            case "generatingTree":
-                setProgress(0.5f);
-                break;
-        }*/
+        //TODO: Dont do this
+        if (findFactorsTask != null){
+            setProgress(findFactorsTask.getProgress());
+        }
         return super.getProgress();
     }
 
@@ -94,10 +67,12 @@ public class PrimeFactorizationTask extends Task implements Savable{
 
         final Tree<Long> tree = new Tree<>(number);
 
-        final FindFactorsTask findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number));
+        findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number));
         findFactorsTask.start();
 
         final int size = findFactorsTask.getFactors().size();
+
+        setProgress((float) getNumber() / number);
 
         if (size == 1){
             primeFactors.put(1L, 1);
@@ -130,8 +105,6 @@ public class PrimeFactorizationTask extends Task implements Savable{
                 number1 = findFactorsTask.getFactors().get((size / 2));
                 number2 = findFactorsTask.getFactors().get((size / 2));
             }
-
-            setProgress((float) number / getNumber());
 
             tree.addNode(generateTree(number1));
             tree.addNode(generateTree(number2));

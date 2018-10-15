@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.R;
@@ -42,7 +43,7 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.View
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_saved_file, parent, false));
+        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.saved_file_list_item, parent, false));
     }
 
     @Override
@@ -52,23 +53,19 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.View
         holder.fileName.setText(Utils.formatTitle(file));
 
         switch (FileManager.getFileType(directory)){
-            default:
-                holder.icon.setText("?");
-                break;
-
             case PRIMES:
-                holder.icon.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.purple)));
-                holder.icon.setText("P");
+                holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.purple)));
+                holder.icon.setImageResource(R.drawable.find_primes_icon);
                 break;
 
             case FACTORS:
-                holder.icon.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.orange)));
-                holder.icon.setText("F");
+                holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.orange)));
+                holder.icon.setImageResource(R.drawable.find_factors_icon);
                 break;
 
             case TREE:
-                holder.icon.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.green)));
-                holder.icon.setText("T");
+                holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.green)));
+                holder.icon.setImageResource(R.drawable.prime_factorization_icon);
                 break;
         }
     }
@@ -91,7 +88,7 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.View
 
     class ViewHolder extends RecyclerView.ViewHolder{
 
-        private final TextView icon;
+        private final ImageView icon;
         private final TextView fileName;
 
         ViewHolder(final View itemView){
@@ -99,19 +96,16 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.View
             icon = itemView.findViewById(R.id.icon);
             fileName = itemView.findViewById(R.id.file_name);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    final FileType fileType = FileManager.getFileType(directory);
-                    if (fileType.getOpeningClass() != null){
-                        final Intent intent = new Intent(context, fileType.getOpeningClass());
-                        intent.putExtra("filePath", files.get(getAdapterPosition()).getAbsolutePath());
-                        intent.putExtra("allowExport", true);
-                        intent.putExtra("enableSearch", true);
-                        intent.putExtra("allowDelete", true);
-                        intent.putExtra("title", true);
-                        context.startActivity(intent);
-                    }
+            itemView.setOnClickListener(v -> {
+                final FileType fileType = FileManager.getFileType(directory);
+                if (fileType.getOpeningClass() != null){
+                    final Intent intent = new Intent(context, fileType.getOpeningClass());
+                    intent.putExtra("filePath", files.get(getAdapterPosition()).getAbsolutePath());
+                    intent.putExtra("allowExport", true);
+                    intent.putExtra("enableSearch", true);
+                    intent.putExtra("allowDelete", true);
+                    intent.putExtra("title", true);
+                    context.startActivity(intent);
                 }
             });
         }

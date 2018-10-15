@@ -106,20 +106,12 @@ public abstract class SelectableAdapter<H extends SelectableAdapter.ViewHolder> 
 
         ViewHolder(final View itemView) {
             super(itemView);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ViewHolder.this.onClick(v);
-                    addToSelection(false);
-                }
+            itemView.setOnClickListener(v -> {
+                ViewHolder.this.onClick(v);
+                addToSelection(false);
             });
 
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    return addToSelection(true)|| ViewHolder.this.onLongClick(v);
-                }
-            });
+            itemView.setOnLongClickListener(v -> addToSelection(true) | ViewHolder.this.onLongClick(v));
         }
 
         /**
@@ -127,6 +119,7 @@ public abstract class SelectableAdapter<H extends SelectableAdapter.ViewHolder> 
          *
          * @param startSelection {@code true} if selection mode should be enabled if this is the
          *                       first item.
+         * @return {@code true} if the item is now selected. {@code false} otherwise.
          */
         protected boolean addToSelection(final boolean startSelection) {
             if (selectionMode) {
@@ -134,7 +127,7 @@ public abstract class SelectableAdapter<H extends SelectableAdapter.ViewHolder> 
                 if (selectedItemCount == 0) {
                     setSelectionMode(false);
                 }
-            } else if (startSelection){
+            } else if (startSelection) {
                 setSelectionMode(true);
                 setSelected(true);
             }

@@ -14,7 +14,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
         android:text="Go To Number"
-        android:textColor="@color/primary_text"
         android:textSize="20sp" />
 
     <LinearLayout
@@ -28,7 +27,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Go to the "
-            android:textColor="@color/primary_text"
             android:textSize="14sp" />
 
         <com.tycho.app.primenumberfinder.ui.FormattedEditText
@@ -45,7 +43,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=" number."
-            android:textColor="@color/primary_text"
             android:textSize="14sp" />
 
     </LinearLayout>

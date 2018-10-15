@@ -1,39 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Default themes -->
-    <style name="Default" parent="Theme.AppCompat.Light.DarkActionBar">
+    <!-- Light Theme -->
+    <style name="Light" parent="Theme.AppCompat.Light">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
-        <item name="colorControlActivated">?attr/colorAccent</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="colorControlActivated">?android:attr/colorAccent</item>
+        <item name="colorControlHighlight">@color/accent_very_light</item>
+        <item name="colorBackgroundFloating">@color/white</item>
+        <item name="android:colorMultiSelectHighlight">@color/accent_very_light</item>
 
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColorPrimary">@color/primary_text</item>
+        <item name="android:textColorPrimaryDisableOnly">@color/item_disabled</item>
+        <item name="android:textColor">@color/text_color</item>
+
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+        <!--<item name="android:navigationBarColor">#010101</item>-->
+        <item name="checkboxStyle">@style/CheckBox</item>
+        <item name="radioButtonStyle">@style/RadioButton</item>
     </style>
-    <style name="Default.NoActionBar">
+    <style name="Light.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:statusBarColor">@color/primary_dark</item>
     </style>
-    <style name="Default.Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
-    <style name="Default.Dialog" parent="Base.Theme.AppCompat.Light.Dialog"/>
-    <style name="Default.PopupOverlay">
+    <style name="Light.Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <style name="Light.Dialog" parent="Base.Theme.AppCompat.Light.Dialog"/>
+    <style name="Light.PopupOverlay">
         <item name="android:colorBackground">@color/primary_light</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
 
+    <!-- Dark Theme -->
+    <style name="Dark" parent="Theme.AppCompat">
+        <item name="colorPrimary">#222222</item>
+        <item name="colorPrimaryDark">#0c0c0c</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="colorControlActivated">?android:attr/colorAccent</item>
+        <item name="colorControlHighlight">@color/background_dark_5</item>
+        <item name="colorBackgroundFloating">@color/background_dark_4</item>
+        <item name="android:colorMultiSelectHighlight">@color/accent_very_dark</item>
+
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColorPrimary">@color/primary_text_light</item>
+        <item name="android:textColorPrimaryDisableOnly">@color/item_disabled_dark</item>
+        <item name="android:textColorSecondary">@color/secondary_text_light</item>
+        <item name="android:textColor">@color/text_color</item>
+
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@color/background_dark_0</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+        <item name="android:navigationBarColor">#010101</item>
+
+        <item name="checkboxStyle">@style/CheckBox</item>
+        <item name="radioButtonStyle">@style/RadioButton</item>
+    </style>
+    <style name="Dark.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:statusBarColor">?android:attr/colorPrimaryDark</item>
+    </style>
+    <style name="Dark.Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <style name="Dark.Dialog" parent="Base.Theme.AppCompat.Light.Dialog"/>
+    <style name="Dark.PopupOverlay">
+        <item name="android:colorBackground">@color/primary_light</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="CheckBox" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+    <style name="RadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+
     <!-- Find Primes Theme -->
-    <style name="FindPrimes" parent="Default.NoActionBar">
+    <style name="FindPrimes">
         <item name="colorPrimary">@color/purple</item>
         <item name="colorPrimaryDark">@color/purple_dark</item>
         <item name="colorAccent">@color/purple</item>
     </style>
-    <style name="FindPrimes.Activity">
-        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
-    </style>
-    <style name="FindPrimes.Dialog" parent="Default.Dialog">
+    <style name="FindPrimes.Dialog" parent="Light.Dialog">
         <item name="colorPrimary">@color/purple</item>
         <item name="colorPrimaryDark">@color/purple_dark</item>
         <item name="colorAccent">@color/purple</item>
@@ -44,15 +96,12 @@
     </style>
 
     <!-- Find Factors themes-->
-    <style name="FindFactors" parent="Default.NoActionBar">
+    <style name="FindFactors">
         <item name="colorPrimary">@color/orange</item>
         <item name="colorPrimaryDark">@color/orange_dark</item>
         <item name="colorAccent">@color/orange</item>
     </style>
-    <style name="FindFactors.Activity">
-        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
-    </style>
-    <style name="FindFactors.Dialog" parent="Default.Dialog">
+    <style name="FindFactors.Dialog" parent="Light.Dialog">
         <item name="colorPrimary">@color/orange</item>
         <item name="colorPrimaryDark">@color/orange_dark</item>
         <item name="colorAccent">@color/orange</item>
@@ -63,15 +112,12 @@
     </style>
 
     <!-- Prime Factorization themes-->
-    <style name="PrimeFactorization" parent="Default.NoActionBar">
+    <style name="PrimeFactorization">
         <item name="colorPrimary">@color/green</item>
         <item name="colorPrimaryDark">@color/green_dark</item>
         <item name="colorAccent">@color/green</item>
     </style>
-    <style name="PrimeFactorization.Activity">
-        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
-    </style>
-    <style name="PrimeFactorization.Dialog" parent="Default.Dialog">
+    <style name="PrimeFactorization.Dialog" parent="Light.Dialog">
         <item name="colorPrimary">@color/green</item>
         <item name="colorPrimaryDark">@color/green_dark</item>
         <item name="colorAccent">@color/green</item>
@@ -81,13 +127,39 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
-
-    <style name="DefaultText">
-        <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/text_color</item>
+    <!-- Least Common Multiple themes-->
+    <style name="LCM">
+        <item name="colorPrimary">@color/yellow</item>
+        <item name="colorPrimaryDark">@color/yellow_dark</item>
+        <item name="colorAccent">@color/yellow</item>
+    </style>
+    <style name="LCM.Dialog" parent="Light.Dialog">
+        <item name="colorPrimary">@color/yellow</item>
+        <item name="colorPrimaryDark">@color/yellow_dark</item>
+        <item name="colorAccent">@color/yellow</item>
+    </style>
+    <style name="LCM.PopupOverlay">
+        <item name="android:colorBackground">@color/yellow_light</item>
+        <item name="android:textColor">@android:color/black</item>
     </style>
 
-    <style name="Label" parent="DefaultText">
+    <!-- Greatest Common Factor themes-->
+    <style name="GCF">
+        <item name="colorPrimary">@color/lt_blue</item>
+        <item name="colorPrimaryDark">@color/blue_light</item>
+        <item name="colorAccent">@color/lt_blue</item>
+    </style>
+    <style name="GCF.Dialog" parent="Light.Dialog">
+        <item name="colorPrimary">@color/lt_blue</item>
+        <item name="colorPrimaryDark">@color/blue_dark</item>
+        <item name="colorAccent">@color/lt_blue</item>
+    </style>
+    <style name="GCF.PopupOverlay">
+        <item name="android:colorBackground">@color/blue_light</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="Label" parent="Light">
         <item name="android:textSize">16sp</item>
         <item name="android:includeFontPadding">false</item>
     </style>
@@ -101,7 +173,6 @@
         <item name="android:inputType">number</item>
         <item name="android:gravity">center_horizontal</item>
         <item name="android:hint">1,000,000</item>
-        <item name="android:textColor">@color/primary_text</item>
     </style>
 
     <style name="Button">
@@ -115,6 +186,11 @@
         <item name="android:background">@drawable/background_white</item>
         <item name="android:textColor">@color/text_color</item>
         <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="PopupWindowAnimationStyle">
+        <item name="android:windowEnterAnimation">@anim/popup_window_enter</item>
+        <item name="android:windowExitAnimation">@anim/popup_window_exit</item>
     </style>
 
 </resources>
