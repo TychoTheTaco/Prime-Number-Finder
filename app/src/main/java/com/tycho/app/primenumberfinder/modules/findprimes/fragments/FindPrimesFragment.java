@@ -39,6 +39,8 @@ import easytasks.Task;
 import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.DELETE;
 import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.PAUSE;
 import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.SAVE;
+import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
+import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.SIEVE_OF_ERATOSTHENES;
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_PRIMES;
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
@@ -68,7 +70,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
     /**
      * Search options used for starting tasks.
      */
-    private final FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(0, FindPrimesTask.INFINITY, FindPrimesTask.SearchMethod.BRUTE_FORCE, 1);
+    private final FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(0, FindPrimesTask.INFINITY, BRUTE_FORCE, 1);
 
     /**
      * Request code for starting a new task.
@@ -217,7 +219,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
                 }
 
                 //Reset search options
-                searchOptions.setSearchMethod(FindPrimesTask.SearchMethod.BRUTE_FORCE);
+                searchOptions.setSearchMethod(BRUTE_FORCE);
 
                 hideKeyboard(getActivity());
 
@@ -333,19 +335,19 @@ public class FindPrimesFragment extends ModuleHostFragment {
         startActivityForResult(intent, REQUEST_CODE_NEW_TASK);
     }
 
-    private FindPrimesTask.SearchMethod determineBestSearchMethod() {
+    private FindPrimesTask.SearchOptions.SearchMethod determineBestSearchMethod() {
 
         //Check if end value is infinity or is greater than int range
         if (getEndValue().longValue() == FindPrimesTask.INFINITY || getEndValue().compareTo(BigInteger.valueOf(Integer.MAX_VALUE - 1)) > 0) {
-            return FindPrimesTask.SearchMethod.BRUTE_FORCE;
+            return BRUTE_FORCE;
         }
 
         //Make sure we have enough heap memory to use the sieve
         if (getStartValue().compareTo(BigInteger.ZERO) >= 0 && hasEnoughMemoryForSieve()) {
-            return FindPrimesTask.SearchMethod.SIEVE_OF_ERATOSTHENES;
+            return SIEVE_OF_ERATOSTHENES;
         }
 
-        return FindPrimesTask.SearchMethod.BRUTE_FORCE;
+        return BRUTE_FORCE;
     }
 
     private boolean hasEnoughMemoryForSieve() {

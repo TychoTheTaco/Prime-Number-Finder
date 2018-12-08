@@ -30,6 +30,8 @@ import easytasks.MultithreadedTask;
 import easytasks.Task;
 import easytasks.TaskAdapter;
 
+import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
+import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.SIEVE_OF_ERATOSTHENES;
 import static com.tycho.app.primenumberfinder.utils.FileManager.EXTENSION;
 
 public class FindPrimesTask extends MultithreadedTask implements Savable, SearchOptions {
@@ -41,60 +43,26 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
 
     public static final int INFINITY = -1;
 
-    /**
-     * The starting value of the search range. (inclusive).
-     */
-    private final long startValue;
-
-    /**
-     * The ending value of the search range. (inclusive).
-     */
-    private long endValue;
-
-    /**
-     * The number of threads to use. This must be at least 1.
-     */
-    private int threadCount;
-
-    public enum SearchMethod {
-        BRUTE_FORCE,
-        SIEVE_OF_ERATOSTHENES
-    }
-
-    private SearchMethod searchMethod;
-
     private static final Object COUNTER_SYNC = new Object();
 
     private int primeCount = 0;
 
-    private SearchOptions searchOptions;
+    /**
+     * Search options that specify task parameters.
+     */
+    private SearchOptions options;
 
     /**
-     * Create a new {@linkplain FindPrimesTask}.
-     *
-     * @param startValue  The start value (inclusive).
-     * @param endValue    The end value (inclusive).
-     * @param threadCount The number of threads to use.
+     * Create a new FindPrimesTask with the specified search options
+     * @param options
      */
-    public FindPrimesTask(final long startValue, final long endValue, final int threadCount, final SearchMethod searchMethod) {
-        this.startValue = startValue;
-        this.endValue = endValue;
-        this.threadCount = threadCount;
-        this.searchMethod = searchMethod;
-    }
-
-    public FindPrimesTask(final SearchOptions searchOptions) {
-        this(searchOptions.getStartValue(), searchOptions.getEndValue(), searchOptions.getThreadCount(), searchOptions.getSearchMethod());
-        this.searchOptions = searchOptions;
-    }
-
-    public SearchOptions getSearchOptions() {
-        return this.searchOptions;
+    public FindPrimesTask(final SearchOptions options) {
+        this.options = options;
     }
 
     @Override
     protected void run() {
-        switch (searchMethod) {
+        switch (options.getSearchMethod()) {
             case BRUTE_FORCE:
                 searchBruteForce();
                 break;
@@ -105,13 +73,16 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
         }
     }
 
+    /**
+     * Search for primes using the brute force method.
+     */
     private void searchBruteForce() {
-        Log.w(TAG, "Start task: " + endValue);
+        Log.w(TAG, "Start task: " + options.getEndValue());
 
-        final long[] startValues = new long[threadCount];
-        int increment = threadCount * 2;
+        final long[] startValues = new long[options.getThreadCount()];
+        int increment = options.getThreadCount() * 2;
 
-        startValues[0] = (startValue % 2 == 0) ? (startValue + 1) : startValue;
+        startValues[0] = (options.startValue % 2 == 0) ? (options.startValue + 1) : options.startValue;
         for (int i = 0; i < startValues.length; i++) {
             long s = i == 0 ? startValues[0] : startValues[i - 1] + 2;
             while (true){
@@ -129,6 +100,9 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
             }
             startValues[i] = s;
         }
+        /*
+        3 5 7 9 11 13 15 17 19 21 23 25 27 29 31 33 35 37 39
+         */
 
         /*final long partition = (endValue - startValue) / threadCount;
         for (int i = 0; i < startValues.length; i++) {
@@ -149,14 +123,14 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
 
         //Create worker tasks
         for (long start : startValues){
-            final BruteForceTask task = new BruteForceTask(start, endValue, increment);
+            final BruteForceTask task = new BruteForceTask(start, options.endValue, increment);
             task.addTaskListener(new TaskAdapter(){
                 @Override
                 public void onTaskStopped() {
                     Log.e(TAG, "Task " + task.startValue + " stopped.");
                 }
             });
-            task.bufferSize = searchOptions.bufferSize / threadCount;
+            task.bufferSize = options.bufferSize / options.getThreadCount();
             addTask(task);
         }
 
@@ -274,7 +248,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
     public File saveToFile(){
 
         final File largeCache = new File(FileManager.getInstance().getTaskCacheDirectory(this) + File.separator + "primes");
-        if (searchMethod == SearchMethod.BRUTE_FORCE) {
+        if (options.searchMethod == BRUTE_FORCE) {
             //sortCache(getState() == State.STOPPED);
             sortCache(false);
         } else {
@@ -406,25 +380,29 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
         return true;
     }
 
+    public SearchOptions getSearchOptions() {
+        return this.options;
+    }
+
     /**
      * @return the endValue
      */
     public long getEndValue() {
-        return endValue;
+        return options.endValue;
     }
 
     /**
      * @return the threadCount
      */
     public int getThreadCount() {
-        return threadCount;
+        return options.getThreadCount();
     }
 
     /**
      * @return the startValue
      */
     public long getStartValue() {
-        return startValue;
+        return options.startValue;
     }
 
     public int getPrimeCount() {
@@ -435,7 +413,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
 
         final List<Long> primes = new ArrayList<>(primeCount);
 
-        switch (searchMethod) {
+        switch (options.searchMethod) {
             case BRUTE_FORCE:
                 final int[] index = new int[getTasks().size()];
                 for (int i = 0; i < index.length; i++) {
@@ -476,9 +454,9 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
      */
     public long getCurrentValue() {
         if (getTasks().size() == 0) return 0;
-        if (searchMethod == SearchMethod.SIEVE_OF_ERATOSTHENES) {
+        if (options.searchMethod == SIEVE_OF_ERATOSTHENES) {
             if (getState() == State.STOPPED) {
-                return endValue;
+                return options.endValue;
             } else {
                 return 0;
             }
@@ -493,7 +471,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
     }
 
     public void setOptions(final SearchOptions searchOptions) {
-        this.searchOptions = searchOptions;
+        this.options = searchOptions;
     }
 
     private final File taskDirectory = FileManager.getInstance().getTaskCacheDirectory(this);
@@ -637,14 +615,14 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
          */
         private final Queue<Long> primes = new ArrayDeque<>();
 
-        private final int sqrtMax = (int) Math.sqrt(endValue);
+        private final int sqrtMax = (int) Math.sqrt(options.endValue);
         private int factor;
         private long counter;
 
         @Override
         protected void run() {
             //Assume all numbers are prime
-            final BitSet bitSet = new BitSet((int) (endValue + 1));
+            final BitSet bitSet = new BitSet((int) (options.endValue + 1));
             bitSet.set(0, bitSet.size() - 1, true);
 
             // mark non-primes <= n using Sieve of Eratosthenes
@@ -653,7 +631,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
                 // if factor is prime, then mark multiples of factor as nonprime
                 // suffices to consider mutiples factor, factor+1, ...,  n/factor
                 if (bitSet.get(factor)) {
-                    for (int j = factor; factor * j <= endValue; j++) {
+                    for (int j = factor; factor * j <= options.endValue; j++) {
                         bitSet.set(factor * j, false);
                     }
                 }
@@ -668,7 +646,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
             status = "counting";
 
             //Count primes
-            for (counter = (startValue > 2 ? startValue : 2); counter <= endValue; counter++) {
+            for (counter = (options.startValue > 2 ? options.startValue : 2); counter <= options.endValue; counter++) {
                 if (bitSet.get((int) counter)) {
                     primes.add(counter);
                     primeCount++;
@@ -687,7 +665,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
                     break;
 
                 case "counting":
-                    setProgress(0.5f + (((float) counter / endValue) / 2));
+                    setProgress(0.5f + (((float) counter / options.endValue) / 2));
                     break;
             }
             return super.getProgress();
@@ -708,7 +686,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
     }
 
     public String getStatus(){
-        switch (searchMethod){
+        switch (options.searchMethod){
             case BRUTE_FORCE:
                 break;
 
@@ -733,10 +711,30 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
          */
         private long endValue;
 
+        public enum SearchMethod {
+            /**
+             * Using brute force will loop over every number in the search range and check if it is divisible by numbers below its square root. This is
+             * typically much slower, but more memory efficient.
+             */
+            BRUTE_FORCE,
+
+            /**
+             * Using the Sieve or Eratosthenes is a very quick way to check primality for each number in a specified range. The only drawbacks are that the
+             * range needs to start at 0 and this method also requires a significant amount of memory.
+             */
+            SIEVE_OF_ERATOSTHENES
+        }
+
         /**
          * The search method to use.
          */
         private SearchMethod searchMethod;
+
+        /**
+         * Directory used to cache task data. This is used to keep memory usage low. If no cache directory is specified, the task will not use caching and risks
+         * running out of memory.
+         */
+        private File cacheDirectory;
 
         /**
          * The maximum size of prime numbers in memory. If more numbers are found, the entire list will be saved onto the disk first.
@@ -755,7 +753,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
         }
 
         public SearchOptions(final long startValue, final long endValue) {
-            this(startValue, endValue, SearchMethod.BRUTE_FORCE, 1, false, false);
+            this(startValue, endValue, BRUTE_FORCE, 1, false, false);
         }
 
         private SearchOptions(final Parcel parcel) {

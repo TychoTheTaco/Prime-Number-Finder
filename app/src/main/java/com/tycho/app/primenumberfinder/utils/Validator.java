@@ -27,7 +27,7 @@ public class Validator {
         return true;
     }
 
-    public static boolean isFindPrimesRangeValid(final BigInteger start, final BigInteger end, final FindPrimesTask.SearchMethod searchMethod) {
+    public static boolean isFindPrimesRangeValid(final BigInteger start, final BigInteger end, final FindPrimesTask.SearchOptions.SearchMethod searchMethod) {
 
         //Number must be less than or equal to max long value
         if (start.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) >= 0 || end.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) >= 0) {

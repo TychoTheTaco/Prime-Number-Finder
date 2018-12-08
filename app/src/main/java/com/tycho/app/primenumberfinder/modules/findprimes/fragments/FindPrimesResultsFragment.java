@@ -30,6 +30,8 @@ import java.util.Map;
 
 import easytasks.Task;
 
+import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
+
 /**
  * Created by tycho on 11/16/2017.
  */
@@ -168,7 +170,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         subtitleTextView.setText(Utils.formatSpannable(subtitleStringBuilder, getString(R.string.find_primes_subtitle), new String[]{
                 NUMBER_FORMAT.format(getTask().getStartValue()),
                 getTask().getEndValue() == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),
-                getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE ? "brute force" : "the sieve of Eratosthenes"
+                getTask().getSearchOptions().getSearchMethod() == BRUTE_FORCE ? "brute force" : "the sieve of Eratosthenes"
         }, new boolean[]{
                 true,
                 getTask().getEndValue() != FindPrimesTask.INFINITY,
@@ -371,7 +373,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     protected void onResetViews() {
         super.onResetViews();
-        showStatistics = getTask().getSearchOptions().getSearchMethod() == FindPrimesTask.SearchMethod.BRUTE_FORCE;
+        showStatistics = getTask().getSearchOptions().getSearchMethod() == BRUTE_FORCE;
         progress.setVisibility(getTask().getEndValue() == FindPrimesTask.INFINITY ? View.GONE : View.VISIBLE);
         bodyTextView.setVisibility(View.VISIBLE);
         statisticsLayout.show("eta");
