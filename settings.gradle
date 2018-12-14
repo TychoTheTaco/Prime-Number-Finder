@@ -1,1 +1,1 @@
-include ':app', ':simplegraphs'
+include ':app'
