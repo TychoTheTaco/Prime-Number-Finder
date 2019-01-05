@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Queue;
-import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import easytasks.MultithreadedTask;
@@ -35,6 +34,12 @@ import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.
 import static com.tycho.app.primenumberfinder.utils.FileManager.EXTENSION;
 
 public class FindPrimesTask extends MultithreadedTask implements Savable, SearchOptions {
+
+    static {
+        System.loadLibrary("native-utils");
+    }
+
+    public native int nativeSieve(final long start, final long end);
 
     /**
      * Tag used for logging and debugging.
@@ -84,13 +89,13 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
             options.searchMode = SearchOptions.SearchMode.PACKET;
         }
 
-        Vector v = new Vector();
+        /*Vector v = new Vector();
         while (true) {
             byte b[] = new byte[1048576];
             v.add(b);
             Runtime rt = Runtime.getRuntime();
             System.out.println("free memory: " + rt.freeMemory());
-        }
+        }*/
 
         /*switch (options.searchMode) {
             case PARTITION:
@@ -686,6 +691,42 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
     private void searchSieve() {
         addTask(new SieveTask());
         executeTasks();
+
+        long start = System.currentTimeMillis();
+        System.out.println("Version 0: " + version_0() + "\t" + (System.currentTimeMillis() - start) + " ms.");
+        start = System.currentTimeMillis();
+        System.out.println("Version N: " + nativeSieve(options.startValue, options.endValue) + "\t" + (System.currentTimeMillis() - start) + " ms.");
+    }
+
+    private int version_0(){
+        final boolean[] array = new boolean[(int) options.endValue + 1];
+        for (int i = 0; i < array.length; ++i){
+            array[i] = true;
+        }
+        final int sqrtMax = (int) Math.sqrt(options.endValue);
+        int primeCount = 0;
+
+        // mark non-primes <= n using Sieve of Eratosthenes
+        for (int factor = 2; factor <= sqrtMax; factor++) {
+
+            // if factor is prime, then mark multiples of factor as nonprime
+            // suffices to consider mutiples factor, factor+1, ...,  n/factor
+            if (array[factor]) {
+                for (long j = factor; factor * j <= options.endValue; j++) {
+                    final long number = factor * j;
+                    array[(int) number] = false;
+                }
+            }
+        }
+
+        //Count primes
+        for (int counter = (int) (options.startValue > 2 ? options.startValue : 2); counter <= options.endValue; counter++) {
+            if (array[counter]) {
+                primeCount++;
+            }
+        }
+
+        return primeCount;
     }
 
     public String getStatus() {
