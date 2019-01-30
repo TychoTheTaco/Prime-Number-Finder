@@ -17,7 +17,22 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        src/main/cpp/utils.cpp)
+        "src/main/cpp/source/utils.cpp"
+        "src/main/cpp/source/native_task.cpp")
+
+set(TASKR_SOURCE_FILES
+"src/main/cpp/EasyTasks/source/EasyTasks.cpp"
+"src/main/cpp/EasyTasks/source/task.cpp"
+"src/main/cpp/EasyTasks/source/find_primes_task.cpp"
+"src/main/cpp/EasyTasks/source/task_listener.cpp"
+"src/main/cpp/EasyTasks/source/test_task.cpp"
+"src/main/cpp/EasyTasks/source/debug_listener.cpp"
+"src/main/cpp/EasyTasks/source/multithreaded_task.cpp"
+)
+
+include_directories("src/main/cpp/EasyTasks/include")
+
+add_library(Taskr SHARED ${TASKR_SOURCE_FILES})
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -38,6 +53,7 @@ find_library( # Sets the name of the path variable.
 
 target_link_libraries( # Specifies the target library.
         native-utils
+        Taskr
 
         # Links the target library to the log library
         # included in the NDK.

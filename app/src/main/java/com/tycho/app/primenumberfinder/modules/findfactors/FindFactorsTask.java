@@ -3,6 +3,7 @@ package com.tycho.app.primenumberfinder.modules.findfactors;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.tycho.app.primenumberfinder.NativeTask;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.utils.FileManager;
@@ -20,6 +21,11 @@ import easytasks.Task;
  */
 
 public class FindFactorsTask extends Task implements Savable, SearchOptions{
+
+    static{
+        System.loadLibrary("native-utils");
+        System.loadLibrary("Taskr");
+    }
 
     /**
      * Tag used for logging and debugging.
@@ -62,6 +68,11 @@ public class FindFactorsTask extends Task implements Savable, SearchOptions{
 
     @Override
     public void run() {
+
+        //TODO: TESTING
+        NativeTask nativeTask = new NativeTask(0);
+        nativeTask.start();
+
         for (i = 1; i <= sqrtMax; i++) {
 
             //Check if the number divides perfectly

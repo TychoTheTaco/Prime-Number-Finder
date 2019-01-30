@@ -3,12 +3,22 @@
 #include <iostream>
 #include <android/log.h>
 #include <cmath>
+#include <sstream>
+#include "find_primes_task.h"
+#include <sstream>
 
 #define APP_NAME "PrimeNumberFinder"
 
 extern "C" JNIEXPORT jstring JNICALL Java_com_tycho_app_primenumberfinder_activities_MainActivity_testNative(JNIEnv *env, jobject /* this */) {
     std::string hello = "Hello from C++";
     return env->NewStringUTF(hello.c_str());
+}
+
+extern "C" JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesTask_startNativeTask(JNIEnv *env, jobject self) {
+    __android_log_print(ANDROID_LOG_VERBOSE, APP_NAME, "Starting native task...");
+    FindPrimesTask task(0, 10000000);
+    task.start();
+    __android_log_print(ANDROID_LOG_VERBOSE, APP_NAME, "Native task finished in %d ms.", task.getElapsedTime());
 }
 
 extern "C" JNIEXPORT jint JNICALL Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesTask_nativeSieve(JNIEnv *env, jobject /* this */,
@@ -115,36 +125,23 @@ extern "C" JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_modules_f
 
         // Check if the number is divisible by every odd number below it's square root.
         for (int i = 3; i <= sqrtMax; i += 2) {
-
-            /*
-            TODO: Optimization
-            Ideally, this check should go after the check for primality so it does not get
-            called every iteration. For now, this will remain here in case a thread never
-            finds a prime number.
-             */
-            /*jclass cls = env->FindClass("com/tycho/app/primenumberfinder/modules/findprimes/FindPrimesTask$BruteForceTask");
-            jmethodID id = env->GetMethodID(cls, "tryPause", "()V");
-            env->CallVoidMethod(self, id);
-
-            cls = env->FindClass("com/tycho/app/primenumberfinder/modules/findprimes/FindPrimesTask$BruteForceTask");
-            id = env->GetMethodID(cls, "shouldStop", "()Z");
-            if (env->CallBooleanMethod(self, id)){
-                running = false;
-                break;
-            }*/
-
-            /*tryPause();
-            if (shouldStop()) {
-                running = false;
-                break;
-            }*/
-
             // Check if the number divides perfectly
             if (current % i == 0) {
                 isPrime = false;
                 break;
             }
         }
+
+        /*jclass cls = env->FindClass("com/tycho/app/primenumberfinder/modules/findprimes/FindPrimesTask$BruteForceTask");
+        jmethodID id = env->GetMethodID(cls, "tryPause", "()V");
+        env->CallVoidMethod(self, id);
+
+        cls = env->FindClass("com/tycho/app/primenumberfinder/modules/findprimes/FindPrimesTask$BruteForceTask");
+        id = env->GetMethodID(cls, "shouldStop", "()Z");
+        if (env->CallBooleanMethod(self, id)){
+        running = false;
+            break;
+        }*/
 
         // Check if the number was prime
         if (isPrime) {

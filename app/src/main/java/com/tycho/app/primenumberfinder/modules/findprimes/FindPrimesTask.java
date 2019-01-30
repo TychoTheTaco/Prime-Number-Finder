@@ -37,11 +37,14 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
 
     static{
         System.loadLibrary("native-utils");
+        System.loadLibrary("Taskr");
     }
 
     public native int nativeSieve(final long start, final long end);
 
     public native int nativeBrute(final long start, final long end);
+
+    private native void startNativeTask();
 
     /**
      * Tag used for logging and debugging.
@@ -90,6 +93,8 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
         }else{
             options.searchMode = SearchOptions.SearchMode.PACKET;
         }
+
+        //startNativeTask();
 
         /*Vector v = new Vector();
         while (true) {
@@ -485,7 +490,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
 
         @Override
         protected void run(){
-            if (false){
+            if (true){
                 nativeRun(startValue, endValue, increment);
             }else{
                 currentNumber = startValue;
@@ -512,18 +517,6 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
 
                     // Check if the number is divisible by every odd number below it's square root.
                     for (int i = 3; i <= sqrtMax; i += 2){
-
-                    /*
-                    TODO: Optimization
-                    Ideally, this check should go after the check for primality so it does not get
-                    called every iteration. For now, this will remain here in case a thread never
-                    finds a prime number.
-                     */
-                        /*tryPause();
-                        if (shouldStop()){
-                            running = false;
-                            break;
-                        }*/
 
                         // Check if the number divides perfectly
                         if (currentNumber % i == 0){
