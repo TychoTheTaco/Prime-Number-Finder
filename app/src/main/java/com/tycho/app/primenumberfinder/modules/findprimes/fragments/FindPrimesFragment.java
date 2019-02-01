@@ -25,6 +25,7 @@ import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.ModuleHostFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfigurationActivity;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesNativeTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.Utils;
@@ -105,6 +106,22 @@ public class FindPrimesFragment extends ModuleHostFragment {
         //Set up check primality button
         final Button buttonCheckPrimality = rootView.findViewById(R.id.check_primality_button);
         buttonCheckPrimality.setOnClickListener(v -> {
+
+            Log.w(TAG, "Starting native task...");
+            FindPrimesNativeTask nativeTask = new FindPrimesNativeTask();
+            nativeTask.startOnNewThread();
+            Log.w(TAG, "Started native task!");
+            nativeTask.pause();
+            nativeTask.resume();
+            /*try {
+                nativeTask.pauseAndWait();
+            }catch (InterruptedException e){}*/
+
+            /*try{
+                Thread.sleep(3000);
+            }catch (InterruptedException e){}*/
+
+            Log.w(TAG, "Task state: " + nativeTask.getState());
 
             //Check if the number is valid
             if (Validator.isPrimalityInputValid(getPrimalityInput())) {

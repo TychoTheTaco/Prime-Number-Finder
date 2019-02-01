@@ -18,7 +18,8 @@ add_library( # Sets the name of the library.
 
         # Provides a relative path to your source file(s).
         "src/main/cpp/source/utils.cpp"
-        "src/main/cpp/source/native_task.cpp")
+        "src/main/cpp/source/native_task.cpp"
+        "src/main/cpp/source/find_primes_native_task.cpp")
 
 set(TASKR_SOURCE_FILES
 "src/main/cpp/EasyTasks/source/EasyTasks.cpp"

@@ -69,10 +69,6 @@ public class FindFactorsTask extends Task implements Savable, SearchOptions{
     @Override
     public void run() {
 
-        //TODO: TESTING
-        NativeTask nativeTask = new NativeTask(0);
-        nativeTask.start();
-
         for (i = 1; i <= sqrtMax; i++) {
 
             //Check if the number divides perfectly
