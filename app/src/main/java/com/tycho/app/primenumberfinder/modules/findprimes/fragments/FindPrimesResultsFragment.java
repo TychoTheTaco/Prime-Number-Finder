@@ -14,6 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.tycho.app.primenumberfinder.FPT;
+import com.tycho.app.primenumberfinder.ITask;
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
@@ -30,7 +32,7 @@ import java.util.Map;
 
 import easytasks.Task;
 
-import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
+import static com.tycho.app.primenumberfinder.FPT.SearchOptions.SearchMethod.BRUTE_FORCE;
 
 /**
  * Created by tycho on 11/16/2017.
@@ -61,11 +63,11 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
     /**
-     * This map holds the statistics for each task. When {@linkplain FindPrimesResultsFragment#setTask(Task)} is called,
+     * This map holds the statistics for each task. When {@linkplain FindPrimesResultsFragment#setTask(ITask)} is called,
      * the current task's statistics are saved to the map so that they can be used later when
-     * {@linkplain FindPrimesResultsFragment#setTask(Task)} is called with the same task.
+     * {@linkplain FindPrimesResultsFragment#setTask(ITask)} is called with the same task.
      */
-    private final Map<FindPrimesTask, Statistics> statisticsMap = new HashMap<>();
+    private final Map<FPT, Statistics> statisticsMap = new HashMap<>();
 
     /**
      * This class keeps the statistics for a task.
@@ -131,7 +133,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                 final Intent intent = new Intent(getActivity(), DisplayPrimesActivity.class);
                 intent.putExtra("filePath", file.getAbsolutePath());
                 intent.putExtra("enableSearch", true);
-                intent.putExtra("range", new long[]{getTask().getStartValue(), getTask().getState() == Task.State.STOPPED ? getTask().getEndValue() : getTask().getCurrentValue()});
+                //intent.putExtra("range", new long[]{getTask().getStartValue(), getTask().getState() == Task.State.STOPPED ? getTask().getEndValue() : getTask().getCurrentValue()});
                 intent.putExtra("title", false);
                 getActivity().startActivity(intent);
             }).start();
@@ -144,7 +146,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         return rootView;
     }
 
-    public void saveTask(final FindPrimesTask task, final Context context) {
+    public void saveTask(final FPT task, final Context context) {
         final ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setTitle("Saving...");
         progressDialog.show();
@@ -336,10 +338,10 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             if (showStatistics && getTask().getElapsedTime() - statisticsMap.get(getTask()).lastUpdateTime >= 1000) {
 
                 //Numbers per second
-                final long currentValue = getTask().getCurrentValue();
+                /*final long currentValue = getTask().getCurrentValue();
                 statisticsMap.get(getTask()).finalNumbersPerSecond = currentValue - statisticsMap.get(getTask()).lastCurrentValue;
                 statisticsLayout.set("nps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(currentValue - statisticsMap.get(getTask()).lastCurrentValue)}, getTextHighlight()));
-                statisticsMap.get(getTask()).lastCurrentValue = currentValue;
+                statisticsMap.get(getTask()).lastCurrentValue = currentValue;*/
 
                 //Primes per second
                 final long primeCount = getTask().getPrimeCount();
@@ -353,12 +355,12 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     }
 
     @Override
-    public synchronized FindPrimesTask getTask() {
-        return (FindPrimesTask) super.getTask();
+    public synchronized FPT getTask() {
+        return (FPT) super.getTask();
     }
 
     @Override
-    public synchronized void setTask(final Task task) {
+    public synchronized void setTask(final ITask task) {
         super.setTask(task);
         if (getTask() != null) {
             if (!statisticsMap.containsKey(getTask())) {

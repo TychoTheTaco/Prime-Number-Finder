@@ -30,6 +30,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.tycho.app.primenumberfinder.ITask;
 import com.tycho.app.primenumberfinder.LongClickableSpan;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
@@ -379,7 +380,7 @@ public final class Utils {
         view.layout(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
     }
 
-    public static void logTaskStarted(final Context context, final Task task) {
+    public static void logTaskStarted(final Context context, final ITask task) {
         if (task instanceof FindPrimesTask) {
             final Bundle bundle = new Bundle();
             bundle.putLong("start", ((FindPrimesTask) task).getStartValue());

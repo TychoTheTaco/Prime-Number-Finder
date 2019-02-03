@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.tycho.app.primenumberfinder.ITask;
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
@@ -103,7 +104,7 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
     }
 
     @Override
-    public synchronized void setTask(final Task task) {
+    public synchronized void setTask(final ITask task) {
         super.setTask(task);
         if (getView() != null) {
             init();

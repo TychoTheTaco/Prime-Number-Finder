@@ -1,5 +1,6 @@
 #pragma once
 #include "task.h"
+#include <vector>
 
 class MultithreadedTask : public Task {
 
@@ -12,14 +13,20 @@ class MultithreadedTask : public Task {
 	virtual void resume();
 	virtual void stop();
 
+	virtual float getProgress();
+
 	protected:
 
 	void addSubTask(Task* task);
+	std::vector<Task*> getTasks();
 	void startSubTasks();
 	void finishSubTasks();
 
+	// Calculate the average progress of all attached sub-tasks.
+	float getAverageProgress();
+
 	private:
 	
+	// List of sub-tasks
 	std::vector<Task*> tasks;
-
 };

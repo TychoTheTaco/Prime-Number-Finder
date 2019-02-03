@@ -39,9 +39,9 @@ import java.util.UUID;
 
 import easytasks.Task;
 
+import static com.tycho.app.primenumberfinder.FPT.SearchOptions.SearchMethod.BRUTE_FORCE;
+import static com.tycho.app.primenumberfinder.FPT.SearchOptions.SearchMethod.SIEVE_OF_ERATOSTHENES;
 import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.INFINITY;
-import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
-import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.SIEVE_OF_ERATOSTHENES;
 
 /**
  * Created by tycho on 1/24/2018.

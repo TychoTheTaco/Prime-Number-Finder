@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.tycho.app.primenumberfinder.FPT;
+import com.tycho.app.primenumberfinder.ITask;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.utils.FileManager;
@@ -29,11 +31,7 @@ import easytasks.Task;
 import easytasks.TaskAdapter;
 import easytasks.TaskListener;
 
-import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
-import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.SIEVE_OF_ERATOSTHENES;
-import static com.tycho.app.primenumberfinder.utils.FileManager.EXTENSION;
-
-public class FindPrimesTask extends MultithreadedTask implements Savable, SearchOptions{
+public class FindPrimesTask extends MultithreadedTask implements FPT {
 
     static{
         System.loadLibrary("native-utils");
@@ -43,8 +41,6 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
     public native int nativeSieve(final long start, final long end);
 
     public native int nativeBrute(final long start, final long end);
-
-    private native void startNativeTask();
 
     /**
      * Tag used for logging and debugging.
@@ -89,22 +85,12 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
     private void searchBruteForce(){
         //Determine best search mode to use
         if (options.getThreadCount() % 2 == 0){
-            options.searchMode = SearchOptions.SearchMode.ALTERNATE;
+            options.setSearchMode(SearchOptions.SearchMode.ALTERNATE);
         }else{
-            options.searchMode = SearchOptions.SearchMode.PACKET;
+            options.setSearchMode(SearchOptions.SearchMode.PACKET);
         }
 
-        //startNativeTask();
-
-        /*Vector v = new Vector();
-        while (true) {
-            byte b[] = new byte[1048576];
-            v.add(b);
-            Runtime rt = Runtime.getRuntime();
-            System.out.println("free memory: " + rt.freeMemory());
-        }*/
-
-        switch (options.searchMode){
+        switch (options.getSearchMode()){
             case PARTITION:
                 preparePartitionMode();
                 executeTasks();
@@ -131,9 +117,9 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
         final long partitionSize = getRange() / options.getThreadCount();
         System.out.println("partition size: " + partitionSize);
         for (int i = 0; i < options.getThreadCount(); i++){
-            long start = options.startValue + (i * partitionSize + 1);
+            long start = options.getStartValue() + (i * partitionSize + 1);
             if (start % 2 == 0) start++;
-            final BruteForceTask task = new BruteForceTask(start, options.startValue + (i + 1) * partitionSize, 2);
+            final BruteForceTask task = new BruteForceTask(start, options.getStartValue() + (i + 1) * partitionSize, 2);
             System.out.println("task " + start + " " + task.endValue);
             debugTaskListener(task);
             addTask(task);
@@ -146,14 +132,14 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
     private void prepareAlternateMode(){
         final long[] startValues = new long[options.getThreadCount()];
         int increment = options.getThreadCount() * 2;
-        startValues[0] = (options.startValue % 2 == 0) ? (options.startValue + 1) : options.startValue;
+        startValues[0] = (options.getStartValue() % 2 == 0) ? (options.getStartValue() + 1) : options.getStartValue();
         for (int i = 0; i < startValues.length; i++){
             long s = i == 0 ? startValues[0] : startValues[i - 1] + 2;
             if (s % 2 == 0){
                 s -= 1;
             }
             startValues[i] = s;
-            final BruteForceTask task = new BruteForceTask(s, options.endValue, increment);
+            final BruteForceTask task = new BruteForceTask(s, options.getEndValue(), increment);
             debugTaskListener(task);
             addTask(task);
         }
@@ -169,9 +155,9 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
      */
     private void preparePacketMode(final long packetSize){
         for (int i = 0; i < Math.ceil((double) getRange() / packetSize); i++){
-            long start = options.startValue + (i * packetSize + 1);
+            long start = options.getStartValue() + (i * packetSize + 1);
             if (start % 2 == 0) start++;
-            final BruteForceTask task = new BruteForceTask(start, Math.min(options.startValue + (i + 1) * packetSize, options.endValue), 2);
+            final BruteForceTask task = new BruteForceTask(start, Math.min(options.getStartValue() + (i + 1) * packetSize, options.getEndValue()), 2);
             System.out.println("task " + start + " " + task.endValue);
             debugTaskListener(task);
             addTask(task);
@@ -261,7 +247,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
     public File saveToFile(){
 
         final File largeCache = new File(FileManager.getInstance().getTaskCacheDirectory(this) + File.separator + "primes");
-        if (options.searchMethod == BRUTE_FORCE){
+        if (options.getSearchMethod() == SearchOptions.SearchMethod.BRUTE_FORCE){
             //sortCache(getState() == State.STOPPED);
             sortCache(false);
         }else{
@@ -272,7 +258,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
     }
 
     private long getRange(){
-        return options.endValue - options.startValue;
+        return options.getEndValue() - options.getStartValue();
     }
 
     private void sortCache(final boolean delete){
@@ -386,8 +372,6 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
         }
     }
 
-    private volatile boolean takeFlag = false;
-
     public SearchOptions getSearchOptions(){
         return this.options;
     }
@@ -396,7 +380,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
      * @return the endValue
      */
     public long getEndValue(){
-        return options.endValue;
+        return options.getEndValue();
     }
 
     /**
@@ -410,7 +394,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
      * @return the startValue
      */
     public long getStartValue(){
-        return options.startValue;
+        return options.getStartValue();
     }
 
     public int getPrimeCount(){
@@ -424,29 +408,6 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
             }
         }
         return (int) total;
-    }
-
-    /**
-     * Finds and returns the lowest number that is currently being checked or has already been checked for primality. If there is more than one thread, this will return the lowest {@linkplain BruteForceTask#currentNumber} out of all threads.
-     *
-     * @return The lowest {@linkplain BruteForceTask#currentNumber}.
-     */
-    public long getCurrentValue(){
-        if (getTasks().size() == 0) return 0;
-        if (options.searchMethod == SIEVE_OF_ERATOSTHENES){
-            if (getState() == State.STOPPED){
-                return options.endValue;
-            }else{
-                return 0;
-            }
-        }
-        long lowest = ((BruteForceTask) getTasks().get(0)).getCurrentValue();
-        for (Task task : getTasks()){
-            if (((BruteForceTask) task).getCurrentValue() < lowest){
-                lowest = ((BruteForceTask) task).getCurrentValue();
-            }
-        }
-        return lowest;
     }
 
     public void setOptions(final SearchOptions searchOptions){
@@ -544,10 +505,6 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
             return super.getProgress();
         }
 
-        public long getCurrentValue(){
-            return this.currentNumber;
-        }
-
         private void dispatchPrimeFound(final long number){
             try{
                 primes.add(number);
@@ -584,7 +541,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
          */
         private final Queue<Long> primes = new ArrayDeque<>();
 
-        private final int sqrtMax = (int) Math.sqrt(options.endValue);
+        private final int sqrtMax = (int) Math.sqrt(options.getEndValue());
         private int factor;
         private long counter;
 
@@ -593,7 +550,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
         @Override
         protected void run(){
             //Assume all numbers are prime
-            final BitSet bitSet = new BitSet((int) (options.endValue + 1));
+            final BitSet bitSet = new BitSet((int) (options.getEndValue() + 1));
             bitSet.set(0, bitSet.size() - 1, true);
 
             // mark non-primes <= n using Sieve of Eratosthenes
@@ -602,7 +559,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
                 // if factor is prime, then mark multiples of factor as nonprime
                 // suffices to consider mutiples factor, factor+1, ...,  n/factor
                 if (bitSet.get(factor)){
-                    for (int j = factor; factor * j <= options.endValue; j++){
+                    for (int j = factor; factor * j <= options.getEndValue(); j++){
                         bitSet.set(factor * j, false);
                     }
                 }
@@ -617,7 +574,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
             status = "counting";
 
             //Count primes
-            for (counter = (options.startValue > 2 ? options.startValue : 2); counter <= options.endValue; counter++){
+            for (counter = (options.getStartValue() > 2 ? options.getStartValue() : 2); counter <= options.getEndValue(); counter++){
                 if (bitSet.get((int) counter)){
                     primes.add(counter);
                     primeCount++;
@@ -636,7 +593,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
                     break;
 
                 case "counting":
-                    setProgress(0.5f + (((float) counter / options.endValue) / 2));
+                    setProgress(0.5f + (((float) counter / options.getEndValue()) / 2));
                     break;
             }
             return super.getProgress();
@@ -658,12 +615,12 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
         long start = System.currentTimeMillis();
         System.out.println("Sieve version 0: " + version_0() + "\t" + (System.currentTimeMillis() - start) + " ms.");
         start = System.currentTimeMillis();
-        System.out.println("Sieve version N: " + nativeSieve(options.startValue, options.endValue) + "\t" + (System.currentTimeMillis() - start) + " ms.");
+        System.out.println("Sieve version N: " + nativeSieve(options.getStartValue(), options.getEndValue()) + "\t" + (System.currentTimeMillis() - start) + " ms.");
 
         start = System.currentTimeMillis();
-        System.out.println("Brute version 0: " + brute_version_0(options.startValue, options.endValue) + "\t" + (System.currentTimeMillis() - start) + " ms.");
+        System.out.println("Brute version 0: " + brute_version_0(options.getStartValue(), options.getEndValue()) + "\t" + (System.currentTimeMillis() - start) + " ms.");
         start = System.currentTimeMillis();
-        System.out.println("Brute version N: " + nativeBrute(options.startValue, options.endValue) + "\t" + (System.currentTimeMillis() - start) + " ms.");
+        System.out.println("Brute version N: " + nativeBrute(options.getStartValue(), options.getEndValue()) + "\t" + (System.currentTimeMillis() - start) + " ms.");
     }
 
     private int brute_version_0(final long start, final long end){
@@ -702,11 +659,11 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
     }
 
     private int version_0(){
-        final boolean[] array = new boolean[(int) options.endValue + 1];
+        final boolean[] array = new boolean[(int) options.getEndValue() + 1];
         for (int i = 0; i < array.length; ++i){
             array[i] = true;
         }
-        final int sqrtMax = (int) Math.sqrt(options.endValue);
+        final int sqrtMax = (int) Math.sqrt(options.getEndValue());
         int primeCount = 0;
 
         // mark non-primes <= n using Sieve of Eratosthenes
@@ -715,7 +672,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
             // if factor is prime, then mark multiples of factor as nonprime
             // suffices to consider mutiples factor, factor+1, ...,  n/factor
             if (array[factor]){
-                for (long j = factor; factor * j <= options.endValue; j++){
+                for (long j = factor; factor * j <= options.getEndValue(); j++){
                     final long number = factor * j;
                     array[(int) number] = false;
                 }
@@ -723,7 +680,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
         }
 
         //Count primes
-        for (int counter = (int) (options.startValue > 2 ? options.startValue : 2); counter <= options.endValue; counter++){
+        for (int counter = (int) (options.getStartValue() > 2 ? options.getStartValue() : 2); counter <= options.getEndValue(); counter++){
             if (array[counter]){
                 primeCount++;
             }
@@ -733,7 +690,7 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
     }
 
     public String getStatus(){
-        switch (options.searchMethod){
+        switch (options.getSearchMethod()){
             case BRUTE_FORCE:
                 break;
 
@@ -746,158 +703,42 @@ public class FindPrimesTask extends MultithreadedTask implements Savable, Search
         return String.valueOf(getState());
     }
 
-    public static class SearchOptions extends GeneralSearchOptions{
-
-        /**
-         * The value to start the search from. Inclusive.
-         */
-        private long startValue;
-
-        /**
-         * The value to stop the search on. Inclusive.
-         */
-        private long endValue;
-
-        public enum SearchMethod{
-            /**
-             * Using brute force will loop over every number in the search range and check if it is divisible by numbers below its square root. This is
-             * typically much slower, but more memory efficient.
-             */
-            BRUTE_FORCE,
-
-            /**
-             * Using the Sieve or Eratosthenes is a very quick way to check primality for each number in a specified range. The only drawbacks are that the
-             * range needs to start at 0 and this method also requires a significant amount of memory.
-             */
-            SIEVE_OF_ERATOSTHENES
-        }
-
-        /**
-         * The search method to use.
-         */
-        private SearchMethod searchMethod;
-
-        private enum SearchMode{
-            PARTITION,
-            ALTERNATE,
-            PACKET
-        }
-
-        private SearchMode searchMode = SearchMode.PACKET;
-
-        /**
-         * Directory used to cache task data. This is used to keep memory usage low. If no cache directory is specified, the task will not use caching and risks
-         * running out of memory.
-         */
-        private File cacheDirectory;
-
-        /**
-         * The maximum size of prime numbers in memory. If more numbers are found, the entire list will be saved onto the disk first.
-         */
-        private int bufferSize = 1_000_000;
-
-        public SearchOptions(final long startValue, final long endValue, final SearchMethod searchMethod, final int threadCount, final boolean notifyWhenFinished, final boolean autoSave){
-            super(threadCount, notifyWhenFinished, autoSave);
-            this.startValue = startValue;
-            this.endValue = endValue;
-            this.searchMethod = searchMethod;
-        }
-
-        public SearchOptions(final long startValue, final long endValue, final SearchMethod searchMethod, final int threadCount){
-            this(startValue, endValue, searchMethod, threadCount, false, false);
-        }
-
-        public SearchOptions(final long startValue, final long endValue){
-            this(startValue, endValue, BRUTE_FORCE, 1, false, false);
-        }
-
-        private SearchOptions(final Parcel parcel){
-            super(parcel);
-            this.startValue = parcel.readLong();
-            this.endValue = parcel.readLong();
-            this.searchMethod = (SearchMethod) parcel.readSerializable();
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags){
-            super.writeToParcel(dest, flags);
-            dest.writeLong(this.startValue);
-            dest.writeLong(this.endValue);
-            dest.writeSerializable(this.searchMethod);
-        }
-
-        public static final Parcelable.Creator<SearchOptions> CREATOR = new Parcelable.Creator<SearchOptions>(){
-
-            @Override
-            public SearchOptions createFromParcel(Parcel in){
-                return new SearchOptions(in);
-            }
-
-            @Override
-            public SearchOptions[] newArray(int size){
-                return new SearchOptions[size];
-            }
-        };
-
-        public long getStartValue(){
-            return startValue;
-        }
-
-        public void setStartValue(long startValue){
-            this.startValue = startValue;
-        }
-
-        public long getEndValue(){
-            return endValue;
-        }
-
-        public void setEndValue(long endValue){
-            this.endValue = endValue;
-        }
-
-        public SearchMethod getSearchMethod(){
-            return searchMethod;
-        }
-
-        public void setSearchMethod(SearchMethod searchMethod){
-            this.searchMethod = searchMethod;
-        }
-    }
+    
 
     private boolean saved = false;
 
     @Override
     public boolean save(){
-        try{
+        /*try{
             FileManager.copy(saveToFile(), new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getStartValue() + " to " + (getEndValue() == FindPrimesTask.INFINITY ? getCurrentValue() : getEndValue()) + EXTENSION));
             saved = true;
             sendOnSaved();
             return true;
         }catch (IOException e){
             e.printStackTrace();
-        }
+        }*/
         sendOnError();
         return false;
     }
 
-    private CopyOnWriteArrayList<SaveListener> saveListeners = new CopyOnWriteArrayList<>();
+    private CopyOnWriteArrayList<Savable.SaveListener> saveListeners = new CopyOnWriteArrayList<>();
 
-    public void addSaveListener(final SaveListener listener){
+    public void addSaveListener(final Savable.SaveListener listener){
         saveListeners.add(listener);
     }
 
-    public void removeSaveListener(final SaveListener listener){
+    public void removeSaveListener(final Savable.SaveListener listener){
         saveListeners.remove(listener);
     }
 
     private void sendOnSaved(){
-        for (SaveListener listener : saveListeners){
+        for (Savable.SaveListener listener : saveListeners){
             listener.onSaved();
         }
     }
 
     private void sendOnError(){
-        for (SaveListener listener : saveListeners){
+        for (Savable.SaveListener listener : saveListeners){
             listener.onError();
         }
     }

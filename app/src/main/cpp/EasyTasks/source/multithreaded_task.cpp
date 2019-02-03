@@ -9,7 +9,6 @@ void MultithreadedTask::pause() {
 		//Pause subtasks
 		std::thread([this]() {
 			for (Task* task : this->tasks) {
-				std::cout << task << std::endl;
 				task->pauseAndWait();
 			}
 			this->dispatchPaused();
@@ -23,7 +22,6 @@ void MultithreadedTask::pauseAndWait() {
 	if (this->state == RUNNING) {
 		this->dispatchPausing();
 		for (Task* task : this->tasks) {
-			std::cout << task << std::endl;
 			task->pauseAndWait();
 		}
 		this->dispatchPaused();
@@ -74,5 +72,22 @@ void MultithreadedTask::startSubTasks() {
 void MultithreadedTask::finishSubTasks() {
 	for (Task *task : this->tasks) {
 		task->finish();
+		//std::cout << "[Task " << task->getId() << "] Finished." << std::endl;
 	}
+}
+
+std::vector<Task*> MultithreadedTask::getTasks() {
+	return this->tasks;
+}
+
+float MultithreadedTask::getProgress() {
+	return this->getAverageProgress();
+}
+
+float MultithreadedTask::getAverageProgress() {
+	float total = 0;
+	for (Task* task : this->tasks) {
+		total += task->getProgress();
+	}
+	return total / this->tasks.size();
 }

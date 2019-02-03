@@ -57,7 +57,7 @@ extern "C" JNIEXPORT jint JNICALL Java_com_tycho_app_primenumberfinder_modules_f
     return primeCount;
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesTask_nativeBrute(JNIEnv *env, jobject /* this */,
+extern "C" JNIEXPORT jint JNICALL Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesTask_nativeBrute(JNIEnv *env, jobject self,
                                                                                                                      jlong start_value, jlong end_value) {
     __android_log_print(ANDROID_LOG_VERBOSE, APP_NAME, "Testing native brute...");
 
@@ -68,6 +68,10 @@ extern "C" JNIEXPORT jint JNICALL Java_com_tycho_app_primenumberfinder_modules_f
         ++primeCount;
         current = 3;
     }
+
+    jclass cls = env->FindClass("com/tycho/app/primenumberfinder/modules/findprimes/FindPrimesTask$BruteForceTask");
+    jmethodID try_pause_id = env->GetMethodID(cls, "tryPause", "()V");
+    jmethodID should_stop_id = env->GetMethodID(cls, "shouldStop", "()Z");
 
     while (current <= end_value) {
         int sqrtMax = (int) std::sqrt(current);
@@ -83,6 +87,11 @@ extern "C" JNIEXPORT jint JNICALL Java_com_tycho_app_primenumberfinder_modules_f
                 isPrime = false;
                 break;
             }
+        }
+
+        env->CallVoidMethod(self, try_pause_id);
+        if (env->CallBooleanMethod(self, should_stop_id)){
+            break;
         }
 
         // Check if the number was prime

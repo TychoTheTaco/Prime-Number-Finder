@@ -1,7 +1,6 @@
 #pragma once
 #include "multithreaded_task.h"
 #include <iostream>
-#include <cmath>
 
 class FindPrimesTask : public MultithreadedTask {
 	
@@ -25,6 +24,14 @@ class FindPrimesTask : public MultithreadedTask {
 
 	virtual void run();
 
+	unsigned int getPrimeCount();
+
+	// Getters
+	unsigned long getStartValue();
+	unsigned long getEndValue();
+	SearchMethod getSearchMethod();
+	unsigned int getThreadCount();
+
 	private:
 
 	unsigned long start_value;
@@ -35,7 +42,7 @@ class FindPrimesTask : public MultithreadedTask {
 
 	unsigned int thread_count;
 
-	std::vector<unsigned int> primes;
+	std::string cache_dir;
 
 	class BruteForceTask : public Task {
 		public:
@@ -44,21 +51,29 @@ class FindPrimesTask : public MultithreadedTask {
 
 		virtual void run();
 
+		virtual float getProgress();
+
+		unsigned int getPrimeCount();
+
 		private:
 		unsigned long start_value;
 		unsigned long end_value;
 
 		int increment;
 
+		std::vector<unsigned int> primes;
+		unsigned int buffer_size = 0;
 		unsigned int prime_count = 0;
 		unsigned long current_number = 0;
 
 		void dispatchPrimeFound(unsigned long number);
+		void writeToCache();
 	};
 
-	void preparePartitionMode();
-	void prepareAlternateMode();
-	void perparePacketMode();
+	void searchPartitionMode();
+	void searchAlternateMode();
+	void searchPacketMode(unsigned long packet_size);
+	void executeThreadPool();
 
 	unsigned long getRange();
 

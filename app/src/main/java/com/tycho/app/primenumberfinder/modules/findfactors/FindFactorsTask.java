@@ -3,6 +3,7 @@ package com.tycho.app.primenumberfinder.modules.findfactors;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.tycho.app.primenumberfinder.ITask;
 import com.tycho.app.primenumberfinder.NativeTask;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.SearchOptions;
@@ -20,7 +21,7 @@ import easytasks.Task;
  *         Date Created: 3/3/2017
  */
 
-public class FindFactorsTask extends Task implements Savable, SearchOptions{
+public class FindFactorsTask extends Task implements Savable, SearchOptions, ITask {
 
     static{
         System.loadLibrary("native-utils");

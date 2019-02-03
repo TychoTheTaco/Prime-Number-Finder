@@ -24,7 +24,6 @@ void Task::start() {
 	lock.unlock();
 	run();
 	dispatchStopped();
-	std::cout << "[Native Task] Finished." << std::endl;
 }
 
 std::thread* Task::startOnNewThread() {
@@ -125,7 +124,7 @@ void Task::processRequestedState() {
 	}
 }
 
-void Task::setProgress(const float progress) {
+void Task::setProgress(float progress) {
 	this->progress = progress;
 }
 
@@ -166,6 +165,10 @@ int64_t Task::getElapsedTime() const {
 
 Task::State Task::getState() const {
 	return this->state;
+}
+
+float Task::getProgress() {
+	return this->progress;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

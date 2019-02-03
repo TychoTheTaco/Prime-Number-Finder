@@ -19,6 +19,7 @@ import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FabAnimator;
 import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
 import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
+import com.tycho.app.primenumberfinder.ITask;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Savable;
@@ -149,17 +150,17 @@ public abstract class ModuleHostFragment extends Fragment implements FloatingAct
     }
 
     @Override
-    public void onTaskSelected(Task task) {
+    public void onTaskSelected(ITask task) {
         resultsFragment.setTask(task);
     }
 
     @Override
-    public void onPausePressed(Task task) {
+    public void onPausePressed(ITask task) {
 
     }
 
     @Override
-    public void onTaskRemoved(Task task) {
+    public void onTaskRemoved(ITask task) {
         if (resultsFragment.getTask() == task) {
             resultsFragment.setTask(null);
         }
@@ -168,12 +169,12 @@ public abstract class ModuleHostFragment extends Fragment implements FloatingAct
     }
 
     @Override
-    public void onEditPressed(Task task) {
+    public void onEditPressed(ITask task) {
 
     }
 
     @Override
-    public void onSavePressed(Task task) {
+    public void onSavePressed(ITask task) {
 
     }
 
@@ -202,7 +203,7 @@ public abstract class ModuleHostFragment extends Fragment implements FloatingAct
 
     protected void afterLoadFragments(){}
 
-    protected void startTask(final Task task){
+    protected void startTask(final ITask task){
         task.addTaskListener(new TaskAdapter() {
 
             @Override

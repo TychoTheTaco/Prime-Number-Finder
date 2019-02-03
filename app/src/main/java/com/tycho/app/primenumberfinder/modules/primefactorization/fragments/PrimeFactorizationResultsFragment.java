@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.tycho.app.primenumberfinder.ITask;
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
@@ -212,7 +213,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     }
 
     @Override
-    public synchronized void setTask(Task task) {
+    public synchronized void setTask(ITask task) {
         super.setTask(task);
         if (getView() != null){
             init();

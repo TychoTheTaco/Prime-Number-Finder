@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 
+import com.tycho.app.primenumberfinder.ITask;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.activities.MainActivity;
 
@@ -24,7 +25,7 @@ public class NotificationManager {
 
     private static int nextNotificationId = 0;
 
-    public static synchronized void displayNotification(final Context context, final String channelId, final Task task, final int taskType, final String contentText, final int smallIconDrawable){
+    public static synchronized void displayNotification(final Context context, final String channelId, final ITask task, final int taskType, final String contentText, final int smallIconDrawable){
 
         //Create notification
         final Intent intent = new Intent(context, MainActivity.class);

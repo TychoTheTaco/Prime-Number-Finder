@@ -3,6 +3,8 @@ package com.tycho.app.primenumberfinder.utils;
 import android.content.Context;
 import android.util.Log;
 
+import com.tycho.app.primenumberfinder.ITask;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -139,7 +141,7 @@ public final class FileManager {
         }
     }
 
-    public File getTaskCacheDirectory(final Task task) {
+    public File getTaskCacheDirectory(final ITask task) {
         final File cacheDirectory = new File(context.get().getFilesDir() + File.separator + "cache" + File.separator + task.getId() + File.separator);
         if (!cacheDirectory.exists()) {
             cacheDirectory.mkdirs();

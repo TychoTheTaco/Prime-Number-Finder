@@ -1,6 +1,9 @@
 package com.tycho.app.primenumberfinder;
 
+import java.util.UUID;
+
 import easytasks.Task;
+import easytasks.TaskListener;
 
 public abstract class NativeTask implements ITask {
 
@@ -8,10 +11,45 @@ public abstract class NativeTask implements ITask {
         System.loadLibrary("native-utils");
     }
 
-    private final long native_task_pointer;
+    @Override
+    public UUID getId() {
+        return UUID.randomUUID();
+    }
 
-    public NativeTask(){
-        this.native_task_pointer = initNativeTask();
+    @Override
+    public float getProgress() {
+        return nativeGetProgress(native_task_pointer);
+    }
+
+    @Override
+    public long getStartTime() {
+        return 0;
+    }
+
+    @Override
+    public long getEndTime() {
+        return 0;
+    }
+
+    @Override
+    public long getEstimatedTimeRemaining() {
+        return 0;
+    }
+
+    @Override
+    public void addTaskListener(TaskListener listener) {
+
+    }
+
+    @Override
+    public boolean removeTaskListener(TaskListener listener) {
+        return false;
+    }
+
+    protected long native_task_pointer;
+
+    protected void init(final long native_task_pointer){
+        this.native_task_pointer = native_task_pointer;
     }
 
     @Override
@@ -20,8 +58,9 @@ public abstract class NativeTask implements ITask {
     }
 
     @Override
-    public void startOnNewThread() {
+    public Thread startOnNewThread() {
         nativeStartOnNewThread(native_task_pointer);
+        return new Thread();
     }
 
     @Override
@@ -64,7 +103,6 @@ public abstract class NativeTask implements ITask {
         return nativeGetElapsedTime(native_task_pointer);
     }
 
-    protected abstract long initNativeTask();
     private native void nativeStart(long native_task_pointer);
     private native void nativeStartOnNewThread(long native_task_pointer);
     private native void nativePause(long native_task_pointer);
@@ -73,6 +111,8 @@ public abstract class NativeTask implements ITask {
     private native void nativeResumeAndWait(long native_task_pointer);
     private native void nativeStop(long native_task_pointer);
     private native void nativeStopAndWait(long native_task_pointer);
+
+    private native float nativeGetProgress(long native_task_pointer);
 
     private native int nativeGetState(long native_task_pointer);
     private native long nativeGetElapsedTime(long native_task_pointer);

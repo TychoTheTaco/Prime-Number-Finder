@@ -13,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
+import com.tycho.app.primenumberfinder.ITask;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 
@@ -36,7 +37,7 @@ import easytasks.TaskListener;
  * Created by tycho on 12/12/2017.
  */
 
-public class AbstractTaskListAdapter<T extends Task> extends RecyclerView.Adapter<AbstractTaskListAdapter.ViewHolder> implements TaskListener{
+public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapter<AbstractTaskListAdapter.ViewHolder> implements TaskListener{
 
     /**
      * Tag used for logging and debugging.
@@ -61,7 +62,7 @@ public class AbstractTaskListAdapter<T extends Task> extends RecyclerView.Adapte
     /**
      * Custom task event listeners that update the view holder when the task is paused / resumed / stopped.
      */
-    private Map<Task, CustomTaskEventListener> customEventListeners = new HashMap<>();
+    private Map<ITask, CustomTaskEventListener> customEventListeners = new HashMap<>();
 
     /**
      * Handler for posting to UI thread.
@@ -119,7 +120,7 @@ public class AbstractTaskListAdapter<T extends Task> extends RecyclerView.Adapte
     @Override
     public void onBindViewHolder(@NonNull AbstractTaskListAdapter.ViewHolder holder, int position) {
         final Item item = items.get(position);
-        final Task task = item.getTask();
+        final ITask task = item.getTask();
         customEventListeners.get(task).setViewHolder(holder);
 
         //Start the UI updater if it hasn't been started yet
@@ -501,7 +502,7 @@ public class AbstractTaskListAdapter<T extends Task> extends RecyclerView.Adapte
         }
     }
 
-    public void setSelected(final Task task) {
+    public void setSelected(final ITask task) {
         setSelected(items.indexOf(getItem(task)));
     }
 
@@ -515,15 +516,15 @@ public class AbstractTaskListAdapter<T extends Task> extends RecyclerView.Adapte
     }
 
     public interface EventListener {
-        void onTaskSelected(final Task task);
+        void onTaskSelected(final ITask task);
 
-        void onPausePressed(final Task task);
+        void onPausePressed(final ITask task);
 
-        void onTaskRemoved(final Task task);
+        void onTaskRemoved(final ITask task);
 
-        void onEditPressed(final Task task);
+        void onEditPressed(final ITask task);
 
-        void onSavePressed(final Task task);
+        void onSavePressed(final ITask task);
     }
 
     public void addEventListener(final EventListener eventListener) {
@@ -534,31 +535,31 @@ public class AbstractTaskListAdapter<T extends Task> extends RecyclerView.Adapte
         return eventListeners.remove(eventListener);
     }
 
-    private void sendOnTaskSelected(final Task task) {
+    private void sendOnTaskSelected(final ITask task) {
         for (EventListener eventListener : eventListeners) {
             eventListener.onTaskSelected(task);
         }
     }
 
-    private void sendOnPausePressed(final Task task) {
+    private void sendOnPausePressed(final ITask task) {
         for (EventListener eventListener : eventListeners) {
             eventListener.onPausePressed(task);
         }
     }
 
-    private void sendOnEditClicked(final Task task) {
+    private void sendOnEditClicked(final ITask task) {
         for (EventListener eventListener : eventListeners) {
             eventListener.onEditPressed(task);
         }
     }
 
-    private void sendOnDeletePressed(final Task task) {
+    private void sendOnDeletePressed(final ITask task) {
         for (EventListener eventListener : eventListeners) {
             eventListener.onTaskRemoved(task);
         }
     }
 
-    private void sendOnSavePressed(final Task task) {
+    private void sendOnSavePressed(final ITask task) {
         for (EventListener eventListener : eventListeners) {
             eventListener.onSavePressed(task);
         }
@@ -572,7 +573,7 @@ public class AbstractTaskListAdapter<T extends Task> extends RecyclerView.Adapte
         }
     }
 
-    protected Task getTask(final int position) {
+    protected ITask getTask(final int position) {
         return items.get(position).getTask();
     }
 
@@ -666,7 +667,7 @@ public class AbstractTaskListAdapter<T extends Task> extends RecyclerView.Adapte
 
                     //Remove the task from the list
                     final int position = getAdapterPosition();
-                    final Task task = getTask(position);
+                    final ITask task = getTask(position);
                     customEventListeners.remove(task);
                     items.remove(position);
                     notifyItemRemoved(position);
@@ -700,7 +701,7 @@ public class AbstractTaskListAdapter<T extends Task> extends RecyclerView.Adapte
         }
     }
 
-    public void setSaved(final Task task, boolean isSaved) {
+    public void setSaved(final ITask task, boolean isSaved) {
         final Item item = getItem(task);
         final int index = items.indexOf(item);
         if (item != null){
@@ -709,16 +710,16 @@ public class AbstractTaskListAdapter<T extends Task> extends RecyclerView.Adapte
         }
     }
 
-    public void postSetSaved(final Task task, final boolean isSaved){
+    public void postSetSaved(final ITask task, final boolean isSaved){
         handler.post(() -> setSaved(task, isSaved));
     }
 
-    protected boolean isSaved(Task task){
+    protected boolean isSaved(ITask task){
         return getItem(task).isSaved();
     }
 
-    public List<Task> getSavedItems(){
-        final List<Task> savedItems = new ArrayList<>();
+    public List<ITask> getSavedItems(){
+        final List<ITask> savedItems = new ArrayList<>();
         for (Item item : items){
             if (item.isSaved()){
                 savedItems.add(item.getTask());
@@ -727,7 +728,7 @@ public class AbstractTaskListAdapter<T extends Task> extends RecyclerView.Adapte
         return savedItems;
     }
 
-    public int indexOf(final Task task){
+    public int indexOf(final ITask task){
         return items.indexOf(getItem(task));
     }
 
@@ -735,7 +736,7 @@ public class AbstractTaskListAdapter<T extends Task> extends RecyclerView.Adapte
 
     }
 
-    protected Item getItem(final Task task) {
+    protected Item getItem(final ITask task) {
         for (Item item : items) {
             if (item.getTask() == task) {
                 return item;

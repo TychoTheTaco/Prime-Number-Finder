@@ -1,4 +1,5 @@
 #include "test_task.h"
+#include <cmath>
 
 void TestTask::run() {
 	long start_value = 0;

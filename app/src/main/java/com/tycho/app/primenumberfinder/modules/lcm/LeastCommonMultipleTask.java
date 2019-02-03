@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.tycho.app.primenumberfinder.ITask;
 import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
@@ -16,7 +17,7 @@ import java.util.TreeMap;
 
 import easytasks.Task;
 
-public class LeastCommonMultipleTask extends Task implements SearchOptions {
+public class LeastCommonMultipleTask extends Task implements SearchOptions, ITask {
 
     /**
      * Tag used for logging and debugging.

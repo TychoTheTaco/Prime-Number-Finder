@@ -1,5 +1,7 @@
 package com.tycho.app.primenumberfinder.utils;
 
+import com.tycho.app.primenumberfinder.ITask;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -19,18 +21,18 @@ public class TaskManager {
      */
     private static final String TAG = TaskManager.class.getSimpleName();
 
-    private final Map<Task, Task.State> tasks = new HashMap<>();
+    private final Map<ITask, Task.State> tasks = new HashMap<>();
 
-    public void registerTask(final Task task) {
+    public void registerTask(final ITask task) {
         tasks.put(task, task.getState());
     }
 
-    public void unregisterTask(final Task task) {
+    public void unregisterTask(final ITask task) {
         tasks.remove(task);
     }
 
     public void saveTaskStates(){
-        for (Task task : tasks.keySet()){
+        for (ITask task : tasks.keySet()){
             tasks.put(task, task.getState());
         }
     }
@@ -39,7 +41,7 @@ public class TaskManager {
      * PAUSE all tasks.
      */
     public void pauseAllTasks() {
-        for (Task task : tasks.keySet()) {
+        for (ITask task : tasks.keySet()) {
             tasks.put(task, task.getState());
             task.pause();
         }
@@ -49,19 +51,19 @@ public class TaskManager {
      * Resume all tasks.
      */
     public void resumeAllTasks() {
-        for (Task task : tasks.keySet()) {
+        for (ITask task : tasks.keySet()) {
             if (tasks.get(task) != Task.State.PAUSED && tasks.get(task) != Task.State.STOPPED) {
                 task.resume();
             }
         }
     }
 
-    public Set<Task> getTasks() {
+    public Set<ITask> getTasks() {
         return tasks.keySet();
     }
 
-    public Task findTaskById(final UUID id) {
-        for (Task task : tasks.keySet()) {
+    public ITask findTaskById(final UUID id) {
+        for (ITask task : tasks.keySet()) {
             if (task.getId().equals(id)) {
                 return task;
             }

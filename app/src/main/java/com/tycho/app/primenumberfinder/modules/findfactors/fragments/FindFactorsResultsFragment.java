@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.tycho.app.primenumberfinder.ITask;
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
@@ -62,9 +63,9 @@ public class FindFactorsResultsFragment extends ResultsFragment {
     private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
     /**
-     * This map holds the statistics for each task. When {@linkplain FindFactorsResultsFragment#setTask(Task)} is called,
+     * This map holds the statistics for each task. When {@linkplain FindFactorsResultsFragment#setTask(ITask)} is called,
      * the current task's statistics are saved to the map so that they can be used later when
-     * {@linkplain FindFactorsResultsFragment#setTask(Task)} is called with the same task.
+     * {@linkplain FindFactorsResultsFragment#setTask(ITask)} is called with the same task.
      */
     private final Map<FindFactorsTask, FindFactorsResultsFragment.Statistics> statisticsMap = new HashMap<>();
 
@@ -239,7 +240,7 @@ public class FindFactorsResultsFragment extends ResultsFragment {
     }
 
     @Override
-    public synchronized void setTask(final Task task) {
+    public synchronized void setTask(final ITask task) {
         super.setTask(task);
         if (task != null) {
             if (!statisticsMap.containsKey(getTask())) {

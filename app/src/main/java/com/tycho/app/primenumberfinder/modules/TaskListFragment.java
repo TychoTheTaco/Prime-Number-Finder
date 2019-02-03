@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
+import com.tycho.app.primenumberfinder.ITask;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Savable;
@@ -54,7 +55,7 @@ public class TaskListFragment extends Fragment {
     private Queue<AbstractTaskListAdapter.EventListener> eventListenerQueue = new LinkedBlockingQueue<>(5);
     private Queue<ActionViewListener> actionViewListenerQueue = new LinkedBlockingQueue<>(5);
 
-    private final List<Class<? extends Task>> whitelist = new ArrayList<>();
+    private final List<Class<? extends ITask>> whitelist = new ArrayList<>();
 
     /**
      * All UI updates are posted to this {@link Handler} on the main thread.
@@ -82,7 +83,7 @@ public class TaskListFragment extends Fragment {
         textViewNoTasks = rootView.findViewById(R.id.empty_message);
 
         //Restore tasks if fragment was destroyed
-        for (Task task : PrimeNumberFinder.getTaskManager().getTasks()) {
+        for (ITask task : PrimeNumberFinder.getTaskManager().getTasks()) {
             if (whitelist.contains(task.getClass())){
                 addTask(task);
                 if (task instanceof Savable) taskListAdapter.setSaved(task, ((Savable) task).isSaved());
@@ -116,9 +117,9 @@ public class TaskListFragment extends Fragment {
         outState.putInt("selectedItemPosition", taskListAdapter.getSelectedItemPosition());
 
         //Store the saved item positions
-        final List<Task> savedItems = taskListAdapter.getSavedItems();
+        final List<ITask> savedItems = taskListAdapter.getSavedItems();
         final ArrayList<Integer> savedItemPositions = new ArrayList<>();
-        for (Task task : savedItems) {
+        for (ITask task : savedItems) {
             savedItemPositions.add(taskListAdapter.indexOf(task));
         }
         outState.putIntegerArrayList("savedItemPositions", savedItemPositions);
@@ -132,7 +133,7 @@ public class TaskListFragment extends Fragment {
         }
     }
 
-    public void addTask(final Task task) {
+    public void addTask(final ITask task) {
         if (task instanceof FindPrimesTask){
             ((FindPrimesTask) task).addSaveListener(new Savable.SaveListener() {
                 @Override
@@ -179,7 +180,7 @@ public class TaskListFragment extends Fragment {
         taskListAdapter.setSelected(index);
     }
 
-    public void setSelected(final Task task) {
+    public void setSelected(final ITask task) {
         taskListAdapter.setSelected(task);
     }
 
@@ -199,7 +200,7 @@ public class TaskListFragment extends Fragment {
         }
     }
 
-    public void whitelist(final Class<? extends Task>... classes){
+    public void whitelist(final Class<? extends ITask>... classes){
         whitelist.addAll(Arrays.asList(classes));
     }
 }

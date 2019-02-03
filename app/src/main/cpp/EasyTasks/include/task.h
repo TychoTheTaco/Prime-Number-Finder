@@ -1,10 +1,10 @@
 #pragma once
 #include <mutex>
-#include "task_listener.h"
 #include <vector>
 #include <condition_variable>
 #include <iostream>
 #include <thread>
+#include "task_listener.h"
 
 class Task {
 
@@ -46,13 +46,15 @@ class Task {
 	int64_t getEstimatedTimeRemaining() const;
 	State getState() const;
 
+	virtual float getProgress();
+
 	protected:
 
 	Task();
 
-	/*volatile*/ State state = State::NOT_STARTED;
+	State state = State::NOT_STARTED;
 
-	/*volatile*/ State requested_state = State::NOT_STARTED;
+	State requested_state = State::NOT_STARTED;
 
 	std::recursive_mutex state_lock;
 	std::condition_variable_any condition_variable;
@@ -68,10 +70,10 @@ class Task {
 	void dispatchResumed();
 	void dispatchStopping();
 
-	void setProgress(const float progress);
-	/*long getTotalPauseTime();*/
+	void setProgress(float progress);
 
 	private:
+
 	static long next_id;
 	long id;
 

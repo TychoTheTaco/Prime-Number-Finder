@@ -5,6 +5,8 @@ import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
+import com.tycho.app.primenumberfinder.ITask;
+
 import easytasks.Task;
 import easytasks.TaskListener;
 
@@ -25,7 +27,7 @@ public abstract class TaskFragment extends Fragment implements TaskListener {
     /**
      * The {@link Task} that belongs to this fragment.
      */
-    private Task task;
+    private ITask task;
 
     /**
      * All UI updates are posted to this {@link Handler} on the main thread.
@@ -67,11 +69,11 @@ public abstract class TaskFragment extends Fragment implements TaskListener {
 
     }
 
-    public synchronized Task getTask(){
+    public synchronized ITask getTask(){
         return task;
     }
 
-    public synchronized void setTask(Task task){
+    public synchronized void setTask(ITask task){
         //Remove task listener from previous task
         if (this.task != null){
             if (!this.task.removeTaskListener(this)){
