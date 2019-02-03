@@ -1,6 +1,7 @@
 package com.tycho.app.primenumberfinder;
 
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import easytasks.Task;
 import easytasks.TaskListener;
@@ -116,4 +117,7 @@ public abstract class NativeTask implements ITask {
 
     private native int nativeGetState(long native_task_pointer);
     private native long nativeGetElapsedTime(long native_task_pointer);
+
+    private native long nativeAddTaskListener(long native_task_pointer);
+    private native long nativeRemoveTaskListener(long native_task_pointer);
 }

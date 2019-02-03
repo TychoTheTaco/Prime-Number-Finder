@@ -202,6 +202,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
         final ImageButton infinityButton = rootView.findViewById(R.id.infinity_button);
         infinityButton.setOnClickListener(v -> {
             NATIVE = !NATIVE;
+            Toast.makeText(getActivity(), "Native: " + NATIVE, Toast.LENGTH_SHORT).show();
             //editTextSearchRangeEnd.setText(getString(R.string.infinity_text), false);
         });
 

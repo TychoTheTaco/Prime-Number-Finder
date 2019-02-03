@@ -33,14 +33,12 @@ import easytasks.TaskListener;
 
 public class FindPrimesTask extends MultithreadedTask implements FPT {
 
-    static{
+    static {
         System.loadLibrary("native-utils");
         System.loadLibrary("Taskr");
     }
 
     public native int nativeSieve(final long start, final long end);
-
-    public native int nativeBrute(final long start, final long end);
 
     /**
      * Tag used for logging and debugging.
@@ -62,13 +60,13 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
      *
      * @param options
      */
-    public FindPrimesTask(final SearchOptions options){
+    public FindPrimesTask(final SearchOptions options) {
         this.options = options;
     }
 
     @Override
-    protected void run(){
-        switch (options.getSearchMethod()){
+    protected void run() {
+        switch (options.getSearchMethod()) {
             case BRUTE_FORCE:
                 searchBruteForce();
                 break;
@@ -82,15 +80,15 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
     /**
      * Search for primes using the brute force method.
      */
-    private void searchBruteForce(){
+    private void searchBruteForce() {
         //Determine best search mode to use
-        if (options.getThreadCount() % 2 == 0){
+        if (options.getThreadCount() % 2 == 0) {
             options.setSearchMode(SearchOptions.SearchMode.ALTERNATE);
-        }else{
+        } else {
             options.setSearchMode(SearchOptions.SearchMode.PACKET);
         }
 
-        switch (options.getSearchMode()){
+        switch (options.getSearchMode()) {
             case PARTITION:
                 preparePartitionMode();
                 executeTasks();
@@ -113,10 +111,10 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
      * This method prepares the task for searching using the partition mode. The partition mode divides the search range into even partitions based on the
      * number of threads available. Each thread then is responsible for searching through a single partition.
      */
-    private void preparePartitionMode(){
+    private void preparePartitionMode() {
         final long partitionSize = getRange() / options.getThreadCount();
         System.out.println("partition size: " + partitionSize);
-        for (int i = 0; i < options.getThreadCount(); i++){
+        for (int i = 0; i < options.getThreadCount(); i++) {
             long start = options.getStartValue() + (i * partitionSize + 1);
             if (start % 2 == 0) start++;
             final BruteForceTask task = new BruteForceTask(start, options.getStartValue() + (i + 1) * partitionSize, 2);
@@ -129,13 +127,13 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
     /**
      * This method prepares the task for searching using the alternate mode. The alternate mode ???
      */
-    private void prepareAlternateMode(){
+    private void prepareAlternateMode() {
         final long[] startValues = new long[options.getThreadCount()];
         int increment = options.getThreadCount() * 2;
         startValues[0] = (options.getStartValue() % 2 == 0) ? (options.getStartValue() + 1) : options.getStartValue();
-        for (int i = 0; i < startValues.length; i++){
+        for (int i = 0; i < startValues.length; i++) {
             long s = i == 0 ? startValues[0] : startValues[i - 1] + 2;
-            if (s % 2 == 0){
+            if (s % 2 == 0) {
                 s -= 1;
             }
             startValues[i] = s;
@@ -153,8 +151,8 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
      *
      * @param packetSize The maximum size of a packet.
      */
-    private void preparePacketMode(final long packetSize){
-        for (int i = 0; i < Math.ceil((double) getRange() / packetSize); i++){
+    private void preparePacketMode(final long packetSize) {
+        for (int i = 0; i < Math.ceil((double) getRange() / packetSize); i++) {
             long start = options.getStartValue() + (i * packetSize + 1);
             if (start % 2 == 0) start++;
             final BruteForceTask task = new BruteForceTask(start, Math.min(options.getStartValue() + (i + 1) * packetSize, options.getEndValue()), 2);
@@ -167,26 +165,26 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
     int count = 0;
     final Object LOCK = new Object();
 
-    private void executeThreadPool(){
+    private void executeThreadPool() {
         final List<Thread> pool = new ArrayList<>();
         final Queue<Task> pending = new ArrayDeque<>(getTasks());
-        while (!pending.isEmpty()){
+        while (!pending.isEmpty()) {
             final Task task = pending.poll();
-            task.addTaskListener(new TaskAdapter(){
+            task.addTaskListener(new TaskAdapter() {
                 @Override
-                public void onTaskStopped(){
-                    synchronized (LOCK){
+                public void onTaskStopped() {
+                    synchronized (LOCK) {
                         count--;
                         LOCK.notifyAll();
                     }
                 }
             });
 
-            synchronized (LOCK){
-                while (count >= options.getThreadCount()){
-                    try{
+            synchronized (LOCK) {
+                while (count >= options.getThreadCount()) {
+                    try {
                         LOCK.wait();
-                    }catch (InterruptedException e){
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
@@ -195,74 +193,74 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
             }
         }
 
-        for (Thread thread : pool){
-            try{
+        for (Thread thread : pool) {
+            try {
                 thread.join();
-            }catch (InterruptedException e){
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
     }
 
-    private void debugTaskListener(BruteForceTask task){
-        task.addTaskListener(new TaskListener(){
+    private void debugTaskListener(BruteForceTask task) {
+        task.addTaskListener(new TaskListener() {
             @Override
-            public void onTaskStarted(){
+            public void onTaskStarted() {
                 System.out.println("STARTED: " + task.startValue);
             }
 
             @Override
-            public void onTaskPausing(){
+            public void onTaskPausing() {
 
             }
 
             @Override
-            public void onTaskPaused(){
+            public void onTaskPaused() {
 
             }
 
             @Override
-            public void onTaskResuming(){
+            public void onTaskResuming() {
 
             }
 
             @Override
-            public void onTaskResumed(){
+            public void onTaskResumed() {
 
             }
 
             @Override
-            public void onTaskStopping(){
+            public void onTaskStopping() {
 
             }
 
             @Override
-            public void onTaskStopped(){
+            public void onTaskStopped() {
                 System.out.println("STOPPED: " + task.startValue + " in " + task.getElapsedTime() + " ms.");
             }
         });
     }
 
-    public File saveToFile(){
+    public File saveToFile() {
 
         final File largeCache = new File(FileManager.getInstance().getTaskCacheDirectory(this) + File.separator + "primes");
-        if (options.getSearchMethod() == SearchOptions.SearchMethod.BRUTE_FORCE){
+        if (options.getSearchMethod() == SearchOptions.SearchMethod.BRUTE_FORCE) {
             //sortCache(getState() == State.STOPPED);
             sortCache(false);
-        }else{
+        } else {
             if (getState() != State.STOPPED) return largeCache;
             FileManager.getInstance().writeNumbersQuick(((SieveTask) getTasks().get(0)).primes, largeCache, false);
         }
         return largeCache;
     }
 
-    private long getRange(){
+    private long getRange() {
         return options.getEndValue() - options.getStartValue();
     }
 
-    private void sortCache(final boolean delete){
-        try{
+    private void sortCache(final boolean delete) {
+        try {
 
             //Main cache file
             final File cache = new File(FileManager.getInstance().getTaskCacheDirectory(this) + File.separator + "primes");
@@ -270,8 +268,8 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
 
             //Create readers for each sub-task cache file
             final List<DataInputStream> dataInputStreams = new ArrayList<>();
-            for (File file : FileManager.getInstance().getTaskCacheDirectory(this).listFiles()){
-                if (!file.getAbsolutePath().contains("primes")){
+            for (File file : FileManager.getInstance().getTaskCacheDirectory(this).listFiles()) {
+                if (!file.getAbsolutePath().contains("primes")) {
                     dataInputStreams.add(new DataInputStream(new FileInputStream(file)));
                 }
             }
@@ -279,20 +277,20 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
             final List<Long> numbers = new ArrayList<>();
 
             //Read one number from each cache file
-            for (DataInputStream dataInputStream : dataInputStreams){
-                try{
+            for (DataInputStream dataInputStream : dataInputStreams) {
+                try {
                     numbers.add(dataInputStream.readLong());
-                }catch (EOFException e){
+                } catch (EOFException e) {
                     Log.d(TAG, "End of file reached!");
                 }
             }
 
-            while (numbers.size() > 0){
+            while (numbers.size() > 0) {
 
                 //Find the smallest number
                 int smallestIndex = 0;
-                for (int i = 0; i < numbers.size(); i++){
-                    if (numbers.get(i) < numbers.get(smallestIndex)){
+                for (int i = 0; i < numbers.size(); i++) {
+                    if (numbers.get(i) < numbers.get(smallestIndex)) {
                         smallestIndex = i;
                     }
                 }
@@ -301,40 +299,40 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
                 dataOutputStream.writeLong(numbers.get(smallestIndex));
 
                 //Refill numbers
-                try{
+                try {
                     numbers.remove(smallestIndex);
                     numbers.add(smallestIndex, dataInputStreams.get(smallestIndex).readLong());
-                }catch (EOFException e){
+                } catch (EOFException e) {
                     //Log.d(TAG, "End of file reached!");
                 }
             }
 
             //Close readers
-            for (DataInputStream dataInputStream : dataInputStreams){
+            for (DataInputStream dataInputStream : dataInputStreams) {
                 dataInputStream.close();
             }
 
             //SAVE from lists
             final List<List<Long>> lists = new ArrayList<>();
-            for (Task task : getTasks()){
+            for (Task task : getTasks()) {
                 lists.add(((BruteForceTask) task).primes);
             }
 
             final int[] indexes = new int[lists.size()];
 
-            for (List<Long> list : lists){
-                if (list.size() > 0){
+            for (List<Long> list : lists) {
+                if (list.size() > 0) {
                     numbers.add(list.get(0));
                     indexes[lists.indexOf(list)] = 1;
                 }
             }
 
-            while (numbers.size() > 0){
+            while (numbers.size() > 0) {
 
                 //Find the smallest number
                 int smallestIndex = 0;
-                for (int i = 0; i < numbers.size(); i++){
-                    if (numbers.get(i) < numbers.get(smallestIndex)){
+                for (int i = 0; i < numbers.size(); i++) {
+                    if (numbers.get(i) < numbers.get(smallestIndex)) {
                         smallestIndex = i;
                     }
                 }
@@ -343,11 +341,11 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
                 dataOutputStream.writeLong(numbers.get(smallestIndex));
 
                 //Refill numbers
-                try{
+                try {
                     numbers.remove(smallestIndex);
                     numbers.add(smallestIndex, lists.get(smallestIndex).get(indexes[smallestIndex]));
                     indexes[smallestIndex]++;
-                }catch (IndexOutOfBoundsException e){
+                } catch (IndexOutOfBoundsException e) {
                     //Log.d(TAG, "End of list reached!");
                 }
             }
@@ -355,68 +353,68 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
             dataOutputStream.close();
 
             //DELETE files and clear lists
-            if (delete){
-                for (File file : FileManager.getInstance().getTaskCacheDirectory(this).listFiles()){
-                    if (!file.getAbsolutePath().contains("primes")){
+            if (delete) {
+                for (File file : FileManager.getInstance().getTaskCacheDirectory(this).listFiles()) {
+                    if (!file.getAbsolutePath().contains("primes")) {
                         file.delete();
                     }
                 }
 
-                for (List<Long> list : lists){
+                for (List<Long> list : lists) {
                     list.clear();
                 }
             }
 
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public SearchOptions getSearchOptions(){
+    public SearchOptions getSearchOptions() {
         return this.options;
     }
 
     /**
      * @return the endValue
      */
-    public long getEndValue(){
+    public long getEndValue() {
         return options.getEndValue();
     }
 
     /**
      * @return the threadCount
      */
-    public int getThreadCount(){
+    public int getThreadCount() {
         return options.getThreadCount();
     }
 
     /**
      * @return the startValue
      */
-    public long getStartValue(){
+    public long getStartValue() {
         return options.getStartValue();
     }
 
-    public int getPrimeCount(){
+    public int getPrimeCount() {
         long total = 0;
         //TODO: Potential concurrent modification exception if we are removing tasks as they finish. We need to synchronize
-        for (Task task : getTasks()){
-            if (task instanceof BruteForceTask){
+        for (Task task : getTasks()) {
+            if (task instanceof BruteForceTask) {
                 total += ((BruteForceTask) task).primeCount;
-            }else if (task instanceof SieveTask){
+            } else if (task instanceof SieveTask) {
                 total += ((SieveTask) task).primeCount;
             }
         }
         return (int) total;
     }
 
-    public void setOptions(final SearchOptions searchOptions){
+    public void setOptions(final SearchOptions searchOptions) {
         this.options = searchOptions;
     }
 
     private final File taskDirectory = FileManager.getInstance().getTaskCacheDirectory(this);
 
-    private class BruteForceTask extends MultithreadedTask.SubTask{
+    private class BruteForceTask extends MultithreadedTask.SubTask {
 
         /**
          * The starting value of the search. (inclusive).
@@ -440,86 +438,79 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
 
         private long primeCount = 0;
 
-        private BruteForceTask(final long startValue, final long endValue, final int increment){
+        private BruteForceTask(final long startValue, final long endValue, final int increment) {
             this.startValue = startValue;
             this.endValue = endValue;
             this.increment = increment;
             this.currentNumber = startValue;
         }
 
-        private native void nativeRun(final long start, final long end, final int increment);
-
         @Override
-        protected void run(){
-            if (true){
-                nativeRun(startValue, endValue, increment);
-            }else{
-                currentNumber = startValue;
-                if (startValue < 3){
-                    if (endValue == INFINITY || endValue >= 2){
-                        dispatchPrimeFound(2);
+        protected void run() {
+
+            currentNumber = startValue;
+            if (startValue < 3) {
+                if (endValue == INFINITY || endValue >= 2) {
+                    dispatchPrimeFound(2);
+                }
+                currentNumber += increment;
+            }
+
+            while ((currentNumber <= endValue || endValue == INFINITY)) {
+
+                /*
+                Get the square root of the number. We only need to calculate up to the square root
+                to determine if the number is prime. The square root of a long will always fit
+                inside the value range of an int.
+                 */
+                final int sqrtMax = (int) Math.sqrt(currentNumber);
+
+                // Assume the number is prime
+                boolean isPrime = true;
+
+                // Check if the number is divisible by every odd number below it's square root.
+                for (int i = 3; i <= sqrtMax; i += 2) {
+
+                    // Check if the number divides perfectly
+                    if (currentNumber % i == 0) {
+                        isPrime = false;
+                        break;
                     }
-                    currentNumber += increment;
                 }
 
-                boolean running = true;
-
-                while (running && (currentNumber <= endValue || endValue == INFINITY)){
-
-                    /*
-                    Get the square root of the number. We only need to calculate up to the square root
-                    to determine if the number is prime. The square root of a long will always fit
-                    inside the value range of an int.
-                     */
-                    final int sqrtMax = (int) Math.sqrt(currentNumber);
-
-                    // Assume the number is prime
-                    boolean isPrime = true;
-
-                    // Check if the number is divisible by every odd number below it's square root.
-                    for (int i = 3; i <= sqrtMax; i += 2){
-
-                        // Check if the number divides perfectly
-                        if (currentNumber % i == 0){
-                            isPrime = false;
-                            break;
-                        }
-                    }
-
-                    // Check if the number was prime
-                    if (isPrime){
-                        dispatchPrimeFound(currentNumber);
-                    }
-
-                    currentNumber += increment;
+                // Check if the number was prime
+                if (isPrime) {
+                    dispatchPrimeFound(currentNumber);
                 }
+
+                currentNumber += increment;
             }
         }
 
         @Override
-        public float getProgress(){
+        public float getProgress() {
             if (endValue == INFINITY) return 0;
-            if (getState() != State.STOPPED){
+            if (getState() != State.STOPPED) {
                 setProgress((float) (currentNumber - startValue) / (endValue - startValue));
             }
             return super.getProgress();
         }
 
-        private void dispatchPrimeFound(final long number){
-            try{
+        private void dispatchPrimeFound(final long number) {
+            try {
                 primes.add(number);
                 primeCount++;
-            }catch (OutOfMemoryError e){
+            } catch (OutOfMemoryError e) {
                 System.out.println("[ERROR] Out of memory with " + primes.size() + " primes!");
                 //Write all to cache
             }
 
 
-            if (bufferSize != -1 && primes.size() >= bufferSize){
+            if (bufferSize != -1 && primes.size() >= bufferSize) {
                 Log.d(TAG, "Swapping to disk! Size: " + primes.size());
 
                 //Swap memory to disk
-                if (!taskDirectory.exists()){
+                if (!taskDirectory.exists()) {
                     taskDirectory.mkdirs();
                 }
 
@@ -531,7 +522,7 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
 
     }
 
-    private class SieveTask extends MultithreadedTask.SubTask{
+    private class SieveTask extends MultithreadedTask.SubTask {
 
         private String status = "searching";
 
@@ -548,18 +539,18 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
         private long primeCount = 0;
 
         @Override
-        protected void run(){
+        protected void run() {
             //Assume all numbers are prime
             final BitSet bitSet = new BitSet((int) (options.getEndValue() + 1));
             bitSet.set(0, bitSet.size() - 1, true);
 
             // mark non-primes <= n using Sieve of Eratosthenes
-            for (factor = 2; factor <= sqrtMax; factor++){
+            for (factor = 2; factor <= sqrtMax; factor++) {
 
                 // if factor is prime, then mark multiples of factor as nonprime
                 // suffices to consider mutiples factor, factor+1, ...,  n/factor
-                if (bitSet.get(factor)){
-                    for (int j = factor; factor * j <= options.getEndValue(); j++){
+                if (bitSet.get(factor)) {
+                    for (int j = factor; factor * j <= options.getEndValue(); j++) {
                         bitSet.set(factor * j, false);
                     }
                 }
@@ -567,15 +558,15 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
                 tryPause();
             }
 
-            if (shouldStop()){
+            if (shouldStop()) {
                 return;
             }
 
             status = "counting";
 
             //Count primes
-            for (counter = (options.getStartValue() > 2 ? options.getStartValue() : 2); counter <= options.getEndValue(); counter++){
-                if (bitSet.get((int) counter)){
+            for (counter = (options.getStartValue() > 2 ? options.getStartValue() : 2); counter <= options.getEndValue(); counter++) {
+                if (bitSet.get((int) counter)) {
                     primes.add(counter);
                     primeCount++;
                 }
@@ -586,8 +577,8 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
         }
 
         @Override
-        public float getProgress(){
-            switch (status){
+        public float getProgress() {
+            switch (status) {
                 case "searching":
                     setProgress(((float) factor / sqrtMax) / 2);
                     break;
@@ -599,16 +590,16 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
             return super.getProgress();
         }
 
-        public int getFactor(){
+        public int getFactor() {
             return factor;
         }
     }
 
-    public int getCurrentFactor(){
+    public int getCurrentFactor() {
         return ((SieveTask) getTasks().get(0)).getFactor();
     }
 
-    private void searchSieve(){
+    private void searchSieve() {
         addTask(new SieveTask());
         executeTasks();
 
@@ -616,63 +607,23 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
         System.out.println("Sieve version 0: " + version_0() + "\t" + (System.currentTimeMillis() - start) + " ms.");
         start = System.currentTimeMillis();
         System.out.println("Sieve version N: " + nativeSieve(options.getStartValue(), options.getEndValue()) + "\t" + (System.currentTimeMillis() - start) + " ms.");
-
-        start = System.currentTimeMillis();
-        System.out.println("Brute version 0: " + brute_version_0(options.getStartValue(), options.getEndValue()) + "\t" + (System.currentTimeMillis() - start) + " ms.");
-        start = System.currentTimeMillis();
-        System.out.println("Brute version N: " + nativeBrute(options.getStartValue(), options.getEndValue()) + "\t" + (System.currentTimeMillis() - start) + " ms.");
     }
 
-    private int brute_version_0(final long start, final long end){
-        int primeCount = 0;
-        long current = start;
-
-        if (start <= 2){
-            ++primeCount;
-            current = 3;
-        }
-
-        while (current <= end){
-            final int sqrtMax = (int) Math.sqrt(current);
-
-            // Assume the number is prime
-            boolean isPrime = true;
-
-            // Check if the number is divisible by every odd number below it's square root.
-            for (int i = 2; i <= sqrtMax; i += 1){
-
-                // Check if the number divides perfectly
-                if (current % i == 0){
-                    isPrime = false;
-                    break;
-                }
-            }
-
-            // Check if the number was prime
-            if (isPrime){
-                primeCount++;
-            }
-
-            current += 1;
-        }
-        return primeCount;
-    }
-
-    private int version_0(){
+    private int version_0() {
         final boolean[] array = new boolean[(int) options.getEndValue() + 1];
-        for (int i = 0; i < array.length; ++i){
+        for (int i = 0; i < array.length; ++i) {
             array[i] = true;
         }
         final int sqrtMax = (int) Math.sqrt(options.getEndValue());
         int primeCount = 0;
 
         // mark non-primes <= n using Sieve of Eratosthenes
-        for (int factor = 2; factor <= sqrtMax; factor++){
+        for (int factor = 2; factor <= sqrtMax; factor++) {
 
             // if factor is prime, then mark multiples of factor as nonprime
             // suffices to consider mutiples factor, factor+1, ...,  n/factor
-            if (array[factor]){
-                for (long j = factor; factor * j <= options.getEndValue(); j++){
+            if (array[factor]) {
+                for (long j = factor; factor * j <= options.getEndValue(); j++) {
                     final long number = factor * j;
                     array[(int) number] = false;
                 }
@@ -680,8 +631,8 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
         }
 
         //Count primes
-        for (int counter = (int) (options.getStartValue() > 2 ? options.getStartValue() : 2); counter <= options.getEndValue(); counter++){
-            if (array[counter]){
+        for (int counter = (int) (options.getStartValue() > 2 ? options.getStartValue() : 2); counter <= options.getEndValue(); counter++) {
+            if (array[counter]) {
                 primeCount++;
             }
         }
@@ -689,13 +640,13 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
         return primeCount;
     }
 
-    public String getStatus(){
-        switch (options.getSearchMethod()){
+    public String getStatus() {
+        switch (options.getSearchMethod()) {
             case BRUTE_FORCE:
                 break;
 
             case SIEVE_OF_ERATOSTHENES:
-                if (getTasks().size() > 0){
+                if (getTasks().size() > 0) {
                     return ((SieveTask) getTasks().get(0)).status;
                 }
                 break;
@@ -703,12 +654,11 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
         return String.valueOf(getState());
     }
 
-    
 
     private boolean saved = false;
 
     @Override
-    public boolean save(){
+    public boolean save() {
         /*try{
             FileManager.copy(saveToFile(), new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getStartValue() + " to " + (getEndValue() == FindPrimesTask.INFINITY ? getCurrentValue() : getEndValue()) + EXTENSION));
             saved = true;
@@ -723,27 +673,27 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
 
     private CopyOnWriteArrayList<Savable.SaveListener> saveListeners = new CopyOnWriteArrayList<>();
 
-    public void addSaveListener(final Savable.SaveListener listener){
+    public void addSaveListener(final Savable.SaveListener listener) {
         saveListeners.add(listener);
     }
 
-    public void removeSaveListener(final Savable.SaveListener listener){
+    public void removeSaveListener(final Savable.SaveListener listener) {
         saveListeners.remove(listener);
     }
 
-    private void sendOnSaved(){
-        for (Savable.SaveListener listener : saveListeners){
+    private void sendOnSaved() {
+        for (Savable.SaveListener listener : saveListeners) {
             listener.onSaved();
         }
     }
 
-    private void sendOnError(){
-        for (Savable.SaveListener listener : saveListeners){
+    private void sendOnError() {
+        for (Savable.SaveListener listener : saveListeners) {
             listener.onError();
         }
     }
 
-    public boolean isSaved(){
+    public boolean isSaved() {
         return saved;
     }
 }
