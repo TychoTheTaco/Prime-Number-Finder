@@ -9,7 +9,7 @@ import java.io.File;
 
 public class FindPrimesNativeTask extends NativeTask implements FPT, SearchOptions, Savable {
 
-    private SearchOptions searchOptions;
+    private FPT.SearchOptions searchOptions;
 
     public FindPrimesNativeTask(final SearchOptions searchOptions){
         this.searchOptions = searchOptions;
@@ -56,7 +56,7 @@ public class FindPrimesNativeTask extends NativeTask implements FPT, SearchOptio
     }
 
     @Override
-    public FindPrimesTask.SearchOptions getSearchOptions() {
+    public FPT.SearchOptions getSearchOptions() {
         return searchOptions;
     }
 
