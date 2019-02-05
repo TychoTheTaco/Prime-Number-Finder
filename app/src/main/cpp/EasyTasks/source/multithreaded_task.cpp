@@ -85,6 +85,7 @@ float MultithreadedTask::getProgress() {
 }
 
 float MultithreadedTask::getAverageProgress() {
+	if (this->tasks.size() == 0) return 0;
 	float total = 0;
 	for (Task* task : this->tasks) {
 		total += task->getProgress();

@@ -159,7 +159,7 @@ unsigned long FindPrimesTask::getRange() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // NOTE: start_value MUST be an odd number and increment MUST be an even number!
-FindPrimesTask::BruteForceTask::BruteForceTask(unsigned long start_value, unsigned long end_value, unsigned int increment): start_value(start_value), end_value(end_value), increment(increment) {
+FindPrimesTask::BruteForceTask::BruteForceTask(unsigned long start_value, unsigned long end_value, unsigned int increment): start_value(start_value), end_value(end_value), increment(increment), current_number(start_value) {
 }
 
 FindPrimesTask::BruteForceTask::~BruteForceTask() {
@@ -204,7 +204,12 @@ void FindPrimesTask::BruteForceTask::run() {
 }
 
 float FindPrimesTask::BruteForceTask::getProgress() {
-	return end_value == FindPrimesTask::RANGE_INFINITY ? 0 : (float)(current_number - start_value) / (end_value - start_value);
+	if (end_value == FindPrimesTask::RANGE_INFINITY) return 0;
+	if (this->getState() == NOT_STARTED) return 0;
+	if (this->getState() != STOPPED) {
+		setProgress((float)(current_number - start_value) / (end_value - start_value));
+	}
+	return Task::getProgress();
 }
 
 void FindPrimesTask::BruteForceTask::dispatchPrimeFound(unsigned long number) {

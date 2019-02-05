@@ -102,7 +102,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_com_tycho_app_primenumberfinder_NativeTa
 }
 
 extern "C" JNIEXPORT jfloat JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeGetProgress(JNIEnv *env, jobject self, jlong task_ptr) {
-    __android_log_print(ANDROID_LOG_VERBOSE, TAG, "Native progress: %f", ((Task*) task_ptr)->getProgress());
+    //__android_log_print(ANDROID_LOG_VERBOSE, TAG, "Native progress: %f", ((Task*) task_ptr)->getProgress());
     return (jfloat) ((Task*) task_ptr)->getProgress();
 }
 

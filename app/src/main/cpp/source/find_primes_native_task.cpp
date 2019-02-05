@@ -39,12 +39,12 @@ class DListener : public DebugListener{
 extern "C" JNIEXPORT jlong JNICALL Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeInit(JNIEnv *env, jobject self, jlong start_value, jlong end_value, jobject search_method, jint thread_count) {
     __android_log_print(ANDROID_LOG_VERBOSE, TAG, "init()");
 
-    /*jclass cls = env->FindClass("com/tycho/app/primenumberfinder/modules/findprimes/FindPrimesNativeTask/SearchOptions");
-    jmethodID id = env->GetMethodID(cls, "getOrdinal", "()I");
+    jmethodID id = env->GetMethodID(env->GetObjectClass(search_method), "ordinal", "()I");
     int value = (int) env->CallIntMethod(search_method, id);
-    __android_log_print(ANDROID_LOG_VERBOSE, TAG, "Enum value: %i", value);*/
+    __android_log_print(ANDROID_LOG_VERBOSE, TAG, "Enum value: %i", value);
 
-    FindPrimesTask* task = new FindPrimesTask((unsigned long) start_value, (unsigned long) end_value, FindPrimesTask::BRUTE_FORCE, (unsigned int) thread_count);
+    FindPrimesTask* task = new FindPrimesTask((unsigned long) start_value, (unsigned long) end_value,
+                                              static_cast<FindPrimesTask::SearchMethod>(value), (unsigned int) thread_count);
     task->addTaskListener(new DListener());
     return (long) task;
 }
