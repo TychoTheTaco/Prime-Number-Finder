@@ -9,7 +9,9 @@ void MultithreadedTask::pause() {
 		//Pause subtasks
 		std::thread([this]() {
 			for (Task* task : this->tasks) {
+				std::cout << "Pausing " << task->getId() << std::endl;
 				task->pauseAndWait();
+				std::cout << "Paused " << task->getId() << std::endl;
 			}
 			this->dispatchPaused();
 		}).detach();

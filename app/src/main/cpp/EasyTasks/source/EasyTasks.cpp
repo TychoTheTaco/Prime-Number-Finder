@@ -31,7 +31,7 @@ int main() {
 	FindPrimesTask find_primes_task(0, 1000000, FindPrimesTask::BRUTE_FORCE, 1);
 	find_primes_task.addTaskListener(&listener);
 	std::thread* thread1 = find_primes_task.startOnNewThread();
-	//find_primes_task.pauseAndWait();
+	find_primes_task.pause();
 	//find_primes_task.resume();
 	//std::thread timer(&printProgress, &find_primes_task);
 	find_primes_task.finish();

@@ -42,7 +42,7 @@ void Task::pause() {
 void Task::pauseAndWait() {
 	std::unique_lock<std::recursive_mutex> lock(this->state_lock);
 	pause();
-	this->condition_variable.wait(lock, [this]() {return this->state == PAUSED || this->state == STOPPED; });
+	this->condition_variable.wait(lock, [this]() {return this->state == NOT_STARTED || this->state == PAUSED || this->state == STOPPED; });
 }
 
 void Task::resume() {
@@ -56,7 +56,7 @@ void Task::resume() {
 void Task::resumeAndWait() {
 	std::unique_lock<std::recursive_mutex> lock(this->state_lock);
 	resume();
-	this->condition_variable.wait(lock, [this]() {return this->state == RUNNING || this->state == STOPPED; });
+	this->condition_variable.wait(lock, [this]() {return this->state == NOT_STARTED || this->state == RUNNING || this->state == STOPPED; });
 }
 
 void Task::stop() {
@@ -71,7 +71,7 @@ void Task::stop() {
 void Task::stopAndWait() {
 	std::unique_lock<std::recursive_mutex> lock(this->state_lock);
 	stop();
-	this->condition_variable.wait(lock, [this]() {return this->state == STOPPED; });
+	this->condition_variable.wait(lock, [this]() {return this->state == NOT_STARTED || this->state == STOPPED; });
 }
 
 void Task::finish() {
