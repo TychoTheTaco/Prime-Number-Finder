@@ -11,7 +11,9 @@ class MultithreadedTask : public Task {
 	virtual void pause();
 	virtual void pauseAndWait();
 	virtual void resume();
+	virtual void resumeAndWait();
 	virtual void stop();
+	virtual void stopAndWait();
 
 	virtual float getProgress();
 

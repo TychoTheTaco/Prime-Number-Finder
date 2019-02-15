@@ -33,6 +33,7 @@ import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
+import java.io.File;
 import java.math.BigInteger;
 import java.util.Random;
 import java.util.UUID;
@@ -212,6 +213,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
 
             //Determine best search method
             searchOptions.setSearchMethod(determineBestSearchMethod());
+            searchOptions.setSearchMethod(BRUTE_FORCE);
 
             //Check if the range is valid
             if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
@@ -219,13 +221,11 @@ public class FindPrimesFragment extends ModuleHostFragment {
                 //Create a new task
                 searchOptions.setThreadCount(1);
 
+                searchOptions.setCacheDirectory(new File(getActivity().getFilesDir() + File.separator + "cache"));
+
                 try {
                     if (NATIVE){
-                        Log.w(TAG, "Starting native task...");
-                        FindPrimesNativeTask nativeTask = new FindPrimesNativeTask((FPT.SearchOptions) searchOptions.clone());
-                        startTask(nativeTask);
-                        Log.w(TAG, "Started native task!");
-                        Log.w(TAG, "Task state: " + nativeTask.getState());
+                        startTask(new FindPrimesNativeTask((FPT.SearchOptions) searchOptions.clone()));
                     }else {
                         startTask(new FindPrimesTask((FindPrimesTask.SearchOptions) searchOptions.clone()));
                     }

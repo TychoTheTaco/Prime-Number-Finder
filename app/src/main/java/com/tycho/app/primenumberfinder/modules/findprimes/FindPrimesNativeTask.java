@@ -17,7 +17,7 @@ public class FindPrimesNativeTask extends NativeTask implements FPT, SearchOptio
     }
 
     private long initNativeTask() {
-        return nativeInit(searchOptions.getStartValue(), searchOptions.getEndValue(), searchOptions.getSearchMethod(), searchOptions.getThreadCount());
+        return nativeInit(searchOptions.getStartValue(), searchOptions.getEndValue(), searchOptions.getSearchMethod(), searchOptions.getThreadCount(), searchOptions.getCacheDirectory().getAbsolutePath());
     }
 
     @Override
@@ -65,7 +65,7 @@ public class FindPrimesNativeTask extends NativeTask implements FPT, SearchOptio
         return false;
     }
 
-    private native long nativeInit(final long startValue, final long endValue, final SearchOptions.SearchMethod searchMethod, final int threadCount);
+    private native long nativeInit(final long startValue, final long endValue, final SearchOptions.SearchMethod searchMethod, final int threadCount, final String cacheDirectory);
     private native File nativeSaveToFile(final long native_task_pointer);
     private native long nativeGetStartValue(final long native_task_pointer);
     private native long nativeGetEndValue(final long native_task_pointer);

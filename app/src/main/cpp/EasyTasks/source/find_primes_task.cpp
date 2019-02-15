@@ -4,14 +4,21 @@
 #include <algorithm>
 #include <queue>
 #include <string>
+#include <iostream>
 #include <fstream>
+#include <stdint.h>
+#include <filesystem>
+#include <bitset>
 
-FindPrimesTask::FindPrimesTask(unsigned long start_value, unsigned long end_value, SearchMethod search_method, unsigned int thread_count) {
-	this->start_value = start_value;
-	this->end_value = end_value;
-	this->search_method = search_method;
-	this->thread_count = thread_count;
-	this->cache_dir = "task_" + std::to_string(this->getId()) + "_cache";
+#ifdef _WIN32
+#define PLATFORM "Windows"
+#else
+#define PLATFORM "Unknown"
+#endif
+
+
+FindPrimesTask::FindPrimesTask(num_type start_value, num_type end_value, SearchMethod search_method, unsigned int thread_count) : start_value(start_value), end_value(end_value), search_method(search_method), thread_count(thread_count) {
+	std::cout << "Platform: " << PLATFORM << std::endl;
 }
 
 FindPrimesTask::~FindPrimesTask() {
@@ -19,25 +26,41 @@ FindPrimesTask::~FindPrimesTask() {
 }
 
 void FindPrimesTask::run() {
-	//Determine best search mode to use
-	if (this->thread_count % 2 == 0) {
-		this->search_mode = ALTERNATE;
-	} else {
-		this->search_mode = PACKET;
-	}
+	//Create cache directory at current location
+	this->setCacheDirectory("cache");
 
-	switch (this->search_mode) {
-		case PARTITION:
-			searchPartitionMode();
+	switch (this->search_method) {
+		case BRUTE_FORCE:
+			//Determine best search mode to use
+			if (this->thread_count == 1) {
+				this->search_mode = PARTITION;
+			} else if (this->thread_count % 2 == 0) {
+				this->search_mode = ALTERNATE;
+			} else {
+				this->search_mode = PACKET;
+			}
+
+			switch (this->search_mode) {
+				case PARTITION:
+					searchPartitionMode();
+					break;
+
+				case ALTERNATE:
+					searchAlternateMode();
+					break;
+
+				case PACKET:
+					//The optimal packet size is roughly 10% of each thread's total workload
+					searchPacketMode((num_type)((getRange() / this->thread_count) * 0.1));
+					break;
+			}
 			break;
 
-		case ALTERNATE:
-			searchAlternateMode();
-			break;
-
-		case PACKET:
-			//The optimal packet size is roughly 10% of each thread's total workload
-			searchPacketMode((unsigned long)((getRange() / this->thread_count) * 0.1));
+		case SIEVE_OF_ERATOSTHENES:
+			SieveTask* task = new SieveTask(start_value, end_value);
+			addSubTask(task);
+			this->startSubTasks();
+			this->finishSubTasks();
 			break;
 	}
 	std::cout << "Found " << getPrimeCount() << " primes." << std::endl;
@@ -80,12 +103,12 @@ void FindPrimesTask::executeThreadPool() {
 }
 
 void FindPrimesTask::searchPartitionMode() {
-	const unsigned long partition_size = this->getRange() / this->thread_count;
+	const num_type partition_size = this->getRange() / this->thread_count;
 	std::cout << "Partition Size: " << partition_size << std::endl;
 	for (unsigned int i = 0; i < this->thread_count; ++i) {
-		unsigned long start = this->start_value + (i * partition_size + 1);
+		num_type start = this->start_value + (i * partition_size + 1);
 		if (start % 2 == 0) ++start;
-		BruteForceTask* task = new BruteForceTask(start, this->start_value + (i + 1) * partition_size, 2);
+		BruteForceTask* task = new BruteForceTask(this, start, this->start_value + (i + 1) * partition_size, 2);
 		task->addTaskListener(new DebugListener());
 		this->addSubTask(task);
 	}
@@ -94,16 +117,16 @@ void FindPrimesTask::searchPartitionMode() {
 }
 
 void FindPrimesTask::searchAlternateMode() {
-	unsigned long *startValues = new unsigned long[this->thread_count];
+	num_type *startValues = new num_type[this->thread_count];
 	unsigned int increment = this->thread_count * 2;
-	startValues[0] = (this->start_value % 2 == 0) ? (this->start_value + 1) :this->start_value;
+	startValues[0] = (this->start_value % 2 == 0) ? (this->start_value + 1) : this->start_value;
 	for (unsigned int i = 0; i < this->thread_count; i++) {
-		unsigned long s = i == 0 ? startValues[0] : startValues[i - 1] + 2;
+		num_type s = i == 0 ? startValues[0] : startValues[i - 1] + 2;
 		if (s % 2 == 0) {
 			s -= 1;
 		}
 		startValues[i] = s;
-		BruteForceTask* task = new BruteForceTask(s, this->end_value, increment);
+		BruteForceTask* task = new BruteForceTask(this, s, this->end_value, increment);
 		task->addTaskListener(new DebugListener());
 		this->addSubTask(task);
 	}
@@ -112,27 +135,154 @@ void FindPrimesTask::searchAlternateMode() {
 	this->finishSubTasks();
 }
 
-void FindPrimesTask::searchPacketMode(unsigned long packet_size) {
+void FindPrimesTask::searchPacketMode(num_type packet_size) {
 	std::cout << "packet_size: " << packet_size << std::endl;
-	for (unsigned int i = 0; i < std::ceil((double) getRange() / packet_size); i++) {
-		unsigned long start = this->start_value + (i * packet_size + 1);
+	for (unsigned int i = 0; i < std::ceil((double)getRange() / packet_size); i++) {
+		num_type start = this->start_value + (i * packet_size + 1);
 		if (start % 2 == 0) start++;
-		BruteForceTask* task = new BruteForceTask(start, std::min(this->start_value + (i + 1) * packet_size, this->end_value), 2);
+		BruteForceTask* task = new BruteForceTask(this, start, std::min(this->start_value + (i + 1) * packet_size, this->end_value), 2);
 		task->addTaskListener(new DebugListener());
 		this->addSubTask(task);;
 	}
 	executeThreadPool();
 }
 
+void FindPrimesTask::saveToFile(const std::string file_path) {
+	std::cout << "Saving..." << std::endl;
+
+	// Clear the file if it already exists
+	int result = std::remove(file_path.c_str());
+
+	// Header Format (bits)
+	// [0 - 7] Version
+	// [8 - 15] Header length (in bytes)
+	// [16 - 23] Number size (in bytes) 
+
+	// Open file
+	std::ofstream output(file_path, std::ios::binary | std::ios::app);
+
+	// Write version number
+	char header[3];
+	header[0] = 1; // Version
+	header[1] = sizeof(header) / sizeof(*header); // Header length
+	header[2] = sizeof(num_type); // Number size
+	output.write(header, sizeof(header) / sizeof(*header));
+
+	std::string* cache_files = new std::string[this->getTasks().size()];
+	for (int i = 0; i < this->getTasks().size(); ++i) {
+		cache_files[i] = dynamic_cast<FindPrimesTask::BruteForceTask*>(this->getTasks().at(i))->cache_file;
+	}
+
+	if (this->search_method == BRUTE_FORCE) {
+		switch (this->search_mode) {
+			case PARTITION:
+			case PACKET:
+				// Each cache file is already sorted and we just need to combine them all into 1 file
+				for (int i = 0; i < this->getTasks().size(); ++i) {
+					std::ifstream input(cache_files[i], std::ios::binary);
+					std::copy(std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>(), std::ostreambuf_iterator<char>(output));
+				}
+				break;
+
+			case ALTERNATE:
+				// Each cache file is sorted, but we need to interleave the numbers of each file
+				const int BUFFER_SIZE = sizeof(num_type) * 10;
+				std::vector<std::queue<num_type>*> buffers;
+				for (int i = 0; i < this->getTasks().size(); ++i) {
+					buffers.push_back(new std::queue<num_type>());
+				}
+
+				int* offsets = new int[buffers.size()];
+				for (int i = 0; i < buffers.size(); ++i) {
+					offsets[i] = 0;
+				}
+
+				while (buffers.size() > 0) {
+
+					//Read from file
+					std::vector<int> pending_remove;
+					for (int i = 0; i < buffers.size(); ++i) {
+						if (buffers.at(i)->empty()) {
+							std::ifstream input(cache_files[i], std::ios::binary);
+							char buffer[BUFFER_SIZE];
+							input.seekg(offsets[i]);
+							input.read(buffer, BUFFER_SIZE);
+							offsets[i] += input.gcount();
+							for (int a = 0; a < input.gcount(); a += sizeof(num_type)) {
+								buffers.at(i)->push(bytesToNumber(buffer + a));
+							}
+
+							if (input.eof()) {
+								pending_remove.push_back(i);
+							}
+						}
+					}
+
+					//Remove empty queues
+					std::vector<int>::iterator iterator = pending_remove.begin();
+					while (iterator != pending_remove.end()) {
+						if (buffers[*iterator]->empty()) {
+							buffers.erase(buffers.begin() + *iterator);
+							iterator = pending_remove.erase(iterator);
+						} else {
+							iterator++;
+						}
+					}
+
+					if (buffers.size() == 0) break;
+
+					//Find smallest number
+					int smallest_index = 0;
+					for (int i = 1; i < buffers.size(); ++i) {
+						if (buffers[i][0] < buffers[smallest_index][0]) {
+							smallest_index = i;
+						}
+					}
+
+					//Write to file
+					char buffer[sizeof(num_type)];
+					numberToBytes(buffers[smallest_index]->front(), buffer);
+					buffers[smallest_index]->pop();
+					output.write(buffer, sizeof(num_type));
+
+				}
+
+				delete[] offsets;
+
+				break;
+		}
+	}
+
+	delete[] cache_files;
+	output.close();
+
+	std::cout << "Saved!" << std::endl;
+}
+
+num_type FindPrimesTask::bytesToNumber(char* bytes) {
+	num_type number = 0;
+	for (unsigned int i = 0, offset = sizeof(num_type) * 8 - 8; i < sizeof(num_type); ++i, offset -= sizeof(num_type)) {
+		num_type n = (unsigned char)bytes[i];
+		number |= (n << offset);
+	}
+	return number;
+}
+
+void FindPrimesTask::numberToBytes(num_type number, char destination[]) {
+	for (unsigned int i = 0, offset = sizeof(num_type) * 8 - 8; i < sizeof(num_type); ++i, offset -= sizeof(num_type)) {
+		destination[i] = number >> offset;
+	}
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // [FindPrimesTask] Getters
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-unsigned long FindPrimesTask::getStartValue() {
+num_type FindPrimesTask::getStartValue() {
 	return this->start_value;
 }
 
-unsigned long FindPrimesTask::getEndValue() {
+num_type FindPrimesTask::getEndValue() {
 	return this->end_value;
 }
 
@@ -145,21 +295,54 @@ unsigned int FindPrimesTask::getPrimeCount() {
 	for (Task* task : this->getTasks()) {
 		if (BruteForceTask* t = dynamic_cast<BruteForceTask*>(task)) {
 			total += t->getPrimeCount();
+		} else if (SieveTask* t = dynamic_cast<SieveTask*>(task)) {
+			total += t->getPrimeCount();
 		}
 	}
 	return total;
 }
 
-unsigned long FindPrimesTask::getRange() {
+num_type FindPrimesTask::getRange() {
 	return this->end_value - this->start_value;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// [FindPrimesTask::BruteForceTask]
+// [FindPrimesTask] Setters
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// NOTE: start_value MUST be an odd number and increment MUST be an even number!
-FindPrimesTask::BruteForceTask::BruteForceTask(unsigned long start_value, unsigned long end_value, unsigned int increment): start_value(start_value), end_value(end_value), increment(increment), current_number(start_value) {
+void FindPrimesTask::setCacheDirectory(std::string directory) {
+	this->cache_dir = directory + "/task_" + std::to_string(this->getId()) + "_cache";
+
+	//Empty the cache directory
+	std::string cmd = "rmdir /s /q \"" + this->cache_dir + "\"";
+	std::cout << "Empty: " << cmd << std::endl;
+	system(cmd.c_str());
+
+	//Create cache directory
+//#ifdef _WIN32
+	//std::cout << "Windows: " << this->cache_dir << std::endl;
+	cmd = "mkdir \"" + this->cache_dir + "\"";
+	system(cmd.c_str());
+//#else
+//	std::cout << "Not Windows" << std::endl;
+//	cmd = "mkdir -p" + this->cache_dir;
+//	system(cmd.c_str());
+//#endif // _WIN32
+
+
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// [FindPrimesTask::BruteForceTask]
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// NOTE: start_value MUST be an odd number and increment MUST be an even number!
+FindPrimesTask::BruteForceTask::BruteForceTask(const FindPrimesTask* parent, num_type start_value, num_type end_value, unsigned int increment) : parent(parent), start_value(start_value), end_value(end_value), increment(increment), current_number(start_value) {
+	this->cache_file = parent->cache_dir + "/cache" + std::to_string(this->getId()) + ".txt";
+
+	// Clear cache
+	int result = std::remove(this->cache_file.c_str());
+	std::cout << "Deleted File: " << result << std::endl;
 }
 
 FindPrimesTask::BruteForceTask::~BruteForceTask() {
@@ -179,13 +362,13 @@ void FindPrimesTask::BruteForceTask::run() {
 
 	while (isRunning() && (current_number <= end_value || end_value == FindPrimesTask::RANGE_INFINITY)) {
 		// We don't have to search past the sqrt of the number
-		const int sqrt_max = (int) std::sqrt(current_number);
+		const num_type sqrt_max = std::sqrt(current_number);
 
 		// Assume the number is prime
 		bool isPrime = true;
 
 		// Check if the number is divisible by every odd number below it's square root.
-		for (int i = 3; i <= sqrt_max; i += 2) {
+		for (num_type i = 3; i <= sqrt_max; i += 2) {
 
 			// Check if the number divides perfectly
 			if (current_number % i == 0) {
@@ -201,6 +384,8 @@ void FindPrimesTask::BruteForceTask::run() {
 
 		current_number += increment;
 	}
+	std::cout << "Final cache write." << std::endl;
+	writeToCache();
 }
 
 float FindPrimesTask::BruteForceTask::getProgress() {
@@ -212,7 +397,7 @@ float FindPrimesTask::BruteForceTask::getProgress() {
 	return Task::getProgress();
 }
 
-void FindPrimesTask::BruteForceTask::dispatchPrimeFound(unsigned long number) {
+void FindPrimesTask::BruteForceTask::dispatchPrimeFound(num_type number) {
 	primes.push_back(number);
 	++prime_count;
 
@@ -225,11 +410,71 @@ void FindPrimesTask::BruteForceTask::dispatchPrimeFound(unsigned long number) {
 
 void FindPrimesTask::BruteForceTask::writeToCache() {
 	std::ofstream fos;
-	fos.open("cache", std::ios::binary | std::ios::out | std::ios::app);
-	fos.write(reinterpret_cast<const char*>(&primes[0]), primes.size() * sizeof(unsigned long));
+	fos.open(cache_file, std::ios::binary | std::ios::out | std::ios::app);
+	for (num_type number : primes) {
+		char data[8];
+		for (int i = 0, offset = 56; i < 8; ++i, offset -= 8) {
+			if (i < 8 - sizeof(num_type)) {
+				data[i] = 0;
+			} else {
+				data[i] = number >> offset;
+			}
+		}
+		fos.write(data, 8);
+	}
 	fos.close();
 }
 
 unsigned int FindPrimesTask::BruteForceTask::getPrimeCount() {
 	return this->prime_count;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// [FindPrimesTask::SieveTask]
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+FindPrimesTask::SieveTask::SieveTask(num_type start_value, num_type end_value) : start_value(start_value), end_value(end_value) {
+
+}
+
+FindPrimesTask::SieveTask::~SieveTask() {
+
+}
+
+void FindPrimesTask::SieveTask::run() {
+	std::cout << "Starting ST (" << this->getId() << "). start_value: " << start_value << " end_value: " << end_value << std::endl;
+
+	bool* buffer = new bool[end_value + 1];
+	for (num_type i = 0; i < end_value + 1; ++i) {
+		buffer[i] = true;
+	}
+
+	const num_type sqrt_max = std::sqrt(end_value);
+
+	//Mark numbers
+	for (num_type factor = 2; factor <= sqrt_max && isRunning(); ++factor) {
+		if (buffer[factor]) {
+			for (num_type n = factor; factor * n <= end_value; ++n) {
+				buffer[factor * n] = false;
+			}
+		}
+	}
+
+	//Count primes
+	for (num_type i = (start_value > 2 ? start_value : 2); i < end_value && isRunning(); ++i) {
+		if (buffer[i]) {
+			primes.push_back(i);
+			++prime_count;
+		}
+	}
+
+	delete[] buffer;
+}
+
+unsigned int FindPrimesTask::SieveTask::getPrimeCount() {
+	return this->prime_count;
+}
+
+float FindPrimesTask::SieveTask::getProgress() {
+	return 0;
 }

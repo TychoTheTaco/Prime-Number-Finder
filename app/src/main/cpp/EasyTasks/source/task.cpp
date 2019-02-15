@@ -3,6 +3,10 @@
 #include <iostream>
 #include <algorithm>
 
+//TOODO:
+// 1. Replace time measurements with chrono::now() instead of casting to millis every time
+// 2. Create random UUIDs for new tasks
+
 long Task::next_id = 0;
 
 Task::Task() {
@@ -19,7 +23,7 @@ void Task::start() {
 	if (this->state == NOT_STARTED || this->state == STARTING) {
 		dispatchStarted();
 	} else {
-		//TODO: Exception: cant start a task that was already started
+		throw std::runtime_error("Cannot start a task that has already started!");
 	}
 	lock.unlock();
 	run();

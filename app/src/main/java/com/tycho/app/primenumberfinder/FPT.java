@@ -93,6 +93,8 @@ public interface FPT extends ITask {
             this.startValue = parcel.readLong();
             this.endValue = parcel.readLong();
             this.searchMethod = (SearchMethod) parcel.readSerializable();
+            this.searchMode = (SearchMode) parcel.readSerializable();
+            this.cacheDirectory = (File) parcel.readSerializable();
         }
 
         @Override
@@ -101,6 +103,8 @@ public interface FPT extends ITask {
             dest.writeLong(this.startValue);
             dest.writeLong(this.endValue);
             dest.writeSerializable(this.searchMethod);
+            dest.writeSerializable(this.searchMode);
+            dest.writeSerializable(this.cacheDirectory);
         }
 
         public static final Parcelable.Creator<SearchOptions> CREATOR = new Parcelable.Creator<SearchOptions>(){
@@ -136,6 +140,10 @@ public interface FPT extends ITask {
             return searchMethod;
         }
 
+        public void setSearchMethod(SearchMethod searchMethod){
+            this.searchMethod = searchMethod;
+        }
+
         public SearchMode getSearchMode() {
             return searchMode;
         }
@@ -144,8 +152,12 @@ public interface FPT extends ITask {
             this.searchMode = searchMode;
         }
 
-        public void setSearchMethod(SearchMethod searchMethod){
-            this.searchMethod = searchMethod;
+        public File getCacheDirectory() {
+            return cacheDirectory;
+        }
+
+        public void setCacheDirectory(File cacheDirectory) {
+            this.cacheDirectory = cacheDirectory;
         }
     }
 }

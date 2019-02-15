@@ -38,7 +38,6 @@ class Task {
 	bool addTaskListener(TaskListener* listener);
 	bool removeTaskListener(TaskListener* listener);
 
-	/*UUID getId() const;*/
 	long getId() const;
 	int64_t getStartTime() const;
 	int64_t getEndTime() const;

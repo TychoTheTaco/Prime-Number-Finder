@@ -21,31 +21,31 @@ public:
     }
 
     void onTaskStarted(Task* task){
-        getEnv()->CallVoidMethod(task_listener, method_ids[0]);
+        call(task_listener, method_ids[0]);
     }
 
     void onTaskPausing(Task* task){
-        getEnv()->CallVoidMethod(task_listener, method_ids[1]);
+        call(task_listener, method_ids[1]);
     }
 
     void onTaskPaused(Task* task){
-        getEnv()->CallVoidMethod(task_listener, method_ids[2]);
+        call(task_listener, method_ids[2]);
     }
 
     void onTaskResuming(Task* task){
-        getEnv()->CallVoidMethod(task_listener, method_ids[3]);
+        call(task_listener, method_ids[3]);
     }
 
     void onTaskResumed(Task* task){
-        getEnv()->CallVoidMethod(task_listener, method_ids[4]);
+        call(task_listener, method_ids[4]);
     }
 
     void onTaskStopping(Task* task){
-        getEnv()->CallVoidMethod(task_listener, method_ids[5]);
+        call(task_listener, method_ids[5]);
     }
 
     void onTaskStopped(Task* task){
-        getEnv()->CallVoidMethod(task_listener, method_ids[6]);
+        call(task_listener, method_ids[6]);
     }
 
 private:
@@ -58,6 +58,11 @@ private:
         int result = jvm->AttachCurrentThread(&env, 0);
         assert(result == JNI_OK);
         return env;
+    }
+
+    void call(jobject object, jmethodID method_id){
+        getEnv()->CallVoidMethod(object, method_id);
+        jvm->DetachCurrentThread();
     }
 };
 

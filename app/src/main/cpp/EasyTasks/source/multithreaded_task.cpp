@@ -9,9 +9,7 @@ void MultithreadedTask::pause() {
 		//Pause subtasks
 		std::thread([this]() {
 			for (Task* task : this->tasks) {
-				std::cout << "Pausing " << task->getId() << std::endl;
 				task->pauseAndWait();
-				std::cout << "Paused " << task->getId() << std::endl;
 			}
 			this->dispatchPaused();
 		}).detach();
@@ -46,10 +44,22 @@ void MultithreadedTask::resume() {
 	}
 }
 
+void MultithreadedTask::resumeAndWait() {
+	std::lock_guard<std::recursive_mutex> lock(this->state_lock);
+	this->requested_state = RUNNING;
+	if (this->state == PAUSED) {
+		this->dispatchResuming();
+		for (Task* task : this->tasks) {
+			task->resumeAndWait();
+		}
+		this->dispatchResumed();
+	}
+}
+
 void MultithreadedTask::stop() {
 	std::lock_guard<std::recursive_mutex> lock(this->state_lock);
 	this->requested_state = STOPPED;
-	if (this->state == RUNNING) {
+	if (this->state != NOT_STARTED && this->state != STOPPING && this->state != STOPPED) {
 		dispatchStopping();
 
 		//Stop subtasks
@@ -58,6 +68,17 @@ void MultithreadedTask::stop() {
 				task->stopAndWait();
 			}
 		}).detach();
+	}
+}
+
+void MultithreadedTask::stopAndWait() {
+	std::lock_guard<std::recursive_mutex> lock(this->state_lock);
+	this->requested_state = STOPPED;
+	if (this->state == RUNNING) {
+		this->dispatchStopping();
+		for (Task* task : this->tasks) {
+			task->stopAndWait();
+		}
 	}
 }
 

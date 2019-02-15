@@ -36,7 +36,7 @@ class DListener : public DebugListener{
     }
 };
 
-extern "C" JNIEXPORT jlong JNICALL Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeInit(JNIEnv *env, jobject self, jlong start_value, jlong end_value, jobject search_method, jint thread_count) {
+extern "C" JNIEXPORT jlong JNICALL Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeInit(JNIEnv *env, jobject self, jlong start_value, jlong end_value, jobject search_method, jint thread_count, jstring cache_directory) {
     __android_log_print(ANDROID_LOG_VERBOSE, TAG, "init()");
 
     jmethodID id = env->GetMethodID(env->GetObjectClass(search_method), "ordinal", "()I");
@@ -45,6 +45,9 @@ extern "C" JNIEXPORT jlong JNICALL Java_com_tycho_app_primenumberfinder_modules_
 
     FindPrimesTask* task = new FindPrimesTask((unsigned long) start_value, (unsigned long) end_value,
                                               static_cast<FindPrimesTask::SearchMethod>(value), (unsigned int) thread_count);
+    const char* string = env->GetStringUTFChars(cache_directory, 0);
+    task->setCacheDirectory(std::string(string));
+    env->ReleaseStringUTFChars(cache_directory, string);
     task->addTaskListener(new DListener());
     return (long) task;
 }
