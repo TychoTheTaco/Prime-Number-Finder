@@ -7,7 +7,6 @@
 #include <iostream>
 #include <fstream>
 #include <stdint.h>
-#include <filesystem>
 #include <bitset>
 
 #ifdef _WIN32
@@ -22,12 +21,14 @@ FindPrimesTask::FindPrimesTask(num_type start_value, num_type end_value, SearchM
 }
 
 FindPrimesTask::~FindPrimesTask() {
-
+	
 }
 
 void FindPrimesTask::run() {
+
+	//TODO: If no cache directory specified, then use this as a default location
 	//Create cache directory at current location
-	this->setCacheDirectory("cache");
+	//this->setCacheDirectory("cache");
 
 	switch (this->search_method) {
 		case BRUTE_FORCE:
@@ -314,29 +315,30 @@ void FindPrimesTask::setCacheDirectory(std::string directory) {
 	this->cache_dir = directory + "/task_" + std::to_string(this->getId()) + "_cache";
 
 	//Empty the cache directory
+#ifdef _WIN32
 	std::string cmd = "rmdir /s /q \"" + this->cache_dir + "\"";
+#else
+	std::string cmd = "rmdir \"" + this->cache_dir + "\"";
+#endif
 	std::cout << "Empty: " << cmd << std::endl;
 	system(cmd.c_str());
 
 	//Create cache directory
 //#ifdef _WIN32
-	//std::cout << "Windows: " << this->cache_dir << std::endl;
 	cmd = "mkdir \"" + this->cache_dir + "\"";
-	system(cmd.c_str());
 //#else
-//	std::cout << "Not Windows" << std::endl;
 //	cmd = "mkdir -p" + this->cache_dir;
-//	system(cmd.c_str());
 //#endif // _WIN32
+	system(cmd.c_str());
 
 
-	}
+}
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// [FindPrimesTask::BruteForceTask]
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// [FindPrimesTask::BruteForceTask]
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// NOTE: start_value MUST be an odd number and increment MUST be an even number!
+// NOTE: start_value MUST be an odd number and increment MUST be an even number!
 FindPrimesTask::BruteForceTask::BruteForceTask(const FindPrimesTask* parent, num_type start_value, num_type end_value, unsigned int increment) : parent(parent), start_value(start_value), end_value(end_value), increment(increment), current_number(start_value) {
 	this->cache_file = parent->cache_dir + "/cache" + std::to_string(this->getId()) + ".txt";
 

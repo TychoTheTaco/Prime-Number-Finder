@@ -254,49 +254,49 @@ void Task::dispatchStopped() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Task::notifyOnTaskStarted() {
-	std::lock_guard<std::mutex> lock(this->listener_mutex);
+	std::lock_guard<std::recursive_mutex> lock(this->listener_mutex);
 	for (TaskListener *listener : this->task_listeners) {
 		listener->onTaskStarted(this);
 	}
 }
 
 void Task::notifyOnTaskPausing() {
-	std::lock_guard<std::mutex> lock(this->listener_mutex);
+	std::lock_guard<std::recursive_mutex> lock(this->listener_mutex);
 	for (TaskListener *listener : this->task_listeners) {
 		listener->onTaskPausing(this);
 	}
 }
 
 void Task::notifyOnTaskPaused() {
-	std::lock_guard<std::mutex> lock(this->listener_mutex);
+	std::lock_guard<std::recursive_mutex> lock(this->listener_mutex);
 	for (TaskListener *listener : this->task_listeners) {
 		listener->onTaskPaused(this);
 	}
 }
 
 void Task::notifyOnTaskResuming() {
-	std::lock_guard<std::mutex> lock(this->listener_mutex);
+	std::lock_guard<std::recursive_mutex> lock(this->listener_mutex);
 	for (TaskListener *listener : this->task_listeners) {
 		listener->onTaskResuming(this);
 	}
 }
 
 void Task::notifyOnTaskResumed() {
-	std::lock_guard<std::mutex> lock(this->listener_mutex);
+	std::lock_guard<std::recursive_mutex> lock(this->listener_mutex);
 	for (TaskListener *listener : this->task_listeners) {
 		listener->onTaskResumed(this);
 	}
 }
 
 void Task::notifyOnTaskStopping() {
-	std::lock_guard<std::mutex> lock(this->listener_mutex);
+	std::lock_guard<std::recursive_mutex> lock(this->listener_mutex);
 	for (TaskListener *listener : this->task_listeners) {
 		listener->onTaskStopping(this);
 	}
 }
 
 void Task::notifyOnTaskStopped() {
-	std::lock_guard<std::mutex> lock(this->listener_mutex);
+	std::lock_guard<std::recursive_mutex> lock(this->listener_mutex);
 	for (TaskListener *listener : this->task_listeners) {
 		listener->onTaskStopped(this);
 	}
@@ -307,8 +307,8 @@ void Task::notifyOnTaskStopped() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bool Task::addTaskListener(TaskListener* listener) {
-	std::vector<TaskListener*>::iterator iterator = std::find(this->task_listeners.begin(), this->task_listeners.end(), listener);
-	if (iterator != this->task_listeners.end()) {
+	std::lock_guard<std::recursive_mutex> lock(this->listener_mutex);
+	if (std::find(this->task_listeners.begin(), this->task_listeners.end(), listener) != this->task_listeners.end()) {
 		return false;
 	}
 	this->task_listeners.push_back(listener);
@@ -316,12 +316,12 @@ bool Task::addTaskListener(TaskListener* listener) {
 }
 
 bool Task::removeTaskListener(TaskListener* listener) {
-	std::vector<TaskListener*>::iterator iterator = std::find(this->task_listeners.begin(), this->task_listeners.end(), listener);
-	if (iterator != this->task_listeners.end()) {
-		return false;
+	std::lock_guard<std::recursive_mutex> lock(this->listener_mutex);
+	if (std::find(this->task_listeners.begin(), this->task_listeners.end(), listener) != this->task_listeners.end()) {
+		this->task_listeners.erase(std::remove(this->task_listeners.begin(), this->task_listeners.end(), listener));
+		return true;
 	}
-	this->task_listeners.erase(std::remove(this->task_listeners.begin(), this->task_listeners.end(), listener));
-	return true;
+	return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

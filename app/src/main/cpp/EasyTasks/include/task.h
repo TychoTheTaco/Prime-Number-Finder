@@ -87,7 +87,7 @@ class Task {
 	std::vector<TaskListener*> task_listeners;
 
 	// This mutex is used to ensure that all listeners for a given state are executed in order and not mixed together.
-	std::mutex listener_mutex;
+	std::recursive_mutex listener_mutex;
 
 	void pauseThread();
 	void processRequestedState();

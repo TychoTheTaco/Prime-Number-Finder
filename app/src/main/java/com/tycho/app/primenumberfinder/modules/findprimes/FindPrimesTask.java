@@ -82,7 +82,9 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
      */
     private void searchBruteForce() {
         //Determine best search mode to use
-        if (options.getThreadCount() % 2 == 0) {
+        if (options.getThreadCount() == 1){
+            options.setSearchMode(SearchOptions.SearchMode.PARTITION);
+        }else if (options.getThreadCount() % 2 == 0) {
             options.setSearchMode(SearchOptions.SearchMode.ALTERNATE);
         } else {
             options.setSearchMode(SearchOptions.SearchMode.PACKET);
@@ -243,7 +245,6 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
     }
 
     public File saveToFile() {
-
         final File largeCache = new File(FileManager.getInstance().getTaskCacheDirectory(this) + File.separator + "primes");
         if (options.getSearchMethod() == SearchOptions.SearchMethod.BRUTE_FORCE) {
             //sortCache(getState() == State.STOPPED);

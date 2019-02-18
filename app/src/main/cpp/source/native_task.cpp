@@ -1,5 +1,6 @@
 #include <jni.h>
 #include <android/log.h>
+#include <map>
 
 #include "find_primes_task.h"
 
@@ -66,6 +67,8 @@ private:
     }
 };
 
+std::map<std::string, NativeListener*> listener_map;
+
 extern "C" JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeStart(JNIEnv *env, jobject self, jlong task_ptr) {
     ((Task*) task_ptr)->start();
 }
@@ -107,10 +110,23 @@ extern "C" JNIEXPORT jlong JNICALL Java_com_tycho_app_primenumberfinder_NativeTa
 }
 
 extern "C" JNIEXPORT jfloat JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeGetProgress(JNIEnv *env, jobject self, jlong task_ptr) {
-    //__android_log_print(ANDROID_LOG_VERBOSE, TAG, "Native progress: %f", ((Task*) task_ptr)->getProgress());
     return (jfloat) ((Task*) task_ptr)->getProgress();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeAddTaskListener(JNIEnv *env, jobject self, jlong task_ptr, jobject task_listener) {
-    ((Task*) task_ptr)->addTaskListener(new NativeListener(env, task_listener));
+extern "C" JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeAddTaskListener(JNIEnv *env, jobject self, jlong task_ptr, jobject task_listener, jstring id) {
+    const char* string = env->GetStringUTFChars(id, 0);
+    NativeListener* native_listener = new NativeListener(env, task_listener);
+    listener_map[string] = native_listener;
+    ((Task*) task_ptr)->addTaskListener(native_listener);
+    env->ReleaseStringUTFChars(id, string);
+}
+
+extern "C" JNIEXPORT jboolean JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeRemoveTaskListener(JNIEnv *env, jobject self, jlong task_ptr, jobject task_listener, jstring id) {
+    const char* string = env->GetStringUTFChars(id, 0);
+    NativeListener* native_listener = listener_map[string];
+    listener_map.erase(string);
+    env->ReleaseStringUTFChars(id, string);
+    bool result = ((Task*) task_ptr)->removeTaskListener(native_listener);
+    delete native_listener;
+    return (jboolean ) result;
 }

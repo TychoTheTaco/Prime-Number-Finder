@@ -1,5 +1,7 @@
 package com.tycho.app.primenumberfinder;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import easytasks.Task;
@@ -10,6 +12,8 @@ public abstract class NativeTask implements ITask {
     static {
         System.loadLibrary("native-utils");
     }
+
+    private Map<TaskListener, UUID> taskListenerMap = new HashMap<>();
 
     @Override
     public UUID getId() {
@@ -38,12 +42,16 @@ public abstract class NativeTask implements ITask {
 
     @Override
     public void addTaskListener(TaskListener listener) {
-        nativeAddTaskListener(native_task_pointer, listener);
+        final UUID id = UUID.randomUUID();
+        taskListenerMap.put(listener, id);
+        nativeAddTaskListener(native_task_pointer, listener, id.toString());
     }
 
     @Override
     public boolean removeTaskListener(TaskListener listener) {
-        return false;
+        final String id = taskListenerMap.get(listener).toString();
+        taskListenerMap.remove(listener);
+        return nativeRemoveTaskListener(native_task_pointer, listener, id);
     }
 
     protected long native_task_pointer;
@@ -117,6 +125,6 @@ public abstract class NativeTask implements ITask {
     private native int nativeGetState(long native_task_pointer);
     private native long nativeGetElapsedTime(long native_task_pointer);
 
-    private native void nativeAddTaskListener(long native_task_pointer, TaskListener listener);
-    private native boolean nativeRemoveTaskListener(long native_task_pointer, TaskListener listener);
+    private native void nativeAddTaskListener(long native_task_pointer, TaskListener listener, String id);
+    private native boolean nativeRemoveTaskListener(long native_task_pointer, TaskListener listener, String id);
 }
