@@ -9,15 +9,7 @@
 #include <stdint.h>
 #include <bitset>
 
-#ifdef _WIN32
-#define PLATFORM "Windows"
-#else
-#define PLATFORM "Unknown"
-#endif
-
-
 FindPrimesTask::FindPrimesTask(num_type start_value, num_type end_value, SearchMethod search_method, unsigned int thread_count) : start_value(start_value), end_value(end_value), search_method(search_method), thread_count(thread_count) {
-	std::cout << "Platform: " << PLATFORM << std::endl;
 }
 
 FindPrimesTask::~FindPrimesTask() {
@@ -131,13 +123,12 @@ void FindPrimesTask::searchAlternateMode() {
 		task->addTaskListener(new DebugListener());
 		this->addSubTask(task);
 	}
-	delete startValues;
+	delete[] startValues;
 	this->startSubTasks();
 	this->finishSubTasks();
 }
 
 void FindPrimesTask::searchPacketMode(num_type packet_size) {
-	std::cout << "packet_size: " << packet_size << std::endl;
 	for (unsigned int i = 0; i < std::ceil((double)getRange() / packet_size); i++) {
 		num_type start = this->start_value + (i * packet_size + 1);
 		if (start % 2 == 0) start++;
@@ -262,7 +253,7 @@ void FindPrimesTask::saveToFile(const std::string file_path) {
 
 num_type FindPrimesTask::bytesToNumber(char* bytes) {
 	num_type number = 0;
-	for (unsigned int i = 0, offset = sizeof(num_type) * 8 - 8; i < sizeof(num_type); ++i, offset -= sizeof(num_type)) {
+	for (unsigned int i = 0, offset = sizeof(num_type) * 8 - 8; i < sizeof(num_type); ++i, offset -= 8) {
 		num_type n = (unsigned char)bytes[i];
 		number |= (n << offset);
 	}
@@ -270,7 +261,7 @@ num_type FindPrimesTask::bytesToNumber(char* bytes) {
 }
 
 void FindPrimesTask::numberToBytes(num_type number, char destination[]) {
-	for (unsigned int i = 0, offset = sizeof(num_type) * 8 - 8; i < sizeof(num_type); ++i, offset -= sizeof(num_type)) {
+	for (unsigned int i = 0, offset = sizeof(num_type) * 8 - 8; i < sizeof(num_type); ++i, offset -= 8) {
 		destination[i] = number >> offset;
 	}
 }
@@ -307,6 +298,10 @@ num_type FindPrimesTask::getRange() {
 	return this->end_value - this->start_value;
 }
 
+FindPrimesTask::SearchMethod FindPrimesTask::getSearchMethod() {
+	return this->search_method;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // [FindPrimesTask] Setters
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -339,7 +334,7 @@ void FindPrimesTask::setCacheDirectory(std::string directory) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // NOTE: start_value MUST be an odd number and increment MUST be an even number!
-FindPrimesTask::BruteForceTask::BruteForceTask(const FindPrimesTask* parent, num_type start_value, num_type end_value, unsigned int increment) : parent(parent), start_value(start_value), end_value(end_value), increment(increment), current_number(start_value) {
+FindPrimesTask::BruteForceTask::BruteForceTask(const FindPrimesTask* parent, num_type start_value, num_type end_value, num_type increment) : parent(parent), start_value(start_value), end_value(end_value), increment(increment), current_number(start_value) {
 	this->cache_file = parent->cache_dir + "/cache" + std::to_string(this->getId()) + ".txt";
 
 	// Clear cache

@@ -213,7 +213,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
 
             //Determine best search method
             searchOptions.setSearchMethod(determineBestSearchMethod());
-            searchOptions.setSearchMethod(BRUTE_FORCE);
+            //searchOptions.setSearchMethod(BRUTE_FORCE);
 
             //Check if the range is valid
             if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {

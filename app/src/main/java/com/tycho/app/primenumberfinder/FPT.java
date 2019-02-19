@@ -10,7 +10,7 @@ import java.io.File;
 
 public interface FPT extends ITask {
 
-    File saveToFile();
+    void saveToFile(final File file);
     boolean save();
 
     long getStartValue();

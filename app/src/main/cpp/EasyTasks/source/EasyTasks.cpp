@@ -1,5 +1,4 @@
 ﻿#include <iostream>
-#include "test_task.h"
 #include "find_primes_task.h"
 #include "debug_listener.h"
 #include <chrono>
@@ -45,16 +44,6 @@ void printProgress(Task* task) {
 int main() {
 
 	DebugListener listener;
-
-	// Test single threaded task
-	std::cout << "Testing single-threaded" << std::endl;
-	TestTask task;
-	task.addTaskListener(&listener);
-	std::thread* thread0 = task.startOnNewThread();
-	task.pauseAndWait();
-	task.resume();
-	task.finish();
-	std::cout << std::endl;
 
 	// Test multithreaded task
 	std::cout << "Testing multi-threaded" << std::endl;

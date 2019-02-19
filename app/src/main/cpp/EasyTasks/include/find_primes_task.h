@@ -63,7 +63,7 @@ class FindPrimesTask : public MultithreadedTask {
 		friend class FindPrimesTask;
 
 		public:
-		BruteForceTask(const FindPrimesTask* parent, num_type start_value, num_type end_value, unsigned int increment = 1);
+		BruteForceTask(const FindPrimesTask* parent, num_type start_value, num_type end_value, num_type increment = 1);
 		~BruteForceTask();
 
 		virtual void run();
@@ -78,7 +78,7 @@ class FindPrimesTask : public MultithreadedTask {
 		num_type start_value;
 		num_type end_value;
 
-		int increment;
+		num_type increment;
 
 		std::vector<num_type> primes;
 

@@ -27,6 +27,7 @@ import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -281,8 +282,16 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
         new Thread(() -> {
 
             //Count numbers
-            final int totalNumbers = FileManager.countTotalNumbersQuick(file);
-            scrollListener.setTotalNumbers(totalNumbers);
+            int n;
+            try {
+                n = FileManager.countTotalNumbersQuick(file);
+            }catch (IOException e){
+                n = -1;
+                throw new RuntimeException("Error Loading File!");
+            }
+            scrollListener.setTotalNumbers(n);
+            final int totalNumbers = n;
+
 
             //Read file
             final List<Long> numbers = FileManager.readNumbers(file, 0, 1000);

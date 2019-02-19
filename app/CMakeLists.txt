@@ -17,16 +17,13 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        "src/main/cpp/source/utils.cpp"
         "src/main/cpp/source/native_task.cpp"
         "src/main/cpp/source/find_primes_native_task.cpp")
 
 set(TASKR_SOURCE_FILES
-        "src/main/cpp/EasyTasks/source/EasyTasks.cpp"
         "src/main/cpp/EasyTasks/source/task.cpp"
-        "src/main/cpp/EasyTasks/source/find_primes_task.cpp"
         "src/main/cpp/EasyTasks/source/task_listener.cpp"
-        "src/main/cpp/EasyTasks/source/test_task.cpp"
+        "src/main/cpp/EasyTasks/source/find_primes_task.cpp"
         "src/main/cpp/EasyTasks/source/debug_listener.cpp"
         "src/main/cpp/EasyTasks/source/multithreaded_task.cpp"
         )

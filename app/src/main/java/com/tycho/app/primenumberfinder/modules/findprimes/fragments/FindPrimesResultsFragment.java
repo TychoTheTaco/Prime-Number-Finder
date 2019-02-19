@@ -113,14 +113,12 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                     e.printStackTrace();
                 }
 
-                final File file;
-
                 //Check if cached file exists
-                final File cached = new File(FileManager.getInstance().getTaskCacheDirectory(getTask()) + File.separator + "primes");
-                if (cached.exists() && getTask().getState() == Task.State.STOPPED) {
-                    file = cached;
+                final File file = new File(FileManager.getInstance().getTaskCacheDirectory(getTask()) + File.separator + "primes");
+                if (file.exists() && getTask().getState() == Task.State.STOPPED) {
+                    //Do nothing
                 } else {
-                    file = getTask().saveToFile();
+                   getTask().saveToFile(file);
                 }
 
                 //Resume the task

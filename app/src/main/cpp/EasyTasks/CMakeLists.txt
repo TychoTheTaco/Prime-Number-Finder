@@ -14,7 +14,6 @@ SET(SOURCE_FILES
 "source/task.cpp"
 "source/find_primes_task.cpp"
 "source/task_listener.cpp"
-"source/test_task.cpp"
 "source/debug_listener.cpp"
 "source/multithreaded_task.cpp"
 )
@@ -23,7 +22,6 @@ set(HEADER_FILES
 "include/task.h"
 "include/find_primes_task.h"
 "include/task_listener.h"
-"include/test_task.h"
 "include/debug_listener.h"
 "include/multithreaded_task.h"
 )

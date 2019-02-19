@@ -38,8 +38,6 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
         System.loadLibrary("Taskr");
     }
 
-    public native int nativeSieve(final long start, final long end);
-
     /**
      * Tag used for logging and debugging.
      */
@@ -244,8 +242,8 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
         });
     }
 
-    public File saveToFile() {
-        final File largeCache = new File(FileManager.getInstance().getTaskCacheDirectory(this) + File.separator + "primes");
+    public void saveToFile(final File file) {
+        /*final File largeCache = new File(FileManager.getInstance().getTaskCacheDirectory(this) + File.separator + "primes");
         if (options.getSearchMethod() == SearchOptions.SearchMethod.BRUTE_FORCE) {
             //sortCache(getState() == State.STOPPED);
             sortCache(false);
@@ -253,7 +251,7 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
             if (getState() != State.STOPPED) return largeCache;
             FileManager.getInstance().writeNumbersQuick(((SieveTask) getTasks().get(0)).primes, largeCache, false);
         }
-        return largeCache;
+        return largeCache;*/
     }
 
     private long getRange() {
@@ -459,6 +457,9 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
 
             while ((currentNumber <= endValue || endValue == INFINITY)) {
 
+                tryPause();
+                if (shouldStop()) return;
+
                 /*
                 Get the square root of the number. We only need to calculate up to the square root
                 to determine if the number is prime. The square root of a long will always fit
@@ -603,42 +604,6 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
     private void searchSieve() {
         addTask(new SieveTask());
         executeTasks();
-
-        long start = System.currentTimeMillis();
-        System.out.println("Sieve version 0: " + version_0() + "\t" + (System.currentTimeMillis() - start) + " ms.");
-        start = System.currentTimeMillis();
-        System.out.println("Sieve version N: " + nativeSieve(options.getStartValue(), options.getEndValue()) + "\t" + (System.currentTimeMillis() - start) + " ms.");
-    }
-
-    private int version_0() {
-        final boolean[] array = new boolean[(int) options.getEndValue() + 1];
-        for (int i = 0; i < array.length; ++i) {
-            array[i] = true;
-        }
-        final int sqrtMax = (int) Math.sqrt(options.getEndValue());
-        int primeCount = 0;
-
-        // mark non-primes <= n using Sieve of Eratosthenes
-        for (int factor = 2; factor <= sqrtMax; factor++) {
-
-            // if factor is prime, then mark multiples of factor as nonprime
-            // suffices to consider mutiples factor, factor+1, ...,  n/factor
-            if (array[factor]) {
-                for (long j = factor; factor * j <= options.getEndValue(); j++) {
-                    final long number = factor * j;
-                    array[(int) number] = false;
-                }
-            }
-        }
-
-        //Count primes
-        for (int counter = (int) (options.getStartValue() > 2 ? options.getStartValue() : 2); counter <= options.getEndValue(); counter++) {
-            if (array[counter]) {
-                primeCount++;
-            }
-        }
-
-        return primeCount;
     }
 
     public String getStatus() {

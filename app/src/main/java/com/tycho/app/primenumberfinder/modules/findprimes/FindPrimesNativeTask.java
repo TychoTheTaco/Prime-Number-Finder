@@ -4,6 +4,7 @@ import com.tycho.app.primenumberfinder.FPT;
 import com.tycho.app.primenumberfinder.NativeTask;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.SearchOptions;
+import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;
 
@@ -21,13 +22,14 @@ public class FindPrimesNativeTask extends NativeTask implements FPT, SearchOptio
     }
 
     @Override
-    public File saveToFile() {
-        return null;
+    public void saveToFile(final File file) {
+        nativeSaveToFile(native_task_pointer, file.getAbsolutePath());
     }
 
     @Override
     public boolean save() {
-        return false;
+        saveToFile(new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getStartValue() + " to " + (getEndValue() == FindPrimesTask.INFINITY ? "INF" : getEndValue())));
+        return true;
     }
 
     @Override
@@ -66,7 +68,7 @@ public class FindPrimesNativeTask extends NativeTask implements FPT, SearchOptio
     }
 
     private native long nativeInit(final long startValue, final long endValue, final SearchOptions.SearchMethod searchMethod, final int threadCount, final String cacheDirectory);
-    private native File nativeSaveToFile(final long native_task_pointer);
+    private native void nativeSaveToFile(final long native_task_pointer, String filePath);
     private native long nativeGetStartValue(final long native_task_pointer);
     private native long nativeGetEndValue(final long native_task_pointer);
     private native int nativeGetCurrentFactor(final long native_task_pointer);

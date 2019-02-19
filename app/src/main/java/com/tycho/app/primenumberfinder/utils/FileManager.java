@@ -39,7 +39,7 @@ import simpletrees.Tree;
 
 /**
  * @author Tycho Bellers
- *         Date Created: 10/24/2016
+ * Date Created: 10/24/2016
  */
 
 public final class FileManager {
@@ -149,11 +149,11 @@ public final class FileManager {
         return cacheDirectory;
     }
 
-    public boolean savePrimes(final long startValue, final long endValue, final List<Long> primes){
+    public boolean savePrimes(final long startValue, final long endValue, final List<Long> primes) {
         return writeNumbersQuick(primes, new File(savedPrimesDirectory.getAbsolutePath() + File.separator + "Prime numbers from " + startValue + " to " + endValue + EXTENSION), false);
     }
 
-    public void savePrimes(final List<Long> primes, final File file){
+    public void savePrimes(final List<Long> primes, final File file) {
         writeNumbersQuick(primes, file, false);
     }
 
@@ -338,19 +338,19 @@ public final class FileManager {
         return true;
     }
 
-    public static List<Long> readNumbers(final File file){
+    public static List<Long> readNumbers(final File file) {
         final List<Long> numbers = new ArrayList<>();
 
         try {
             final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
 
             try {
-                while (true){
+                while (true) {
                     numbers.add(dataInputStream.readLong());
                 }
             } catch (EOFException e) {
 
-            }finally {
+            } finally {
                 dataInputStream.close();
             }
 
@@ -363,27 +363,33 @@ public final class FileManager {
 
     /**
      * Reads numbers from a file and adds them to the given list. Returns true if the end of file was reached.
+     *
      * @param file
      * @param numbers
      * @param startIndex
      * @param count
      * @return
      */
-    public static boolean readNumbers(final File file, final List<Long> numbers, final int startIndex, final int count){
+    public static boolean readNumbers(final File file, final List<Long> numbers, final int startIndex, final int count) {
         boolean endOfFile = false;
         try {
             final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
 
+            //Read header
+            final int version = dataInputStream.readUnsignedByte();
+            final int headerLength = dataInputStream.readUnsignedByte();
+            final int numberSize = dataInputStream.readUnsignedByte();
+
             //Skip numbers
-            dataInputStream.skipBytes(startIndex * 8);
+            dataInputStream.skipBytes(startIndex * numberSize);
 
             try {
-                for (int i = 0; i < count; i++){
+                for (int i = 0; i < count; i++) {
                     numbers.add(dataInputStream.readLong());
                 }
             } catch (EOFException e) {
                 endOfFile = true;
-            }finally {
+            } finally {
                 dataInputStream.close();
             }
 
@@ -394,14 +400,14 @@ public final class FileManager {
         return endOfFile;
     }
 
-    public static List<Long> readNumbers(final File file, final int startIndex, final int count){
+    public static List<Long> readNumbers(final File file, final int startIndex, final int count) {
         final List<Long> numbers = new ArrayList<>();
         readNumbers(file, numbers, startIndex, count);
         return numbers;
     }
 
-    public static void saveDebugFile(final int version, final int count, final File file){
-        switch (version){
+    public static void saveDebugFile(final int version, final int count, final File file) {
+        switch (version) {
             default:
                 Log.d(TAG, "Invalid version: " + version);
                 break;
@@ -410,7 +416,7 @@ public final class FileManager {
                 try {
                     final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
 
-                    for (int i = 0; i < count; i++){
+                    for (int i = 0; i < count; i++) {
                         bufferedWriter.write(String.valueOf(i));
                         if (i != count - 1) {
                             bufferedWriter.write(LIST_ITEM_SEPARATOR);
@@ -428,7 +434,7 @@ public final class FileManager {
                 try {
                     final DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
 
-                    for (int i = 0; i < count; i++){
+                    for (int i = 0; i < count; i++) {
                         dataOutputStream.writeLong(i);
                     }
 
@@ -440,8 +446,15 @@ public final class FileManager {
         }
     }
 
-    public static int countTotalNumbersQuick(final File file){
-        return (int) (file.length() / 8);
+    public static int countTotalNumbersQuick(final File file) throws IOException {
+        final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+
+        //Read header
+        final int version = dataInputStream.readUnsignedByte();
+        final int headerLength = dataInputStream.readUnsignedByte();
+        final int numberSize = dataInputStream.readUnsignedByte();
+
+        return (int) (file.length() - headerLength) / numberSize;
     }
 
     public Tree<Long> readTree(final File file) {
@@ -521,15 +534,15 @@ public final class FileManager {
         }
     }
 
-    public void upgradeTo1_3_0(){
-        if (PreferenceManager.getInt(PreferenceManager.Preference.FILE_VERSION) == 0){
+    public void upgradeTo1_3_0() {
+        if (PreferenceManager.getInt(PreferenceManager.Preference.FILE_VERSION) == 0) {
 
             final List<File> files = new ArrayList<>();
             files.addAll(Arrays.asList(savedPrimesDirectory.listFiles()));
             files.addAll(Arrays.asList(savedFactorsDirectory.listFiles()));
 
             //Update saved primes
-            for (File file : files){
+            for (File file : files) {
 
                 //Read old file
                 final List<Long> numbers = new ArrayList<>();
@@ -572,9 +585,9 @@ public final class FileManager {
             final long lastItem = items.get(items.size() - 1);
 
             for (long number : items) {
-                if (numberFormat != null){
+                if (numberFormat != null) {
                     bufferedWriter.write(numberFormat.format(number));
-                }else{
+                } else {
                     bufferedWriter.write(String.valueOf(number));
                 }
 
@@ -622,8 +635,8 @@ public final class FileManager {
         }
     }
 
-    public static long estimateFileSize(int method, final int count){
-        switch (method){
+    public static long estimateFileSize(int method, final int count) {
+        switch (method) {
 
             /*
             Method 1
@@ -631,8 +644,8 @@ public final class FileManager {
              */
             case 0:
                 int digits = 0;
-                for (int i = 1; i < count; i++){
-                    digits += (int)(Math.log10(i)+1);
+                for (int i = 1; i < count; i++) {
+                    digits += (int) (Math.log10(i) + 1);
                 }
                 Log.d(TAG, "Digits: " + digits);
                 return (digits + count);
@@ -650,25 +663,25 @@ public final class FileManager {
              */
             case 2:
                 digits = 0;
-                for (int i = 1; i < count; i++){
-                    digits += (int)(Math.log10(i)+1);
+                for (int i = 1; i < count; i++) {
+                    digits += (int) (Math.log10(i) + 1);
                 }
                 return ((digits + count) / 4);
         }
         return -1;
     }
 
-    public static int numbersWithNDigits(final int n){
+    public static int numbersWithNDigits(final int n) {
         return (int) (Math.pow(10, n) - Math.pow(10, n - 1));
     }
 
-    public static long[] getPrimesRangeFromTitle(final File file){
+    public static long[] getPrimesRangeFromTitle(final File file) {
         final long[] range = new long[2];
 
         final Pattern pattern = Pattern.compile("\\d+");
         final Matcher matcher = pattern.matcher(file.getName());
-        for (int i = 0; i < 2; i++){
-            if (matcher.find()){
+        for (int i = 0; i < 2; i++) {
+            if (matcher.find()) {
                 range[i] = Long.valueOf(matcher.group());
             }
         }
@@ -676,21 +689,21 @@ public final class FileManager {
         return range;
     }
 
-    public static long getNumberFromTitle(final File file){
+    public static long getNumberFromTitle(final File file) {
         final Pattern pattern = Pattern.compile("\\d+");
         final Matcher matcher = pattern.matcher(file.getName());
-        if (matcher.find()){
+        if (matcher.find()) {
             return Long.valueOf(matcher.group());
         }
         return 0;
     }
 
-    public static FileType getFileType(final File directory){
-        if (directory.equals(getInstance().getSavedPrimesDirectory())){
+    public static FileType getFileType(final File directory) {
+        if (directory.equals(getInstance().getSavedPrimesDirectory())) {
             return FileType.PRIMES;
-        } else if (directory.equals(getInstance().getSavedFactorsDirectory())){
+        } else if (directory.equals(getInstance().getSavedFactorsDirectory())) {
             return FileType.FACTORS;
-        } else if (directory.equals(getInstance().getSavedTreesDirectory())){
+        } else if (directory.equals(getInstance().getSavedTreesDirectory())) {
             return FileType.TREE;
         }
         return FileType.UNKNOWN;
