@@ -26,14 +26,10 @@ import java.lang.ref.WeakReference;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import easytasks.Task;
 import simpletrees.Tokenizer;
 import simpletrees.Tree;
 
@@ -185,141 +181,7 @@ public final class FileManager {
         return true;
     }
 
-    public void writeToCache(final List<Long> numbers, final UUID id, final boolean append) {
-        writeNumbersQuick(numbers, new File(context.get().getFilesDir() + File.separator + "cache" + File.separator + id + File.separator + "cache"), append);
-    }
-
-    public static void writeCompact(final List<Long> numbers, final File file, final boolean append) {
-        try {
-            final DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(file, append));
-
-            final List<Integer> cache = new ArrayList<>();
-
-            //Check if last value is already separator
-            if (file.exists() && append && file.length() > 0) {
-                final DataInputStream dataInputStream = new DataInputStream(new FileInputStream(file));
-                Log.d(TAG, "Skipping: " + (file.length() - 1) + " bytes");
-                dataInputStream.skip(file.length() - 1);
-                if ((dataInputStream.readUnsignedByte() & 0x0F) == 0xF) {
-                    //Already has separator
-                } else {
-                    cache.add(0xFF);
-                }
-            }
-
-            for (long number : numbers) {
-                /*final String string = String.valueOf(number);
-                final char[] chars = string.toCharArray();
-                for (int i = 0; i < chars.length; i++){
-                    cache.add(Character.digit(chars[i], 10));
-                }*/
-                while (number > 0) {
-                    long d = number / 10;
-                    int k = (int) (number - d * 10);
-                    number = d;
-                    cache.add(k);
-                }
-                cache.add(0xFF);
-            }
-            cache.remove(cache.size() - 1);
-
-            //Log.d(TAG, "Final Cache: " + cache);
-
-            for (int i = 0; i < cache.size(); i += 8) {
-                int data = 0;
-                for (int a = 0; a < 8; a++) {
-                    final int value;
-                    if (i + a < cache.size()) {
-                        value = cache.get(i + a);
-                    } else {
-                        value = 0xF;
-                    }
-                    data |= ((value << ((a) * 4)) & (0xF << ((a) * 4)));
-                }
-                //Log.d(TAG, "Write: " + data);
-                dataOutputStream.writeInt(data);
-            }
-
-            dataOutputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static List<Long> readCompat(final File file) {
-        final List<Long> numbers = new ArrayList<>();
-
-        try {
-            final DataInputStream dataInputStream = new DataInputStream(new FileInputStream(file));
-            final List<Integer> digits = new ArrayList<>();
-            try {
-
-                while (true) {
-                    final int data = dataInputStream.readInt();
-                    final int[] split = new int[8];
-                    //Log.d(TAG, "Read: " + data);
-                    for (int i = 0; i < 8; i++) {
-                        split[i] = ((data >> ((i) * 4)) & 0xF);
-                        //Log.d(TAG, "split[" + i + "] = " + split[i]);
-                    }
-                    //Log.d(TAG, "Read: " + (data & 0xFF));
-                    for (int i = 0; i < 8; i++) {
-                        if (split[i] != 0xF) {
-                            digits.add(split[i]);
-                        } else {
-                            String number = "";
-                            Collections.reverse(digits);
-                            for (Integer integer : digits) {
-                                number += integer;
-                            }
-                            //Log.d(TAG, "Adding: " + number);
-                            if (number.length() > 0) {
-                                numbers.add(Long.valueOf(number));
-                                digits.clear();
-                            }
-                        }
-                    }
-                }
-            } catch (EOFException e) {
-                dataInputStream.close();
-                String number = "";
-                for (Integer integer : digits) {
-                    number += integer;
-                }
-                //Log.d(TAG, "Adding: " + number);
-                if (number.length() > 0) {
-                    numbers.add(Long.valueOf(number));
-                }
-                digits.clear();
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return numbers;
-    }
-
     public boolean writeNumbersQuick(final List<Long> numbers, final File file, final boolean append) {
-
-        try {
-            final DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file, append)));
-
-            for (long number : numbers) {
-                dataOutputStream.writeLong(number);
-            }
-
-            dataOutputStream.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        return true;
-    }
-
-    public boolean writeNumbersQuick(final Queue<Long> numbers, final File file, final boolean append) {
 
         try {
             final DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file, append)));
@@ -404,46 +266,6 @@ public final class FileManager {
         final List<Long> numbers = new ArrayList<>();
         readNumbers(file, numbers, startIndex, count);
         return numbers;
-    }
-
-    public static void saveDebugFile(final int version, final int count, final File file) {
-        switch (version) {
-            default:
-                Log.d(TAG, "Invalid version: " + version);
-                break;
-
-            case 0:
-                try {
-                    final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
-
-                    for (int i = 0; i < count; i++) {
-                        bufferedWriter.write(String.valueOf(i));
-                        if (i != count - 1) {
-                            bufferedWriter.write(LIST_ITEM_SEPARATOR);
-                        }
-                    }
-
-                    bufferedWriter.flush();
-                    bufferedWriter.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                break;
-
-            case 1:
-                try {
-                    final DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
-
-                    for (int i = 0; i < count; i++) {
-                        dataOutputStream.writeLong(i);
-                    }
-
-                    dataOutputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                break;
-        }
     }
 
     public static int countTotalNumbersQuick(final File file) throws IOException {
@@ -633,42 +455,6 @@ public final class FileManager {
                 }
             }
         }
-    }
-
-    public static long estimateFileSize(int method, final int count) {
-        switch (method) {
-
-            /*
-            Method 1
-            Using a BufferedWriter to write the string values of each number separated by a new line character.
-             */
-            case 0:
-                int digits = 0;
-                for (int i = 1; i < count; i++) {
-                    digits += (int) (Math.log10(i) + 1);
-                }
-                Log.d(TAG, "Digits: " + digits);
-                return (digits + count);
-
-                /*
-            Method 2
-            Using a DataOutputStream to write each long.
-             */
-            case 1:
-                return (count * 8);
-
-                 /*
-            Method 3
-            Compacting each number so that each digit fits into 4 bits, separated by 4 full bits.
-             */
-            case 2:
-                digits = 0;
-                for (int i = 1; i < count; i++) {
-                    digits += (int) (Math.log10(i) + 1);
-                }
-                return ((digits + count) / 4);
-        }
-        return -1;
     }
 
     public static int numbersWithNDigits(final int n) {
