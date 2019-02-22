@@ -6,12 +6,8 @@ import com.tycho.app.primenumberfinder.FPT;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -251,117 +247,6 @@ public class FindPrimesTask extends MultithreadedTask implements FPT{
 
     private long getRange(){
         return options.getEndValue() - options.getStartValue();
-    }
-
-    private void sortCache(final boolean delete){
-        try{
-
-            //Main cache file
-            final File cache = new File(FileManager.getInstance().getTaskCacheDirectory(this) + File.separator + "primes");
-            final DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(cache, false)));
-
-            //Create readers for each sub-task cache file
-            final List<DataInputStream> dataInputStreams = new ArrayList<>();
-            for (File file : FileManager.getInstance().getTaskCacheDirectory(this).listFiles()){
-                if (!file.getAbsolutePath().contains("primes")){
-                    dataInputStreams.add(new DataInputStream(new FileInputStream(file)));
-                }
-            }
-
-            final List<Long> numbers = new ArrayList<>();
-
-            //Read one number from each cache file
-            for (DataInputStream dataInputStream : dataInputStreams){
-                try{
-                    numbers.add(dataInputStream.readLong());
-                }catch (EOFException e){
-                    Log.d(TAG, "End of file reached!");
-                }
-            }
-
-            while (numbers.size() > 0){
-
-                //Find the smallest number
-                int smallestIndex = 0;
-                for (int i = 0; i < numbers.size(); i++){
-                    if (numbers.get(i) < numbers.get(smallestIndex)){
-                        smallestIndex = i;
-                    }
-                }
-
-                //Write smallest number to large cache
-                dataOutputStream.writeLong(numbers.get(smallestIndex));
-
-                //Refill numbers
-                try{
-                    numbers.remove(smallestIndex);
-                    numbers.add(smallestIndex, dataInputStreams.get(smallestIndex).readLong());
-                }catch (EOFException e){
-                    //Log.d(TAG, "End of file reached!");
-                }
-            }
-
-            //Close readers
-            for (DataInputStream dataInputStream : dataInputStreams){
-                dataInputStream.close();
-            }
-
-            //SAVE from lists
-            final List<List<Long>> lists = new ArrayList<>();
-            for (Task task : getTasks()){
-                lists.add(((BruteForceTask) task).primes);
-            }
-
-            final int[] indexes = new int[lists.size()];
-
-            for (List<Long> list : lists){
-                if (list.size() > 0){
-                    numbers.add(list.get(0));
-                    indexes[lists.indexOf(list)] = 1;
-                }
-            }
-
-            while (numbers.size() > 0){
-
-                //Find the smallest number
-                int smallestIndex = 0;
-                for (int i = 0; i < numbers.size(); i++){
-                    if (numbers.get(i) < numbers.get(smallestIndex)){
-                        smallestIndex = i;
-                    }
-                }
-
-                //Write smallest number to large cache
-                dataOutputStream.writeLong(numbers.get(smallestIndex));
-
-                //Refill numbers
-                try{
-                    numbers.remove(smallestIndex);
-                    numbers.add(smallestIndex, lists.get(smallestIndex).get(indexes[smallestIndex]));
-                    indexes[smallestIndex]++;
-                }catch (IndexOutOfBoundsException e){
-                    //Log.d(TAG, "End of list reached!");
-                }
-            }
-
-            dataOutputStream.close();
-
-            //DELETE files and clear lists
-            if (delete){
-                for (File file : FileManager.getInstance().getTaskCacheDirectory(this).listFiles()){
-                    if (!file.getAbsolutePath().contains("primes")){
-                        file.delete();
-                    }
-                }
-
-                for (List<Long> list : lists){
-                    list.clear();
-                }
-            }
-
-        }catch (IOException e){
-            e.printStackTrace();
-        }
     }
 
     public SearchOptions getSearchOptions(){
