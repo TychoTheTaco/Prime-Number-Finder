@@ -3,12 +3,13 @@ package com.tycho.app.primenumberfinder;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 
 import java.io.File;
 
-public interface FPT extends ITask {
+public interface FindPrimesTask extends NativeTaskInterface, Savable {
+
+    long INFINITY = 0;
 
     void saveToFile(final File file);
     boolean save();
@@ -18,10 +19,14 @@ public interface FPT extends ITask {
     int getCurrentFactor();
 
     int getPrimeCount();
+    int getThreadCount();
 
     String getStatus();
 
-    FindPrimesTask.SearchOptions getSearchOptions();
+    boolean isEndless();
+
+    void setSearchOptions(final SearchOptions options);
+    SearchOptions getSearchOptions();
 
     class SearchOptions extends GeneralSearchOptions {
 

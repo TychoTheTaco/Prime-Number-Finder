@@ -19,16 +19,17 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
-import com.tycho.app.primenumberfinder.FPT;
-import com.tycho.app.primenumberfinder.ITask;
+import com.tycho.app.primenumberfinder.FindPrimesTask;
+import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.ModuleHostFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfigurationActivity;
+
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesJavaTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesNativeTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
@@ -40,8 +41,8 @@ import java.util.UUID;
 
 import easytasks.Task;
 
-import static com.tycho.app.primenumberfinder.FPT.SearchOptions.SearchMethod.BRUTE_FORCE;
-import static com.tycho.app.primenumberfinder.FPT.SearchOptions.SearchMethod.SIEVE_OF_ERATOSTHENES;
+import static com.tycho.app.primenumberfinder.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
+import static com.tycho.app.primenumberfinder.FindPrimesTask.SearchOptions.SearchMethod.SIEVE_OF_ERATOSTHENES;
 import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.DELETE;
 import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.PAUSE;
 import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.SAVE;
@@ -71,7 +72,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
     /**
      * Search options used for starting tasks.
      */
-    private final FPT.SearchOptions searchOptions = new FPT.SearchOptions(0, FindPrimesTask.INFINITY, BRUTE_FORCE, 1);
+    private final FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(0, FindPrimesTask.INFINITY, BRUTE_FORCE, 1);
 
     /**
      * Request code for starting a new task.
@@ -113,7 +114,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
             if (Validator.isPrimalityInputValid(getPrimalityInput())) {
 
                 //Create a new task
-                final ITask task = new CheckPrimalityTask(getPrimalityInput().longValue());
+                final NativeTaskInterface task = new CheckPrimalityTask(getPrimalityInput().longValue());
                 taskListFragment.addTask(task);
                 PrimeNumberFinder.getTaskManager().registerTask(task);
 
@@ -213,7 +214,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
 
             //Determine best search method
             searchOptions.setSearchMethod(determineBestSearchMethod());
-            //searchOptions.setSearchMethod(BRUTE_FORCE);
+            searchOptions.setSearchMethod(BRUTE_FORCE);
 
             //Check if the range is valid
             if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
@@ -225,9 +226,9 @@ public class FindPrimesFragment extends ModuleHostFragment {
 
                 try {
                     if (NATIVE){
-                        startTask(new FindPrimesNativeTask((FPT.SearchOptions) searchOptions.clone()));
+                        startTask(new FindPrimesNativeTask((FindPrimesTask.SearchOptions) searchOptions.clone()));
                     }else {
-                        startTask(new FindPrimesTask((FindPrimesTask.SearchOptions) searchOptions.clone()));
+                        startTask(new FindPrimesJavaTask((FindPrimesJavaTask.SearchOptions) searchOptions.clone()));
                     }
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
@@ -254,7 +255,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
 
     @Override
     protected void afterLoadFragments() {
-        taskListFragment.setAdapter(new AbstractTaskListAdapter<ITask>(getContext(), SAVE, PAUSE, DELETE) {
+        taskListFragment.setAdapter(new AbstractTaskListAdapter<NativeTaskInterface>(getContext(), SAVE, PAUSE, DELETE) {
 
             /*@Override
             public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
@@ -267,10 +268,9 @@ public class FindPrimesFragment extends ModuleHostFragment {
             }*/
 
             @Override
-            protected CharSequence getTitle(ITask task) {
-                if (task instanceof FPT) {
-                    final long endValue = ((FPT) task).getEndValue();
-                    return context.getString(R.string.find_primes_task_list_item_title, NUMBER_FORMAT.format(((FPT) task).getStartValue()), endValue == FindPrimesTask.INFINITY ? context.getString(R.string.infinity_text) : NUMBER_FORMAT.format(endValue));
+            protected CharSequence getTitle(NativeTaskInterface task) {
+                if (task instanceof FindPrimesTask) {
+                    return context.getString(R.string.find_primes_task_list_item_title, NUMBER_FORMAT.format(((FindPrimesTask) task).getStartValue()), ((FindPrimesTask) task).isEndless() ? context.getString(R.string.infinity_text) : NUMBER_FORMAT.format(((FindPrimesTask) task).getEndValue()));
                 } else if (task instanceof CheckPrimalityTask) {
                     return context.getString(R.string.check_primality_task_list_title, NUMBER_FORMAT.format(((CheckPrimalityTask) task).getNumber()));
                 }
@@ -278,13 +278,13 @@ public class FindPrimesFragment extends ModuleHostFragment {
             }
 
             @Override
-            protected CharSequence getSubtitle(ITask task) {
+            protected CharSequence getSubtitle(NativeTaskInterface task) {
                 if (task.getState() == Task.State.STOPPED) {
                     final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
                     spannableStringBuilder.append(context.getString(R.string.status_finished));
                     spannableStringBuilder.append(": ");
-                    if (task instanceof FPT) {
-                        spannableStringBuilder.append(context.getString(R.string.find_primes_result, NUMBER_FORMAT.format(((FPT) task).getPrimeCount())));
+                    if (task instanceof FindPrimesTask) {
+                        spannableStringBuilder.append(context.getString(R.string.find_primes_result, NUMBER_FORMAT.format(((FindPrimesTask) task).getPrimeCount())));
                         spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, getTheme() == 0 ? R.color.accent_dark : R.color.accent_light_but_not_that_light)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                     } else if (task instanceof CheckPrimalityTask) {
                         spannableStringBuilder.append(context.getString(R.string.check_primality_result, NUMBER_FORMAT.format(((CheckPrimalityTask) task).getNumber()), ((CheckPrimalityTask) task).isPrime() ? "prime" : "not prime"));
@@ -297,7 +297,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
 
             @Override
             protected void onUpdate(AbstractTaskListAdapter.ViewHolder holder) {
-                final ITask task = getTask(holder.getAdapterPosition());
+                final NativeTaskInterface task = getTask(holder.getAdapterPosition());
 
                 if (task instanceof CheckPrimalityTask) {
                     if (holder.saveButton != null) holder.saveButton.setVisibility(View.GONE);
@@ -306,7 +306,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
 
                 //Set progress
                 if (holder.getAdapterPosition() != -1) {
-                    if (task.getState() == Task.State.STOPPED || task instanceof FPT && ((FPT) task).getEndValue() == FindPrimesTask.INFINITY) {
+                    if (task.getState() == Task.State.STOPPED || task instanceof FindPrimesTask && ((FindPrimesTask) task).isEndless()) {
                         holder.progress.setVisibility(View.GONE);
                     } else if (task.getState() != Task.State.STOPPED) {
                         holder.progress.setVisibility(View.VISIBLE);
@@ -322,7 +322,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
                 return TASK_TYPE_FIND_PRIMES;
             }
         });
-        taskListFragment.whitelist(FindPrimesTask.class, CheckPrimalityTask.class, FindPrimesNativeTask.class);
+        taskListFragment.whitelist(FindPrimesJavaTask.class, CheckPrimalityTask.class, FindPrimesNativeTask.class);
     }
 
     @Override
@@ -334,9 +334,9 @@ public class FindPrimesFragment extends ModuleHostFragment {
                     final FindPrimesTask.SearchOptions searchOptions = data.getExtras().getParcelable("searchOptions");
                     if (searchOptions != null) {
                         if (task == null) {
-                            startTask(new FindPrimesTask(searchOptions));
+                            startTask(new FindPrimesNativeTask(searchOptions));
                         } else {
-                            task.setOptions(searchOptions);
+                            task.setSearchOptions(searchOptions);
                         }
                     }
                 }
@@ -410,8 +410,8 @@ public class FindPrimesFragment extends ModuleHostFragment {
     }
 
     @Override
-    public void onTaskSelected(ITask task) {
-        if (task instanceof FindPrimesTask || task instanceof FindPrimesNativeTask) {
+    public void onTaskSelected(NativeTaskInterface task) {
+        if (task instanceof FindPrimesTask) {
             findPrimesResultsFragment.setTask(task);
             checkPrimalityResultsFragment.setTask(null);
             ((GeneralResultsFragment) resultsFragment).setContent(findPrimesResultsFragment);
@@ -427,12 +427,12 @@ public class FindPrimesFragment extends ModuleHostFragment {
     }
 
     @Override
-    public void onPausePressed(ITask task) {
+    public void onPausePressed(NativeTaskInterface task) {
 
     }
 
     @Override
-    public void onTaskRemoved(ITask task) {
+    public void onTaskRemoved(NativeTaskInterface task) {
         if (findPrimesResultsFragment.getTask() == task) {
             findPrimesResultsFragment.setTask(null);
         }
@@ -444,7 +444,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
     }
 
     @Override
-    public void onEditPressed(ITask task) {
+    public void onEditPressed(NativeTaskInterface task) {
         final Intent intent = new Intent(getActivity(), FindPrimesConfigurationActivity.class);
         intent.putExtra("searchOptions", ((FindPrimesTask) task).getSearchOptions());
         intent.putExtra("taskId", task.getId());
@@ -452,9 +452,9 @@ public class FindPrimesFragment extends ModuleHostFragment {
     }
 
     @Override
-    public void onSavePressed(ITask task) {
-        if (task instanceof FPT) {
-            findPrimesResultsFragment.saveTask((FPT) task, getActivity());
+    public void onSavePressed(NativeTaskInterface task) {
+        if (task instanceof FindPrimesTask) {
+            findPrimesResultsFragment.saveTask((FindPrimesTask) task, getActivity());
         }
     }
 }

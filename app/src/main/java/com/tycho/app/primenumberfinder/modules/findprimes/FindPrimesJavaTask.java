@@ -1,15 +1,10 @@
 package com.tycho.app.primenumberfinder.modules.findprimes;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
 
-import com.tycho.app.primenumberfinder.FPT;
-import com.tycho.app.primenumberfinder.ITask;
+import com.tycho.app.primenumberfinder.FindPrimesTask;
 import com.tycho.app.primenumberfinder.Savable;
-import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.utils.FileManager;
-import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -31,17 +26,12 @@ import easytasks.Task;
 import easytasks.TaskAdapter;
 import easytasks.TaskListener;
 
-public class FindPrimesTask extends MultithreadedTask implements FPT {
-
-    static {
-        System.loadLibrary("native-utils");
-        System.loadLibrary("Taskr");
-    }
+public class FindPrimesJavaTask extends MultithreadedTask implements FindPrimesTask {
 
     /**
      * Tag used for logging and debugging.
      */
-    private static final String TAG = FindPrimesTask.class.getSimpleName();
+    private static final String TAG = FindPrimesJavaTask.class.getSimpleName();
 
     /**
      * Used to represent infinity (typically as an end value).
@@ -54,11 +44,11 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
     private SearchOptions options;
 
     /**
-     * Create a new FindPrimesTask with the specified search options
+     * Create a new FindPrimesJavaTask with the specified search options
      *
      * @param options
      */
-    public FindPrimesTask(final SearchOptions options) {
+    public FindPrimesJavaTask(final SearchOptions options) {
         this.options = options;
     }
 
@@ -73,6 +63,11 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
                 searchSieve();
                 break;
         }
+    }
+
+    @Override
+    public boolean isEndless() {
+        return getEndValue() == INFINITY;
     }
 
     /**
@@ -407,8 +402,9 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
         return (int) total;
     }
 
-    public void setOptions(final SearchOptions searchOptions) {
-        this.options = searchOptions;
+    @Override
+    public void setSearchOptions(SearchOptions options) {
+        this.options = options;
     }
 
     private final File taskDirectory = FileManager.getInstance().getTaskCacheDirectory(this);
@@ -517,7 +513,7 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
                 }
 
                 //Write to 1 file with no commas use byte offset for quick reads
-                FileManager.getInstance().writeNumbersQuick(primes, new File(FileManager.getInstance().getTaskCacheDirectory(FindPrimesTask.this) + File.separator + getId() + ".cache"), true);
+                FileManager.getInstance().writeNumbersQuick(primes, new File(FileManager.getInstance().getTaskCacheDirectory(FindPrimesJavaTask.this) + File.separator + getId() + ".cache"), true);
                 primes.clear();
             }
         }
@@ -626,7 +622,7 @@ public class FindPrimesTask extends MultithreadedTask implements FPT {
     @Override
     public boolean save() {
         /*try{
-            FileManager.copy(saveToFile(), new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getStartValue() + " to " + (getEndValue() == FindPrimesTask.INFINITY ? getCurrentValue() : getEndValue()) + EXTENSION));
+            FileManager.copy(saveToFile(), new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getStartValue() + " to " + (getEndValue() == FindPrimesJavaTask.INFINITY ? getCurrentValue() : getEndValue()) + EXTENSION));
             saved = true;
             sendOnSaved();
             return true;

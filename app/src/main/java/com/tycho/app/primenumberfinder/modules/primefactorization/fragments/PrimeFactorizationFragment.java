@@ -15,7 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.tycho.app.primenumberfinder.ITask;
+import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
@@ -165,7 +165,7 @@ public class PrimeFactorizationFragment extends ModuleHostFragment {
     }
 
     @Override
-    public void onEditPressed(ITask task) {
+    public void onEditPressed(NativeTaskInterface task) {
         final Intent intent = new Intent(getActivity(), PrimeFactorizationConfigurationActivity.class);
         intent.putExtra("searchOptions", ((PrimeFactorizationTask) task).getSearchOptions());
         intent.putExtra("taskId", task.getId());
@@ -173,7 +173,7 @@ public class PrimeFactorizationFragment extends ModuleHostFragment {
     }
 
     @Override
-    public void onSavePressed(ITask task) {
+    public void onSavePressed(NativeTaskInterface task) {
         ((PrimeFactorizationResultsFragment) resultsFragment).saveTask((PrimeFactorizationTask) task, getActivity());
     }
 }

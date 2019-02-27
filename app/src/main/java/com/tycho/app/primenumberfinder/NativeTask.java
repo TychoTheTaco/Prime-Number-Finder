@@ -7,7 +7,7 @@ import java.util.UUID;
 import easytasks.Task;
 import easytasks.TaskListener;
 
-public abstract class NativeTask implements ITask {
+public abstract class NativeTask implements NativeTaskInterface {
 
     static {
         System.loadLibrary("native-utils");
@@ -49,9 +49,12 @@ public abstract class NativeTask implements ITask {
 
     @Override
     public boolean removeTaskListener(TaskListener listener) {
-        final String id = taskListenerMap.get(listener).toString();
-        taskListenerMap.remove(listener);
-        return nativeRemoveTaskListener(native_task_pointer, listener, id);
+        final UUID id = taskListenerMap.get(listener);
+        if (id != null){
+            taskListenerMap.remove(listener);
+            return nativeRemoveTaskListener(native_task_pointer, listener, id.toString());
+        }
+        return false;
     }
 
     protected long native_task_pointer;

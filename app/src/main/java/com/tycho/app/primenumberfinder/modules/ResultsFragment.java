@@ -18,7 +18,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.tycho.app.primenumberfinder.ITask;
+import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findfactors.fragments.FindFactorsResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.fragments.CheckPrimalityResultsFragment;
@@ -366,7 +366,7 @@ public abstract class ResultsFragment extends TaskFragment {
      * @param task
      */
     @Override
-    public synchronized void setTask(ITask task) {
+    public synchronized void setTask(NativeTaskInterface task) {
         super.setTask(task);
         switchState();
     }

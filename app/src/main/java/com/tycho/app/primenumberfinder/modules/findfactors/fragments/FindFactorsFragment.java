@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.tycho.app.primenumberfinder.ITask;
+import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
@@ -143,7 +143,7 @@ public class FindFactorsFragment extends ModuleHostFragment{
     }
 
     @Override
-    public void onEditPressed(ITask task) {
+    public void onEditPressed(NativeTaskInterface task) {
         final Intent intent = new Intent(getActivity(), FindFactorsConfigurationActivity.class);
         intent.putExtra("searchOptions", ((FindFactorsTask) task).getSearchOptions());
         intent.putExtra("taskId", task.getId());
@@ -151,7 +151,7 @@ public class FindFactorsFragment extends ModuleHostFragment{
     }
 
     @Override
-    public void onSavePressed(ITask task) {
+    public void onSavePressed(NativeTaskInterface task) {
         ((FindFactorsResultsFragment) resultsFragment).saveTask((FindFactorsTask) task, getActivity());
     }
 

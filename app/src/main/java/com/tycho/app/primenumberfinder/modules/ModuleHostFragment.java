@@ -17,16 +17,16 @@ import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FabAnimator;
+import com.tycho.app.primenumberfinder.FindPrimesTask;
 import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
 import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
-import com.tycho.app.primenumberfinder.ITask;
+import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.gcf.GreatestCommonFactorTask;
 import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
@@ -38,7 +38,6 @@ import com.tycho.app.primenumberfinder.utils.Utils;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import easytasks.Task;
 import easytasks.TaskAdapter;
 
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_FACTORS;
@@ -150,17 +149,17 @@ public abstract class ModuleHostFragment extends Fragment implements FloatingAct
     }
 
     @Override
-    public void onTaskSelected(ITask task) {
+    public void onTaskSelected(NativeTaskInterface task) {
         resultsFragment.setTask(task);
     }
 
     @Override
-    public void onPausePressed(ITask task) {
+    public void onPausePressed(NativeTaskInterface task) {
 
     }
 
     @Override
-    public void onTaskRemoved(ITask task) {
+    public void onTaskRemoved(NativeTaskInterface task) {
         if (resultsFragment.getTask() == task) {
             resultsFragment.setTask(null);
         }
@@ -169,12 +168,12 @@ public abstract class ModuleHostFragment extends Fragment implements FloatingAct
     }
 
     @Override
-    public void onEditPressed(ITask task) {
+    public void onEditPressed(NativeTaskInterface task) {
 
     }
 
     @Override
-    public void onSavePressed(ITask task) {
+    public void onSavePressed(NativeTaskInterface task) {
 
     }
 
@@ -203,7 +202,7 @@ public abstract class ModuleHostFragment extends Fragment implements FloatingAct
 
     protected void afterLoadFragments(){}
 
-    protected void startTask(final ITask task){
+    protected void startTask(final NativeTaskInterface task){
         task.addTaskListener(new TaskAdapter() {
 
             @Override

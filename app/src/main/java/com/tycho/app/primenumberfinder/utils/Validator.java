@@ -1,6 +1,6 @@
 package com.tycho.app.primenumberfinder.utils;
 
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.FindPrimesTask;
 
 import java.math.BigInteger;
 import java.util.List;

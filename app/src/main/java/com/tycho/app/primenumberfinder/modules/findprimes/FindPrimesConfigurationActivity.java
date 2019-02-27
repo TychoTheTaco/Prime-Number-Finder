@@ -23,11 +23,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tycho.app.primenumberfinder.FindPrimesTask;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.activities.AbstractActivity;
 import com.tycho.app.primenumberfinder.ui.CustomRadioGroup;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
+import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
@@ -39,9 +41,8 @@ import java.util.UUID;
 
 import easytasks.Task;
 
-import static com.tycho.app.primenumberfinder.FPT.SearchOptions.SearchMethod.BRUTE_FORCE;
-import static com.tycho.app.primenumberfinder.FPT.SearchOptions.SearchMethod.SIEVE_OF_ERATOSTHENES;
-import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.INFINITY;
+import static com.tycho.app.primenumberfinder.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
+import static com.tycho.app.primenumberfinder.FindPrimesTask.SearchOptions.SearchMethod.SIEVE_OF_ERATOSTHENES;
 
 /**
  * Created by tycho on 1/24/2018.
@@ -295,7 +296,7 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
 
         //Check for infinity
         if (input.equals(getString(R.string.infinity_text))) {
-            return BigInteger.valueOf(INFINITY);
+            return BigInteger.valueOf(FindPrimesTask.INFINITY);
         }
 
         return Utils.textToNumber(input);
@@ -307,7 +308,7 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
         editTextSearchRangeStart.setEnabled(true);
         editTextSearchRangeStart.setText(NUMBER_FORMAT.format(searchOptions.getStartValue()), true);
         editTextSearchRangeEnd.setEnabled(true);
-        editTextSearchRangeEnd.setText(searchOptions.getEndValue() == INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(searchOptions.getEndValue()), true);
+        editTextSearchRangeEnd.setText(searchOptions.getEndValue() == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(searchOptions.getEndValue()), true);
 
         //Thread count
         threadCountSpinner.setSelection(searchOptions.getThreadCount() - 1);
@@ -336,7 +337,7 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
         //Miscellaneous
         notifyWhenFinishedCheckbox.setChecked(searchOptions.isNotifyWhenFinished());
         autoSaveCheckbox.setChecked(searchOptions.isAutoSave());
-        if (searchOptions.getEndValue() == INFINITY) {
+        if (searchOptions.getEndValue() == FindPrimesTask.INFINITY) {
             notifyWhenFinishedCheckbox.setEnabled(false);
             autoSaveCheckbox.setEnabled(false);
         } else {
@@ -362,5 +363,8 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
                 radioGroupSearchMethod.setEnabled(false);
             }
         }
+
+        //Set cache directory
+        searchOptions.setCacheDirectory(getCacheDir());
     }
 }

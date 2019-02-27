@@ -30,11 +30,11 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.tycho.app.primenumberfinder.ITask;
+import com.tycho.app.primenumberfinder.FindPrimesTask;
+import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.LongClickableSpan;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.gcf.GreatestCommonFactorTask;
 import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
@@ -50,8 +50,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import easytasks.Task;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 
@@ -380,7 +378,7 @@ public final class Utils {
         view.layout(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
     }
 
-    public static void logTaskStarted(final Context context, final ITask task) {
+    public static void logTaskStarted(final Context context, final NativeTaskInterface task) {
         if (task instanceof FindPrimesTask) {
             final Bundle bundle = new Bundle();
             bundle.putLong("start", ((FindPrimesTask) task).getStartValue());

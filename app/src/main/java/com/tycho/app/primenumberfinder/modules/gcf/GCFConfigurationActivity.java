@@ -74,7 +74,7 @@ public class GCFConfigurationActivity extends AbstractActivity {
             }
 
             try {
-                //task = (FindPrimesTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) getIntent().getExtras().get("taskId"));
+                //task = (FindPrimesJavaTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) getIntent().getExtras().get("taskId"));
                 //searchOptions = task.getSearchOptions();
             } catch (NullPointerException e) {
                 Log.w(TAG, "Task not found.");
@@ -132,7 +132,7 @@ public class GCFConfigurationActivity extends AbstractActivity {
         findViewById(R.id.root).requestFocus();
     }
 
-    /*private void applyConfig(final FindPrimesTask.SearchOptions searchOptions) {
+    /*private void applyConfig(final FindPrimesJavaTask.SearchOptions searchOptions) {
 
         //Start and end values
         editTextSearchRangeStart.setEnabled(true);

@@ -5,7 +5,10 @@ import java.util.UUID;
 import easytasks.Task;
 import easytasks.TaskListener;
 
-public interface ITask {
+/**
+ * This is used as an interface between Java tasks and tasks written in native code.
+ */
+public interface NativeTaskInterface {
 
     UUID getId();
 

@@ -3,7 +3,7 @@ package com.tycho.app.primenumberfinder.utils;
 import android.content.Context;
 import android.util.Log;
 
-import com.tycho.app.primenumberfinder.ITask;
+import com.tycho.app.primenumberfinder.NativeTaskInterface;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -33,7 +33,6 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import easytasks.Task;
 import simpletrees.Tokenizer;
 import simpletrees.Tree;
 
@@ -141,7 +140,7 @@ public final class FileManager {
         }
     }
 
-    public File getTaskCacheDirectory(final ITask task) {
+    public File getTaskCacheDirectory(final NativeTaskInterface task) {
         final File cacheDirectory = new File(context.get().getFilesDir() + File.separator + "cache" + File.separator + task.getId() + File.separator);
         if (!cacheDirectory.exists()) {
             cacheDirectory.mkdirs();

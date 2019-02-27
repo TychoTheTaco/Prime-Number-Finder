@@ -1,6 +1,6 @@
 package com.tycho.app.primenumberfinder.utils;
 
-import com.tycho.app.primenumberfinder.ITask;
+import com.tycho.app.primenumberfinder.NativeTaskInterface;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,18 +21,18 @@ public class TaskManager {
      */
     private static final String TAG = TaskManager.class.getSimpleName();
 
-    private final Map<ITask, Task.State> tasks = new HashMap<>();
+    private final Map<NativeTaskInterface, Task.State> tasks = new HashMap<>();
 
-    public void registerTask(final ITask task) {
+    public void registerTask(final NativeTaskInterface task) {
         tasks.put(task, task.getState());
     }
 
-    public void unregisterTask(final ITask task) {
+    public void unregisterTask(final NativeTaskInterface task) {
         tasks.remove(task);
     }
 
     public void saveTaskStates(){
-        for (ITask task : tasks.keySet()){
+        for (NativeTaskInterface task : tasks.keySet()){
             tasks.put(task, task.getState());
         }
     }
@@ -41,7 +41,7 @@ public class TaskManager {
      * PAUSE all tasks.
      */
     public void pauseAllTasks() {
-        for (ITask task : tasks.keySet()) {
+        for (NativeTaskInterface task : tasks.keySet()) {
             tasks.put(task, task.getState());
             task.pause();
         }
@@ -51,19 +51,19 @@ public class TaskManager {
      * Resume all tasks.
      */
     public void resumeAllTasks() {
-        for (ITask task : tasks.keySet()) {
+        for (NativeTaskInterface task : tasks.keySet()) {
             if (tasks.get(task) != Task.State.PAUSED && tasks.get(task) != Task.State.STOPPED) {
                 task.resume();
             }
         }
     }
 
-    public Set<ITask> getTasks() {
+    public Set<NativeTaskInterface> getTasks() {
         return tasks.keySet();
     }
 
-    public ITask findTaskById(final UUID id) {
-        for (ITask task : tasks.keySet()) {
+    public NativeTaskInterface findTaskById(final UUID id) {
+        for (NativeTaskInterface task : tasks.keySet()) {
             if (task.getId().equals(id)) {
                 return task;
             }

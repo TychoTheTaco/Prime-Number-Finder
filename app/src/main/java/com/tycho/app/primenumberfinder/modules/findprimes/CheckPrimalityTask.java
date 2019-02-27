@@ -1,7 +1,7 @@
 package com.tycho.app.primenumberfinder.modules.findprimes;
 
 
-import com.tycho.app.primenumberfinder.ITask;
+import com.tycho.app.primenumberfinder.NativeTaskInterface;
 
 import easytasks.Task;
 
@@ -10,7 +10,7 @@ import easytasks.Task;
  *         Date Created: 5/12/2017
  */
 
-public class CheckPrimalityTask extends Task implements ITask {
+public class CheckPrimalityTask extends Task implements NativeTaskInterface {
 
     /**
      * Tag used for logging and debugging.

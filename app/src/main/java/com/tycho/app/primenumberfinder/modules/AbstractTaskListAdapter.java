@@ -13,7 +13,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
-import com.tycho.app.primenumberfinder.ITask;
+import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 
@@ -37,7 +37,7 @@ import easytasks.TaskListener;
  * Created by tycho on 12/12/2017.
  */
 
-public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapter<AbstractTaskListAdapter.ViewHolder> implements TaskListener{
+public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends RecyclerView.Adapter<AbstractTaskListAdapter.ViewHolder> implements TaskListener{
 
     /**
      * Tag used for logging and debugging.
@@ -62,7 +62,7 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
     /**
      * Custom task event listeners that update the view holder when the task is paused / resumed / stopped.
      */
-    private Map<ITask, CustomTaskEventListener> customEventListeners = new HashMap<>();
+    private Map<NativeTaskInterface, CustomTaskEventListener> customEventListeners = new HashMap<>();
 
     /**
      * Handler for posting to UI thread.
@@ -120,7 +120,7 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
     @Override
     public void onBindViewHolder(@NonNull AbstractTaskListAdapter.ViewHolder holder, int position) {
         final Item item = items.get(position);
-        final ITask task = item.getTask();
+        final NativeTaskInterface task = item.getTask();
         customEventListeners.get(task).setViewHolder(holder);
 
         //Start the UI updater if it hasn't been started yet
@@ -502,7 +502,7 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
         }
     }
 
-    public void setSelected(final ITask task) {
+    public void setSelected(final NativeTaskInterface task) {
         setSelected(items.indexOf(getItem(task)));
     }
 
@@ -516,15 +516,15 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
     }
 
     public interface EventListener {
-        void onTaskSelected(final ITask task);
+        void onTaskSelected(final NativeTaskInterface task);
 
-        void onPausePressed(final ITask task);
+        void onPausePressed(final NativeTaskInterface task);
 
-        void onTaskRemoved(final ITask task);
+        void onTaskRemoved(final NativeTaskInterface task);
 
-        void onEditPressed(final ITask task);
+        void onEditPressed(final NativeTaskInterface task);
 
-        void onSavePressed(final ITask task);
+        void onSavePressed(final NativeTaskInterface task);
     }
 
     public void addEventListener(final EventListener eventListener) {
@@ -535,31 +535,31 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
         return eventListeners.remove(eventListener);
     }
 
-    private void sendOnTaskSelected(final ITask task) {
+    private void sendOnTaskSelected(final NativeTaskInterface task) {
         for (EventListener eventListener : eventListeners) {
             eventListener.onTaskSelected(task);
         }
     }
 
-    private void sendOnPausePressed(final ITask task) {
+    private void sendOnPausePressed(final NativeTaskInterface task) {
         for (EventListener eventListener : eventListeners) {
             eventListener.onPausePressed(task);
         }
     }
 
-    private void sendOnEditClicked(final ITask task) {
+    private void sendOnEditClicked(final NativeTaskInterface task) {
         for (EventListener eventListener : eventListeners) {
             eventListener.onEditPressed(task);
         }
     }
 
-    private void sendOnDeletePressed(final ITask task) {
+    private void sendOnDeletePressed(final NativeTaskInterface task) {
         for (EventListener eventListener : eventListeners) {
             eventListener.onTaskRemoved(task);
         }
     }
 
-    private void sendOnSavePressed(final ITask task) {
+    private void sendOnSavePressed(final NativeTaskInterface task) {
         for (EventListener eventListener : eventListeners) {
             eventListener.onSavePressed(task);
         }
@@ -573,7 +573,7 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
         }
     }
 
-    protected ITask getTask(final int position) {
+    protected NativeTaskInterface getTask(final int position) {
         return items.get(position).getTask();
     }
 
@@ -667,7 +667,7 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
 
                     //Remove the task from the list
                     final int position = getAdapterPosition();
-                    final ITask task = getTask(position);
+                    final NativeTaskInterface task = getTask(position);
                     customEventListeners.remove(task);
                     items.remove(position);
                     notifyItemRemoved(position);
@@ -701,7 +701,7 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
         }
     }
 
-    public void setSaved(final ITask task, boolean isSaved) {
+    public void setSaved(final NativeTaskInterface task, boolean isSaved) {
         final Item item = getItem(task);
         final int index = items.indexOf(item);
         if (item != null){
@@ -710,16 +710,16 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
         }
     }
 
-    public void postSetSaved(final ITask task, final boolean isSaved){
+    public void postSetSaved(final NativeTaskInterface task, final boolean isSaved){
         handler.post(() -> setSaved(task, isSaved));
     }
 
-    protected boolean isSaved(ITask task){
+    protected boolean isSaved(NativeTaskInterface task){
         return getItem(task).isSaved();
     }
 
-    public List<ITask> getSavedItems(){
-        final List<ITask> savedItems = new ArrayList<>();
+    public List<NativeTaskInterface> getSavedItems(){
+        final List<NativeTaskInterface> savedItems = new ArrayList<>();
         for (Item item : items){
             if (item.isSaved()){
                 savedItems.add(item.getTask());
@@ -728,7 +728,7 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
         return savedItems;
     }
 
-    public int indexOf(final ITask task){
+    public int indexOf(final NativeTaskInterface task){
         return items.indexOf(getItem(task));
     }
 
@@ -736,7 +736,7 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
 
     }
 
-    protected Item getItem(final ITask task) {
+    protected Item getItem(final NativeTaskInterface task) {
         for (Item item : items) {
             if (item.getTask() == task) {
                 return item;

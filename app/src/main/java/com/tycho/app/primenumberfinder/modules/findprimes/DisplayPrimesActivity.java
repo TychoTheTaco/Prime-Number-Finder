@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import examples.FindPrimesTask;
+
 /**
  * @author Tycho Bellers
  * Date Created: 11/5/2016

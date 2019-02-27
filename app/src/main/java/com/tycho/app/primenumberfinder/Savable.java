@@ -9,4 +9,7 @@ public interface Savable {
         void onSaved();
         void onError();
     }
+
+    void addSaveListener(final SaveListener listener);
+    void removeSaveListener(final SaveListener listener);
 }

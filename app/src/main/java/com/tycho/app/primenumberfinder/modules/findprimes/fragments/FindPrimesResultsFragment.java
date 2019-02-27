@@ -14,15 +14,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
-import com.tycho.app.primenumberfinder.FPT;
-import com.tycho.app.primenumberfinder.ITask;
+import com.tycho.app.primenumberfinder.FindPrimesTask;
+import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.StatisticsLayout;
 import com.tycho.app.primenumberfinder.modules.findprimes.DisplayPrimesActivity;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
@@ -32,7 +31,7 @@ import java.util.Map;
 
 import easytasks.Task;
 
-import static com.tycho.app.primenumberfinder.FPT.SearchOptions.SearchMethod.BRUTE_FORCE;
+import static com.tycho.app.primenumberfinder.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
 
 /**
  * Created by tycho on 11/16/2017.
@@ -63,11 +62,11 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
     /**
-     * This map holds the statistics for each task. When {@linkplain FindPrimesResultsFragment#setTask(ITask)} is called,
+     * This map holds the statistics for each task. When {@linkplain FindPrimesResultsFragment#setTask(NativeTaskInterface)} is called,
      * the current task's statistics are saved to the map so that they can be used later when
-     * {@linkplain FindPrimesResultsFragment#setTask(ITask)} is called with the same task.
+     * {@linkplain FindPrimesResultsFragment#setTask(NativeTaskInterface)} is called with the same task.
      */
-    private final Map<FPT, Statistics> statisticsMap = new HashMap<>();
+    private final Map<FindPrimesTask, Statistics> statisticsMap = new HashMap<>();
 
     /**
      * This class keeps the statistics for a task.
@@ -144,7 +143,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         return rootView;
     }
 
-    public void saveTask(final FPT task, final Context context) {
+    public void saveTask(final FindPrimesTask task, final Context context) {
         final ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setTitle("Saving...");
         progressDialog.show();
@@ -169,16 +168,16 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         //Subtitle
         subtitleTextView.setText(Utils.formatSpannable(subtitleStringBuilder, getString(R.string.find_primes_subtitle), new String[]{
                 NUMBER_FORMAT.format(getTask().getStartValue()),
-                getTask().getEndValue() == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),
+                getTask().isEndless() ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),
                 getTask().getSearchOptions().getSearchMethod() == BRUTE_FORCE ? "brute force" : "the sieve of Eratosthenes"
         }, new boolean[]{
                 true,
-                getTask().getEndValue() != FindPrimesTask.INFINITY,
+                !getTask().isEndless(),
                 false
         }, getTextHighlight(), getContext()));
 
         //Statistics
-        if (getTask().getEndValue() == FindPrimesTask.INFINITY) statisticsLayout.hide("eta");
+        if (getTask().isEndless()) statisticsLayout.hide("eta");
         statisticsLayout.set("nps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, getTextHighlight()));
         statisticsLayout.set("pps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.primes_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalPrimesPerSecond)}, getTextHighlight()));
     }
@@ -267,11 +266,11 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         subtitleTextView.setText(Utils.formatSpannable(subtitleStringBuilder, getResources().getQuantityString(R.plurals.find_primes_subtitle_result, getTask().getPrimeCount()), new String[]{
                 NUMBER_FORMAT.format(getTask().getPrimeCount()),
                 NUMBER_FORMAT.format(getTask().getStartValue()),
-                getTask().getEndValue() == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),
+                getTask().isEndless() ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),
         }, new boolean[]{
                 true,
                 true,
-                getTask().getEndValue() != FindPrimesTask.INFINITY
+                !getTask().isEndless()
         }, getTextHighlight(), getContext()));
 
         //Body
@@ -293,7 +292,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         if (getTask() != null) {
 
             //Update progress
-            if (getTask().getEndValue() != FindPrimesTask.INFINITY) {
+            if (!getTask().isEndless()) {
                 progress.setText(String.valueOf((int) (getTask().getProgress() * 100)));
                 progressBar.setProgress((int) (getTask().getProgress() * 100));
             } else {
@@ -353,12 +352,12 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     }
 
     @Override
-    public synchronized FPT getTask() {
-        return (FPT) super.getTask();
+    public synchronized FindPrimesTask getTask() {
+        return (FindPrimesTask) super.getTask();
     }
 
     @Override
-    public synchronized void setTask(final ITask task) {
+    public synchronized void setTask(final NativeTaskInterface task) {
         super.setTask(task);
         if (getTask() != null) {
             if (!statisticsMap.containsKey(getTask())) {
@@ -374,7 +373,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     protected void onResetViews() {
         super.onResetViews();
         showStatistics = getTask().getSearchOptions().getSearchMethod() == BRUTE_FORCE;
-        progress.setVisibility(getTask().getEndValue() == FindPrimesTask.INFINITY ? View.GONE : View.VISIBLE);
+        progress.setVisibility(getTask().isEndless() ? View.GONE : View.VISIBLE);
         bodyTextView.setVisibility(View.VISIBLE);
         statisticsLayout.show("eta");
         statisticsLayout.setVisibility(showStatistics ? View.VISIBLE : View.GONE);

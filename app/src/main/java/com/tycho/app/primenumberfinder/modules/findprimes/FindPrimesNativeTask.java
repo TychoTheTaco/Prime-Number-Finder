@@ -1,6 +1,6 @@
 package com.tycho.app.primenumberfinder.modules.findprimes;
 
-import com.tycho.app.primenumberfinder.FPT;
+import com.tycho.app.primenumberfinder.FindPrimesTask;
 import com.tycho.app.primenumberfinder.NativeTask;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.SearchOptions;
@@ -8,9 +8,9 @@ import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;
 
-public class FindPrimesNativeTask extends NativeTask implements FPT, SearchOptions, Savable {
+public class FindPrimesNativeTask extends NativeTask implements FindPrimesTask, SearchOptions, Savable {
 
-    private FPT.SearchOptions searchOptions;
+    private FindPrimesTask.SearchOptions searchOptions;
 
     public FindPrimesNativeTask(final SearchOptions searchOptions){
         this.searchOptions = searchOptions;
@@ -28,7 +28,7 @@ public class FindPrimesNativeTask extends NativeTask implements FPT, SearchOptio
 
     @Override
     public boolean save() {
-        saveToFile(new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getStartValue() + " to " + (getEndValue() == FindPrimesTask.INFINITY ? "INF" : getEndValue())));
+        saveToFile(new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getStartValue() + " to " + (isEndless() ? "INF" : getEndValue())));
         return true;
     }
 
@@ -53,13 +53,38 @@ public class FindPrimesNativeTask extends NativeTask implements FPT, SearchOptio
     }
 
     @Override
+    public int getThreadCount() {
+        return 0;
+    }
+
+    @Override
+    public void addSaveListener(SaveListener listener) {
+
+    }
+
+    @Override
+    public void removeSaveListener(SaveListener listener) {
+
+    }
+
+    @Override
     public String getStatus() {
         return nativeGetStatus(native_task_pointer);
     }
 
     @Override
-    public FPT.SearchOptions getSearchOptions() {
+    public boolean isEndless() {
+        return false;
+    }
+
+    @Override
+    public FindPrimesTask.SearchOptions getSearchOptions() {
         return searchOptions;
+    }
+
+    @Override
+    public void setSearchOptions(SearchOptions searchOptions) {
+        this.searchOptions = searchOptions;
     }
 
     @Override
