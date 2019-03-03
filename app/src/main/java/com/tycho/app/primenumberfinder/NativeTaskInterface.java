@@ -12,6 +12,7 @@ public interface NativeTaskInterface {
 
     UUID getId();
 
+    // Lifecycle methods
     void start();
     Thread startOnNewThread();
     void pause();
@@ -20,16 +21,19 @@ public interface NativeTaskInterface {
     void resumeAndWait() throws InterruptedException;
     void stop();
     void stopAndWait() throws InterruptedException;
+    //void finish();
 
-    float getProgress();
+    // Listeners
+    void addTaskListener(final TaskListener listener);
+    boolean removeTaskListener(final TaskListener listener);
+
+    // Time methods
+    long getStartTime();
+    long getEndTime();
     long getElapsedTime();
     long getEstimatedTimeRemaining();
 
-    long getStartTime();
-    long getEndTime();
-
-    void addTaskListener(TaskListener listener);
-    boolean removeTaskListener(TaskListener listener);
-
+    // State methods
     Task.State getState();
+    float getProgress();
 }

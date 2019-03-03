@@ -27,6 +27,7 @@ class FindPrimesTask : public MultithreadedTask {
 	virtual void run();
 
 	void saveToFile(const std::string file_path);
+	bool isEndless();
 
 	// Getters
 	num_type getStartValue();

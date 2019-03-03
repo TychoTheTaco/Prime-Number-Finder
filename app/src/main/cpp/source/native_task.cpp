@@ -69,51 +69,49 @@ private:
 
 std::map<std::string, NativeListener*> listener_map;
 
-extern "C" JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeStart(JNIEnv *env, jobject self, jlong task_ptr) {
+extern "C"{
+    
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Life-cycle methods
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeStart(JNIEnv *env, jobject self, jlong task_ptr) {
     ((Task*) task_ptr)->start();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeStartOnNewThread(JNIEnv *env, jobject self, jlong task_ptr) {
+JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeStartOnNewThread(JNIEnv *env, jobject self, jlong task_ptr) {
     ((Task*) task_ptr)->startOnNewThread();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativePause(JNIEnv *env, jobject self, jlong task_ptr) {
+JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativePause(JNIEnv *env, jobject self, jlong task_ptr) {
     ((Task*) task_ptr)->pause();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativePauseAndWait(JNIEnv *env, jobject self, jlong task_ptr) {
+JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativePauseAndWait(JNIEnv *env, jobject self, jlong task_ptr) {
     ((Task*) task_ptr)->pauseAndWait();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeResume(JNIEnv *env, jobject self, jlong task_ptr) {
+JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeResume(JNIEnv *env, jobject self, jlong task_ptr) {
     ((Task*) task_ptr)->resume();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeResumeAndWait(JNIEnv *env, jobject self, jlong task_ptr) {
+JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeResumeAndWait(JNIEnv *env, jobject self, jlong task_ptr) {
     ((Task*) task_ptr)->resumeAndWait();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeStop(JNIEnv *env, jobject self, jlong task_ptr) {
+JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeStop(JNIEnv *env, jobject self, jlong task_ptr) {
     ((Task*) task_ptr)->stop();
 }
 
-extern "C" JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeStopAndWait(JNIEnv *env, jobject self, jlong task_ptr) {
+JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeStopAndWait(JNIEnv *env, jobject self, jlong task_ptr) {
     ((Task*) task_ptr)->stopAndWait();
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeGetState(JNIEnv *env, jobject self, jlong task_ptr) {
-    return (jint) ((Task*) task_ptr)->getState();
-}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Listeners
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-extern "C" JNIEXPORT jlong JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeGetElapsedTime(JNIEnv *env, jobject self, jlong task_ptr) {
-    return (jlong) ((Task*) task_ptr)->getElapsedTime();
-}
-
-extern "C" JNIEXPORT jfloat JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeGetProgress(JNIEnv *env, jobject self, jlong task_ptr) {
-    return (jfloat) ((Task*) task_ptr)->getProgress();
-}
-
-extern "C" JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeAddTaskListener(JNIEnv *env, jobject self, jlong task_ptr, jobject task_listener, jstring id) {
+JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeAddTaskListener(JNIEnv *env, jobject self, jlong task_ptr, jobject task_listener, jstring id) {
     const char* string = env->GetStringUTFChars(id, 0);
     NativeListener* native_listener = new NativeListener(env, task_listener);
     listener_map[string] = native_listener;
@@ -121,7 +119,7 @@ extern "C" JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTas
     env->ReleaseStringUTFChars(id, string);
 }
 
-extern "C" JNIEXPORT jboolean JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeRemoveTaskListener(JNIEnv *env, jobject self, jlong task_ptr, jobject task_listener, jstring id) {
+JNIEXPORT jboolean JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeRemoveTaskListener(JNIEnv *env, jobject self, jlong task_ptr, jstring id) {
     const char* string = env->GetStringUTFChars(id, 0);
     NativeListener* native_listener = listener_map[string];
     listener_map.erase(string);
@@ -131,14 +129,36 @@ extern "C" JNIEXPORT jboolean JNICALL Java_com_tycho_app_primenumberfinder_Nativ
     return (jboolean ) result;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeGetStartTime(JNIEnv *env, jobject self, jlong task_ptr) {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Time methods
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+JNIEXPORT jlong JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeGetStartTime(JNIEnv *env, jobject self, jlong task_ptr) {
     return (jlong) ((Task*) task_ptr)->getStartTime();
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeGetEndTime(JNIEnv *env, jobject self, jlong task_ptr) {
+JNIEXPORT jlong JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeGetEndTime(JNIEnv *env, jobject self, jlong task_ptr) {
     return (jlong) ((Task*) task_ptr)->getEndTime();
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeGetEstimatedTimeRemaining(JNIEnv *env, jobject self, jlong task_ptr) {
+JNIEXPORT jlong JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeGetElapsedTime(JNIEnv *env, jobject self, jlong task_ptr) {
+    return (jlong) ((Task*) task_ptr)->getElapsedTime();
+}
+
+JNIEXPORT jlong JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeGetEstimatedTimeRemaining(JNIEnv *env, jobject self, jlong task_ptr) {
     return (jlong) ((Task*) task_ptr)->getEstimatedTimeRemaining();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// State methods
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+JNIEXPORT jint JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeGetState(JNIEnv *env, jobject self, jlong task_ptr) {
+    return (jint) ((Task*) task_ptr)->getState();
+}
+
+JNIEXPORT jfloat JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeGetProgress(JNIEnv *env, jobject self, jlong task_ptr) {
+    return (jfloat) ((Task*) task_ptr)->getProgress();
+}
+
 }

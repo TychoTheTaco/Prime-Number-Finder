@@ -73,7 +73,7 @@ public class TaskListFragment extends Fragment {
         recyclerView = rootView.findViewById(R.id.task_list);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.addItemDecoration(new VerticalItemDecoration((int) Utils.dpToPx(getContext(), 8)));
+        recyclerView.addItemDecoration(new VerticalItemDecoration(Utils.dpToPx(getContext(), 8)));
         recyclerView.setAdapter(taskListAdapter);
         recyclerView.setItemAnimator(null);
 

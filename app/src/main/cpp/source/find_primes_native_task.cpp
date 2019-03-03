@@ -36,11 +36,12 @@ class DListener : public DebugListener {
     }
 };
 
-extern "C" JNIEXPORT jlong JNICALL
-Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeInit(JNIEnv *env, jobject self, jlong start_value, jlong end_value, jobject search_method,
-                                                                                        jint thread_count, jstring cache_directory) {
-    __android_log_print(ANDROID_LOG_VERBOSE, TAG, "init()");
+extern "C" {
 
+JNIEXPORT jlong JNICALL
+Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeInit(JNIEnv *env, jobject self, jlong start_value, jlong end_value,
+                                                                                        jobject search_method,
+                                                                                        jint thread_count, jstring cache_directory) {
     //Get enum value
     jmethodID id = env->GetMethodID(env->GetObjectClass(search_method), "ordinal", "()I");
     int value = (int) env->CallIntMethod(search_method, id);
@@ -58,26 +59,50 @@ Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nat
     return (long) task;
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeGetStartValue(JNIEnv *env, jobject self, jlong task_ptr) {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Getters
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+JNIEXPORT jlong JNICALL
+Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeGetStartValue(JNIEnv *env, jobject self, jlong task_ptr) {
     return ((FindPrimesTask *) task_ptr)->getStartValue();
 }
 
-extern "C" JNIEXPORT jlong JNICALL Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeGetEndValue(JNIEnv *env, jobject self, jlong task_ptr) {
+JNIEXPORT jlong JNICALL
+Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeGetEndValue(JNIEnv *env, jobject self, jlong task_ptr) {
     return ((FindPrimesTask *) task_ptr)->getEndValue();
 }
 
-extern "C" JNIEXPORT jint JNICALL Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeGetPrimeCount(JNIEnv *env, jobject self, jlong task_ptr) {
+JNIEXPORT jint JNICALL
+Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeGetThreadCount(JNIEnv *env, jobject self, jlong task_ptr) {
+    return ((FindPrimesTask *) task_ptr)->getThreadCount();
+}
+
+JNIEXPORT jint JNICALL
+Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeGetPrimeCount(JNIEnv *env, jobject self, jlong task_ptr) {
     return ((FindPrimesTask *) task_ptr)->getPrimeCount();
 }
 
-extern "C" JNIEXPORT jstring JNICALL Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeGetStatus(JNIEnv *env, jobject self, jlong task_ptr) {
+JNIEXPORT jstring JNICALL
+Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeGetStatus(JNIEnv *env, jobject self, jlong task_ptr) {
     return env->NewStringUTF("Native Status String");
 }
 
-extern "C" JNIEXPORT void JNICALL
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Misc
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+JNIEXPORT jboolean JNICALL
+Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeIsEndless(JNIEnv *env, jobject self, jlong task_ptr) {
+    return ((FindPrimesTask *) task_ptr)->isEndless();
+}
+
+JNIEXPORT void JNICALL
 Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeSaveToFile(JNIEnv *env, jobject self, jlong task_ptr, jstring file_path) {
     //Get file path
     const char *path = env->GetStringUTFChars(file_path, 0);
     ((FindPrimesTask *) task_ptr)->saveToFile(std::string(path));
     env->ReleaseStringUTFChars(file_path, path);
+}
+
 }

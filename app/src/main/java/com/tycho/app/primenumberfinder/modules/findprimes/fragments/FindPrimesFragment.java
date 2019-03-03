@@ -79,8 +79,6 @@ public class FindPrimesFragment extends ModuleHostFragment {
      */
     private static final int REQUEST_CODE_NEW_TASK = 0;
 
-    private static boolean NATIVE = false;
-
     @Override
     protected View createView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_primes_fragment, container, false);
@@ -203,9 +201,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
         //Set up infinity button
         final ImageButton infinityButton = rootView.findViewById(R.id.infinity_button);
         infinityButton.setOnClickListener(v -> {
-            NATIVE = !NATIVE;
-            Toast.makeText(getActivity(), "Native: " + NATIVE, Toast.LENGTH_SHORT).show();
-            //editTextSearchRangeEnd.setText(getString(R.string.infinity_text), false);
+            editTextSearchRangeEnd.setText(getString(R.string.infinity_text), false);
         });
 
         //Set up find primes button
@@ -225,11 +221,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
                 searchOptions.setCacheDirectory(new File(getActivity().getFilesDir() + File.separator + "cache"));
 
                 try {
-                    if (NATIVE){
-                        startTask(new FindPrimesNativeTask((FindPrimesTask.SearchOptions) searchOptions.clone()));
-                    }else {
-                        startTask(new FindPrimesJavaTask((FindPrimesJavaTask.SearchOptions) searchOptions.clone()));
-                    }
+                    startTask(new FindPrimesNativeTask((FindPrimesTask.SearchOptions) searchOptions.clone()));
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }
