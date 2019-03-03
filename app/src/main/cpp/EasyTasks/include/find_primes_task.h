@@ -21,7 +21,7 @@ class FindPrimesTask : public MultithreadedTask {
 		PACKET
 	};
 
-	FindPrimesTask(num_type start_value, num_type end_value, SearchMethod search_method = BRUTE_FORCE, unsigned int thread_count = 1);
+	FindPrimesTask(num_type start_value, num_type end_value, SearchMethod search_method = BRUTE_FORCE, num_type thread_count = 1);
 	~FindPrimesTask();
 
 	virtual void run();
@@ -105,6 +105,8 @@ class FindPrimesTask : public MultithreadedTask {
 		virtual float getProgress();
 
 		unsigned int getPrimeCount();
+
+		std::vector<num_type> getPrimes();
 
 		private:
 		num_type start_value;

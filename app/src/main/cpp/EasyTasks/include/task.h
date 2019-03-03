@@ -42,7 +42,7 @@ class Task {
 	int64_t getStartTime() const;
 	int64_t getEndTime() const;
 	int64_t getElapsedTime() const;
-	int64_t getEstimatedTimeRemaining() const;
+	int64_t getEstimatedTimeRemaining();
 	State getState() const;
 
 	virtual float getProgress();
@@ -69,14 +69,10 @@ class Task {
 	void dispatchResumed();
 	void dispatchStopping();
 
-	void setProgress(float progress);
-
 	private:
 
 	static long next_id;
 	long id;
-
-	float progress = 0;
 
 	int64_t start_time = 0;
 	int64_t last_pause_time = 0;

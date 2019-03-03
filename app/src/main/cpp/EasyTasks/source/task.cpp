@@ -128,10 +128,6 @@ void Task::processRequestedState() {
 	}
 }
 
-void Task::setProgress(float progress) {
-	this->progress = progress;
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Getters
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -167,12 +163,19 @@ int64_t Task::getElapsedTime() const {
 	return this->end_time - this->start_time;
 }
 
+int64_t Task::getEstimatedTimeRemaining() {
+	if (this->state == STOPPED) return 0;
+	float progress = getProgress();
+	if (progress == 0) return -1;
+	return ((double)getElapsedTime() / progress) * (1.0f - progress);
+}
+
 Task::State Task::getState() const {
 	return this->state;
 }
 
 float Task::getProgress() {
-	return this->progress;
+	return (getState() == STOPPED ? 1 : 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -242,7 +245,6 @@ void Task::dispatchStopping() {
 void Task::dispatchStopped() {
 	std::unique_lock<std::recursive_mutex> lock(this->state_lock);
 	this->end_time = currentTimeMillis();
-	setProgress(1);
 	this->state = STOPPED;
 	this->condition_variable.notify_all();
 	lock.unlock();

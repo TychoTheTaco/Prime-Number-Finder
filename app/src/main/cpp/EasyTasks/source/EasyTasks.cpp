@@ -47,21 +47,17 @@ int main() {
 
 	// Test multithreaded task
 	std::cout << "Testing multi-threaded" << std::endl;
-	FindPrimesTask find_primes_task(0, 1000000, FindPrimesTask::BRUTE_FORCE, 1);
+	FindPrimesTask find_primes_task(0, 1000000, FindPrimesTask::SIEVE_OF_ERATOSTHENES, 1);
 	find_primes_task.addTaskListener(&listener);
 	find_primes_task.addTaskListener(new DListener());
+	find_primes_task.setCacheDirectory("cache");
 	std::thread* thread1 = find_primes_task.startOnNewThread();
-	TaskListener* ler = &listener;
-	std::thread([ler, &find_primes_task]() {
-		find_primes_task.removeTaskListener(ler);
-		std::cout << "REMOVED LER" << std::endl;
-	}).detach();
 	//find_primes_task.pause();
 	//find_primes_task.resumeAndWait();
 	//find_primes_task.stopAndWait();
 	//std::thread timer(&printProgress, &find_primes_task);
 	find_primes_task.finish();
-	//find_primes_task.saveToFile("saved.txt");
+	find_primes_task.saveToFile("saved.txt");
 	//timer.join();
 
 	std::cout << "Finished all tests." << std::endl;

@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include <bitset>
 
-FindPrimesTask::FindPrimesTask(num_type start_value, num_type end_value, SearchMethod search_method, unsigned int thread_count) : start_value(start_value), end_value(end_value), search_method(search_method), thread_count(thread_count) {
+FindPrimesTask::FindPrimesTask(num_type start_value, num_type end_value, SearchMethod search_method, num_type thread_count) : start_value(start_value), end_value(end_value), search_method(search_method), thread_count(thread_count) {
 }
 
 FindPrimesTask::~FindPrimesTask() {
@@ -160,12 +160,14 @@ void FindPrimesTask::saveToFile(const std::string file_path) {
 	header[2] = sizeof(num_type); // Number size
 	output.write(header, sizeof(header) / sizeof(*header));
 
-	std::string* cache_files = new std::string[this->getTasks().size()];
-	for (int i = 0; i < this->getTasks().size(); ++i) {
-		cache_files[i] = dynamic_cast<FindPrimesTask::BruteForceTask*>(this->getTasks().at(i))->cache_file;
-	}
-
 	if (this->search_method == BRUTE_FORCE) {
+
+		// Find cache files
+		std::string* cache_files = new std::string[this->getTasks().size()];
+		for (int i = 0; i < this->getTasks().size(); ++i) {
+			cache_files[i] = dynamic_cast<FindPrimesTask::BruteForceTask*>(this->getTasks().at(i))->cache_file;
+		}
+
 		switch (this->search_mode) {
 			case PARTITION:
 			case PACKET:
@@ -243,11 +245,18 @@ void FindPrimesTask::saveToFile(const std::string file_path) {
 
 				break;
 		}
+
+		delete[] cache_files;
+
+	} else if (this->search_method == SIEVE_OF_ERATOSTHENES) {
+		for (num_type number : dynamic_cast<FindPrimesTask::SieveTask*>(this->getTasks().at(0))->getPrimes()) {
+			char buffer[sizeof(num_type)];
+			numberToBytes(number, buffer);
+			output.write(buffer, sizeof(num_type));
+		}
 	}
 
-	delete[] cache_files;
 	output.close();
-
 	std::cout << "Saved!" << std::endl;
 }
 
@@ -267,7 +276,7 @@ void FindPrimesTask::numberToBytes(num_type number, char destination[]) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// [FindPrimesJavaTask] Getters
+// [FindPrimesTask] Getters
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 num_type FindPrimesTask::getStartValue() {
@@ -303,7 +312,7 @@ FindPrimesTask::SearchMethod FindPrimesTask::getSearchMethod() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// [FindPrimesJavaTask] Setters
+// [FindPrimesTask] Setters
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void FindPrimesTask::setCacheDirectory(std::string directory) {
@@ -330,7 +339,7 @@ void FindPrimesTask::setCacheDirectory(std::string directory) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// [FindPrimesJavaTask::BruteForceTask]
+// [FindPrimesTask::BruteForceTask]
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // NOTE: start_value MUST be an odd number and increment MUST be an even number!
@@ -389,7 +398,7 @@ float FindPrimesTask::BruteForceTask::getProgress() {
 	if (end_value == FindPrimesTask::RANGE_INFINITY) return 0;
 	if (this->getState() == NOT_STARTED) return 0;
 	if (this->getState() != STOPPED) {
-		setProgress((float)(current_number - start_value) / (end_value - start_value));
+		return (float)(current_number - start_value) / (end_value - start_value);
 	}
 	return Task::getProgress();
 }
@@ -427,7 +436,7 @@ unsigned int FindPrimesTask::BruteForceTask::getPrimeCount() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// [FindPrimesJavaTask::SieveTask]
+// [FindPrimesTask::SieveTask]
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 FindPrimesTask::SieveTask::SieveTask(num_type start_value, num_type end_value) : start_value(start_value), end_value(end_value) {
@@ -470,6 +479,10 @@ void FindPrimesTask::SieveTask::run() {
 
 unsigned int FindPrimesTask::SieveTask::getPrimeCount() {
 	return this->prime_count;
+}
+
+std::vector<num_type> FindPrimesTask::SieveTask::getPrimes() {
+	return this->primes;
 }
 
 float FindPrimesTask::SieveTask::getProgress() {

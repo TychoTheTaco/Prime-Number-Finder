@@ -27,17 +27,17 @@ public abstract class NativeTask implements NativeTaskInterface {
 
     @Override
     public long getStartTime() {
-        return 0;
+        return nativeGetStartTime(native_task_pointer);
     }
 
     @Override
     public long getEndTime() {
-        return 0;
+        return nativeGetEndTime(native_task_pointer);
     }
 
     @Override
     public long getEstimatedTimeRemaining() {
-        return 0;
+        return nativeGetEstimatedTimeRemaining(native_task_pointer);
     }
 
     @Override
@@ -125,8 +125,12 @@ public abstract class NativeTask implements NativeTaskInterface {
 
     private native float nativeGetProgress(long native_task_pointer);
 
+    private native long nativeGetStartTime(long native_task_pointer);
+    private native long nativeGetEndTime(long native_task_pointer);
+
     private native int nativeGetState(long native_task_pointer);
     private native long nativeGetElapsedTime(long native_task_pointer);
+    private native long nativeGetEstimatedTimeRemaining(long native_task_pointer);
 
     private native void nativeAddTaskListener(long native_task_pointer, TaskListener listener, String id);
     private native boolean nativeRemoveTaskListener(long native_task_pointer, TaskListener listener, String id);

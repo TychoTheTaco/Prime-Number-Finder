@@ -282,7 +282,6 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
     protected void loadFile(final File file) {
         //Load file in another thread
         new Thread(() -> {
-
             //Count numbers
             int n;
             try {

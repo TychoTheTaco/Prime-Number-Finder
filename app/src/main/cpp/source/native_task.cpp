@@ -130,3 +130,15 @@ extern "C" JNIEXPORT jboolean JNICALL Java_com_tycho_app_primenumberfinder_Nativ
     delete native_listener;
     return (jboolean ) result;
 }
+
+extern "C" JNIEXPORT jlong JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeGetStartTime(JNIEnv *env, jobject self, jlong task_ptr) {
+    return (jlong) ((Task*) task_ptr)->getStartTime();
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeGetEndTime(JNIEnv *env, jobject self, jlong task_ptr) {
+    return (jlong) ((Task*) task_ptr)->getEndTime();
+}
+
+extern "C" JNIEXPORT jlong JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeGetEstimatedTimeRemaining(JNIEnv *env, jobject self, jlong task_ptr) {
+    return (jlong) ((Task*) task_ptr)->getEstimatedTimeRemaining();
+}
