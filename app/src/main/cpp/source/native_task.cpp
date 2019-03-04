@@ -54,16 +54,12 @@ private:
     jobject task_listener;
     jmethodID method_ids[7];
 
-    JNIEnv* getEnv(){
+    void call(jobject object, jmethodID method_id){
         JNIEnv* env;
         int result = jvm->AttachCurrentThread(&env, 0);
         assert(result == JNI_OK);
-        return env;
-    }
-
-    void call(jobject object, jmethodID method_id){
-        getEnv()->CallVoidMethod(object, method_id);
-        jvm->DetachCurrentThread();
+        env->CallVoidMethod(object, method_id);
+        //jvm->DetachCurrentThread(); // This causes a crash when pausing tasks
     }
 };
 
