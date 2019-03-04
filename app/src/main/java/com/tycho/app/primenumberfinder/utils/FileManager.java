@@ -242,6 +242,7 @@ public final class FileManager {
 
             try {
                 for (int i = 0; i < count; i++) {
+                    //TODO: Read long only if number size = 8
                     numbers.add(dataInputStream.readLong());
                 }
             } catch (EOFException e) {
@@ -257,7 +258,7 @@ public final class FileManager {
         return endOfFile;
     }
 
-    public static long bytesToNumber(final byte[] bytes){
+    private static long bytesToNumber(final byte[] bytes){
         long number = 0;
         for (int i = 0, offset = 8 * 8 - 8; i < 8; ++i, offset -= 8){
             long n = bytes[i] & 0xFF;
@@ -266,7 +267,7 @@ public final class FileManager {
         return number;
     }
 
-    public static byte[] numberToBytes(final long number){
+    private static byte[] numberToBytes(final long number){
         final byte[] bytes = new byte[8];
         for (int i = 0, offset = 8 * 8 - 8; i < 8; ++i, offset -= 8){
             bytes[i] = (byte) ((number >> offset) & 0xFF);
@@ -408,5 +409,36 @@ public final class FileManager {
             return FileType.TREE;
         }
         return FileType.UNKNOWN;
+    }
+
+    public static void upgradeFileSystem_1_4(){
+        for (File file : FileManager.getInstance().getSavedPrimesDirectory().listFiles()){
+            Log.d(TAG, "Upgrading: " + file);
+            final int BUFFER_SIZE = 1024;
+            final List<Long> primes = new ArrayList<>(BUFFER_SIZE);
+
+            final File dest = new File("0-100.primes");
+            try (final DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(dest)))){
+                dataOutputStream.writeByte(1);
+                dataOutputStream.writeByte(3 + 8 * 2);
+                dataOutputStream.writeByte(8);
+                dataOutputStream.writeLong(0);
+                dataOutputStream.writeLong(100);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+            try (final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))){
+                for (int i = 0; i < BUFFER_SIZE; ++i){
+                    primes.add(dataInputStream.readLong());
+                }
+
+                //Write to dest
+            } catch (EOFException e) {
+                // Ignore
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
     }
 }
