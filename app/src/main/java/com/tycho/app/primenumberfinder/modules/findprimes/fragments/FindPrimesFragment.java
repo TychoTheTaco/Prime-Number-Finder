@@ -419,11 +419,6 @@ public class FindPrimesFragment extends ModuleHostFragment {
     }
 
     @Override
-    public void onPausePressed(NativeTaskInterface task) {
-
-    }
-
-    @Override
     public void onTaskRemoved(NativeTaskInterface task) {
         if (findPrimesResultsFragment.getTask() == task) {
             findPrimesResultsFragment.setTask(null);
@@ -441,12 +436,5 @@ public class FindPrimesFragment extends ModuleHostFragment {
         intent.putExtra("searchOptions", ((FindPrimesTask) task).getSearchOptions());
         intent.putExtra("taskId", task.getId());
         startActivityForResult(intent, 0);
-    }
-
-    @Override
-    public void onSavePressed(NativeTaskInterface task) {
-        if (task instanceof FindPrimesTask) {
-            findPrimesResultsFragment.saveTask((FindPrimesTask) task, getActivity());
-        }
     }
 }

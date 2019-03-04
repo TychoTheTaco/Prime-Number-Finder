@@ -13,18 +13,14 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.text.style.SuperscriptSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
-import com.tycho.app.primenumberfinder.ProgressDialog;
+import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.StatisticsLayout;
@@ -81,29 +77,11 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         statisticsLayout.add("eta", R.drawable.ic_timer_white_24dp);
         statisticsLayout.inflate();
 
-        saveButton.setOnClickListener(v -> saveTask(getTask(), getActivity()));
+        saveButton.setOnClickListener(v -> Utils.save(getTask(), getActivity()));
 
         init();
 
         return rootView;
-    }
-
-    public void saveTask(final PrimeFactorizationTask task, final Context context){
-        final ProgressDialog progressDialog = new ProgressDialog(context);
-        progressDialog.setTitle("Saving...");
-        progressDialog.show();
-
-        new Thread(() -> {
-            if (task.save()) {
-                progressDialog.dismiss();
-                handler.post(() -> {
-                    Crashlytics.log(Log.DEBUG, TAG, "Posted context: " + getContext() + " " + getActivity());
-                    Toast.makeText(context.getApplicationContext(), context.getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
-                });
-            } else {
-                handler.post(() -> Toast.makeText(context.getApplicationContext(), context.getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show());
-            }
-        }).start();
     }
 
     @Override

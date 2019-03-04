@@ -1,22 +1,18 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.SpannableStringBuilder;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
 import com.tycho.app.primenumberfinder.FindPrimesTask;
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
+import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
@@ -136,29 +132,11 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             }).start();
         });
 
-        saveButton.setOnClickListener(v -> saveTask(getTask(), getActivity()));
+        saveButton.setOnClickListener(v -> Utils.save(getTask(), getActivity()));
 
         init();
 
         return rootView;
-    }
-
-    public void saveTask(final FindPrimesTask task, final Context context) {
-        final ProgressDialog progressDialog = new ProgressDialog(context);
-        progressDialog.setTitle("Saving...");
-        progressDialog.show();
-
-        new Thread(() -> {
-            if (task.save()) {
-                handler.post(() -> {
-                    Crashlytics.log(Log.DEBUG, TAG, "Posted context: " + getContext() + " " + getActivity());
-                    Toast.makeText(context.getApplicationContext(), context.getString(R.string.successfully_saved_file), Toast.LENGTH_SHORT).show();
-                });
-            } else {
-                handler.post(() -> Toast.makeText(context.getApplicationContext(), context.getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show());
-            }
-            progressDialog.dismiss();
-        }).start();
     }
 
     @Override

@@ -12,6 +12,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -28,12 +30,15 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tycho.app.primenumberfinder.FindPrimesTask;
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.LongClickableSpan;
+import com.tycho.app.primenumberfinder.NativeTaskInterface;
+import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.gcf.GreatestCommonFactorTask;
 import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
@@ -496,5 +501,17 @@ public final class Utils {
 
     public static int applyAlpha(final int color, final float alpha){
         return ((color & 0x00FFFFFF) | ((int) (255 * alpha) << 24));
+    }
+
+    public static void save(final Savable task, final Context context) {
+        final ProgressDialog progressDialog = new ProgressDialog(context);
+        progressDialog.setTitle("Saving...");
+        progressDialog.show();
+
+        new Thread(() -> {
+            final boolean saved = task.save();
+            new Handler(Looper.getMainLooper()).post(() -> {Toast.makeText(context.getApplicationContext(), saved ? context.getString(R.string.successfully_saved_file) : context.getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();});
+            progressDialog.dismiss();
+        }).start();
     }
 }

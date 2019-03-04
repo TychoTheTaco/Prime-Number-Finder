@@ -173,7 +173,7 @@ public abstract class ModuleHostFragment extends Fragment implements FloatingAct
     }
 
     @Override
-    public void onSavePressed(NativeTaskInterface task) {
+    public void onSavePressed(NativeTaskInterface task){
 
     }
 

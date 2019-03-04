@@ -172,8 +172,4 @@ public class PrimeFactorizationFragment extends ModuleHostFragment {
         startActivityForResult(intent, 0);
     }
 
-    @Override
-    public void onSavePressed(NativeTaskInterface task) {
-        ((PrimeFactorizationResultsFragment) resultsFragment).saveTask((PrimeFactorizationTask) task, getActivity());
-    }
 }

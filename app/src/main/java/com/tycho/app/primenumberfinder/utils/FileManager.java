@@ -15,7 +15,6 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +24,6 @@ import java.io.PrintWriter;
 import java.lang.ref.WeakReference;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -145,14 +143,6 @@ public final class FileManager {
         return cacheDirectory;
     }
 
-    public boolean savePrimes(final long startValue, final long endValue, final List<Long> primes) {
-        return writeNumbersQuick(primes, new File(savedPrimesDirectory.getAbsolutePath() + File.separator + "Prime numbers from " + startValue + " to " + endValue + EXTENSION), false);
-    }
-
-    public void savePrimes(final List<Long> primes, final File file) {
-        writeNumbersQuick(primes, file, false);
-    }
-
     public boolean saveFactors(final List<Long> factors, final long number) {
         return writeNumbersQuick(factors, new File(savedFactorsDirectory.getAbsolutePath() + File.separator + "Factors of " + number + EXTENSION), false);
     }
@@ -241,6 +231,11 @@ public final class FileManager {
             final int version = dataInputStream.readUnsignedByte();
             final int headerLength = dataInputStream.readUnsignedByte();
             final int numberSize = dataInputStream.readUnsignedByte();
+            final byte[] buffer = new byte[numberSize];
+            dataInputStream.readFully(buffer);
+            final long startValue = bytesToNumber(buffer);
+            dataInputStream.readFully(buffer);
+            final long endValue = bytesToNumber(buffer);
 
             //Skip numbers
             dataInputStream.skipBytes(startIndex * numberSize);
@@ -260,6 +255,23 @@ public final class FileManager {
         }
 
         return endOfFile;
+    }
+
+    public static long bytesToNumber(final byte[] bytes){
+        long number = 0;
+        for (int i = 0, offset = 8 * 8 - 8; i < 8; ++i, offset -= 8){
+            long n = bytes[i] & 0xFF;
+            number |= (n << offset);
+        }
+        return number;
+    }
+
+    public static byte[] numberToBytes(final long number){
+        final byte[] bytes = new byte[8];
+        for (int i = 0, offset = 8 * 8 - 8; i < 8; ++i, offset -= 8){
+            bytes[i] = (byte) ((number >> offset) & 0xFF);
+        }
+        return bytes;
     }
 
     public static List<Long> readNumbers(final File file, final int startIndex, final int count) {
@@ -296,103 +308,6 @@ public final class FileManager {
             e.printStackTrace();
             return null;
         }
-    }
-
-    /**
-     * Update the file system used in versions prior to 1.2.0
-     *
-     * @param context
-     */
-    public void updateFileSystem(final Context context) {
-
-        //Check for primes directory
-        final File primesDirectory = new File(context.getFilesDir().getAbsolutePath() + File.separator + "Prime numbers");
-        if (primesDirectory.exists()) {
-            for (File file : primesDirectory.listFiles()) {
-                final List<Long> numbers = new ArrayList<>();
-
-                //Read old file
-                try {
-                    final BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        numbers.add(Long.valueOf(line));
-                    }
-                    bufferedReader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                //Save as new file
-                savePrimes(numbers, new File(getSavedPrimesDirectory() + File.separator + file.getName()));
-                file.delete();
-            }
-            primesDirectory.delete();
-        }
-
-        //Check for factors directory
-        final File factorsDirectory = new File(context.getFilesDir().getAbsolutePath() + File.separator + "Factors");
-        if (factorsDirectory.exists()) {
-            for (File file : factorsDirectory.listFiles()) {
-                final List<Long> numbers = new ArrayList<>();
-
-                //Read old file
-                try {
-                    BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        numbers.add(Long.valueOf(line));
-                    }
-                    bufferedReader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                //Save as new file
-                saveFactors(numbers, new File(getSavedFactorsDirectory() + File.separator + file.getName()));
-                file.delete();
-            }
-            factorsDirectory.delete();
-        }
-    }
-
-    public void upgradeTo1_3_0() {
-        if (PreferenceManager.getInt(PreferenceManager.Preference.FILE_VERSION) == 0) {
-
-            final List<File> files = new ArrayList<>();
-            files.addAll(Arrays.asList(savedPrimesDirectory.listFiles()));
-            files.addAll(Arrays.asList(savedFactorsDirectory.listFiles()));
-
-            //Update saved primes
-            for (File file : files) {
-
-                //Read old file
-                final List<Long> numbers = new ArrayList<>();
-                try {
-                    BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-                    final StringBuilder stringBuilder = new StringBuilder("");
-
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        stringBuilder.append(line);
-                    }
-                    bufferedReader.close();
-
-                    final List<String> stringNumbers = Arrays.asList(stringBuilder.toString().split(","));
-                    for (String string : stringNumbers) {
-                        numbers.add(Long.valueOf(string));
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                //Save in new format
-                writeNumbersQuick(numbers, file, false);
-            }
-
-            PreferenceManager.set(PreferenceManager.Preference.FILE_VERSION, 1);
-        }
-
     }
 
     public File export(final File file, final String fileName, final String itemSeparator, final NumberFormat numberFormat) {

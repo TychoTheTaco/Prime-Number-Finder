@@ -151,11 +151,6 @@ public class FindFactorsFragment extends ModuleHostFragment{
     }
 
     @Override
-    public void onSavePressed(NativeTaskInterface task) {
-        ((FindFactorsResultsFragment) resultsFragment).saveTask((FindFactorsTask) task, getActivity());
-    }
-
-    @Override
     public void onClick(View view) {
         final Intent intent = new Intent(getActivity(), FindFactorsConfigurationActivity.class);
         startActivityForResult(intent, REQUEST_CODE_NEW_TASK);

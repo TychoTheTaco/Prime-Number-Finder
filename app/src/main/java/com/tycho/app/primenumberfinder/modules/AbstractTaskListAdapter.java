@@ -16,6 +16,8 @@ import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.Savable;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -682,6 +684,12 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
 
             if (saveButton != null){
                 saveButton.setOnClickListener(v -> {
+                    //Save the task if it is savable
+                    final NativeTaskInterface task = getTask(getAdapterPosition());
+                    if (task instanceof Savable){
+                        Utils.save((Savable) task, context);
+                    }
+
                     saveButton.setEnabled(false);
                     sendOnSavePressed(getTask(getAdapterPosition()));
                 });

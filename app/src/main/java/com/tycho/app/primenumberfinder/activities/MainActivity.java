@@ -22,7 +22,6 @@ import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
 import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
-import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.about.AboutPageFragment;
 import com.tycho.app.primenumberfinder.modules.findfactors.fragments.FindFactorsFragment;
@@ -32,7 +31,6 @@ import com.tycho.app.primenumberfinder.modules.lcm.fragments.LeastCommonMultiple
 import com.tycho.app.primenumberfinder.modules.primefactorization.fragments.PrimeFactorizationFragment;
 import com.tycho.app.primenumberfinder.modules.savedfiles.SavedFilesFragment;
 import com.tycho.app.primenumberfinder.settings.SettingsFragment;
-import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
@@ -174,7 +172,8 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         }
 
         //Show a dialog while upgrading to the newest version
-        if (PreferenceManager.getInt(PreferenceManager.Preference.FILE_VERSION) < PreferenceManager.CURRENT_VERSION) {
+        //TODO: Implement file structure upgrade
+        /*if (PreferenceManager.getInt(PreferenceManager.Preference.FILE_VERSION) < PreferenceManager.CURRENT_VERSION) {
             final ProgressDialog progressDialog = new ProgressDialog(this);
             progressDialog.setTitle("Updating...");
             progressDialog.show();
@@ -186,7 +185,7 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
 
                 progressDialog.dismiss();
             }).start();
-        }
+        }*/
     }
 
     @Override
