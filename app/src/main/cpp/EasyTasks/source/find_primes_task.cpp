@@ -339,14 +339,13 @@ void FindPrimesTask::setCacheDirectory(std::string directory) {
 	std::cout << "Empty: " << cmd << std::endl;
 	system(cmd.c_str());
 
-	//Create cache directory
-//#ifdef _WIN32
-	cmd = "mkdir \"" + this->cache_dir + "\"";
-//#else
-//	cmd = "mkdir -p" + this->cache_dir;
-//#endif // _WIN32
-	system(cmd.c_str());
-
+    //Create cache directory
+#ifdef _WIN32
+    cmd = "mkdir \"" + this->cache_dir + "\"";
+#else
+    cmd = "mkdir -p \"" + this->cache_dir + "\"";
+#endif // _WIN32
+    system(cmd.c_str());
 
 }
 
