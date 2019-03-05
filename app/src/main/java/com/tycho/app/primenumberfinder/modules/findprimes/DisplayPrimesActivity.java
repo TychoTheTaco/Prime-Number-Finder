@@ -288,6 +288,7 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
                 n = FileManager.countTotalNumbersQuick(file);
             }catch (IOException e){
                 n = -1;
+                e.printStackTrace();
                 throw new RuntimeException("Error Loading File!");
             }
             scrollListener.setTotalNumbers(n);

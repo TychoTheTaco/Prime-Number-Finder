@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.tycho.app.primenumberfinder.NativeTaskInterface;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import easytasks.Task;
 import simpletrees.Tokenizer;
 import simpletrees.Tree;
 
@@ -118,6 +120,13 @@ public final class FileManager {
 
         //Clear cache directory //TODO: Dont do this if there are running tasks
         deleteDirectory(new File(context.getFilesDir() + File.separator + "cache" + File.separator), false);
+    }
+
+    public static File buildFile(final NativeTaskInterface task){
+        if (task instanceof FindPrimesTask){
+            return new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + ((FindPrimesTask) task).getStartValue() + "-" + (((FindPrimesTask) task).isEndless() ? "INF" : ((FindPrimesTask) task).getEndValue()) + ".primes");
+        }
+        return new File(FileManager.getInstance() + File.separator + task.getId().toString() + ".unknown");
     }
 
     private static void deleteDirectory(final File directory, final boolean deleteRoot) {

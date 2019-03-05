@@ -35,6 +35,7 @@ class FindPrimesTask : public MultithreadedTask {
 	unsigned int getPrimeCount();
 	SearchMethod getSearchMethod();
 	unsigned int getThreadCount();
+	std::string getCacheDirectory();
 
 	//Setters
 	void setCacheDirectory(std::string directory);
