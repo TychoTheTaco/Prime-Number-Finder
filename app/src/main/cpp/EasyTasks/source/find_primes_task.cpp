@@ -157,15 +157,19 @@ void FindPrimesTask::saveToFile(const std::string file_path) {
 	// [0 - 7] Version
 	// [8 - 15] Header length (in bytes)
 	// [16 - 23] Number size (in bytes) 
+	// [24 - Variable] Start value
+	// [Variable] End value (0 if infinity)
 
 	// Open file
 	std::ofstream output(file_path, std::ios::binary | std::ios::app);
 
 	// Write version number
-	char header[3];
+	char header[3 + sizeof(num_type) * 2];
 	header[0] = 1; // Version
 	header[1] = sizeof(header) / sizeof(*header); // Header length
 	header[2] = sizeof(num_type); // Number size
+	numberToBytes(this->start_value, &header[3]);
+	numberToBytes(this->isEndless() ? 0 : this->end_value, &header[3 + sizeof(num_type)]);
 	output.write(header, sizeof(header) / sizeof(*header));
 
 	if (this->search_method == BRUTE_FORCE) {

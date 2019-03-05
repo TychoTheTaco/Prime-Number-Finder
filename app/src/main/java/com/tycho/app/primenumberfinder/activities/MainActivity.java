@@ -1,5 +1,6 @@
 package com.tycho.app.primenumberfinder.activities;
 
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
 import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
+import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.about.AboutPageFragment;
 import com.tycho.app.primenumberfinder.modules.findfactors.fragments.FindFactorsFragment;
@@ -31,6 +33,7 @@ import com.tycho.app.primenumberfinder.modules.lcm.fragments.LeastCommonMultiple
 import com.tycho.app.primenumberfinder.modules.primefactorization.fragments.PrimeFactorizationFragment;
 import com.tycho.app.primenumberfinder.modules.savedfiles.SavedFilesFragment;
 import com.tycho.app.primenumberfinder.settings.SettingsFragment;
+import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
@@ -173,19 +176,21 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
 
         //Show a dialog while upgrading to the newest version
         //TODO: Implement file structure upgrade
-        /*if (PreferenceManager.getInt(PreferenceManager.Preference.FILE_VERSION) < PreferenceManager.CURRENT_VERSION) {
-            final ProgressDialog progressDialog = new ProgressDialog(this);
-            progressDialog.setTitle("Updating...");
-            progressDialog.show();
+        if (PreferenceManager.getInt(PreferenceManager.Preference.FILE_VERSION) < PreferenceManager.CURRENT_VERSION) {
+            upgrade(this);
+        }
+    }
 
-            new Thread(() -> {
-                //Update file system
-                FileManager.getInstance().updateFileSystem(getBaseContext());
-                FileManager.getInstance().upgradeTo1_3_0();
+    public static void upgrade(final Context context){
+        final ProgressDialog progressDialog = new ProgressDialog(context);
+        progressDialog.setTitle("Updating...");
+        progressDialog.show();
 
-                progressDialog.dismiss();
-            }).start();
-        }*/
+        new Thread(() -> {
+            //Update file system
+            FileManager.upgradeFileSystem_1_4();
+            progressDialog.dismiss();
+        }).start();
     }
 
     @Override

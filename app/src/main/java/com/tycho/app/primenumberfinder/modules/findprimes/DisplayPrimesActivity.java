@@ -26,6 +26,7 @@ import com.tycho.app.primenumberfinder.modules.savedfiles.FindNthNumberDialog;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -88,11 +89,7 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
         final Intent intent = getIntent();
         if (intent != null) {
             if (file != null) {
-
-                //Set a custom title if there is one
-                if (intent.getBooleanExtra("title", true)) {
-                    setTitle(Utils.formatTitle(file));
-                }
+                setTitle("Loading...");
 
                 //Set up adapter
                 primesAdapter = new PrimesAdapter(this);
@@ -282,70 +279,57 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
     protected void loadFile(final File file) {
         //Load file in another thread
         new Thread(() -> {
-            //Count numbers
-            int n;
             try {
-                n = FileManager.countTotalNumbersQuick(file);
+                final FileManager.PrimesFile primesFile = new FileManager.PrimesFile(file);
+                setTitle("Prime numbers from " + primesFile.getStartValue() + " to " + primesFile.getEndValue());
+                scrollListener.setTotalNumbers(primesFile.getTotalNumbers());
+
+                //Read numbers
+                final List<Long> numbers = FileManager.readNumbers(file, 0, 1000);
+                primesAdapter.getPrimes().addAll(numbers);
+
+                //Update UI
+                runOnUiThread(() -> {
+
+                    //If there are no numbers, there was probably an error
+                    if (numbers.size() == 0 && primesFile.getTotalNumbers() > 0) {
+                        showLoadingError();
+                    } else {
+                        //Set header text
+                        headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.find_primes_subtitle_result, primesFile.getTotalNumbers()), new String[]{
+                                NUMBER_FORMAT.format(primesFile.getTotalNumbers()),
+                                NUMBER_FORMAT.format(primesFile.getStartValue()),
+                                primesFile.getEndValue() == 0 ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(primesFile.getEndValue()),
+                        }, ContextCompat.getColor(getBaseContext(), R.color.white)));
+
+                        resizeCollapsingToolbar();
+
+                        //Update adapter
+                        primesAdapter.notifyItemRangeInserted(0, primesAdapter.getItemCount());
+                        recyclerView.post(new Runnable() {
+
+                            /**
+                             * Minimum number of extra adapter items before displaying the
+                             * scroll to top and scroll to bottom buttons.
+                             */
+                            private final int SCROLL_BUTTON_MIN_OVERFLOW = 20;
+
+                            @Override
+                            public void run() {
+                                final int visibility = ((linearLayoutManager.findLastVisibleItemPosition() - linearLayoutManager.findFirstVisibleItemPosition()) >= scrollListener.totalNumbers - SCROLL_BUTTON_MIN_OVERFLOW) ? View.GONE : View.VISIBLE;
+                                scrollToTopFab.setVisibility(visibility);
+                                scrollToBottomFab.setVisibility(visibility);
+                                findButton.setVisible(enableSearch && visibility == View.VISIBLE);
+                            }
+                        });
+                    }
+
+                    //Dismiss loading dialog
+                    progressDialog.dismiss();
+                });
             }catch (IOException e){
-                n = -1;
                 e.printStackTrace();
-                throw new RuntimeException("Error Loading File!");
             }
-            scrollListener.setTotalNumbers(n);
-            final int totalNumbers = n;
-
-
-            //Read file
-            final List<Long> numbers = FileManager.readNumbers(file, 0, 1000);
-            primesAdapter.getPrimes().addAll(numbers);
-
-            //Get total range
-            final long[] range;
-            if (getIntent().getLongArrayExtra("range") != null) {
-                range = getIntent().getLongArrayExtra("range");
-            } else {
-                range = FileManager.getPrimesRangeFromTitle(file);
-            }
-
-            //Update UI
-            runOnUiThread(() -> {
-
-                //If there are no numbers, there was probably an error
-                if (numbers.size() == 0 && totalNumbers > 0) {
-                    showLoadingError();
-                } else {
-                    //Set header text
-                    headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.find_primes_subtitle_result, totalNumbers), new String[]{
-                            NUMBER_FORMAT.format(totalNumbers),
-                            NUMBER_FORMAT.format(range[0]),
-                            range[1] == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(range[1]),
-                    }, ContextCompat.getColor(getBaseContext(), R.color.white)));
-
-                    resizeCollapsingToolbar();
-
-                    //Update adapter
-                    primesAdapter.notifyItemRangeInserted(0, primesAdapter.getItemCount());
-                    recyclerView.post(new Runnable() {
-
-                        /**
-                         * Minimum number of extra adapter items before displaying the
-                         * scroll to top and scroll to bottom buttons.
-                         */
-                        private final int SCROLL_BUTTON_MIN_OVERFLOW = 20;
-
-                        @Override
-                        public void run() {
-                            final int visibility = ((linearLayoutManager.findLastVisibleItemPosition() - linearLayoutManager.findFirstVisibleItemPosition()) >= scrollListener.totalNumbers - SCROLL_BUTTON_MIN_OVERFLOW) ? View.GONE : View.VISIBLE;
-                            scrollToTopFab.setVisibility(visibility);
-                            scrollToBottomFab.setVisibility(visibility);
-                            findButton.setVisible(enableSearch && visibility == View.VISIBLE);
-                        }
-                    });
-                }
-
-                //Dismiss loading dialog
-                progressDialog.dismiss();
-            });
         }).start();
     }
 

@@ -19,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.tycho.app.primenumberfinder.activities.MainActivity;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
@@ -31,6 +32,7 @@ import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfiguratio
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesJavaTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesNativeTask;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
+import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
@@ -111,8 +113,10 @@ public class FindPrimesFragment extends ModuleHostFragment {
             //Check if the number is valid
             if (Validator.isPrimalityInputValid(getPrimalityInput())) {
 
+                MainActivity.upgrade(getActivity());
+
                 //Create a new task
-                final NativeTaskInterface task = new CheckPrimalityTask(getPrimalityInput().longValue());
+                /*final NativeTaskInterface task = new CheckPrimalityTask(getPrimalityInput().longValue());
                 taskListFragment.addTask(task);
                 PrimeNumberFinder.getTaskManager().registerTask(task);
 
@@ -120,7 +124,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
                 task.startOnNewThread();
                 taskListFragment.setSelected(task);
 
-                hideKeyboard(getActivity());
+                hideKeyboard(getActivity());*/
 
             } else {
                 Toast.makeText(getActivity(), getString(R.string.error_invalid_number), Toast.LENGTH_SHORT).show();

@@ -19,7 +19,7 @@ public class PreferenceManager {
 
     private static SharedPreferences sharedPreferences;
 
-    public static final int CURRENT_VERSION = 1;
+    public static final int CURRENT_VERSION = 2;
 
     public static void initialize(final Context context) {
         sharedPreferences = context.getSharedPreferences("preferences", Context.MODE_PRIVATE);

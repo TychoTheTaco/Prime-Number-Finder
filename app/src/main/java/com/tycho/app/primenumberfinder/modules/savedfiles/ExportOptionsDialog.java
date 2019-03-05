@@ -18,6 +18,7 @@ import com.tycho.app.primenumberfinder.ui.CustomRadioGroup;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -53,12 +54,12 @@ public class ExportOptionsDialog extends Dialog {
 
         //Set up file name
         final EditText fileNameInput = findViewById(R.id.file_name);
-        String name = file.getName();
-        int pos = name.lastIndexOf(".");
-        if (pos > 0) {
-            name = name.substring(0, pos);
+        try{
+            final FileManager.PrimesFile primesFile = new FileManager.PrimesFile(file);
+            fileNameInput.setText("Primes from " + primesFile.getStartValue() + " to " + (primesFile.getEndValue() == 0 ? "infinity" : primesFile.getEndValue()));
+        }catch (IOException e){
+            e.printStackTrace();
         }
-        fileNameInput.setText(name);
 
         final EditText itemSeparatorInput = findViewById(R.id.item_separator);
 

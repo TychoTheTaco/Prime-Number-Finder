@@ -18,6 +18,7 @@ import com.tycho.app.primenumberfinder.utils.FileType;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,6 +57,12 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.View
             case PRIMES:
                 holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.purple)));
                 holder.icon.setImageResource(R.drawable.find_primes_icon);
+                try{
+                    final FileManager.PrimesFile primesFile = new FileManager.PrimesFile(file);
+                    holder.fileName.setText("Primes from " + primesFile.getStartValue() + " to " + (primesFile.getEndValue() == 0 ? "infinity" : primesFile.getEndValue()));
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
                 break;
 
             case FACTORS:

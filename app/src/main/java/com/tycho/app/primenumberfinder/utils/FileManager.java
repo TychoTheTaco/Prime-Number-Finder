@@ -122,8 +122,8 @@ public final class FileManager {
         deleteDirectory(new File(context.getFilesDir() + File.separator + "cache" + File.separator), false);
     }
 
-    public static File buildFile(final NativeTaskInterface task){
-        if (task instanceof FindPrimesTask){
+    public static File buildFile(final NativeTaskInterface task) {
+        if (task instanceof FindPrimesTask) {
             return new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + ((FindPrimesTask) task).getStartValue() + "-" + (((FindPrimesTask) task).isEndless() ? "INF" : ((FindPrimesTask) task).getEndValue()) + ".primes");
         }
         return new File(FileManager.getInstance() + File.separator + task.getId().toString() + ".unknown");
@@ -267,18 +267,64 @@ public final class FileManager {
         return endOfFile;
     }
 
-    private static long bytesToNumber(final byte[] bytes){
+    private static long bytesToNumber(final byte[] bytes) {
         long number = 0;
-        for (int i = 0, offset = 8 * 8 - 8; i < 8; ++i, offset -= 8){
+        for (int i = 0, offset = 8 * 8 - 8; i < 8; ++i, offset -= 8) {
             long n = bytes[i] & 0xFF;
             number |= (n << offset);
         }
         return number;
     }
 
-    private static byte[] numberToBytes(final long number){
+    public static class PrimesFile {
+        private final File file;
+
+        private final int version;
+        private final int headerLength;
+        private final int numberSize;
+        private final long startValue;
+        private final long endValue;
+
+        private final int totalNumbers;
+
+        public PrimesFile(final File file) throws IOException {
+            this.file = file;
+
+            //Read header
+            final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+            version = dataInputStream.readUnsignedByte();
+            headerLength = dataInputStream.readUnsignedByte();
+            numberSize = dataInputStream.readUnsignedByte();
+            final byte[] buffer = new byte[numberSize];
+            dataInputStream.readFully(buffer);
+            startValue = bytesToNumber(buffer);
+            dataInputStream.readFully(buffer);
+            endValue = bytesToNumber(buffer);
+            dataInputStream.close();
+
+            totalNumbers = (int) (file.length() - headerLength) / numberSize;
+        }
+
+        public File getFile() {
+            return file;
+        }
+
+        public long getStartValue() {
+            return startValue;
+        }
+
+        public long getEndValue() {
+            return endValue;
+        }
+
+        public int getTotalNumbers() {
+            return totalNumbers;
+        }
+    }
+
+    private static byte[] numberToBytes(final long number) {
         final byte[] bytes = new byte[8];
-        for (int i = 0, offset = 8 * 8 - 8; i < 8; ++i, offset -= 8){
+        for (int i = 0, offset = 8 * 8 - 8; i < 8; ++i, offset -= 8) {
             bytes[i] = (byte) ((number >> offset) & 0xFF);
         }
         return bytes;
@@ -420,34 +466,50 @@ public final class FileManager {
         return FileType.UNKNOWN;
     }
 
-    public static void upgradeFileSystem_1_4(){
-        for (File file : FileManager.getInstance().getSavedPrimesDirectory().listFiles()){
+    public static void upgradeFileSystem_1_4() {
+        final File[] files = FileManager.getInstance().getSavedPrimesDirectory().listFiles();
+        for (File file : files) {
             Log.d(TAG, "Upgrading: " + file);
-            final int BUFFER_SIZE = 1024;
+            final int BUFFER_SIZE = 1024 * 128;
             final List<Long> primes = new ArrayList<>(BUFFER_SIZE);
+            final long[] range = getPrimesRangeFromTitle(file);
+            final File dest = new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + range[0] + "-" + range[1] + ".primes");
 
-            final File dest = new File("0-100.primes");
-            try (final DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(dest)))){
-                dataOutputStream.writeByte(1);
-                dataOutputStream.writeByte(3 + 8 * 2);
-                dataOutputStream.writeByte(8);
-                dataOutputStream.writeLong(0);
-                dataOutputStream.writeLong(100);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+            try (final DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(dest)))) {
+                //Write header
+                dataOutputStream.writeByte(1); //Version
+                dataOutputStream.writeByte(3 + 8 * 2); //Header length
+                dataOutputStream.writeByte(8); //Number size
+                dataOutputStream.writeLong(range[0]); //Start value
+                dataOutputStream.writeLong(range[1]); //End value
 
-            try (final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))){
-                for (int i = 0; i < BUFFER_SIZE; ++i){
-                    primes.add(dataInputStream.readLong());
+                final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+                boolean endOfFile = false;
+                while (!endOfFile) {
+                    try {
+                        //Read from source
+                        for (int i = 0; i < BUFFER_SIZE; ++i) {
+                            primes.add(dataInputStream.readLong());
+                        }
+                    } catch (EOFException e) {
+                        endOfFile = true;
+                        dataInputStream.close();
+                    }
+
+                    //Write to destination
+                    for (long number : primes) {
+                        dataOutputStream.writeLong(number);
+                    }
+                    primes.clear();
                 }
-
-                //Write to dest
-            } catch (EOFException e) {
-                // Ignore
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        for (File file : files) {
+            file.delete();
+        }
+        PreferenceManager.set(PreferenceManager.Preference.FILE_VERSION, 2);
+        Log.d(TAG, "Finished upgrading!");
     }
 }
