@@ -137,3 +137,6 @@
 - Added Quick Copy feature
 - UI improvements
 - Bug fixes
+
+??/??/2019 > Prime Number Finder version 1.4.0
+- Now uses native code for significant performance improvements

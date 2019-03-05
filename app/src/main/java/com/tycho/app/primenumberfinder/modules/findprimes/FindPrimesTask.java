@@ -1,8 +1,10 @@
-package com.tycho.app.primenumberfinder;
+package com.tycho.app.primenumberfinder.modules.findprimes;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.tycho.app.primenumberfinder.NativeTaskInterface;
+import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 
 import java.io.File;
@@ -22,6 +24,7 @@ public interface FindPrimesTask extends NativeTaskInterface, Savable {
     int getThreadCount();
 
     String getStatus();
+    File getCacheDirectory();
 
     boolean isEndless();
 

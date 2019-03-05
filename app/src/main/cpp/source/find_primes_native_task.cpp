@@ -88,6 +88,11 @@ Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nat
     return env->NewStringUTF("Native Status String");
 }
 
+JNIEXPORT jstring JNICALL
+Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeGetCacheDirectory(JNIEnv *env, jobject self, jlong task_ptr) {
+    return env->NewStringUTF(((FindPrimesTask *) task_ptr)->getCacheDirectory().c_str());
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Misc
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -23,13 +23,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.tycho.app.primenumberfinder.FindPrimesTask;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.activities.AbstractActivity;
 import com.tycho.app.primenumberfinder.ui.CustomRadioGroup;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
-import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
@@ -41,8 +39,8 @@ import java.util.UUID;
 
 import easytasks.Task;
 
-import static com.tycho.app.primenumberfinder.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
-import static com.tycho.app.primenumberfinder.FindPrimesTask.SearchOptions.SearchMethod.SIEVE_OF_ERATOSTHENES;
+import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
+import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.SIEVE_OF_ERATOSTHENES;
 
 /**
  * Created by tycho on 1/24/2018.

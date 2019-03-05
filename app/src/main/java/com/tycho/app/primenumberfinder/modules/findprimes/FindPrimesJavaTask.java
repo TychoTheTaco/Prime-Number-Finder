@@ -2,7 +2,6 @@ package com.tycho.app.primenumberfinder.modules.findprimes;
 
 import android.util.Log;
 
-import com.tycho.app.primenumberfinder.FindPrimesTask;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
@@ -159,6 +158,11 @@ public class FindPrimesJavaTask extends MultithreadedTask implements FindPrimesT
 
     int count = 0;
     final Object LOCK = new Object();
+
+    @Override
+    public File getCacheDirectory() {
+        return getSearchOptions().getCacheDirectory();
+    }
 
     private void executeThreadPool() {
         final List<Thread> pool = new ArrayList<>();

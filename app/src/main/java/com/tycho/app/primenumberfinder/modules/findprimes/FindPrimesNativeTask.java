@@ -1,6 +1,5 @@
 package com.tycho.app.primenumberfinder.modules.findprimes;
 
-import com.tycho.app.primenumberfinder.FindPrimesTask;
 import com.tycho.app.primenumberfinder.NativeTask;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.SearchOptions;
@@ -56,6 +55,11 @@ public class FindPrimesNativeTask extends NativeTask implements FindPrimesTask, 
         return searchOptions;
     }
 
+    @Override
+    public File getCacheDirectory() {
+        return new File(nativeGetCacheDirectory(native_task_pointer));
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Setters
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,6 +87,8 @@ public class FindPrimesNativeTask extends NativeTask implements FindPrimesTask, 
     // [Savable]
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    private boolean isSaved = false;
+
     @Override
     public void addSaveListener(SaveListener listener) {
 
@@ -95,13 +101,14 @@ public class FindPrimesNativeTask extends NativeTask implements FindPrimesTask, 
 
     @Override
     public boolean save() {
-        saveToFile(new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "Prime numbers from " + getStartValue() + " to " + (isEndless() ? "INF" : getEndValue())));
+        saveToFile(FileManager.buildFile(this));
+        isSaved = true;
         return true;
     }
 
     @Override
     public boolean isSaved() {
-        return false;
+        return isSaved;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,6 +123,7 @@ public class FindPrimesNativeTask extends NativeTask implements FindPrimesTask, 
     private native int nativeGetPrimeCount(final long native_task_pointer);
     private native int nativeGetCurrentFactor(final long native_task_pointer);
     private native String nativeGetStatus(final long native_task_pointer);
+    private native String nativeGetCacheDirectory(final long native_task_pointer);
 
     private native boolean nativeIsEndless(final long native_task_pointer);
 

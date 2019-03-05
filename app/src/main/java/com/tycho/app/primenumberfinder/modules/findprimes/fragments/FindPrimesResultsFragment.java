@@ -10,7 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.tycho.app.primenumberfinder.FindPrimesTask;
+import com.crashlytics.android.Crashlytics;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.NativeTaskInterface;
+
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.ProgressDialog;
@@ -27,7 +30,7 @@ import java.util.Map;
 
 import easytasks.Task;
 
-import static com.tycho.app.primenumberfinder.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
+import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
 
 /**
  * Created by tycho on 11/16/2017.
@@ -100,7 +103,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
             new Thread(() -> {
 
-                //PAUSE the task
+                //Pause the task
                 final Task.State state = getTask().getState();
                 try {
                     getTask().pauseAndWait();
@@ -108,15 +111,18 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                     e.printStackTrace();
                 }
 
-                //Check if cached file exists
-                final File file = new File(FileManager.getInstance().getTaskCacheDirectory(getTask()) + File.separator + "primes");
-                if (file.exists() && getTask().getState() == Task.State.STOPPED) {
-                    //Do nothing
-                } else {
-                   getTask().saveToFile(file);
+                //Save to file
+                final File file;
+                if (getTask().getState() == Task.State.STOPPED && getTask().isSaved()){
+                    // Task is stopped and saved already, load saved file
+                    file = FileManager.buildFile(getTask());
+                }else{
+                    // Task has not finished or is not saved, saved to temp file
+                    file = new File(getTask().getCacheDirectory() + File.separator + "primes");
+                    getTask().saveToFile(file);
                 }
 
-                //Resume the task
+                //Restore task state
                 if (state == Task.State.RUNNING) {
                     getTask().resume();
                 }

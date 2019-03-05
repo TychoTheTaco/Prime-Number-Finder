@@ -323,6 +323,10 @@ FindPrimesTask::SearchMethod FindPrimesTask::getSearchMethod() {
 	return this->search_method;
 }
 
+std::string FindPrimesTask::getCacheDirectory() {
+	return this->cache_dir;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // [FindPrimesTask] Setters
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -336,17 +340,15 @@ void FindPrimesTask::setCacheDirectory(std::string directory) {
 #else
 	std::string cmd = "rmdir \"" + this->cache_dir + "\"";
 #endif
-	std::cout << "Empty: " << cmd << std::endl;
 	system(cmd.c_str());
 
-    //Create cache directory
+	//Create cache directory
 #ifdef _WIN32
-    cmd = "mkdir \"" + this->cache_dir + "\"";
+	cmd = "mkdir \"" + this->cache_dir + "\"";
 #else
-    cmd = "mkdir -p \"" + this->cache_dir + "\"";
+	cmd = "mkdir -p \"" + this->cache_dir + "\"";
 #endif // _WIN32
-    system(cmd.c_str());
-
+	system(cmd.c_str());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

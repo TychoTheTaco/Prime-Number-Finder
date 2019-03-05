@@ -33,7 +33,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.tycho.app.primenumberfinder.FindPrimesTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.NativeTaskInterface;
+
 import com.tycho.app.primenumberfinder.LongClickableSpan;
 import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.ProgressDialog;
