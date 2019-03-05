@@ -20,6 +20,7 @@ import com.tycho.app.primenumberfinder.utils.FileType;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,12 +67,21 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final File file = files.get(position);
 
+        //Set file name
+        holder.fileName.setText(Utils.formatTitle(file));
+
         //Format icon
         if (!holder.isSelected()){
             switch (FileManager.getFileType(directory)) {
                 case PRIMES:
                     holder.icon.setImageResource(R.drawable.find_primes_icon);
                     holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.purple)));
+                    try{
+                        final FileManager.PrimesFile primesFile = new FileManager.PrimesFile(file);
+                        holder.fileName.setText("Primes from " + primesFile.getStartValue() + " to " + (primesFile.getEndValue() == 0 ? "infinity" : primesFile.getEndValue()));
+                    }catch (IOException e){
+                        e.printStackTrace();
+                    }
                     break;
 
                 case FACTORS:
@@ -85,9 +95,6 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
                     break;
             }
         }
-
-        //Set file name
-        holder.fileName.setText(Utils.formatTitle(file));
 
         if (holder.isSelected()){
             holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.accent)));
