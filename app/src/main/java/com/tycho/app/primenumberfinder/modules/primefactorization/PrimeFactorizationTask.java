@@ -49,7 +49,7 @@ public class PrimeFactorizationTask extends Task implements Savable, SearchOptio
     }
 
     @Override
-    public void run() {
+    protected void run() {
         this.factorTree = generateTree(number);
     }
 

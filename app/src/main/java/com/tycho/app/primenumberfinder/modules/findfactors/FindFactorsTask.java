@@ -22,11 +22,6 @@ import easytasks.Task;
 
 public class FindFactorsTask extends Task implements Savable, SearchOptions, NativeTaskInterface {
 
-    static{
-        System.loadLibrary("native-utils");
-        System.loadLibrary("Taskr");
-    }
-
     /**
      * Tag used for logging and debugging.
      */
@@ -67,8 +62,7 @@ public class FindFactorsTask extends Task implements Savable, SearchOptions, Nat
     }
 
     @Override
-    public void run() {
-
+    protected void run(){
         for (i = 1; i <= sqrtMax; i++) {
 
             //Check if the number divides perfectly
