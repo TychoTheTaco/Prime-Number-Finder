@@ -305,6 +305,39 @@ public final class FileManager {
             totalNumbers = (int) (file.length() - headerLength) / numberSize;
         }
 
+        public File export(final String fileName, final String itemSeparator, final NumberFormat numberFormat) {
+            final List<Long> items = readNumbers(file); // TODO: Use a buffer to read
+
+            final File output = new File(FileManager.getInstance().getExportCacheDirectory() + File.separator + fileName);
+
+            try {
+
+                final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(output));
+
+                final long lastItem = items.get(items.size() - 1);
+
+                for (long number : items) {
+                    if (numberFormat != null) {
+                        bufferedWriter.write(numberFormat.format(number));
+                    } else {
+                        bufferedWriter.write(String.valueOf(number));
+                    }
+
+                    if (number != lastItem) {
+                        bufferedWriter.write(itemSeparator);
+                    }
+                }
+
+                bufferedWriter.flush();
+                bufferedWriter.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+            return output;
+        }
+
         public File getFile() {
             return file;
         }
@@ -334,17 +367,6 @@ public final class FileManager {
         final List<Long> numbers = new ArrayList<>();
         readNumbers(file, numbers, startIndex, count);
         return numbers;
-    }
-
-    public static int countTotalNumbersQuick(final File file) throws IOException {
-        final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
-
-        //Read header
-        final int version = dataInputStream.readUnsignedByte();
-        final int headerLength = dataInputStream.readUnsignedByte();
-        final int numberSize = dataInputStream.readUnsignedByte();
-
-        return (int) (file.length() - headerLength) / numberSize;
     }
 
     public Tree<Long> readTree(final File file) {
