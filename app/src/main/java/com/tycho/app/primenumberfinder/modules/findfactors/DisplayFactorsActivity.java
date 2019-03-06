@@ -131,7 +131,7 @@ public class DisplayFactorsActivity extends DisplayContentActivity {
         switch (item.getItemId()) {
 
             case R.id.export:
-                final ExportOptionsDialog exportOptionsDialog = new ExportOptionsDialog(this, file, R.style.FindFactors_Dialog);
+                final ExportOptionsDialog exportOptionsDialog = new ExportFactorsOptionsDialog(this, file, R.style.FindFactors_Dialog);
                 exportOptionsDialog.show();
                 break;
 

@@ -26,16 +26,16 @@ import java.util.Locale;
  * Created by tycho on 1/23/2018.
  */
 
-public class ExportOptionsDialog extends Dialog {
+public abstract class ExportOptionsDialog extends Dialog {
 
     /**
      * Tag used for logging and debugging.
      */
     private static final String TAG = ExportOptionsDialog.class.getSimpleName();
 
-    private final Context context;
+    protected final Context context;
 
-    private final File file;
+    protected final File file;
 
     public ExportOptionsDialog(final Context context, final File file, final int style){
         super(context, style);
@@ -52,14 +52,14 @@ public class ExportOptionsDialog extends Dialog {
         setContentView(R.layout.export_options_dialog);
         setCancelable(true);
 
-        //Set up file name
         final EditText fileNameInput = findViewById(R.id.file_name);
+        /*//Set up file name
         try{
             final FileManager.PrimesFile primesFile = new FileManager.PrimesFile(file);
             fileNameInput.setText("Primes from " + primesFile.getStartValue() + " to " + (primesFile.getEndValue() == 0 ? "infinity" : primesFile.getEndValue()));
         }catch (IOException e){
             e.printStackTrace();
-        }
+        }*/
 
         final EditText itemSeparatorInput = findViewById(R.id.item_separator);
 
@@ -97,16 +97,11 @@ public class ExportOptionsDialog extends Dialog {
 
             //Convert the file to the requested format
             new Thread(() -> {
-                final File output = FileManager.getInstance().export(file, fileNameInput.getText().toString().trim() + ".txt", separator, formatNumber ? numberFormat : null);
+                export(fileNameInput.getText().toString().trim(), separator, formatNumber, numberFormat);
                 progressDialog.dismiss();
-
-                final Uri path = FileProvider.getUriForFile(context, "com.tycho.app.primenumberfinder", output);
-                final Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.putExtra(Intent.EXTRA_STREAM, path);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent.setType("text/plain");
-                context.startActivity(intent);
             }).start();
         });
     }
+
+    protected abstract void export(final String fileName, final String separator, final boolean formatNumber, final NumberFormat numberFormat);
 }

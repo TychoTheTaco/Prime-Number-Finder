@@ -175,7 +175,6 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         }
 
         //Show a dialog while upgrading to the newest version
-        //TODO: Implement file structure upgrade
         if (PreferenceManager.getInt(PreferenceManager.Preference.FILE_VERSION) < PreferenceManager.CURRENT_VERSION) {
             upgrade(this);
         }

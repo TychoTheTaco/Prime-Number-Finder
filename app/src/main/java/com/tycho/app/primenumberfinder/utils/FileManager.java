@@ -305,35 +305,38 @@ public final class FileManager {
             totalNumbers = (int) (file.length() - headerLength) / numberSize;
         }
 
-        public File export(final String fileName, final String itemSeparator, final NumberFormat numberFormat) {
-            final List<Long> items = readNumbers(file); // TODO: Use a buffer to read
+        public List<Long> readNumbers(final int startIndex, final int count){
+            final List<Long> numbers = new ArrayList<>();
+            try(final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))){
+                dataInputStream.skipBytes(headerLength + (startIndex * numberSize));
+                for (int i = 0; i < count; ++i){
+                    numbers.add(dataInputStream.readLong());
+                }
+            }catch (EOFException e){
+                //Ignore
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+            return numbers;
+        }
 
+        public File export(final String fileName, final String itemSeparator, final NumberFormat numberFormat) {
+            final int BUFFER_SIZE = 27;
             final File output = new File(FileManager.getInstance().getExportCacheDirectory() + File.separator + fileName);
 
-            try {
-
-                final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(output));
-
-                final long lastItem = items.get(items.size() - 1);
-
-                for (long number : items) {
-                    if (numberFormat != null) {
-                        bufferedWriter.write(numberFormat.format(number));
-                    } else {
-                        bufferedWriter.write(String.valueOf(number));
-                    }
-
-                    if (number != lastItem) {
-                        bufferedWriter.write(itemSeparator);
+            try(final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(output))){
+                for (int i = 0; i < totalNumbers; i += BUFFER_SIZE){
+                    final List<Long> numbers = readNumbers(i, BUFFER_SIZE);
+                    final long lastItem = numbers.get(numbers.size() - 1);
+                    for (long number : numbers) {
+                        bufferedWriter.write(numberFormat == null ? String.valueOf(number) : numberFormat.format(number));
+                        if (i + BUFFER_SIZE < totalNumbers || number != lastItem) {
+                            bufferedWriter.write(itemSeparator);
+                        }
                     }
                 }
-
-                bufferedWriter.flush();
-                bufferedWriter.close();
-
-            } catch (IOException e) {
+            }catch (IOException e){
                 e.printStackTrace();
-                return null;
             }
             return output;
         }
@@ -348,6 +351,68 @@ public final class FileManager {
 
         public long getEndValue() {
             return endValue;
+        }
+
+        public int getTotalNumbers() {
+            return totalNumbers;
+        }
+    }
+
+    public static class FactorsFile {
+        private final File file;
+
+        //private final int version;
+        private final int headerLength = 0;
+        private final int numberSize = 8;
+        //private final long startValue;
+        //private final long endValue;
+
+        private final int totalNumbers;
+
+        public FactorsFile(final File file){
+            this.file = file;
+
+            totalNumbers = (int) (file.length() - headerLength) / numberSize;
+        }
+
+        public List<Long> readNumbers(final int startIndex, final int count){
+            final List<Long> numbers = new ArrayList<>();
+            try(final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))){
+                dataInputStream.skipBytes(headerLength + (startIndex * numberSize));
+                for (int i = 0; i < count; ++i){
+                    numbers.add(dataInputStream.readLong());
+                }
+            }catch (EOFException e){
+                //Ignore
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+            return numbers;
+        }
+
+        public File export(final String fileName, final String itemSeparator, final NumberFormat numberFormat) {
+            final int BUFFER_SIZE = 27;
+            final File output = new File(FileManager.getInstance().getExportCacheDirectory() + File.separator + fileName);
+
+            try(final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(output))){
+                for (int i = 0; i < totalNumbers; i += BUFFER_SIZE){
+                    final List<Long> numbers = readNumbers(i, BUFFER_SIZE);
+                    final long lastItem = numbers.get(numbers.size() - 1);
+                    for (long number : numbers) {
+                        bufferedWriter.write(numberFormat == null ? String.valueOf(number) : numberFormat.format(number));
+                        if (i + BUFFER_SIZE < totalNumbers || number != lastItem) {
+                            bufferedWriter.write(itemSeparator);
+                        }
+                    }
+                }
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+            return output;
+        }
+
+        public File getFile() {
+            return file;
         }
 
         public int getTotalNumbers() {
@@ -386,39 +451,6 @@ public final class FileManager {
             e.printStackTrace();
             return null;
         }
-    }
-
-    public File export(final File file, final String fileName, final String itemSeparator, final NumberFormat numberFormat) {
-        final List<Long> items = readNumbers(file);
-
-        final File output = new File(getExportCacheDirectory() + File.separator + fileName);
-
-        try {
-
-            final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(output));
-
-            final long lastItem = items.get(items.size() - 1);
-
-            for (long number : items) {
-                if (numberFormat != null) {
-                    bufferedWriter.write(numberFormat.format(number));
-                } else {
-                    bufferedWriter.write(String.valueOf(number));
-                }
-
-                if (number != lastItem) {
-                    bufferedWriter.write(itemSeparator);
-                }
-            }
-
-            bufferedWriter.flush();
-            bufferedWriter.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-        return output;
     }
 
     public File getSavedPrimesDirectory() {

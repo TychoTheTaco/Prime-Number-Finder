@@ -365,7 +365,7 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
                 break;
 
             case R.id.export:
-                final ExportOptionsDialog exportOptionsDialog = new ExportOptionsDialog(this, file, R.style.FindPrimes_Dialog);
+                final ExportOptionsDialog exportOptionsDialog = new ExportPrimesOptionsDialog(this, file, R.style.FindPrimes_Dialog);
                 exportOptionsDialog.show();
                 break;
 
