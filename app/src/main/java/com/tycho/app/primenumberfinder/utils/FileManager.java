@@ -26,6 +26,7 @@ import java.lang.ref.WeakReference;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -199,74 +200,6 @@ public final class FileManager {
         return true;
     }
 
-    public static List<Long> readNumbers(final File file) {
-        final List<Long> numbers = new ArrayList<>();
-
-        try {
-            final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
-
-            try {
-                while (true) {
-                    numbers.add(dataInputStream.readLong());
-                }
-            } catch (EOFException e) {
-
-            } finally {
-                dataInputStream.close();
-            }
-
-        } catch (IOException | NumberFormatException e) {
-            e.printStackTrace();
-        }
-
-        return numbers;
-    }
-
-    /**
-     * Reads numbers from a file and adds them to the given list. Returns true if the end of file was reached.
-     *
-     * @param file
-     * @param numbers
-     * @param startIndex
-     * @param count
-     * @return
-     */
-    public static boolean readNumbers(final File file, final List<Long> numbers, final int startIndex, final int count) {
-        boolean endOfFile = false;
-        try {
-            final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
-
-            //Read header
-            final int version = dataInputStream.readUnsignedByte();
-            final int headerLength = dataInputStream.readUnsignedByte();
-            final int numberSize = dataInputStream.readUnsignedByte();
-            final byte[] buffer = new byte[numberSize];
-            dataInputStream.readFully(buffer);
-            final long startValue = bytesToNumber(buffer);
-            dataInputStream.readFully(buffer);
-            final long endValue = bytesToNumber(buffer);
-
-            //Skip numbers
-            dataInputStream.skipBytes(startIndex * numberSize);
-
-            try {
-                for (int i = 0; i < count; i++) {
-                    //TODO: Read long only if number size = 8
-                    numbers.add(dataInputStream.readLong());
-                }
-            } catch (EOFException e) {
-                endOfFile = true;
-            } finally {
-                dataInputStream.close();
-            }
-
-        } catch (IOException | NumberFormatException e) {
-            e.printStackTrace();
-        }
-
-        return endOfFile;
-    }
-
     private static long bytesToNumber(final byte[] bytes) {
         long number = 0;
         for (int i = 0, offset = 8 * 8 - 8; i < 8; ++i, offset -= 8) {
@@ -276,19 +209,77 @@ public final class FileManager {
         return number;
     }
 
-    public static class PrimesFile {
-        private final File file;
+    private static abstract class NumbersFile {
 
+        protected final File file;
+
+        protected int headerLength = 0;
+        protected int numberSize = 8;
+
+        protected int totalNumbers;
+
+        public NumbersFile(final File file) {
+            this.file = file;
+        }
+
+        public List<Long> readNumbers(final int startIndex, final int count) {
+            final List<Long> numbers = new ArrayList<>();
+            try (final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))) {
+                dataInputStream.skipBytes(headerLength + (startIndex * numberSize));
+                for (int i = 0; i < count || count == -1; ++i) {
+                    numbers.add(dataInputStream.readLong());
+                }
+            } catch (EOFException e) {
+                //Ignore
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return numbers;
+        }
+
+        public File export(final String fileName, final String itemSeparator, final NumberFormat numberFormat) {
+            final int BUFFER_SIZE = 1024;
+            final File output = new File(FileManager.getInstance().getExportCacheDirectory() + File.separator + fileName);
+
+            try (final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(output))) {
+                for (int i = 0; i < totalNumbers; i += BUFFER_SIZE) {
+                    final List<Long> numbers = readNumbers(i, BUFFER_SIZE);
+                    final long lastItem = numbers.get(numbers.size() - 1);
+                    for (long number : numbers) {
+                        bufferedWriter.write(numberFormat == null ? String.valueOf(number) : numberFormat.format(number));
+                        if (i + BUFFER_SIZE < totalNumbers || number != lastItem) {
+                            bufferedWriter.write(itemSeparator);
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return output;
+        }
+
+        public String getTitle(){
+            return file.getName();
+        }
+
+        public File getFile() {
+            return file;
+        }
+
+        public int getTotalNumbers() {
+            return totalNumbers;
+        }
+    }
+
+    public static class PrimesFile extends NumbersFile {
         private final int version;
-        private final int headerLength;
-        private final int numberSize;
+        //private final int headerLength;
+        //private final int numberSize;
         private final long startValue;
         private final long endValue;
 
-        private final int totalNumbers;
-
         public PrimesFile(final File file) throws IOException {
-            this.file = file;
+            super(file);
 
             //Read header
             final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
@@ -305,46 +296,6 @@ public final class FileManager {
             totalNumbers = (int) (file.length() - headerLength) / numberSize;
         }
 
-        public List<Long> readNumbers(final int startIndex, final int count){
-            final List<Long> numbers = new ArrayList<>();
-            try(final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))){
-                dataInputStream.skipBytes(headerLength + (startIndex * numberSize));
-                for (int i = 0; i < count; ++i){
-                    numbers.add(dataInputStream.readLong());
-                }
-            }catch (EOFException e){
-                //Ignore
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-            return numbers;
-        }
-
-        public File export(final String fileName, final String itemSeparator, final NumberFormat numberFormat) {
-            final int BUFFER_SIZE = 27;
-            final File output = new File(FileManager.getInstance().getExportCacheDirectory() + File.separator + fileName);
-
-            try(final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(output))){
-                for (int i = 0; i < totalNumbers; i += BUFFER_SIZE){
-                    final List<Long> numbers = readNumbers(i, BUFFER_SIZE);
-                    final long lastItem = numbers.get(numbers.size() - 1);
-                    for (long number : numbers) {
-                        bufferedWriter.write(numberFormat == null ? String.valueOf(number) : numberFormat.format(number));
-                        if (i + BUFFER_SIZE < totalNumbers || number != lastItem) {
-                            bufferedWriter.write(itemSeparator);
-                        }
-                    }
-                }
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-            return output;
-        }
-
-        public File getFile() {
-            return file;
-        }
-
         public long getStartValue() {
             return startValue;
         }
@@ -353,70 +304,17 @@ public final class FileManager {
             return endValue;
         }
 
-        public int getTotalNumbers() {
-            return totalNumbers;
+        @Override
+        public String getTitle() {
+            final NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
+            return "Primes from " +  numberFormat.format(startValue) + " to " + numberFormat.format(endValue);
         }
     }
 
-    public static class FactorsFile {
-        private final File file;
-
-        //private final int version;
-        private final int headerLength = 0;
-        private final int numberSize = 8;
-        //private final long startValue;
-        //private final long endValue;
-
-        private final int totalNumbers;
-
-        public FactorsFile(final File file){
-            this.file = file;
-
+    public static class FactorsFile extends NumbersFile {
+        public FactorsFile(final File file) {
+            super(file);
             totalNumbers = (int) (file.length() - headerLength) / numberSize;
-        }
-
-        public List<Long> readNumbers(final int startIndex, final int count){
-            final List<Long> numbers = new ArrayList<>();
-            try(final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))){
-                dataInputStream.skipBytes(headerLength + (startIndex * numberSize));
-                for (int i = 0; i < count; ++i){
-                    numbers.add(dataInputStream.readLong());
-                }
-            }catch (EOFException e){
-                //Ignore
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-            return numbers;
-        }
-
-        public File export(final String fileName, final String itemSeparator, final NumberFormat numberFormat) {
-            final int BUFFER_SIZE = 27;
-            final File output = new File(FileManager.getInstance().getExportCacheDirectory() + File.separator + fileName);
-
-            try(final BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(output))){
-                for (int i = 0; i < totalNumbers; i += BUFFER_SIZE){
-                    final List<Long> numbers = readNumbers(i, BUFFER_SIZE);
-                    final long lastItem = numbers.get(numbers.size() - 1);
-                    for (long number : numbers) {
-                        bufferedWriter.write(numberFormat == null ? String.valueOf(number) : numberFormat.format(number));
-                        if (i + BUFFER_SIZE < totalNumbers || number != lastItem) {
-                            bufferedWriter.write(itemSeparator);
-                        }
-                    }
-                }
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-            return output;
-        }
-
-        public File getFile() {
-            return file;
-        }
-
-        public int getTotalNumbers() {
-            return totalNumbers;
         }
     }
 
@@ -426,12 +324,6 @@ public final class FileManager {
             bytes[i] = (byte) ((number >> offset) & 0xFF);
         }
         return bytes;
-    }
-
-    public static List<Long> readNumbers(final File file, final int startIndex, final int count) {
-        final List<Long> numbers = new ArrayList<>();
-        readNumbers(file, numbers, startIndex, count);
-        return numbers;
     }
 
     public Tree<Long> readTree(final File file) {
@@ -467,23 +359,6 @@ public final class FileManager {
 
     public File getExportCacheDirectory() {
         return new File(context.get().getFilesDir() + File.separator + "export" + File.separator);
-    }
-
-    public static void copy(File src, File dst) throws IOException {
-        try (InputStream in = new FileInputStream(src)) {
-            try (OutputStream out = new FileOutputStream(dst)) {
-                // Transfer bytes from in to out
-                byte[] buf = new byte[1024];
-                int len;
-                while ((len = in.read(buf)) > 0) {
-                    out.write(buf, 0, len);
-                }
-            }
-        }
-    }
-
-    public static int numbersWithNDigits(final int n) {
-        return (int) (Math.pow(10, n) - Math.pow(10, n - 1));
     }
 
     public static long[] getPrimesRangeFromTitle(final File file) {

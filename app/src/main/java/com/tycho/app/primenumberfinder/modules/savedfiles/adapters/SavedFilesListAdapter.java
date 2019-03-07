@@ -78,7 +78,7 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
                     holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.purple)));
                     try{
                         final FileManager.PrimesFile primesFile = new FileManager.PrimesFile(file);
-                        holder.fileName.setText("Primes from " + primesFile.getStartValue() + " to " + (primesFile.getEndValue() == 0 ? "infinity" : primesFile.getEndValue()));
+                        holder.fileName.setText(primesFile.getTitle());
                     }catch (IOException e){
                         e.printStackTrace();
                     }

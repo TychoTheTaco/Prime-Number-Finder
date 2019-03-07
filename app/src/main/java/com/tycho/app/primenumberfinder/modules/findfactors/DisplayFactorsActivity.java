@@ -121,7 +121,6 @@ public class DisplayFactorsActivity extends DisplayContentActivity {
         menu.findItem(R.id.find).setVisible(false);
         menu.findItem(R.id.export).setVisible(allowExport);
         menu.findItem(R.id.delete).setVisible(allowDelete);
-
         return true;
     }
 
@@ -169,7 +168,8 @@ public class DisplayFactorsActivity extends DisplayContentActivity {
         //Load file in another thread
         new Thread(() -> {
 
-            final List<Long> numbers = FileManager.readNumbers(file);
+            final FileManager.FactorsFile factorsFile = new FileManager.FactorsFile(file);
+            final List<Long> numbers = factorsFile.readNumbers(0, -1);
             adapter.getFactors().addAll(numbers);
 
             //Update UI

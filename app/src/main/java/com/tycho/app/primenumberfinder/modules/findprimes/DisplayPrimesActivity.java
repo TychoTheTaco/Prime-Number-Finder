@@ -69,6 +69,8 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
 
     private ProgressDialog progressDialog;
 
+    private FileManager.PrimesFile primesFile;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -185,7 +187,7 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
 
             //Add items to beginning
             Log.d(TAG, "Adding from " + (firstItemIndex - INCREMENT));
-            final List<Long> numbers = FileManager.readNumbers(file, firstItemIndex - INCREMENT, INCREMENT);
+            final List<Long> numbers = primesFile.readNumbers(firstItemIndex - INCREMENT, INCREMENT);
             for (int i = numbers.size() - 1; i >= 0; i--) {
                 primesAdapter.getPrimes().add(0, numbers.get(i));
             }
@@ -199,8 +201,8 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
             //Log.d(TAG, "Size before: " + primesAdapter.getPrimes().size());
 
             //Read new items
-            final List<Long> numbers = new ArrayList<>();
-            final boolean endOfFile = FileManager.readNumbers(file, numbers, firstItemIndex + totalItemCount, INCREMENT);
+            final List<Long> numbers = primesFile.readNumbers(firstItemIndex + totalItemCount, INCREMENT);
+            final boolean endOfFile = numbers.size() < INCREMENT;
 
             if (!endOfFile) {
                 //Remove items
@@ -226,18 +228,18 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
         private void specialScrollToPosition(final int position, final boolean animate) {
             //Scroll to correct position
             int startIndex = (position / scrollListener.INCREMENT) * (scrollListener.INCREMENT);
-            final List<Long> numbers = new ArrayList<>();
 
             //Try to read from start
             startIndex -= INCREMENT;
             if (startIndex < 0) {
                 startIndex = 0;
             }
-            final boolean endOfFile = FileManager.readNumbers(file, numbers, startIndex, primesAdapter.getItemCount());
+            List<Long> numbers = primesFile.readNumbers(startIndex, primesAdapter.getItemCount());
+            final boolean endOfFile = numbers.size() < INCREMENT;
 
             if (endOfFile) {
                 int previousSize = 0;
-                while (FileManager.readNumbers(file, numbers, startIndex, primesAdapter.getItemCount()) && previousSize != numbers.size()) {
+                while ((numbers = primesFile.readNumbers(startIndex, primesAdapter.getItemCount())).size() > INCREMENT && previousSize != numbers.size()) {
                     //Log.d(TAG, "Read " + numbers.size());
                     startIndex -= (primesAdapter.getItemCount() - numbers.size());
                     previousSize = numbers.size();
@@ -280,12 +282,12 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
         //Load file in another thread
         new Thread(() -> {
             try {
-                final FileManager.PrimesFile primesFile = new FileManager.PrimesFile(file);
+                primesFile = new FileManager.PrimesFile(file);
                 setTitle("Prime numbers from " + primesFile.getStartValue() + " to " + primesFile.getEndValue());
                 scrollListener.setTotalNumbers(primesFile.getTotalNumbers());
 
                 //Read numbers
-                final List<Long> numbers = FileManager.readNumbers(file, 0, 1000);
+                final List<Long> numbers = primesFile.readNumbers(0, 1000);
                 primesAdapter.getPrimes().addAll(numbers);
 
                 //Update UI

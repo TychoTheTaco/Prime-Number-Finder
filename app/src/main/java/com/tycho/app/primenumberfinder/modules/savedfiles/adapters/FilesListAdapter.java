@@ -59,7 +59,7 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.View
                 holder.icon.setImageResource(R.drawable.find_primes_icon);
                 try{
                     final FileManager.PrimesFile primesFile = new FileManager.PrimesFile(file);
-                    holder.fileName.setText("Primes from " + primesFile.getStartValue() + " to " + (primesFile.getEndValue() == 0 ? "infinity" : primesFile.getEndValue()));
+                    holder.fileName.setText(primesFile.getTitle());
                 }catch (IOException e){
                     e.printStackTrace();
                 }
