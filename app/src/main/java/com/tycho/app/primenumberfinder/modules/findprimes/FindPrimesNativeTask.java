@@ -6,6 +6,7 @@ import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 
 import java.io.File;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class FindPrimesNativeTask extends NativeTask implements FindPrimesTask, SearchOptions, Savable {
 
@@ -87,21 +88,24 @@ public class FindPrimesNativeTask extends NativeTask implements FindPrimesTask, 
     // [Savable]
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    private final CopyOnWriteArrayList<SaveListener> saveListeners = new CopyOnWriteArrayList<>();
+
     private boolean isSaved = false;
 
     @Override
     public void addSaveListener(SaveListener listener) {
-
+        saveListeners.add(listener);
     }
 
     @Override
     public void removeSaveListener(SaveListener listener) {
-
+        saveListeners.remove(listener);
     }
 
     @Override
     public boolean save() {
         saveToFile(FileManager.buildFile(this));
+        sendOnSaved();
         isSaved = true;
         return true;
     }
@@ -109,6 +113,18 @@ public class FindPrimesNativeTask extends NativeTask implements FindPrimesTask, 
     @Override
     public boolean isSaved() {
         return isSaved;
+    }
+
+    private void sendOnSaved(){
+        for (SaveListener listener : saveListeners){
+            listener.onSaved();
+        }
+    }
+
+    private void sendOnError(){
+        for (SaveListener listener : saveListeners){
+            listener.onError();
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

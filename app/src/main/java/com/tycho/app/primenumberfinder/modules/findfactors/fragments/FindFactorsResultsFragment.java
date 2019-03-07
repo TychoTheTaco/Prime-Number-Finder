@@ -115,7 +115,7 @@ public class FindFactorsResultsFragment extends ResultsFragment {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            final File file = new File(getActivity().getFilesDir() + File.separator + "temp");
+            final File file = new File(getActivity().getCacheDir() + File.separator + "temp");
             final boolean success = FileManager.getInstance().saveFactors(getTask().getFactors(), file);
             if (!success) {
                 handler.post(() -> Toast.makeText(getActivity(), getString(R.string.general_error), Toast.LENGTH_SHORT).show());
@@ -126,12 +126,9 @@ public class FindFactorsResultsFragment extends ResultsFragment {
 
             final Intent intent = new Intent(getActivity(), DisplayFactorsActivity.class);
             intent.putExtra("filePath", file.getAbsolutePath());
-            intent.putExtra("title", false);
             intent.putExtra("number", getTask().getNumber());
             getActivity().startActivity(intent);
         }).start());
-
-        saveButton.setOnClickListener(v -> Utils.save(getTask(), getActivity()));
 
         init();
 

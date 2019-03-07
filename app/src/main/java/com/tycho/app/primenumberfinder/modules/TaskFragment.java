@@ -77,7 +77,7 @@ public abstract class TaskFragment extends Fragment implements TaskListener {
         //Remove task listener from previous task
         if (this.task != null){
             if (!this.task.removeTaskListener(this)){
-                Log.d(TAG, "Failed to remove task listener from " + this.task);
+                Log.w(TAG, "Failed to remove task listener from " + this.task);
             }
         }
 

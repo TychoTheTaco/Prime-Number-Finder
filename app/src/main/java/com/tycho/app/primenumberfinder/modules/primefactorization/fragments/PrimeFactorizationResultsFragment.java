@@ -77,8 +77,6 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         statisticsLayout.add("eta", R.drawable.ic_timer_white_24dp);
         statisticsLayout.inflate();
 
-        saveButton.setOnClickListener(v -> Utils.save(getTask(), getActivity()));
-
         init();
 
         return rootView;

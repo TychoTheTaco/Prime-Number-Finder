@@ -39,7 +39,7 @@ import easytasks.TaskListener;
  * Created by tycho on 12/12/2017.
  */
 
-public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends RecyclerView.Adapter<AbstractTaskListAdapter.ViewHolder> implements TaskListener{
+public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends RecyclerView.Adapter<AbstractTaskListAdapter.ViewHolder> implements TaskListener {
 
     /**
      * Tag used for logging and debugging.
@@ -60,11 +60,6 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
      * Event listeners.
      */
     private final List<EventListener> eventListeners = new ArrayList<>();
-
-    /**
-     * Custom task event listeners that update the view holder when the task is paused / resumed / stopped.
-     */
-    private Map<NativeTaskInterface, CustomTaskEventListener> customEventListeners = new HashMap<>();
 
     /**
      * Handler for posting to UI thread.
@@ -123,16 +118,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
     public void onBindViewHolder(@NonNull AbstractTaskListAdapter.ViewHolder holder, int position) {
         final Item item = items.get(position);
         final NativeTaskInterface task = item.getTask();
-        customEventListeners.get(task).setViewHolder(holder);
-
-        //Start the UI updater if it hasn't been started yet
-        if (holder.uiUpdater.getState() == Task.State.NOT_STARTED) {
-            //holder.uiUpdater.addTaskListener(getUiUpdaterDebugListener(holder));
-            holder.uiUpdater.startOnNewThread();
-            if (task.getState() == Task.State.PAUSED || task.getState() == Task.State.NOT_STARTED || task.getState() == Task.State.STOPPED) {
-                holder.uiUpdater.pause();
-            }
-        }
+        holder.setTask(task);
 
         //Check if this item should be selected
         holder.itemView.setSelected(holder.getAdapterPosition() == getSelectedItemPosition());
@@ -145,149 +131,149 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         switch (task.getState()) {
             case RUNNING:
                 //Pause button
-                if (holder.pauseButton != null){
+                if (holder.pauseButton != null) {
                     holder.pauseButton.setEnabled(true);
                     holder.pauseButton.setVisibility(View.VISIBLE);
                     holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
                 }
 
                 //Edit button
-                if (holder.editButton != null){
+                if (holder.editButton != null) {
                     holder.editButton.setEnabled(false);
                     holder.editButton.setVisibility(View.VISIBLE);
                 }
 
                 //Delete button
-                if (holder.deleteButton != null){
+                if (holder.deleteButton != null) {
                     holder.deleteButton.setEnabled(false);
                     holder.deleteButton.setVisibility(View.VISIBLE);
                 }
 
                 //Save button
-                if (holder.saveButton != null){
+                if (holder.saveButton != null) {
                     holder.saveButton.setVisibility(View.GONE);
                 }
                 break;
 
             case PAUSING:
                 //Pause button
-                if (holder.pauseButton != null){
+                if (holder.pauseButton != null) {
                     holder.pauseButton.setEnabled(false);
                     holder.pauseButton.setVisibility(View.VISIBLE);
                     holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
                 }
 
                 //Edit button
-                if (holder.editButton != null){
+                if (holder.editButton != null) {
                     holder.editButton.setEnabled(false);
                     holder.editButton.setVisibility(View.VISIBLE);
                 }
 
                 //Delete button
-                if (holder.deleteButton != null){
+                if (holder.deleteButton != null) {
                     holder.deleteButton.setEnabled(false);
                     holder.deleteButton.setVisibility(View.VISIBLE);
                 }
 
                 //Save button
-                if (holder.saveButton != null){
+                if (holder.saveButton != null) {
                     holder.saveButton.setVisibility(View.GONE);
                 }
                 break;
 
             case PAUSED:
                 //Pause button
-                if (holder.pauseButton != null){
+                if (holder.pauseButton != null) {
                     holder.pauseButton.setEnabled(true);
                     holder.pauseButton.setVisibility(View.VISIBLE);
                     holder.pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
                 }
 
                 //Edit button
-                if (holder.editButton != null){
+                if (holder.editButton != null) {
                     holder.editButton.setEnabled(true);
                     holder.editButton.setVisibility(View.VISIBLE);
                 }
 
                 //Delete button
-                if (holder.deleteButton != null){
+                if (holder.deleteButton != null) {
                     holder.deleteButton.setEnabled(true);
                     holder.deleteButton.setVisibility(View.VISIBLE);
                 }
 
                 //Save button
-                if (holder.saveButton != null){
+                if (holder.saveButton != null) {
                     holder.saveButton.setVisibility(View.GONE);
                 }
                 break;
 
             case RESUMING:
                 //Pause button
-                if (holder.pauseButton != null){
+                if (holder.pauseButton != null) {
                     holder.pauseButton.setEnabled(false);
                     holder.pauseButton.setVisibility(View.VISIBLE);
                     holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
                 }
 
                 //Edit button
-                if (holder.editButton != null){
+                if (holder.editButton != null) {
                     holder.editButton.setEnabled(false);
                     holder.editButton.setVisibility(View.VISIBLE);
                 }
 
                 //Delete button
-                if (holder.deleteButton != null){
+                if (holder.deleteButton != null) {
                     holder.deleteButton.setEnabled(false);
                     holder.deleteButton.setVisibility(View.VISIBLE);
                 }
 
                 //Save button
-                if (holder.saveButton != null){
+                if (holder.saveButton != null) {
                     holder.saveButton.setVisibility(View.GONE);
                 }
                 break;
 
             case STOPPED:
                 //Pause button
-                if (holder.pauseButton != null){
+                if (holder.pauseButton != null) {
                     holder.pauseButton.setVisibility(View.GONE);
                 }
 
                 //Edit button
-                if (holder.editButton != null){
+                if (holder.editButton != null) {
                     holder.editButton.setVisibility(View.GONE);
                 }
 
                 //Delete button
-                if (holder.deleteButton != null){
+                if (holder.deleteButton != null) {
                     holder.deleteButton.setEnabled(true);
                     holder.deleteButton.setVisibility(View.VISIBLE);
                 }
 
                 //Save button
-                if (holder.saveButton != null){
+                if (holder.saveButton != null) {
                     holder.saveButton.setEnabled(true);
                     holder.saveButton.setVisibility(View.VISIBLE);
                 }
 
                 //Hide progress if task is complete
-                if (task.getProgress() == 1){
+                if (task.getProgress() == 1) {
                     holder.progress.setVisibility(View.GONE);
                 }
                 break;
         }
 
+        onUpdate(holder);
+
         //Show saved
-        if (isSaved(task)){
+        if (isSaved(task)) {
             if (holder.saveButton != null) holder.saveButton.setVisibility(View.GONE);
             holder.progress.setVisibility(View.VISIBLE);
             holder.progress.setText(context.getString(R.string.saved));
         }
-
-        onUpdate(holder);
     }
 
-    private TaskListener getUiUpdaterDebugListener(final ViewHolder holder){
+    private TaskListener getUiUpdaterDebugListener(final ViewHolder holder) {
         return new TaskListener() {
             @Override
             public void onTaskStarted() {
@@ -366,19 +352,19 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         sendTaskStatesChanged();
     }
 
-    protected CharSequence getTitle(final Item item){
+    protected CharSequence getTitle(final Item item) {
         return getTitle(item.getTask());
     }
 
-    protected CharSequence getTitle(final T task){
+    protected CharSequence getTitle(final T task) {
         return task.getClass().getSimpleName();
     }
 
-    protected CharSequence getSubtitle(final Item item){
+    protected CharSequence getSubtitle(final Item item) {
         return getSubtitle(item.getTask());
     }
 
-    protected CharSequence getSubtitle(final T task){
+    protected CharSequence getSubtitle(final T task) {
         switch (task.getState()) {
             default:
                 return "";
@@ -400,92 +386,18 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         }
     }
 
-    protected float getProgress(final T task){
+    protected float getProgress(final T task) {
         return task.getProgress();
     }
 
-    protected float getProgress(final Item item){
+    protected float getProgress(final Item item) {
         return getProgress(item.getTask());
     }
 
     public void addTask(final T task) {
-        final CustomTaskEventListener customTaskEventListener = new CustomTaskEventListener() {
-            @Override
-            public void onTaskStarted() {
-                handler.post(() -> {
-                    if (holder != null) {
-                        holder.uiUpdater.resume();
-                        notifyItemChanged(holder.getAdapterPosition());
-                    }
-
-                });
-            }
-
-            @Override
-            public void onTaskPausing() {
-                handler.post(() -> {
-                    if (holder != null) {
-                        notifyItemChanged(holder.getAdapterPosition());
-                    }
-
-                });
-            }
-
-            @Override
-            public void onTaskPaused() {
-                handler.post(() -> {
-                    if (holder != null) {
-                        holder.uiUpdater.pause();
-                        notifyItemChanged(holder.getAdapterPosition());
-                    }
-                });
-            }
-
-            @Override
-            public void onTaskResuming() {
-                handler.post(() -> {
-                    if (holder != null) {
-                        notifyItemChanged(holder.getAdapterPosition());
-                    }
-
-                });
-            }
-
-            @Override
-            public void onTaskResumed() {
-                handler.post(() -> {
-                    if (holder != null) {
-                        holder.uiUpdater.resume();
-                        notifyItemChanged(holder.getAdapterPosition());
-                    }
-                });
-            }
-
-            @Override
-            public void onTaskStopping() {
-                handler.post(() -> {
-                    if (holder != null) {
-                        notifyItemChanged(holder.getAdapterPosition());
-                    }
-
-                });
-            }
-
-            @Override
-            public void onTaskStopped() {
-                handler.post(() -> {
-                    if (holder != null) {
-                        holder.uiUpdater.pause();
-                        notifyItemChanged(holder.getAdapterPosition());
-                    }
-                });
-            }
-        };
-        task.addTaskListener(customTaskEventListener);
         task.addTaskListener(this);
         items.add(new Item(task));
         notifyItemInserted(getItemCount());
-        customEventListeners.put(task, customTaskEventListener);
         sendTaskStatesChanged();
     }
 
@@ -579,7 +491,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         return items.get(position).getTask();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements TaskListener {
 
         public final TextView title;
         public final TextView subtitle;
@@ -589,7 +501,9 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         public ImageButton deleteButton;
         public ImageButton saveButton;
 
-        protected final UiUpdater uiUpdater = new UiUpdater(this);
+        private NativeTaskInterface task;
+
+        private final UiUpdater uiUpdater = new UiUpdater(this);
 
         private final List<Button> buttons = new ArrayList<>();
 
@@ -606,19 +520,19 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
             deleteButton = itemView.findViewById(R.id.delete_button);
             saveButton = itemView.findViewById(R.id.save_button);
 
-            if (!buttons.contains(Button.PAUSE)){
+            if (!buttons.contains(Button.PAUSE)) {
                 pauseButton.setVisibility(View.GONE);
                 pauseButton = null;
             }
-            if (!buttons.contains(Button.EDIT)){
+            if (!buttons.contains(Button.EDIT)) {
                 editButton.setVisibility(View.GONE);
                 editButton = null;
             }
-            if (!buttons.contains(Button.DELETE)){
+            if (!buttons.contains(Button.DELETE)) {
                 deleteButton.setVisibility(View.GONE);
                 deleteButton = null;
             }
-            if (!buttons.contains(Button.SAVE)){
+            if (!buttons.contains(Button.SAVE)) {
                 saveButton.setVisibility(View.GONE);
                 saveButton = null;
             }
@@ -632,7 +546,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
             });
 
             //Set button listeners
-            if (pauseButton != null){
+            if (pauseButton != null) {
                 pauseButton.setOnClickListener(v -> {
                     switch (items.get(getAdapterPosition()).getTask().getState()) {
 
@@ -650,14 +564,13 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
                 });
             }
 
-            if (editButton != null){
+            if (editButton != null) {
                 editButton.setOnClickListener(v -> sendOnEditClicked(getTask(getAdapterPosition())));
             }
 
-            if (deleteButton != null){
+            if (deleteButton != null) {
                 deleteButton.setOnClickListener(v -> {
 
-                    //PAUSE the UI updater. It will be re-used by other ViewHolders
                     getTask(getAdapterPosition()).pause();
 
                     if (getAdapterPosition() < selectedItemPosition) {
@@ -670,7 +583,6 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
                     //Remove the task from the list
                     final int position = getAdapterPosition();
                     final NativeTaskInterface task = getTask(position);
-                    customEventListeners.remove(task);
                     items.remove(position);
                     notifyItemRemoved(position);
 
@@ -682,11 +594,11 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
                 });
             }
 
-            if (saveButton != null){
+            if (saveButton != null) {
                 saveButton.setOnClickListener(v -> {
                     //Save the task if it is savable
                     final NativeTaskInterface task = getTask(getAdapterPosition());
-                    if (task instanceof Savable){
+                    if (task instanceof Savable) {
                         Utils.save((Savable) task, context);
                     }
 
@@ -696,14 +608,94 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
             }
         }
 
-        protected void onPausePressed(){}
+        public void setTask(NativeTaskInterface task) {
+            //Remove task listener from previous task
+            if (this.task != null) {
+                if (!this.task.removeTaskListener(this)) {
+                    Log.w(TAG, "Failed to remove task listener from " + this.task);
+                }
+            }
 
-        protected void onDeletePressed(){}
+            this.task = task;
+
+            //Add task listener to new task
+            if (task != null) {
+
+                //Start the UI updater if it hasn't been started yet
+                if (uiUpdater.getState() == Task.State.NOT_STARTED) {
+                    //holder.uiUpdater.addTaskListener(getUiUpdaterDebugListener(holder));
+                    uiUpdater.startOnNewThread();
+                    if (task.getState() == Task.State.PAUSED || task.getState() == Task.State.NOT_STARTED || task.getState() == Task.State.STOPPED) {
+                        uiUpdater.pause();
+                    }
+                }
+
+                task.addTaskListener(this);
+            }
+        }
+
+        protected void onPausePressed() {
+        }
+
+        protected void onDeletePressed() {
+        }
+
+        @Override
+        public void onTaskStarted() {
+            handler.post(() -> {
+                uiUpdater.resume();
+                notifyItemChanged(getAdapterPosition());
+            });
+        }
+
+        @Override
+        public void onTaskPausing() {
+            handler.post(() -> {
+                notifyItemChanged(getAdapterPosition());
+            });
+        }
+
+        @Override
+        public void onTaskPaused() {
+            handler.post(() -> {
+                uiUpdater.pause();
+                notifyItemChanged(getAdapterPosition());
+            });
+        }
+
+        @Override
+        public void onTaskResuming() {
+            handler.post(() -> {
+                notifyItemChanged(getAdapterPosition());
+            });
+        }
+
+        @Override
+        public void onTaskResumed() {
+            handler.post(() -> {
+                notifyItemChanged(getAdapterPosition());
+            });
+        }
+
+        @Override
+        public void onTaskStopping() {
+            handler.post(() -> {
+                notifyItemChanged(getAdapterPosition());
+            });
+        }
+
+        @Override
+        public void onTaskStopped() {
+            handler.post(() -> {
+                uiUpdater.pause();
+                notifyItemChanged(getAdapterPosition());
+            });
+        }
     }
 
-    public void setSaved(final int index, boolean isSaved){
+    public void setSaved(final int index, boolean isSaved) {
         final Item item = items.get(index);
-        if (item != null){
+        if (item != null) {
             item.setSaved(isSaved);
             notifyItemChanged(index);
         }
@@ -712,31 +704,31 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
     public void setSaved(final NativeTaskInterface task, boolean isSaved) {
         final Item item = getItem(task);
         final int index = items.indexOf(item);
-        if (item != null){
+        if (item != null) {
             item.setSaved(isSaved);
             notifyItemChanged(index);
         }
     }
 
-    public void postSetSaved(final NativeTaskInterface task, final boolean isSaved){
+    public void postSetSaved(final NativeTaskInterface task, final boolean isSaved) {
         handler.post(() -> setSaved(task, isSaved));
     }
 
-    protected boolean isSaved(NativeTaskInterface task){
+    protected boolean isSaved(NativeTaskInterface task) {
         return getItem(task).isSaved();
     }
 
-    public List<NativeTaskInterface> getSavedItems(){
+    public List<NativeTaskInterface> getSavedItems() {
         final List<NativeTaskInterface> savedItems = new ArrayList<>();
-        for (Item item : items){
-            if (item.isSaved()){
+        for (Item item : items) {
+            if (item.isSaved()) {
                 savedItems.add(item.getTask());
             }
         }
         return savedItems;
     }
 
-    public int indexOf(final NativeTaskInterface task){
+    public int indexOf(final NativeTaskInterface task) {
         return items.indexOf(getItem(task));
     }
 
@@ -771,7 +763,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
                     if (viewHolder.getAdapterPosition() != -1) {
                         onUpdate(viewHolder);
                         notifyItemChanged(viewHolder.getAdapterPosition());
-                    }else{
+                    } else {
                         Log.w(TAG, "Posted an invalid update on " + viewHolder);
                     }
                 });
@@ -815,11 +807,11 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         }
     }
 
-    protected int getTaskType(){
+    protected int getTaskType() {
         return -1;
     }
 
-    public enum Button{
+    public enum Button {
         SAVE,
         PAUSE,
         EDIT,

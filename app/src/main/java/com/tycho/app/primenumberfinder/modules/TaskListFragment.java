@@ -132,32 +132,8 @@ public class TaskListFragment extends Fragment {
     }
 
     public void addTask(final NativeTaskInterface task) {
-        if (task instanceof FindPrimesTask){
-            ((FindPrimesTask) task).addSaveListener(new Savable.SaveListener() {
-                @Override
-                public void onSaved() {
-                    taskListAdapter.postSetSaved(task, true);
-                }
-
-                @Override
-                public void onError() {
-
-                }
-            });
-        }else if (task instanceof FindFactorsTask){
-            ((FindFactorsTask) task).addSaveListener(new Savable.SaveListener() {
-                @Override
-                public void onSaved() {
-                    taskListAdapter.postSetSaved(task, true);
-                }
-
-                @Override
-                public void onError() {
-
-                }
-            });
-        }else if (task instanceof PrimeFactorizationTask){
-            ((PrimeFactorizationTask) task).addSaveListener(new Savable.SaveListener() {
+        if (task instanceof Savable){
+            ((Savable) task).addSaveListener(new Savable.SaveListener() {
                 @Override
                 public void onSaved() {
                     taskListAdapter.postSetSaved(task, true);
@@ -169,7 +145,6 @@ public class TaskListFragment extends Fragment {
                 }
             });
         }
-
         taskListAdapter.addTask(task);
         update();
     }

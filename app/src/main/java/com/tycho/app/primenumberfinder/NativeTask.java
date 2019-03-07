@@ -9,6 +9,11 @@ import easytasks.TaskListener;
 
 public abstract class NativeTask implements NativeTaskInterface {
 
+    /**
+     * Tag used for logging and debugging.
+     */
+    private static final String TAG = NativeTask.class.getSimpleName();
+
     // Load native library
     static {
         System.loadLibrary("native-utils");

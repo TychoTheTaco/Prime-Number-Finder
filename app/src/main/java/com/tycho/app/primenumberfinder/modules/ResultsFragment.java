@@ -1,5 +1,6 @@
 package com.tycho.app.primenumberfinder.modules;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,16 +20,21 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.NativeTaskInterface;
+import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.findfactors.fragments.FindFactorsResultsFragment;
+import com.tycho.app.primenumberfinder.modules.findprimes.DisplayPrimesActivity;
 import com.tycho.app.primenumberfinder.modules.findprimes.fragments.CheckPrimalityResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesResultsFragment;
 import com.tycho.app.primenumberfinder.modules.gcf.fragments.GreatestCommonFactorResultsFragment;
 import com.tycho.app.primenumberfinder.modules.lcm.fragments.LeastCommonMultipleResultsFragment;
 import com.tycho.app.primenumberfinder.modules.primefactorization.fragments.PrimeFactorizationResultsFragment;
+import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
+import java.io.File;
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -524,6 +530,11 @@ public abstract class ResultsFragment extends TaskFragment {
                 getTask().resume();
             }
         });
+
+        //Set up save button
+        if (saveButton != null){
+            saveButton.setOnClickListener((view)->{if (getTask() instanceof Savable) Utils.save((Savable) getTask(), getActivity());});
+        }
     }
 
     protected final void init(){

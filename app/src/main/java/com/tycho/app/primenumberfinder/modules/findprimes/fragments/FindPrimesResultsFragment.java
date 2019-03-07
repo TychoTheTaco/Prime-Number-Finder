@@ -132,13 +132,9 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                 final Intent intent = new Intent(getActivity(), DisplayPrimesActivity.class);
                 intent.putExtra("filePath", file.getAbsolutePath());
                 intent.putExtra("enableSearch", true);
-                //intent.putExtra("range", new long[]{getTask().getStartValue(), getTask().getState() == Task.State.STOPPED ? getTask().getEndValue() : getTask().getCurrentValue()});
-                intent.putExtra("title", false);
                 getActivity().startActivity(intent);
             }).start();
         });
-
-        saveButton.setOnClickListener(v -> Utils.save(getTask(), getActivity()));
 
         init();
 
