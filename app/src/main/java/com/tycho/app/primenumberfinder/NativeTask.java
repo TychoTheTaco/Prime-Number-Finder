@@ -1,18 +1,14 @@
 package com.tycho.app.primenumberfinder;
 
-import android.util.Log;
-
 import com.tycho.app.primenumberfinder.utils.OneToOneMap;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import easytasks.ITask;
 import easytasks.Task;
 import easytasks.TaskListener;
 
-public abstract class NativeTask implements ITask {
+public abstract class NativeTask implements ITask{
 
     /**
      * Tag used for logging and debugging.
@@ -20,7 +16,7 @@ public abstract class NativeTask implements ITask {
     private static final String TAG = NativeTask.class.getSimpleName();
 
     // Load native library
-    static {
+    static{
         System.loadLibrary("native-utils");
     }
 
@@ -34,7 +30,7 @@ public abstract class NativeTask implements ITask {
     }
 
     @Override
-    public UUID getId() {
+    public UUID getId(){
         return UUID.randomUUID();
     }
 
@@ -43,44 +39,44 @@ public abstract class NativeTask implements ITask {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public void start() {
+    public void start(){
         nativeStart(native_task_pointer);
     }
 
     @Override
-    public Thread startOnNewThread() {
+    public Thread startOnNewThread(){
         nativeStartOnNewThread(native_task_pointer);
         //TODO: Don't just return a new thread.
         return new Thread();
     }
 
     @Override
-    public void pause() {
+    public void pause(){
         nativePause(native_task_pointer);
     }
 
     @Override
-    public void pauseAndWait() {
+    public void pauseAndWait(){
         nativePauseAndWait(native_task_pointer);
     }
 
     @Override
-    public void resume() {
+    public void resume(){
         nativeResume(native_task_pointer);
     }
 
     @Override
-    public void resumeAndWait() {
+    public void resumeAndWait(){
         nativeResumeAndWait(native_task_pointer);
     }
 
     @Override
-    public void stop() {
+    public void stop(){
         nativeStop(native_task_pointer);
     }
 
     @Override
-    public void stopAndWait() {
+    public void stopAndWait(){
         nativeStopAndWait(native_task_pointer);
     }
 
@@ -95,14 +91,14 @@ public abstract class NativeTask implements ITask {
     private OneToOneMap<TaskListener, UUID> taskListenerMap = new OneToOneMap<>();
 
     @Override
-    public void addTaskListener(final TaskListener listener) {
+    public void addTaskListener(final TaskListener listener){
         final UUID id = UUID.randomUUID();
         taskListenerMap.put(listener, id);
         nativeAddTaskListener(native_task_pointer, listener, id.toString());
     }
 
     @Override
-    public boolean removeTaskListener(final TaskListener listener) {
+    public boolean removeTaskListener(final TaskListener listener){
         final UUID id = taskListenerMap.get(listener);
         if (id != null){
             taskListenerMap.remove(listener);
@@ -112,36 +108,45 @@ public abstract class NativeTask implements ITask {
     }
 
     private void sendOnTaskStarted(final String listenerId){
-        taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskStarted(this);
+        if (taskListenerMap.getKey(UUID.fromString(listenerId)) != null){
+            taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskStarted(this);
+        }
     }
 
     private void sendOnTaskPausing(final String listenerId){
-        taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskPausing(this);
+        if (taskListenerMap.getKey(UUID.fromString(listenerId)) != null){
+            taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskPausing(this);
+        }
     }
 
     private void sendOnTaskPaused(final String listenerId){
-        taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskPaused(this);
+        if (taskListenerMap.getKey(UUID.fromString(listenerId)) != null){
+            taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskPaused(this);
+        }
     }
 
     private void sendOnTaskResuming(final String listenerId){
-        taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskResuming(this);
+        if (taskListenerMap.getKey(UUID.fromString(listenerId)) != null){
+            taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskResuming(this);
+        }
     }
 
     private void sendOnTaskResumed(final String listenerId){
-        taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskResumed(this);
+        if (taskListenerMap.getKey(UUID.fromString(listenerId)) != null){
+            taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskResumed(this);
+        }
     }
 
     private void sendOnTaskStopping(final String listenerId){
-        taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskStopping(this);
+        if (taskListenerMap.getKey(UUID.fromString(listenerId)) != null){
+            taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskStopping(this);
+        }
     }
 
     private void sendOnTaskStopped(final String listenerId){
-        if (taskListenerMap.getKey(UUID.fromString(listenerId)) == null){
-            //TODO: Sometimes this happens
-            Log.w(TAG, "Listener was null!");
-            return;
+        if (taskListenerMap.getKey(UUID.fromString(listenerId)) != null){
+            taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskStopped(this);
         }
-        taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskStopped(this);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,22 +154,22 @@ public abstract class NativeTask implements ITask {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public long getStartTime() {
+    public long getStartTime(){
         return nativeGetStartTime(native_task_pointer);
     }
 
     @Override
-    public long getEndTime() {
+    public long getEndTime(){
         return nativeGetEndTime(native_task_pointer);
     }
 
     @Override
-    public long getElapsedTime() {
+    public long getElapsedTime(){
         return nativeGetElapsedTime(native_task_pointer);
     }
 
     @Override
-    public long getEstimatedTimeRemaining() {
+    public long getEstimatedTimeRemaining(){
         return nativeGetEstimatedTimeRemaining(native_task_pointer);
     }
 
@@ -173,12 +178,12 @@ public abstract class NativeTask implements ITask {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public Task.State getState() {
+    public Task.State getState(){
         return Task.State.values()[nativeGetState(native_task_pointer)];
     }
 
     @Override
-    public float getProgress() {
+    public float getProgress(){
         return nativeGetProgress(native_task_pointer);
     }
 
@@ -187,22 +192,34 @@ public abstract class NativeTask implements ITask {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private native void nativeStart(long native_task_pointer);
+
     private native void nativeStartOnNewThread(long native_task_pointer);
+
     private native void nativePause(long native_task_pointer);
+
     private native void nativePauseAndWait(long native_task_pointer);
+
     private native void nativeResume(long native_task_pointer);
+
     private native void nativeResumeAndWait(long native_task_pointer);
+
     private native void nativeStop(long native_task_pointer);
+
     private native void nativeStopAndWait(long native_task_pointer);
 
     private native void nativeAddTaskListener(long native_task_pointer, TaskListener listener, String id);
+
     private native boolean nativeRemoveTaskListener(long native_task_pointer, String id);
 
     private native long nativeGetStartTime(long native_task_pointer);
+
     private native long nativeGetEndTime(long native_task_pointer);
+
     private native long nativeGetElapsedTime(long native_task_pointer);
+
     private native long nativeGetEstimatedTimeRemaining(long native_task_pointer);
 
     private native int nativeGetState(long native_task_pointer);
+
     private native float nativeGetProgress(long native_task_pointer);
 }
