@@ -263,8 +263,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
         //TODO: This should be getRange()
         statisticsLayout.show("nps");
-        statisticsMap.get(getTask()).finalNumbersPerSecond = (long) (getTask().getEndValue() / elapsed);
-        statisticsLayout.set("nps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_numbers_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getEndValue() / elapsed))}, getTextHighlight()));
+        statisticsMap.get(getTask()).finalNumbersPerSecond = (long) ((getTask().getEndValue() - getTask().getStartValue()) / elapsed);
+        statisticsLayout.set("nps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, getTextHighlight()));
         statisticsLayout.set("pps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_primes_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getPrimeCount() / elapsed))}, getTextHighlight()));
     }
 
@@ -351,6 +351,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         progress.setVisibility(getTask().isEndless() ? View.GONE : View.VISIBLE);
         bodyTextView.setVisibility(View.VISIBLE);
         statisticsLayout.show("eta");
+        statisticsLayout.hide("nps");
         statisticsLayout.setVisibility(showStatistics ? View.VISIBLE : View.GONE);
     }
 }
