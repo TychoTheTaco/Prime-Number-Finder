@@ -140,5 +140,4 @@
 
 ??/??/2019 > Prime Number Finder version 1.4.0
 - Now uses native code for significant performance improvements
-TODO:
-- Fix numbers per second statistic
+- Minor UI changes
