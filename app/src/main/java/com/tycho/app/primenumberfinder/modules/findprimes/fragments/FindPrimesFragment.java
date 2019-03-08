@@ -19,22 +19,20 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
-import com.tycho.app.primenumberfinder.activities.MainActivity;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.activities.MainActivity;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.ModuleHostFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfigurationActivity;
-
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesJavaTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesNativeTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
-import java.io.File;
 import java.math.BigInteger;
 import java.util.Random;
 import java.util.UUID;
@@ -42,11 +40,11 @@ import java.util.UUID;
 import easytasks.ITask;
 import easytasks.Task;
 
-import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
-import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.SIEVE_OF_ERATOSTHENES;
 import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.DELETE;
 import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.PAUSE;
 import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.SAVE;
+import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
+import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.SIEVE_OF_ERATOSTHENES;
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_PRIMES;
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
@@ -213,7 +211,6 @@ public class FindPrimesFragment extends ModuleHostFragment {
 
             //Determine best search method
             searchOptions.setSearchMethod(determineBestSearchMethod());
-            searchOptions.setSearchMethod(BRUTE_FORCE);
 
             //Check if the range is valid
             if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
@@ -221,7 +218,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
                 //Create a new task
                 searchOptions.setThreadCount(1);
 
-                searchOptions.setCacheDirectory(new File(getActivity().getFilesDir() + File.separator + "cache"));
+                searchOptions.setCacheDirectory(getActivity().getCacheDir());
 
                 try {
                     startTask(new FindPrimesNativeTask((FindPrimesTask.SearchOptions) searchOptions.clone()));
