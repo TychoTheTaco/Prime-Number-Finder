@@ -56,3 +56,11 @@ target_link_libraries( # Specifies the target library.
         # Links the target library to the log library
         # included in the NDK.
         ${log-lib})
+
+# We need to do this again or android log wont work in Taskr
+target_link_libraries( # Specifies the target library.
+        Taskr
+
+        # Links the target library to the log library
+        # included in the NDK.
+        ${log-lib})

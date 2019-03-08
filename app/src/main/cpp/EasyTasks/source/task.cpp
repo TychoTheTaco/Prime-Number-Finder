@@ -258,49 +258,56 @@ void Task::dispatchStopped() {
 
 void Task::notifyOnTaskStarted() {
 	std::lock_guard<std::recursive_mutex> lock(this->listener_mutex);
-	for (TaskListener *listener : this->task_listeners) {
+	const std::vector<TaskListener*> listeners(this->task_listeners);
+	for (TaskListener *listener : listeners) {
 		listener->onTaskStarted(this);
 	}
 }
 
 void Task::notifyOnTaskPausing() {
 	std::lock_guard<std::recursive_mutex> lock(this->listener_mutex);
-	for (TaskListener *listener : this->task_listeners) {
+	const std::vector<TaskListener*> listeners(this->task_listeners);
+	for (TaskListener *listener : listeners) {
 		listener->onTaskPausing(this);
 	}
 }
 
 void Task::notifyOnTaskPaused() {
 	std::lock_guard<std::recursive_mutex> lock(this->listener_mutex);
-	for (TaskListener *listener : this->task_listeners) {
+	const std::vector<TaskListener*> listeners(this->task_listeners);
+	for (TaskListener *listener : listeners) {
 		listener->onTaskPaused(this);
 	}
 }
 
 void Task::notifyOnTaskResuming() {
 	std::lock_guard<std::recursive_mutex> lock(this->listener_mutex);
-	for (TaskListener *listener : this->task_listeners) {
+	const std::vector<TaskListener*> listeners(this->task_listeners);
+	for (TaskListener *listener : listeners) {
 		listener->onTaskResuming(this);
 	}
 }
 
 void Task::notifyOnTaskResumed() {
 	std::lock_guard<std::recursive_mutex> lock(this->listener_mutex);
-	for (TaskListener *listener : this->task_listeners) {
+	const std::vector<TaskListener*> listeners(this->task_listeners);
+	for (TaskListener *listener : listeners) {
 		listener->onTaskResumed(this);
 	}
 }
 
 void Task::notifyOnTaskStopping() {
 	std::lock_guard<std::recursive_mutex> lock(this->listener_mutex);
-	for (TaskListener *listener : this->task_listeners) {
+	const std::vector<TaskListener*> listeners(this->task_listeners);
+	for (TaskListener *listener : listeners) {
 		listener->onTaskStopping(this);
 	}
 }
 
 void Task::notifyOnTaskStopped() {
 	std::lock_guard<std::recursive_mutex> lock(this->listener_mutex);
-	for (TaskListener *listener : this->task_listeners) {
+	const std::vector<TaskListener*> listeners(this->task_listeners);
+	for (TaskListener *listener : listeners) {
 		listener->onTaskStopped(this);
 	}
 }
