@@ -1,8 +1,6 @@
 package com.tycho.app.primenumberfinder.modules.findprimes;
 
 
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
-
 import easytasks.Task;
 
 /**
@@ -10,7 +8,7 @@ import easytasks.Task;
  *         Date Created: 5/12/2017
  */
 
-public class CheckPrimalityTask extends Task implements NativeTaskInterface {
+public class CheckPrimalityTask extends Task {
 
     /**
      * Tag used for logging and debugging.
@@ -85,7 +83,7 @@ public class CheckPrimalityTask extends Task implements NativeTaskInterface {
     @Override
     public float getProgress() {
         if (getState() != State.STOPPED){
-            setProgress((float) i / sqrtMax);
+            return (float) i / sqrtMax;
         }
         return super.getProgress();
     }

@@ -20,7 +20,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.StatisticsLayout;
@@ -30,6 +29,8 @@ import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.util.Map;
+
+import easytasks.ITask;
 
 /**
  * Created by tycho on 11/19/2017.
@@ -187,7 +188,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     }
 
     @Override
-    public synchronized void setTask(NativeTaskInterface task) {
+    public synchronized void setTask(ITask task) {
         super.setTask(task);
         if (getView() != null){
             init();

@@ -8,57 +8,58 @@
 
 class NativeListener: public TaskListener{
 public:
-    NativeListener(JNIEnv* env, jobject task_listener): task_listener(env->NewGlobalRef(task_listener)){
+    NativeListener(JNIEnv* env, std::string listener_id, jobject native_task_object): listener_id(listener_id), native_task_object(env->NewGlobalRef(native_task_object)){
         int result = env->GetJavaVM(&jvm);
         assert(result == JNI_OK);
-        jclass cls = env->GetObjectClass(task_listener);
-        method_ids[0] = env->GetMethodID(cls, "onTaskStarted", "()V");
-        method_ids[1] = env->GetMethodID(cls, "onTaskPausing", "()V");
-        method_ids[2] = env->GetMethodID(cls, "onTaskPaused", "()V");
-        method_ids[3] = env->GetMethodID(cls, "onTaskResuming", "()V");
-        method_ids[4] = env->GetMethodID(cls, "onTaskResumed", "()V");
-        method_ids[5] = env->GetMethodID(cls, "onTaskStopping", "()V");
-        method_ids[6] = env->GetMethodID(cls, "onTaskStopped", "()V");
+        jclass cls = env->GetObjectClass(native_task_object);
+        method_ids[0] = env->GetMethodID(cls, "sendOnTaskStarted", "(Ljava/lang/String;)V");
+        method_ids[1] = env->GetMethodID(cls, "sendOnTaskPausing", "(Ljava/lang/String;)V");
+        method_ids[2] = env->GetMethodID(cls, "sendOnTaskPaused", "(Ljava/lang/String;)V");
+        method_ids[3] = env->GetMethodID(cls, "sendOnTaskResuming", "(Ljava/lang/String;)V");
+        method_ids[4] = env->GetMethodID(cls, "sendOnTaskResumed", "(Ljava/lang/String;)V");
+        method_ids[5] = env->GetMethodID(cls, "sendOnTaskStopping", "(Ljava/lang/String;)V");
+        method_ids[6] = env->GetMethodID(cls, "sendOnTaskStopped", "(Ljava/lang/String;)V");
     }
 
     void onTaskStarted(Task* task){
-        call(task_listener, method_ids[0]);
+        call(native_task_object, method_ids[0], task);
     }
 
     void onTaskPausing(Task* task){
-        call(task_listener, method_ids[1]);
+        call(native_task_object, method_ids[1], task);
     }
 
     void onTaskPaused(Task* task){
-        call(task_listener, method_ids[2]);
+        call(native_task_object, method_ids[2], task);
     }
 
     void onTaskResuming(Task* task){
-        call(task_listener, method_ids[3]);
+        call(native_task_object, method_ids[3], task);
     }
 
     void onTaskResumed(Task* task){
-        call(task_listener, method_ids[4]);
+        call(native_task_object, method_ids[4], task);
     }
 
     void onTaskStopping(Task* task){
-        call(task_listener, method_ids[5]);
+        call(native_task_object, method_ids[5], task);
     }
 
     void onTaskStopped(Task* task){
-        call(task_listener, method_ids[6]);
+        call(native_task_object, method_ids[6], task);
     }
 
 private:
     JavaVM* jvm;
-    jobject task_listener;
+    std::string listener_id;
+    jobject native_task_object;
     jmethodID method_ids[7];
 
-    void call(jobject object, jmethodID method_id){
+    void call(jobject object, jmethodID method_id, Task* task){
         JNIEnv* env;
         int result = jvm->AttachCurrentThread(&env, 0);
         assert(result == JNI_OK);
-        env->CallVoidMethod(object, method_id);
+        env->CallVoidMethod(object, method_id, env->NewStringUTF(listener_id.c_str()));
         //jvm->DetachCurrentThread(); // This causes a crash when pausing tasks
     }
 };
@@ -109,7 +110,7 @@ JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeSto
 
 JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeAddTaskListener(JNIEnv *env, jobject self, jlong task_ptr, jobject task_listener, jstring id) {
     const char* string = env->GetStringUTFChars(id, 0);
-    NativeListener* native_listener = new NativeListener(env, task_listener);
+    NativeListener* native_listener = new NativeListener(env, string, self);
     listener_map[string] = native_listener;
     ((Task*) task_ptr)->addTaskListener(native_listener);
     env->ReleaseStringUTFChars(id, string);

@@ -10,12 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.crashlytics.android.Crashlytics;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
 
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
@@ -28,6 +25,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import easytasks.ITask;
 import easytasks.Task;
 
 import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
@@ -337,7 +335,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     }
 
     @Override
-    public synchronized void setTask(final NativeTaskInterface task) {
+    public synchronized void setTask(final ITask task) {
         super.setTask(task);
         if (getTask() != null) {
             if (!statisticsMap.containsKey(getTask())) {

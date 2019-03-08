@@ -2,7 +2,6 @@ package com.tycho.app.primenumberfinder.modules.gcf;
 
 import android.os.Parcel;
 
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
@@ -15,7 +14,7 @@ import java.util.TreeMap;
 
 import easytasks.Task;
 
-public class GreatestCommonFactorTask extends Task implements SearchOptions, NativeTaskInterface {
+public class GreatestCommonFactorTask extends Task implements SearchOptions {
 
     /**
      * Tag used for logging and debugging.

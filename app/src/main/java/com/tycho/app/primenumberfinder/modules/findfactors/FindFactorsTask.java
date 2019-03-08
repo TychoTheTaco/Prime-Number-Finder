@@ -3,7 +3,6 @@ package com.tycho.app.primenumberfinder.modules.findfactors;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.utils.FileManager;
@@ -20,7 +19,7 @@ import easytasks.Task;
  *         Date Created: 3/3/2017
  */
 
-public class FindFactorsTask extends Task implements Savable, SearchOptions, NativeTaskInterface {
+public class FindFactorsTask extends Task implements Savable, SearchOptions {
 
     /**
      * Tag used for logging and debugging.
@@ -86,10 +85,9 @@ public class FindFactorsTask extends Task implements Savable, SearchOptions, Nat
     }
 
     @Override
-    //TODO: The downside of this is that getEstimatedTimeRemaining() will be inaccurate if getProgress() is never called because the progress is never set until this is called.
     public float getProgress() {
         if (getState() != State.STOPPED){
-            setProgress((float) i / sqrtMax);
+            return (float) i / sqrtMax;
         }
         return super.getProgress();
     }

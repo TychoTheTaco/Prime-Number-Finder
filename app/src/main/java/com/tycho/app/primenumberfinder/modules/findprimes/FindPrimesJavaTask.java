@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import easytasks.ITask;
 import easytasks.MultithreadedTask;
 import easytasks.Task;
 import easytasks.TaskAdapter;
@@ -113,7 +114,7 @@ public class FindPrimesJavaTask extends MultithreadedTask implements FindPrimesT
             if (start % 2 == 0) start++;
             final BruteForceTask task = new BruteForceTask(start, options.getStartValue() + (i + 1) * partitionSize, 2);
             System.out.println("task " + start + " " + task.endValue);
-            debugTaskListener(task);
+            //debugTaskListener(task);
             addTask(task);
         }
     }
@@ -132,7 +133,7 @@ public class FindPrimesJavaTask extends MultithreadedTask implements FindPrimesT
             }
             startValues[i] = s;
             final BruteForceTask task = new BruteForceTask(s, options.getEndValue(), increment);
-            debugTaskListener(task);
+            //debugTaskListener(task);
             addTask(task);
         }
     }
@@ -151,7 +152,7 @@ public class FindPrimesJavaTask extends MultithreadedTask implements FindPrimesT
             if (start % 2 == 0) start++;
             final BruteForceTask task = new BruteForceTask(start, Math.min(options.getStartValue() + (i + 1) * packetSize, options.getEndValue()), 2);
             System.out.println("task " + start + " " + task.endValue);
-            debugTaskListener(task);
+            //debugTaskListener(task);
             addTask(task);
         }
     }
@@ -171,7 +172,7 @@ public class FindPrimesJavaTask extends MultithreadedTask implements FindPrimesT
             final Task task = pending.poll();
             task.addTaskListener(new TaskAdapter() {
                 @Override
-                public void onTaskStopped() {
+                public void onTaskStopped(final ITask task) {
                     synchronized (LOCK) {
                         count--;
                         LOCK.notifyAll();
@@ -200,45 +201,6 @@ public class FindPrimesJavaTask extends MultithreadedTask implements FindPrimesT
             }
         }
 
-    }
-
-    private void debugTaskListener(BruteForceTask task) {
-        task.addTaskListener(new TaskListener() {
-            @Override
-            public void onTaskStarted() {
-                System.out.println("STARTED: " + task.startValue);
-            }
-
-            @Override
-            public void onTaskPausing() {
-
-            }
-
-            @Override
-            public void onTaskPaused() {
-
-            }
-
-            @Override
-            public void onTaskResuming() {
-
-            }
-
-            @Override
-            public void onTaskResumed() {
-
-            }
-
-            @Override
-            public void onTaskStopping() {
-
-            }
-
-            @Override
-            public void onTaskStopped() {
-                System.out.println("STOPPED: " + task.startValue + " in " + task.getElapsedTime() + " ms.");
-            }
-        });
     }
 
     public void saveToFile(final File file) {
@@ -493,7 +455,7 @@ public class FindPrimesJavaTask extends MultithreadedTask implements FindPrimesT
         public float getProgress() {
             if (endValue == INFINITY) return 0;
             if (getState() != State.STOPPED) {
-                setProgress((float) (currentNumber - startValue) / (endValue - startValue));
+                return (float) (currentNumber - startValue) / (endValue - startValue);
             }
             return super.getProgress();
         }
@@ -582,12 +544,10 @@ public class FindPrimesJavaTask extends MultithreadedTask implements FindPrimesT
         public float getProgress() {
             switch (status) {
                 case "searching":
-                    setProgress(((float) factor / sqrtMax) / 2);
-                    break;
+                    return ((float) factor / sqrtMax) / 2;
 
                 case "counting":
-                    setProgress(0.5f + (((float) counter / options.getEndValue()) / 2));
-                    break;
+                    return 0.5f + (((float) counter / options.getEndValue()) / 2);
             }
             return super.getProgress();
         }

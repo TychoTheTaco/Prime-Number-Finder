@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
@@ -29,6 +28,7 @@ import com.tycho.app.primenumberfinder.utils.Validator;
 import java.math.BigInteger;
 import java.util.UUID;
 
+import easytasks.ITask;
 import easytasks.Task;
 
 import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.DELETE;
@@ -165,7 +165,7 @@ public class PrimeFactorizationFragment extends ModuleHostFragment {
     }
 
     @Override
-    public void onEditPressed(NativeTaskInterface task) {
+    public void onEditPressed(ITask task) {
         final Intent intent = new Intent(getActivity(), PrimeFactorizationConfigurationActivity.class);
         intent.putExtra("searchOptions", ((PrimeFactorizationTask) task).getSearchOptions());
         intent.putExtra("taskId", task.getId());

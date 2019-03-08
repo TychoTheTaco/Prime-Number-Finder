@@ -13,10 +13,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Savable;
+import com.tycho.app.primenumberfinder.utils.UIUpdater;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.text.DecimalFormat;
@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import easytasks.ITask;
 import easytasks.Task;
 import easytasks.TaskListener;
 
@@ -36,7 +37,7 @@ import easytasks.TaskListener;
  * Created by tycho on 12/12/2017.
  */
 
-public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends RecyclerView.Adapter<AbstractTaskListAdapter.ViewHolder> implements TaskListener {
+public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapter<AbstractTaskListAdapter.ViewHolder> implements TaskListener {
 
     /**
      * Tag used for logging and debugging.
@@ -254,37 +255,37 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
     }
 
     @Override
-    public void onTaskStarted() {
+    public void onTaskStarted(final ITask task) {
         sendTaskStatesChanged();
     }
 
     @Override
-    public void onTaskPausing() {
+    public void onTaskPausing(final ITask task) {
 
     }
 
     @Override
-    public void onTaskPaused() {
+    public void onTaskPaused(final ITask task) {
         sendTaskStatesChanged();
     }
 
     @Override
-    public void onTaskResuming() {
+    public void onTaskResuming(final ITask task) {
 
     }
 
     @Override
-    public void onTaskResumed() {
+    public void onTaskResumed(final ITask task) {
         sendTaskStatesChanged();
     }
 
     @Override
-    public void onTaskStopping() {
+    public void onTaskStopping(final ITask task) {
 
     }
 
     @Override
-    public void onTaskStopped() {
+    public void onTaskStopped(final ITask task) {
         sendTaskStatesChanged();
     }
 
@@ -336,7 +337,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         }
     }
 
-    public void setSelected(final NativeTaskInterface task) {
+    public void setSelected(final ITask task) {
         setSelected(tasks.indexOf(getItem(task)));
     }
 
@@ -350,15 +351,15 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
     }
 
     public interface EventListener {
-        void onTaskSelected(final NativeTaskInterface task);
+        void onTaskSelected(final ITask task);
 
-        void onPausePressed(final NativeTaskInterface task);
+        void onPausePressed(final ITask task);
 
-        void onTaskRemoved(final NativeTaskInterface task);
+        void onTaskRemoved(final ITask task);
 
-        void onEditPressed(final NativeTaskInterface task);
+        void onEditPressed(final ITask task);
 
-        void onSavePressed(final NativeTaskInterface task);
+        void onSavePressed(final ITask task);
     }
 
     public void addEventListener(final EventListener eventListener) {
@@ -369,37 +370,37 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         return eventListeners.remove(eventListener);
     }
 
-    private void sendOnTaskSelected(final NativeTaskInterface task) {
+    private void sendOnTaskSelected(final ITask task) {
         for (EventListener eventListener : eventListeners) {
             eventListener.onTaskSelected(task);
         }
     }
 
-    private void sendOnPausePressed(final NativeTaskInterface task) {
+    private void sendOnPausePressed(final ITask task) {
         for (EventListener eventListener : eventListeners) {
             eventListener.onPausePressed(task);
         }
     }
 
-    private void sendOnEditClicked(final NativeTaskInterface task) {
+    private void sendOnEditClicked(final ITask task) {
         for (EventListener eventListener : eventListeners) {
             eventListener.onEditPressed(task);
         }
     }
 
-    private void sendOnDeletePressed(final NativeTaskInterface task) {
+    private void sendOnDeletePressed(final ITask task) {
         for (EventListener eventListener : eventListeners) {
             eventListener.onTaskRemoved(task);
         }
     }
 
-    private void sendOnSavePressed(final NativeTaskInterface task) {
+    private void sendOnSavePressed(final ITask task) {
         for (EventListener eventListener : eventListeners) {
             eventListener.onSavePressed(task);
         }
     }
 
-    protected NativeTaskInterface getTask(final int position) {
+    protected ITask getTask(final int position) {
         return tasks.get(position);
     }
 
@@ -413,9 +414,20 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         public ImageButton deleteButton;
         public ImageButton saveButton;
 
-        private NativeTaskInterface task;
+        private ITask task;
 
-        private final UiUpdater uiUpdater = new UiUpdater(this);
+        private final UIUpdater uiUpdater = new UIUpdater(handler) {
+            @Override
+            protected void update() {
+                //Make sure the view holder is still visible
+                if (getAdapterPosition() != -1) {
+                    onUpdate(ViewHolder.this);
+                    notifyItemChanged(getAdapterPosition());
+                } else {
+                    Log.w(TAG, "Posted an invalid update on " + ViewHolder.this);
+                }
+            }
+        };
 
         private final List<Button> buttons = new ArrayList<>();
 
@@ -494,7 +506,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
 
                     //Remove the task from the list
                     final int position = getAdapterPosition();
-                    final NativeTaskInterface task = getTask(position);
+                    final ITask task = getTask(position);
                     tasks.remove(position);
                     notifyItemRemoved(position);
 
@@ -509,7 +521,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
             if (saveButton != null) {
                 saveButton.setOnClickListener(v -> {
                     //Save the task if it is savable
-                    final NativeTaskInterface task = getTask(getAdapterPosition());
+                    final ITask task = getTask(getAdapterPosition());
                     if (task instanceof Savable) {
                         Utils.save((Savable) task, context);
                     }
@@ -520,7 +532,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
             }
         }
 
-        public void setTask(NativeTaskInterface task) {
+        public void setTask(ITask task) {
             //Remove task listener from previous task
             if (this.task != null) {
                 if (!this.task.removeTaskListener(this)) {
@@ -553,7 +565,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         }
 
         @Override
-        public void onTaskStarted() {
+        public void onTaskStarted(final ITask task) {
             handler.post(() -> {
                 uiUpdater.resume();
                 notifyItemChanged(getAdapterPosition());
@@ -561,14 +573,14 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         }
 
         @Override
-        public void onTaskPausing() {
+        public void onTaskPausing(final ITask task) {
             handler.post(() -> {
                 notifyItemChanged(getAdapterPosition());
             });
         }
 
         @Override
-        public void onTaskPaused() {
+        public void onTaskPaused(final ITask task) {
             handler.post(() -> {
                 uiUpdater.pause();
                 notifyItemChanged(getAdapterPosition());
@@ -576,14 +588,14 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         }
 
         @Override
-        public void onTaskResuming() {
+        public void onTaskResuming(final ITask task) {
             handler.post(() -> {
                 notifyItemChanged(getAdapterPosition());
             });
         }
 
         @Override
-        public void onTaskResumed() {
+        public void onTaskResumed(final ITask task) {
             handler.post(() -> {
                 uiUpdater.resume();
                 notifyItemChanged(getAdapterPosition());
@@ -591,14 +603,14 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         }
 
         @Override
-        public void onTaskStopping() {
+        public void onTaskStopping(final ITask task) {
             handler.post(() -> {
                 notifyItemChanged(getAdapterPosition());
             });
         }
 
         @Override
-        public void onTaskStopped() {
+        public void onTaskStopped(final ITask task) {
             handler.post(() -> {
                 uiUpdater.pause();
                 notifyItemChanged(getAdapterPosition());
@@ -606,21 +618,21 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         }
     }
 
-    public void setSaved(final NativeTaskInterface task) {
+    public void setSaved(final ITask task) {
         final int index = tasks.indexOf(task);
         notifyItemChanged(index);
     }
 
-    public void postSetSaved(final NativeTaskInterface task) {
+    public void postSetSaved(final ITask task) {
         handler.post(() -> setSaved(task));
     }
 
-    protected boolean isSaved(NativeTaskInterface task) {
+    protected boolean isSaved(ITask task) {
         return task instanceof Savable ? ((Savable) task).isSaved() : false;
     }
 
-    public List<NativeTaskInterface> getSavedItems() {
-        final List<NativeTaskInterface> savedItems = new ArrayList<>();
+    public List<ITask> getSavedItems() {
+        final List<ITask> savedItems = new ArrayList<>();
         for (T item : tasks) {
             if (isSaved(item)) {
                 savedItems.add(item);
@@ -629,7 +641,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         return savedItems;
     }
 
-    public int indexOf(final NativeTaskInterface task) {
+    public int indexOf(final ITask task) {
         return tasks.indexOf(getItem(task));
     }
 
@@ -637,51 +649,13 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
 
     }
 
-    protected T getItem(final NativeTaskInterface task) {
+    protected T getItem(final ITask task) {
         for (T item : tasks) {
             if (item == task) {
                 return item;
             }
         }
         return null;
-    }
-
-    private class UiUpdater extends Task {
-
-        private final ViewHolder viewHolder;
-
-        UiUpdater(final ViewHolder viewHolder) {
-            this.viewHolder = viewHolder;
-        }
-
-        @Override
-        protected void run() {
-
-            while (true) {
-
-                handler.post(() -> {
-                    //Make sure the view holder is still visible
-                    if (viewHolder.getAdapterPosition() != -1) {
-                        onUpdate(viewHolder);
-                        notifyItemChanged(viewHolder.getAdapterPosition());
-                    } else {
-                        Log.w(TAG, "Posted an invalid update on " + viewHolder);
-                    }
-                });
-
-                try {
-                    Thread.sleep(1000 / 25);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    break;
-                }
-
-                tryPause();
-                if (shouldStop()) {
-                    break;
-                }
-            }
-        }
     }
 
     public void addActionViewListener(final ActionViewListener actionViewListener) {

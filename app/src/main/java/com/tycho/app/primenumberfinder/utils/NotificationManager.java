@@ -7,10 +7,10 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.activities.MainActivity;
 
+import easytasks.ITask;
 import easytasks.Task;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
@@ -25,7 +25,7 @@ public class NotificationManager {
 
     private static int nextNotificationId = 0;
 
-    public static synchronized void displayNotification(final Context context, final String channelId, final NativeTaskInterface task, final int taskType, final String contentText, final int smallIconDrawable){
+    public static synchronized void displayNotification(final Context context, final String channelId, final ITask task, final int taskType, final String contentText, final int smallIconDrawable){
 
         //Create notification
         final Intent intent = new Intent(context, MainActivity.class);

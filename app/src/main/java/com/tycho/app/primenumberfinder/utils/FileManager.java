@@ -3,7 +3,6 @@ package com.tycho.app.primenumberfinder.utils;
 import android.content.Context;
 import android.util.Log;
 
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 
 import java.io.BufferedInputStream;
@@ -20,7 +19,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.ref.WeakReference;
 import java.text.NumberFormat;
@@ -30,6 +28,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import easytasks.ITask;
 import easytasks.Task;
 import simpletrees.Tokenizer;
 import simpletrees.Tree;
@@ -123,7 +122,7 @@ public final class FileManager {
         deleteDirectory(new File(context.getFilesDir() + File.separator + "cache" + File.separator), false);
     }
 
-    public static File buildFile(final NativeTaskInterface task) {
+    public static File buildFile(final ITask task) {
         if (task instanceof FindPrimesTask) {
             return new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + ((FindPrimesTask) task).getStartValue() + "-" + (((FindPrimesTask) task).isEndless() ? "INF" : ((FindPrimesTask) task).getEndValue()) + ".primes");
         }
@@ -145,7 +144,7 @@ public final class FileManager {
         }
     }
 
-    public File getTaskCacheDirectory(final NativeTaskInterface task) {
+    public File getTaskCacheDirectory(final ITask task) {
         final File cacheDirectory = new File(context.get().getFilesDir() + File.separator + "cache" + File.separator + task.getId() + File.separator);
         if (!cacheDirectory.exists()) {
             cacheDirectory.mkdirs();

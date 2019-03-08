@@ -1,12 +1,11 @@
 package com.tycho.app.primenumberfinder.utils;
 
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import easytasks.ITask;
 import easytasks.Task;
 
 /**
@@ -21,18 +20,18 @@ public class TaskManager {
      */
     private static final String TAG = TaskManager.class.getSimpleName();
 
-    private final Map<NativeTaskInterface, Task.State> tasks = new HashMap<>();
+    private final Map<ITask, Task.State> tasks = new HashMap<>();
 
-    public void registerTask(final NativeTaskInterface task) {
+    public void registerTask(final ITask task) {
         tasks.put(task, task.getState());
     }
 
-    public void unregisterTask(final NativeTaskInterface task) {
+    public void unregisterTask(final ITask task) {
         tasks.remove(task);
     }
 
     public void saveTaskStates(){
-        for (NativeTaskInterface task : tasks.keySet()){
+        for (ITask task : tasks.keySet()){
             tasks.put(task, task.getState());
         }
     }
@@ -41,7 +40,7 @@ public class TaskManager {
      * PAUSE all tasks.
      */
     public void pauseAllTasks() {
-        for (NativeTaskInterface task : tasks.keySet()) {
+        for (ITask task : tasks.keySet()) {
             tasks.put(task, task.getState());
             task.pause();
         }
@@ -51,19 +50,19 @@ public class TaskManager {
      * Resume all tasks.
      */
     public void resumeAllTasks() {
-        for (NativeTaskInterface task : tasks.keySet()) {
+        for (ITask task : tasks.keySet()) {
             if (tasks.get(task) != Task.State.PAUSED && tasks.get(task) != Task.State.STOPPED) {
                 task.resume();
             }
         }
     }
 
-    public Set<NativeTaskInterface> getTasks() {
+    public Set<ITask> getTasks() {
         return tasks.keySet();
     }
 
-    public NativeTaskInterface findTaskById(final UUID id) {
-        for (NativeTaskInterface task : tasks.keySet()) {
+    public ITask findTaskById(final UUID id) {
+        for (ITask task : tasks.keySet()) {
             if (task.getId().equals(id)) {
                 return task;
             }

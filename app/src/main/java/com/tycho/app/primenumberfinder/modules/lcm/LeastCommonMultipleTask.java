@@ -4,7 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
@@ -17,7 +16,7 @@ import java.util.TreeMap;
 
 import easytasks.Task;
 
-public class LeastCommonMultipleTask extends Task implements SearchOptions, NativeTaskInterface {
+public class LeastCommonMultipleTask extends Task implements SearchOptions {
 
     /**
      * Tag used for logging and debugging.
@@ -29,6 +28,8 @@ public class LeastCommonMultipleTask extends Task implements SearchOptions, Nati
     private BigInteger lcm;
 
     private SearchOptions searchOptions;
+
+    private float progress = 0;
 
     public LeastCommonMultipleTask(final SearchOptions searchOptions){
         this.searchOptions = searchOptions;
@@ -53,7 +54,7 @@ public class LeastCommonMultipleTask extends Task implements SearchOptions, Nati
                 }
             }
             Log.d(TAG, "setProgress: " + ((float) numbers.indexOf(number) / numbers.size()));
-            setProgress((float) numbers.indexOf(number) / numbers.size());
+            progress = ((float) numbers.indexOf(number) / numbers.size());
         }
 
 
@@ -62,6 +63,11 @@ public class LeastCommonMultipleTask extends Task implements SearchOptions, Nati
         for (Long number : occurrences.keySet()){
             lcm = lcm.multiply(BigInteger.valueOf((long) Math.pow(number, occurrences.get(number))));
         }
+    }
+
+    @Override
+    public float getProgress() {
+        return progress;
     }
 
     public BigInteger getLcm() {

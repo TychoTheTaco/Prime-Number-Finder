@@ -5,8 +5,7 @@ import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
-
+import easytasks.ITask;
 import easytasks.Task;
 import easytasks.TaskListener;
 
@@ -27,7 +26,7 @@ public abstract class TaskFragment extends Fragment implements TaskListener {
     /**
      * The {@link Task} that belongs to this fragment.
      */
-    private NativeTaskInterface task;
+    private ITask task;
 
     /**
      * All UI updates are posted to this {@link Handler} on the main thread.
@@ -35,45 +34,45 @@ public abstract class TaskFragment extends Fragment implements TaskListener {
     protected final Handler handler = new Handler(Looper.getMainLooper());
 
     @Override
-    public void onTaskStarted() {
+    public void onTaskStarted(final ITask task) {
 
     }
 
     @Override
-    public void onTaskPausing() {
+    public void onTaskPausing(final ITask task) {
 
     }
 
     @Override
-    public void onTaskPaused() {
+    public void onTaskPaused(final ITask task) {
 
     }
 
     @Override
-    public void onTaskResuming() {
+    public void onTaskResuming(final ITask task) {
 
     }
 
     @Override
-    public void onTaskResumed() {
+    public void onTaskResumed(final ITask task) {
 
     }
 
     @Override
-    public void onTaskStopping() {
+    public void onTaskStopping(final ITask task) {
 
     }
 
     @Override
-    public void onTaskStopped() {
+    public void onTaskStopped(final ITask task) {
 
     }
 
-    public synchronized NativeTaskInterface getTask(){
+    public synchronized ITask getTask(){
         return task;
     }
 
-    public synchronized void setTask(NativeTaskInterface task){
+    public synchronized void setTask(ITask task){
         //Remove task listener from previous task
         if (this.task != null){
             if (!this.task.removeTaskListener(this)){

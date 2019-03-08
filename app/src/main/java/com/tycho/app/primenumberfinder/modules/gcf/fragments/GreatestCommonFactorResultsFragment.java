@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
@@ -24,6 +23,8 @@ import com.tycho.app.primenumberfinder.modules.StatisticsLayout;
 import com.tycho.app.primenumberfinder.modules.gcf.GCFListAdapter;
 import com.tycho.app.primenumberfinder.modules.gcf.GreatestCommonFactorTask;
 import com.tycho.app.primenumberfinder.utils.Utils;
+
+import easytasks.ITask;
 
 /**
  * Created by tycho on 11/19/2017.
@@ -118,7 +119,7 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
     }
 
     @Override
-    public synchronized void setTask(final NativeTaskInterface task) {
+    public synchronized void setTask(final ITask task) {
         super.setTask(task);
         if (getView() != null) {
             init();

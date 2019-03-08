@@ -1,13 +1,16 @@
 package com.tycho.app.primenumberfinder;
 
+import com.tycho.app.primenumberfinder.utils.OneToOneMap;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import easytasks.ITask;
 import easytasks.Task;
 import easytasks.TaskListener;
 
-public abstract class NativeTask implements NativeTaskInterface {
+public abstract class NativeTask implements ITask {
 
     /**
      * Tag used for logging and debugging.
@@ -23,12 +26,6 @@ public abstract class NativeTask implements NativeTaskInterface {
      * Pointer to the native Task object.
      */
     protected final long native_task_pointer;
-
-    /**
-     * This map stores each {@link TaskListener} with a unique ID which is passed to the native add/remove listener functions. This allows us to uniquely
-     * identify the same object between Java and native code.
-     */
-    private Map<TaskListener, UUID> taskListenerMap = new HashMap<>();
 
     public NativeTask(final long native_task_pointer){
         this.native_task_pointer = native_task_pointer;
@@ -89,6 +86,12 @@ public abstract class NativeTask implements NativeTaskInterface {
     // Task listeners
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * This map stores each {@link TaskListener} with a unique ID which is passed to the native add/remove listener functions. This allows us to uniquely
+     * identify the same object between Java and native code.
+     */
+    private OneToOneMap<TaskListener, UUID> taskListenerMap = new OneToOneMap<>();
+
     @Override
     public void addTaskListener(final TaskListener listener) {
         final UUID id = UUID.randomUUID();
@@ -104,6 +107,34 @@ public abstract class NativeTask implements NativeTaskInterface {
             return nativeRemoveTaskListener(native_task_pointer, id.toString());
         }
         return false;
+    }
+
+    private void sendOnTaskStarted(final String listenerId){
+        taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskStarted(this);
+    }
+
+    private void sendOnTaskPausing(final String listenerId){
+        taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskPausing(this);
+    }
+
+    private void sendOnTaskPaused(final String listenerId){
+        taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskPaused(this);
+    }
+
+    private void sendOnTaskResuming(final String listenerId){
+        taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskResuming(this);
+    }
+
+    private void sendOnTaskResumed(final String listenerId){
+        taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskResumed(this);
+    }
+
+    private void sendOnTaskStopping(final String listenerId){
+        taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskStopping(this);
+    }
+
+    private void sendOnTaskStopped(final String listenerId){
+        taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskStopped(this);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

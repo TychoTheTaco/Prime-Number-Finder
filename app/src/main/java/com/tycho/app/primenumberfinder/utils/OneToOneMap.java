@@ -23,4 +23,12 @@ public class OneToOneMap<K, V>{
     public K getKey(final V value){
         return valueToKeyMap.get(value);
     }
+
+    public void remove(final K key){
+        final V value = keyToValueMap.get(key);
+        if (value != null){
+            keyToValueMap.remove(key);
+            valueToKeyMap.remove(value);
+        }
+    }
 }

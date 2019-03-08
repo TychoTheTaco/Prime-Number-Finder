@@ -1,6 +1,5 @@
 package com.tycho.app.primenumberfinder.modules;
 
-import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,25 +18,22 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
-import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.findfactors.fragments.FindFactorsResultsFragment;
-import com.tycho.app.primenumberfinder.modules.findprimes.DisplayPrimesActivity;
 import com.tycho.app.primenumberfinder.modules.findprimes.fragments.CheckPrimalityResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesResultsFragment;
 import com.tycho.app.primenumberfinder.modules.gcf.fragments.GreatestCommonFactorResultsFragment;
 import com.tycho.app.primenumberfinder.modules.lcm.fragments.LeastCommonMultipleResultsFragment;
 import com.tycho.app.primenumberfinder.modules.primefactorization.fragments.PrimeFactorizationResultsFragment;
-import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
+import com.tycho.app.primenumberfinder.utils.UIUpdater;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
-import java.io.File;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import easytasks.ITask;
 import easytasks.Task;
 
 /**
@@ -55,7 +51,12 @@ public abstract class ResultsFragment extends TaskFragment {
      * This UI updater is responsible for updating the UI. Its life cycle is managed by this
      * abstract class.
      */
-    private final UIUpdater uiUpdater = new UIUpdater();
+    private final UIUpdater uiUpdater = new UIUpdater(handler){
+        @Override
+        protected void update() {
+            updateUi();
+        }
+    };
 
     //Views
     protected ViewGroup resultsView;
@@ -90,8 +91,8 @@ public abstract class ResultsFragment extends TaskFragment {
     public abstract View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState);
 
     @Override
-    public void onTaskStarted() {
-        super.onTaskStarted();
+    public void onTaskStarted(final ITask task) {
+        super.onTaskStarted(task);
         if (uiUpdater.getState() == Task.State.NOT_STARTED) {
             uiUpdater.startOnNewThread();
         } else {
@@ -108,7 +109,7 @@ public abstract class ResultsFragment extends TaskFragment {
                 //Buttons
                 if (centerView != null){
                     final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                    layoutParams.width = (int) Utils.dpToPx(getContext(), 64);
+                    layoutParams.width = Utils.dpToPx(getContext(), 64);
                     centerView.setLayoutParams(layoutParams);
                 }
                 if (pauseButton != null){
@@ -129,8 +130,8 @@ public abstract class ResultsFragment extends TaskFragment {
     }
 
     @Override
-    public void onTaskPausing() {
-        super.onTaskPausing();
+    public void onTaskPausing(final ITask task) {
+        super.onTaskPausing(task);
         uiUpdater.resume();
         handler.post(() -> {
             if (isAdded() && !isDetached() && getTask() != null) {
@@ -163,8 +164,8 @@ public abstract class ResultsFragment extends TaskFragment {
     }
 
     @Override
-    public void onTaskPaused() {
-        super.onTaskPaused();
+    public void onTaskPaused(final ITask task) {
+        super.onTaskPaused(task);
         uiUpdater.pause();
         handler.post(() -> {
             if (isAdded() && !isDetached() && getTask() != null) {
@@ -198,8 +199,8 @@ public abstract class ResultsFragment extends TaskFragment {
     }
 
     @Override
-    public void onTaskResuming() {
-        super.onTaskResuming();
+    public void onTaskResuming(final ITask task) {
+        super.onTaskResuming(task);
         uiUpdater.resume();
         handler.post(() -> {
             if (isAdded() && !isDetached() && getTask() != null) {
@@ -232,8 +233,8 @@ public abstract class ResultsFragment extends TaskFragment {
     }
 
     @Override
-    public void onTaskResumed() {
-        super.onTaskResumed();
+    public void onTaskResumed(final ITask task) {
+        super.onTaskResumed(task);
         uiUpdater.resume();
         handler.post(() -> {
             if (isAdded() && !isDetached() && getTask() != null) {
@@ -267,8 +268,8 @@ public abstract class ResultsFragment extends TaskFragment {
     }
 
     @Override
-    public void onTaskStopping() {
-        super.onTaskStopping();
+    public void onTaskStopping(final ITask task) {
+        super.onTaskStopping(task);
         uiUpdater.resume();
         handler.post(() -> {
             if (isAdded() && !isDetached() && getTask() != null) {
@@ -302,8 +303,8 @@ public abstract class ResultsFragment extends TaskFragment {
     }
 
     @Override
-    public void onTaskStopped() {
-        super.onTaskStopped();
+    public void onTaskStopped(final ITask task) {
+        super.onTaskStopped(task);
         uiUpdater.pause();
         handler.post(() -> {
             if (isAdded() && !isDetached() && getTask() != null) {
@@ -372,7 +373,7 @@ public abstract class ResultsFragment extends TaskFragment {
      * @param task
      */
     @Override
-    public synchronized void setTask(NativeTaskInterface task) {
+    public synchronized void setTask(ITask task) {
         super.setTask(task);
         switchState();
     }
@@ -407,27 +408,27 @@ public abstract class ResultsFragment extends TaskFragment {
         if (getTask() != null) {
             switch (getTask().getState()) {
                 case RUNNING:
-                    onTaskStarted();
+                    onTaskStarted(getTask());
                     break;
 
                 case PAUSING:
-                    onTaskPausing();
+                    onTaskPausing(getTask());
                     break;
 
                 case PAUSED:
-                    onTaskPaused();
+                    onTaskPaused(getTask());
                     break;
 
                 case RESUMING:
-                    onTaskResuming();
+                    onTaskResuming(getTask());
                     break;
 
                 case STOPPING:
-                    onTaskStopping();
+                    onTaskStopping(getTask());
                     break;
 
                 case STOPPED:
-                    onTaskStopped();
+                    onTaskStopped(getTask());
                     break;
             }
         }
@@ -451,29 +452,6 @@ public abstract class ResultsFragment extends TaskFragment {
     }
 
     protected abstract void onUiUpdate();
-
-    protected final class UIUpdater extends Task {
-
-        @Override
-        protected void run() {
-            while (true) {
-
-                handler.post(() -> updateUi());
-
-                try {
-                    Thread.sleep(1000 / 25);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    break;
-                }
-
-                tryPause();
-                if (shouldStop()) {
-                    break;
-                }
-            }
-        }
-    }
 
     protected void initStandardViews(final View rootView) {
 

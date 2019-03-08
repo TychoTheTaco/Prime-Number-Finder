@@ -17,7 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.StatisticsLayout;
@@ -31,6 +30,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import easytasks.ITask;
 import easytasks.Task;
 
 /**
@@ -60,9 +60,9 @@ public class FindFactorsResultsFragment extends ResultsFragment {
     private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
     /**
-     * This map holds the statistics for each task. When {@linkplain FindFactorsResultsFragment#setTask(NativeTaskInterface)} is called,
+     * This map holds the statistics for each task. When {@linkplain FindFactorsResultsFragment#setTask(ITask)} is called,
      * the current task's statistics are saved to the map so that they can be used later when
-     * {@linkplain FindFactorsResultsFragment#setTask(NativeTaskInterface)} is called with the same task.
+     * {@linkplain FindFactorsResultsFragment#setTask(ITask)} is called with the same task.
      */
     private final Map<FindFactorsTask, FindFactorsResultsFragment.Statistics> statisticsMap = new HashMap<>();
 
@@ -216,7 +216,7 @@ public class FindFactorsResultsFragment extends ResultsFragment {
     }
 
     @Override
-    public synchronized void setTask(final NativeTaskInterface task) {
+    public synchronized void setTask(final ITask task) {
         super.setTask(task);
         if (task != null) {
             if (!statisticsMap.containsKey(getTask())) {

@@ -34,10 +34,8 @@ import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
 
 import com.tycho.app.primenumberfinder.LongClickableSpan;
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Savable;
@@ -57,6 +55,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import easytasks.ITask;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 
@@ -385,7 +385,7 @@ public final class Utils {
         view.layout(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
     }
 
-    public static void logTaskStarted(final Context context, final NativeTaskInterface task) {
+    public static void logTaskStarted(final Context context, final ITask task) {
         if (task instanceof FindPrimesTask) {
             final Bundle bundle = new Bundle();
             bundle.putLong("start", ((FindPrimesTask) task).getStartValue());

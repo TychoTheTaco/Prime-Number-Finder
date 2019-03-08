@@ -3,7 +3,6 @@ package com.tycho.app.primenumberfinder.modules.primefactorization;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
@@ -22,7 +21,7 @@ import simpletrees.Tree;
  *         Date Created: 3/3/2017
  */
 
-public class PrimeFactorizationTask extends Task implements Savable, SearchOptions, NativeTaskInterface {
+public class PrimeFactorizationTask extends Task implements Savable, SearchOptions {
 
     /**
      * Tag used for logging and debugging.
@@ -39,6 +38,8 @@ public class PrimeFactorizationTask extends Task implements Savable, SearchOptio
     private Map<Long, Integer> primeFactors = new TreeMap<>();
 
     private SearchOptions searchOptions;
+
+    private float progress;
 
     //final FindFactorsTask findFactorsTask;
 
@@ -59,9 +60,9 @@ public class PrimeFactorizationTask extends Task implements Savable, SearchOptio
     public float getProgress() {
         //TODO: Dont do this
         if (findFactorsTask != null){
-            setProgress(findFactorsTask.getProgress());
+            return findFactorsTask.getProgress();
         }
-        return super.getProgress();
+        return progress;
     }
 
     private Tree<Long> generateTree(long number) {
@@ -73,7 +74,7 @@ public class PrimeFactorizationTask extends Task implements Savable, SearchOptio
 
         final int size = findFactorsTask.getFactors().size();
 
-        setProgress((float) getNumber() / number);
+        progress = (float) getNumber() / number;
 
         if (size == 1){
             primeFactors.put(1L, 1);

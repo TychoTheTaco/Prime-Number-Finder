@@ -3,13 +3,15 @@ package com.tycho.app.primenumberfinder.modules.findprimes;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 
 import java.io.File;
 
-public interface FindPrimesTask extends NativeTaskInterface, Savable {
+import easytasks.ITask;
+import io.fabric.sdk.android.services.concurrency.Task;
+
+public interface FindPrimesTask extends ITask, Savable {
 
     long INFINITY = 0;
 
