@@ -92,6 +92,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         statisticsLayout.add("nps", R.drawable.ic_trending_up_white_24dp);
         statisticsLayout.add("pps", R.drawable.ic_trending_up_white_24dp);
         statisticsLayout.inflate();
+        statisticsLayout.hide("nps");
 
         viewAllButton.setOnClickListener(v -> {
             final ProgressDialog progressDialog = new ProgressDialog(getActivity());
@@ -155,7 +156,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
         //Statistics
         if (getTask().isEndless()) statisticsLayout.hide("eta");
-        statisticsLayout.set("nps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, getTextHighlight()));
+        statisticsLayout.hide("nps");
         statisticsLayout.set("pps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.primes_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalPrimesPerSecond)}, getTextHighlight()));
     }
 
@@ -261,9 +262,10 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         }
 
         //TODO: This should be getRange()
+        statisticsLayout.show("nps");
+        statisticsMap.get(getTask()).finalNumbersPerSecond = (long) (getTask().getEndValue() / elapsed);
         statisticsLayout.set("nps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_numbers_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getEndValue() / elapsed))}, getTextHighlight()));
         statisticsLayout.set("pps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_primes_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getPrimeCount() / elapsed))}, getTextHighlight()));
-
     }
 
     @Override
