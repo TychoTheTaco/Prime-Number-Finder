@@ -14,14 +14,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.NativeTaskInterface;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.VerticalItemDecoration;
-import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
-import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.util.ArrayList;
@@ -84,7 +81,6 @@ public class TaskListFragment extends Fragment {
         for (NativeTaskInterface task : PrimeNumberFinder.getTaskManager().getTasks()) {
             if (whitelist.contains(task.getClass())){
                 addTask(task);
-                if (task instanceof Savable) taskListAdapter.setSaved(task, ((Savable) task).isSaved());
             }
         }
         taskListAdapter.sortByTimeCreated();
@@ -92,14 +88,6 @@ public class TaskListFragment extends Fragment {
         //Restore saved instance
         if (savedInstanceState != null) {
             taskListAdapter.setSelected(savedInstanceState.getInt("selectedItemPosition"));
-
-            //Restore saved subtitle
-            final ArrayList<Integer> savedItemPositions = savedInstanceState.getIntegerArrayList("savedItemPositions");
-            if (savedItemPositions != null) {
-                for (int i : savedItemPositions) {
-                    taskListAdapter.setSaved(i, true);
-                }
-            }
         } else {
             taskListAdapter.setSelected(PrimeNumberFinder.getTaskManager().findTaskById((UUID) getActivity().getIntent().getSerializableExtra("taskId")));
         }

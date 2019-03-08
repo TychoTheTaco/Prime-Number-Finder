@@ -24,14 +24,11 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import easytasks.Task;
-import easytasks.TaskAdapter;
 import easytasks.TaskListener;
 
 
@@ -49,7 +46,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
     /**
      * List of items in the adapter.
      */
-    protected final List<Item> items = new ArrayList<>();
+    protected final List<T> tasks = new ArrayList<>();
 
     /**
      * The currently selected item position. This will be -1 if nothing is selected.
@@ -76,27 +73,6 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
 
     protected final Context context;
 
-    protected class Item {
-        private final T task;
-        private boolean saved;
-
-        public Item(final T task) {
-            this.task = task;
-        }
-
-        public T getTask() {
-            return task;
-        }
-
-        public void setSaved(boolean saved) {
-            this.saved = saved;
-        }
-
-        public boolean isSaved() {
-            return saved;
-        }
-    }
-
     private final List<Button> buttons = new ArrayList<>();
 
     public AbstractTaskListAdapter(final Context context) {
@@ -116,16 +92,15 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
 
     @Override
     public void onBindViewHolder(@NonNull AbstractTaskListAdapter.ViewHolder holder, int position) {
-        final Item item = items.get(position);
-        final NativeTaskInterface task = item.getTask();
+        final T task = tasks.get(position);
         holder.setTask(task);
 
         //Check if this item should be selected
         holder.itemView.setSelected(holder.getAdapterPosition() == getSelectedItemPosition());
 
-        holder.title.setText(getTitle(item));
-        holder.subtitle.setText(getSubtitle(item));
-        holder.progress.setText(context.getString(R.string.task_progress, DECIMAL_FORMAT.format(getProgress(item) * 100)));
+        holder.title.setText(getTitle(task));
+        holder.subtitle.setText(getSubtitle(task));
+        holder.progress.setText(context.getString(R.string.task_progress, DECIMAL_FORMAT.format(getProgress(task) * 100)));
 
         //Manage button visibility
         switch (task.getState()) {
@@ -273,48 +248,9 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         }
     }
 
-    private TaskListener getUiUpdaterDebugListener(final ViewHolder holder) {
-        return new TaskListener() {
-            @Override
-            public void onTaskStarted() {
-                Log.w(TAG, "UI Updater started(): " + holder);
-            }
-
-            @Override
-            public void onTaskPausing() {
-                Log.w(TAG, "UI Updater pausing(): " + holder);
-            }
-
-            @Override
-            public void onTaskPaused() {
-                Log.w(TAG, "UI Updater paused(): " + holder);
-            }
-
-            @Override
-            public void onTaskResuming() {
-                Log.w(TAG, "UI Updater resuming(): " + holder);
-            }
-
-            @Override
-            public void onTaskResumed() {
-                Log.w(TAG, "UI Updater resumed(): " + holder);
-            }
-
-            @Override
-            public void onTaskStopping() {
-                Log.w(TAG, "UI Updater stopping(): " + holder);
-            }
-
-            @Override
-            public void onTaskStopped() {
-                Log.w(TAG, "UI Updater stopped(): " + holder);
-            }
-        };
-    }
-
     @Override
     public int getItemCount() {
-        return items.size();
+        return tasks.size();
     }
 
     @Override
@@ -352,16 +288,8 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         sendTaskStatesChanged();
     }
 
-    protected CharSequence getTitle(final Item item) {
-        return getTitle(item.getTask());
-    }
-
     protected CharSequence getTitle(final T task) {
         return task.getClass().getSimpleName();
-    }
-
-    protected CharSequence getSubtitle(final Item item) {
-        return getSubtitle(item.getTask());
     }
 
     protected CharSequence getSubtitle(final T task) {
@@ -390,13 +318,9 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         return task.getProgress();
     }
 
-    protected float getProgress(final Item item) {
-        return getProgress(item.getTask());
-    }
-
     public void addTask(final T task) {
         task.addTaskListener(this);
-        items.add(new Item(task));
+        tasks.add(task);
         notifyItemInserted(getItemCount());
         sendTaskStatesChanged();
     }
@@ -417,7 +341,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
     }
 
     public void setSelected(final NativeTaskInterface task) {
-        setSelected(items.indexOf(getItem(task)));
+        setSelected(tasks.indexOf(getItem(task)));
     }
 
     public int getSelectedItemPosition() {
@@ -425,7 +349,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
     }
 
     public void sortByTimeCreated() {
-        Collections.sort(items, (item0, item1) -> Long.compare(item0.getTask().getStartTime(), item1.getTask().getStartTime()));
+        Collections.sort(tasks, (item0, item1) -> Long.compare(item0.getStartTime(), item1.getStartTime()));
         notifyDataSetChanged();
     }
 
@@ -479,16 +403,8 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         }
     }
 
-    protected abstract class CustomTaskEventListener extends TaskAdapter {
-        protected AbstractTaskListAdapter.ViewHolder holder;
-
-        private void setViewHolder(final AbstractTaskListAdapter.ViewHolder holder) {
-            this.holder = holder;
-        }
-    }
-
     protected NativeTaskInterface getTask(final int position) {
-        return items.get(position).getTask();
+        return tasks.get(position);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements TaskListener {
@@ -548,7 +464,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
             //Set button listeners
             if (pauseButton != null) {
                 pauseButton.setOnClickListener(v -> {
-                    switch (items.get(getAdapterPosition()).getTask().getState()) {
+                    switch (tasks.get(getAdapterPosition()).getState()) {
 
                         case PAUSED:
                             getTask(getAdapterPosition()).resume();
@@ -583,7 +499,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
                     //Remove the task from the list
                     final int position = getAdapterPosition();
                     final NativeTaskInterface task = getTask(position);
-                    items.remove(position);
+                    tasks.remove(position);
                     notifyItemRemoved(position);
 
                     PrimeNumberFinder.getTaskManager().unregisterTask(task);
@@ -693,21 +609,9 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         }
     }
 
-    public void setSaved(final int index, boolean isSaved) {
-        final Item item = items.get(index);
-        if (item != null) {
-            item.setSaved(isSaved);
-            notifyItemChanged(index);
-        }
-    }
-
     public void setSaved(final NativeTaskInterface task, boolean isSaved) {
-        final Item item = getItem(task);
-        final int index = items.indexOf(item);
-        if (item != null) {
-            item.setSaved(isSaved);
-            notifyItemChanged(index);
-        }
+        final int index = tasks.indexOf(task);
+        notifyItemChanged(index);
     }
 
     public void postSetSaved(final NativeTaskInterface task, final boolean isSaved) {
@@ -715,30 +619,30 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
     }
 
     protected boolean isSaved(NativeTaskInterface task) {
-        return getItem(task).isSaved();
+        return task instanceof Savable ? ((Savable) task).isSaved() : false;
     }
 
     public List<NativeTaskInterface> getSavedItems() {
         final List<NativeTaskInterface> savedItems = new ArrayList<>();
-        for (Item item : items) {
-            if (item.isSaved()) {
-                savedItems.add(item.getTask());
+        for (T item : tasks) {
+            if (isSaved(item)) {
+                savedItems.add(item);
             }
         }
         return savedItems;
     }
 
     public int indexOf(final NativeTaskInterface task) {
-        return items.indexOf(getItem(task));
+        return tasks.indexOf(getItem(task));
     }
 
     protected void onUpdate(final ViewHolder viewHolder) {
 
     }
 
-    protected Item getItem(final NativeTaskInterface task) {
-        for (Item item : items) {
-            if (item.getTask() == task) {
+    protected T getItem(final NativeTaskInterface task) {
+        for (T item : tasks) {
+            if (item == task) {
                 return item;
             }
         }
@@ -795,8 +699,8 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
 
     private void sendTaskStatesChanged() {
         boolean active = false;
-        for (Item item : items) {
-            if (item.getTask().getState() == Task.State.RUNNING) {
+        for (T item : tasks) {
+            if (item.getState() == Task.State.RUNNING) {
                 active = true;
                 break;
             }
