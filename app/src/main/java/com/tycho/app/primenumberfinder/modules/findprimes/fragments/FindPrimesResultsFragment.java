@@ -59,9 +59,9 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
     /**
-     * This map holds the statistics for each task. When {@linkplain FindPrimesResultsFragment#setTask(NativeTaskInterface)} is called,
+     * This map holds the statistics for each task. When {@linkplain FindPrimesResultsFragment#setTask(ITask)} is called,
      * the current task's statistics are saved to the map so that they can be used later when
-     * {@linkplain FindPrimesResultsFragment#setTask(NativeTaskInterface)} is called with the same task.
+     * {@linkplain FindPrimesResultsFragment#setTask(ITask)} is called with the same task.
      */
     private final Map<FindPrimesTask, Statistics> statisticsMap = new HashMap<>();
 
@@ -69,7 +69,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
      * This class keeps the statistics for a task.
      */
     private class Statistics {
-        private long lastCurrentValue;
         private long lastPrimeCount;
         private long lastUpdateTime = -1000;
         private long finalNumbersPerSecond;
@@ -260,6 +259,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         if (elapsed <= 0) {
             elapsed = 1;
         }
+
+        //TODO: This should be getRange()
         statisticsLayout.set("nps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_numbers_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getEndValue() / elapsed))}, getTextHighlight()));
         statisticsLayout.set("pps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_primes_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getPrimeCount() / elapsed))}, getTextHighlight()));
 
@@ -311,12 +312,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
             //Update statistics every second
             if (showStatistics && getTask().getElapsedTime() - statisticsMap.get(getTask()).lastUpdateTime >= 1000) {
-
-                //Numbers per second
-                /*final long currentValue = getTask().getCurrentValue();
-                statisticsMap.get(getTask()).finalNumbersPerSecond = currentValue - statisticsMap.get(getTask()).lastCurrentValue;
-                statisticsLayout.set("nps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(currentValue - statisticsMap.get(getTask()).lastCurrentValue)}, getTextHighlight()));
-                statisticsMap.get(getTask()).lastCurrentValue = currentValue;*/
 
                 //Primes per second
                 final long primeCount = getTask().getPrimeCount();
