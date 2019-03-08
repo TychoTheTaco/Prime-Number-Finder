@@ -124,7 +124,7 @@ public class TaskListFragment extends Fragment {
             ((Savable) task).addSaveListener(new Savable.SaveListener() {
                 @Override
                 public void onSaved() {
-                    taskListAdapter.postSetSaved(task, true);
+                    taskListAdapter.postSetSaved(task);
                 }
 
                 @Override

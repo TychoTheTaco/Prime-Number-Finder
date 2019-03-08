@@ -100,7 +100,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
 
         holder.title.setText(getTitle(task));
         holder.subtitle.setText(getSubtitle(task));
-        holder.progress.setText(context.getString(R.string.task_progress, DECIMAL_FORMAT.format(getProgress(task) * 100)));
+        holder.progress.setText(context.getString(R.string.task_progress, DECIMAL_FORMAT.format(task.getProgress() * 100)));
 
         //Manage button visibility
         switch (task.getState()) {
@@ -255,6 +255,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
 
     @Override
     public void onTaskStarted() {
+        Log.d(TAG, "onTaskStarted()");
         sendTaskStatesChanged();
     }
 
@@ -265,6 +266,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
 
     @Override
     public void onTaskPaused() {
+        Log.d(TAG, "onTaskPaused()");
         sendTaskStatesChanged();
     }
 
@@ -275,6 +277,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
 
     @Override
     public void onTaskResumed() {
+        Log.d(TAG, "onTaskResumed()");
         sendTaskStatesChanged();
     }
 
@@ -285,6 +288,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
 
     @Override
     public void onTaskStopped() {
+        Log.d(TAG, "onTaskStopped()");
         sendTaskStatesChanged();
     }
 
@@ -312,10 +316,6 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
             case STOPPED:
                 return context.getString(R.string.status_finished);
         }
-    }
-
-    protected float getProgress(final T task) {
-        return task.getProgress();
     }
 
     public void addTask(final T task) {
@@ -589,6 +589,7 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         @Override
         public void onTaskResumed() {
             handler.post(() -> {
+                uiUpdater.resume();
                 notifyItemChanged(getAdapterPosition());
             });
         }
@@ -609,13 +610,13 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
         }
     }
 
-    public void setSaved(final NativeTaskInterface task, boolean isSaved) {
+    public void setSaved(final NativeTaskInterface task) {
         final int index = tasks.indexOf(task);
         notifyItemChanged(index);
     }
 
-    public void postSetSaved(final NativeTaskInterface task, final boolean isSaved) {
-        handler.post(() -> setSaved(task, isSaved));
+    public void postSetSaved(final NativeTaskInterface task) {
+        handler.post(() -> setSaved(task));
     }
 
     protected boolean isSaved(NativeTaskInterface task) {
@@ -699,12 +700,15 @@ public class AbstractTaskListAdapter<T extends NativeTaskInterface> extends Recy
 
     private void sendTaskStatesChanged() {
         boolean active = false;
-        for (T item : tasks) {
-            if (item.getState() == Task.State.RUNNING) {
+        for (T task : tasks) {
+            Log.d(TAG, "State: " + task.getState());
+            if (task.getState() == Task.State.RUNNING) {
                 active = true;
                 break;
             }
         }
+
+        Log.d(TAG, "State change! Active: " + active);
 
         for (ActionViewListener actionViewListener : this.actionViewListeners) {
             actionViewListener.onTaskStatesChanged(getTaskType(), active);
