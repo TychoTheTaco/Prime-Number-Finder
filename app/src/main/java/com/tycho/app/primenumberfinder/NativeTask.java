@@ -1,5 +1,7 @@
 package com.tycho.app.primenumberfinder;
 
+import android.util.Log;
+
 import com.tycho.app.primenumberfinder.utils.OneToOneMap;
 
 import java.util.HashMap;
@@ -134,6 +136,11 @@ public abstract class NativeTask implements ITask {
     }
 
     private void sendOnTaskStopped(final String listenerId){
+        if (taskListenerMap.getKey(UUID.fromString(listenerId)) == null){
+            //TODO: Sometimes this happens
+            Log.w(TAG, "Listener was null!");
+            return;
+        }
         taskListenerMap.getKey(UUID.fromString(listenerId)).onTaskStopped(this);
     }
 
