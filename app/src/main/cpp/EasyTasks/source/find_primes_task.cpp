@@ -331,6 +331,24 @@ std::string FindPrimesTask::getCacheDirectory() {
 	return this->cache_dir;
 }
 
+std::string FindPrimesTask::getStatus() {
+	if (this->getTasks().size() == 1) {
+		if (SieveTask* task = dynamic_cast<SieveTask*>(this->getTasks().at(0))) {
+			return task->getStatus();
+		}
+	}
+	return "";
+}
+
+num_type FindPrimesTask::getCurrentFactor() {
+	if (this->getTasks().size() == 1) {
+		if (SieveTask* task = dynamic_cast<SieveTask*>(this->getTasks().at(0))) {
+			return task->getCurrentFactor();
+		}
+	}
+	return 0;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // [FindPrimesTask] Setters
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -467,15 +485,17 @@ FindPrimesTask::SieveTask::~SieveTask() {
 void FindPrimesTask::SieveTask::run() {
 	std::cout << "Starting ST (" << this->getId() << "). start_value: " << start_value << " end_value: " << end_value << std::endl;
 
+	this->status = "setup";
 	bool* buffer = new bool[end_value + 1];
 	for (num_type i = 0; i < end_value + 1; ++i) {
 		buffer[i] = true;
 	}
 
-	const num_type sqrt_max = std::sqrt(end_value);
+	sqrt_max = std::sqrt(end_value);
 
 	//Mark numbers
-	for (num_type factor = 2; factor <= sqrt_max && isRunning(); ++factor) {
+	this->status = "searching";
+	for (factor = 2; factor <= sqrt_max && isRunning(); ++factor) {
 		if (buffer[factor]) {
 			for (num_type n = factor; factor * n <= end_value; ++n) {
 				buffer[factor * n] = false;
@@ -484,9 +504,10 @@ void FindPrimesTask::SieveTask::run() {
 	}
 
 	//Count primes
-	for (num_type i = (start_value > 2 ? start_value : 2); i < end_value && isRunning(); ++i) {
-		if (buffer[i]) {
-			primes.push_back(i);
+	this->status = "counting";
+	for (counter = (start_value > 2 ? start_value : 2); counter < end_value && isRunning(); ++counter) {
+		if (buffer[counter]) {
+			primes.push_back(counter);
 			++prime_count;
 		}
 	}
@@ -502,6 +523,20 @@ std::vector<num_type> FindPrimesTask::SieveTask::getPrimes() {
 	return this->primes;
 }
 
+std::string FindPrimesTask::SieveTask::getStatus() {
+	return this->status;
+}
+
 float FindPrimesTask::SieveTask::getProgress() {
-	return 0;
+	if (status == "searching") {
+		return ((float)factor / sqrt_max) / 2;
+	} else if (status == "counting") {
+		return 0.5f + (((float)counter / end_value) / 2);
+	} else {
+		return Task::getProgress();
+	}
+}
+
+num_type FindPrimesTask::SieveTask::getCurrentFactor() {
+	return this->factor;
 }

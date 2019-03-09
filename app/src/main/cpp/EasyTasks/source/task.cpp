@@ -79,7 +79,7 @@ void Task::stopAndWait() {
 }
 
 void Task::finish() {
-	//TODO: Resume if paused.
+	resumeAndWait();
 	std::unique_lock<std::recursive_mutex> lock(this->state_lock);
 	this->condition_variable.wait(lock, [this]() {return this->state == STOPPED; });
 }

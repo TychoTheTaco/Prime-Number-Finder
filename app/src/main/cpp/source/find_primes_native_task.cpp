@@ -85,7 +85,12 @@ Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nat
 
 JNIEXPORT jstring JNICALL
 Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeGetStatus(JNIEnv *env, jobject self, jlong task_ptr) {
-    return env->NewStringUTF("Native Status String");
+    return env->NewStringUTF(((FindPrimesTask *) task_ptr)->getStatus().c_str());
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeGetCurrentFactor(JNIEnv *env, jobject self, jlong task_ptr) {
+    return ((FindPrimesTask *) task_ptr)->getCurrentFactor();
 }
 
 JNIEXPORT jstring JNICALL

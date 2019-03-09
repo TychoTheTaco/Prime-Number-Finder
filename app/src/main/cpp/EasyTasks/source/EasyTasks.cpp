@@ -55,7 +55,7 @@ int main() {
 	//find_primes_task.pause();
 	find_primes_task.pauseAndWait();
 	//find_primes_task.stopAndWait();
-	find_primes_task.resume();
+	//find_primes_task.resume();
 	//std::thread timer(&printProgress, &find_primes_task);
 	find_primes_task.finish();
 	find_primes_task.saveToFile("saved.txt");

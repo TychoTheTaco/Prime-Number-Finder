@@ -291,21 +291,23 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                 case SIEVE_OF_ERATOSTHENES:
                     switch (getTask().getStatus()) {
                         default:
-                            text = getString(R.string.find_primes_body_text);
+                            text = "Preparing...";
+                            bodyTextView.setText(text);
                             break;
 
                         case "counting":
                             text = getString(R.string.find_primes_body_text_sieve_counting);
+                            bodyTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, text, content, getTextHighlight()));
                             break;
 
                         case "searching":
                             text = getString(R.string.find_primes_body_text_sieve_marking);
                             content[0] = NUMBER_FORMAT.format(getTask().getCurrentFactor());
+                            bodyTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, text, content, getTextHighlight()));
                             break;
                     }
                     break;
             }
-            bodyTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, text, content, getTextHighlight()));
 
             //Time remaining
             if (statisticsLayout.isVisible("eta")) {

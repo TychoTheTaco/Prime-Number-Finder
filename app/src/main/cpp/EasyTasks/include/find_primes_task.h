@@ -36,6 +36,8 @@ class FindPrimesTask : public MultithreadedTask {
 	SearchMethod getSearchMethod();
 	unsigned int getThreadCount();
 	std::string getCacheDirectory();
+	std::string getStatus();
+	num_type getCurrentFactor();
 
 	//Setters
 	void setCacheDirectory(std::string directory);
@@ -110,84 +112,20 @@ class FindPrimesTask : public MultithreadedTask {
 
 		std::vector<num_type> getPrimes();
 
+		std::string getStatus();
+		num_type getCurrentFactor();
+
 		private:
 		num_type start_value;
 		num_type end_value;
+
+		std::string status = "";
+		num_type sqrt_max;
+		num_type factor;
+		num_type counter;
 
 		std::vector<num_type> primes;
 		unsigned int prime_count = 0;
 	};
 
 };
-
-
-/*
-
- private class SieveTask extends MultithreadedTask.SubTask {
-
-		private String status = "searching";
-
-private final Queue<Long> primes = new ArrayDeque<>();
-
-private final int sqrtMax = (int)Math.sqrt(endValue);
-private int factor;
-private long counter;
-
-@Override
-protected void run() {
-	//Assume all numbers are prime
-	final BitSet bitSet = new BitSet((int)(endValue + 1));
-	bitSet.set(0, bitSet.size() - 1, true);
-
-	// mark non-primes <= n using Sieve of Eratosthenes
-	for (factor = 2; factor <= sqrtMax; factor++) {
-
-		// if factor is prime, then mark multiples of factor as nonprime
-		// suffices to consider mutiples factor, factor+1, ...,  n/factor
-		if (bitSet.get(factor)) {
-			for (int j = factor; factor * j <= endValue; j++) {
-				bitSet.set(factor * j, false);
-			}
-		}
-
-		tryPause();
-	}
-
-	if (shouldStop()) {
-		return;
-	}
-
-	status = "counting";
-
-	//Count primes
-	for (counter = (startValue > 2 ? startValue : 2); counter <= endValue; counter++) {
-		if (bitSet.get((int)counter)) {
-			primes.add(counter);
-			primeCount++;
-		}
-		tryPause();
-	}
-
-	status = String.valueOf(getState());
-}
-
-@Override
-public float getProgress() {
-	switch (status) {
-		case "searching":
-			setProgress(((float)factor / sqrtMax) / 2);
-			break;
-
-		case "counting":
-			setProgress(0.5f + (((float)counter / endValue) / 2));
-			break;
-	}
-	return super.getProgress();
-}
-
-public int getFactor() {
-	return factor;
-}
-	}
-
-*/
