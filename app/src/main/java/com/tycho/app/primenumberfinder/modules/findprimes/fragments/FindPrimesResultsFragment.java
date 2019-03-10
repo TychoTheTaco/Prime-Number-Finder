@@ -261,7 +261,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             elapsed = 1;
         }
 
-        //TODO: This should be getRange()
         statisticsLayout.show("nps");
         statisticsMap.get(getTask()).finalNumbersPerSecond = (long) ((getTask().getEndValue() - getTask().getStartValue()) / elapsed);
         statisticsLayout.set("nps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, getTextHighlight()));
@@ -281,29 +280,23 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             }
 
             //Body
-            String text = null;
-            String[] content = new String[]{NUMBER_FORMAT.format(getTask().getPrimeCount())};
             switch (getTask().getSearchOptions().getSearchMethod()) {
                 case BRUTE_FORCE:
-                    text = getString(R.string.find_primes_body_text);
+                    bodyTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.find_primes_body_text), new String[]{NUMBER_FORMAT.format(getTask().getPrimeCount())}, getTextHighlight()));
                     break;
 
                 case SIEVE_OF_ERATOSTHENES:
                     switch (getTask().getStatus()) {
                         default:
-                            text = "Preparing...";
-                            bodyTextView.setText(text);
+                            bodyTextView.setText("Preparing...");
                             break;
 
                         case "counting":
-                            text = getString(R.string.find_primes_body_text_sieve_counting);
-                            bodyTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, text, content, getTextHighlight()));
+                            bodyTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.find_primes_body_text_sieve_counting), new String[]{NUMBER_FORMAT.format(getTask().getPrimeCount())}, getTextHighlight()));
                             break;
 
                         case "searching":
-                            text = getString(R.string.find_primes_body_text_sieve_marking);
-                            content[0] = NUMBER_FORMAT.format(getTask().getCurrentFactor());
-                            bodyTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, text, content, getTextHighlight()));
+                            bodyTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.find_primes_body_text_sieve_marking), new String[]{NUMBER_FORMAT.format(getTask().getCurrentFactor())}, getTextHighlight()));
                             break;
                     }
                     break;
