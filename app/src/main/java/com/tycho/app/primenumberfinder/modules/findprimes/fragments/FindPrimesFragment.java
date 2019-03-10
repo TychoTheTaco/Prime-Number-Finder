@@ -110,10 +110,8 @@ public class FindPrimesFragment extends ModuleHostFragment {
             //Check if the number is valid
             if (Validator.isPrimalityInputValid(getPrimalityInput())) {
 
-                MainActivity.upgrade(getActivity());
-
                 //Create a new task
-                /*final ITask task = new CheckPrimalityTask(getPrimalityInput().longValue());
+                final ITask task = new CheckPrimalityTask(getPrimalityInput().longValue());
                 taskListFragment.addTask(task);
                 PrimeNumberFinder.getTaskManager().registerTask(task);
 
@@ -121,7 +119,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
                 task.startOnNewThread();
                 taskListFragment.setSelected(task);
 
-                hideKeyboard(getActivity());*/
+                hideKeyboard(getActivity());
 
             } else {
                 Toast.makeText(getActivity(), getString(R.string.error_invalid_number), Toast.LENGTH_SHORT).show();

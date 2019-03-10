@@ -554,6 +554,10 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
                     }
                 }
 
+                if (task.getState() == Task.State.RUNNING){
+                    uiUpdater.resume();
+                }
+
                 task.addTaskListener(this);
             }
         }
