@@ -67,6 +67,8 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
 
     private final List<Section> sections = new ArrayList<>();
 
+    private EditText fileNameInput;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,7 +89,7 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 Utils.applyTheme(this, ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
 
-                final EditText fileNameInput = findViewById(R.id.file_name);
+                fileNameInput = findViewById(R.id.file_name);
                 treeView = findViewById(R.id.factor_tree_preview);
                 exportOptions = treeView.getDefaultExportOptions();
 
@@ -304,14 +306,6 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                 file = new File(filePath);
                 loadFile(file);
 
-                //Set up file name
-                String name = file.getName();
-                int pos = name.lastIndexOf(".");
-                if (pos > 0) {
-                    name = name.substring(0, pos);
-                }
-                fileNameInput.setText(name);
-
             } else {
                 Log.e(TAG, "Invalid file path!");
                 Toast.makeText(this, "Error loading file!", Toast.LENGTH_SHORT).show();
@@ -360,7 +354,10 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
             factorTree = FileManager.getInstance().readTree(file);
             progressDialog.dismiss();
 
-            new Handler(getMainLooper()).post(() -> treeView.setTree(factorTree.formatNumbers()));
+            runOnUiThread(() -> {
+                fileNameInput.setText("Factor tree of " + factorTree.getValue());
+                treeView.setTree(factorTree.formatNumbers());
+            });
 
         }).start();
     }

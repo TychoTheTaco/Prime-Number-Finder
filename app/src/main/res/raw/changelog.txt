@@ -138,6 +138,8 @@
 - UI improvements
 - Bug fixes
 
-??/??/2019 > Prime Number Finder version 1.4.0
+03/11/2019 > Prime Number Finder version 1.4.0
 - Now uses native code for significant performance improvements
 - Minor UI changes
+- Various performance improvements
+- Bug fixes

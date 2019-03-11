@@ -43,16 +43,19 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
      */
     private static final String TAG = SavedFilesListAdapter.class.getSimpleName();
 
-    private final List<File> files = new ArrayList<>();
+    /**
+     * The current directory whose files are listed in the adapter.
+     */
+    protected final File directory;
 
-    private Context context;
+    /**
+     * List of data files currently in the adapter.
+     */
+    protected final List<File> files = new ArrayList<>();
 
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
 
-    private final File directory;
-
     public SavedFilesListAdapter(final Context context, final File directory) {
-        this.context = context;
         this.directory = directory;
         refresh();
     }
@@ -68,37 +71,62 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
         final File file = files.get(position);
 
         //Set file name
-        holder.fileName.setText(Utils.formatTitle(file));
+        switch (FileManager.getFileType(directory)) {
+            default:
+                holder.fileName.setText(file.getName());
+                break;
+
+            case PRIMES:
+                try {
+                    final FileManager.PrimesFile primesFile = new FileManager.PrimesFile(file);
+                    holder.fileName.setText(primesFile.getTitle());
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
+                break;
+
+            case FACTORS:
+                try {
+                    final FileManager.FactorsFile factorsFile = new FileManager.FactorsFile(file);
+                    holder.fileName.setText(factorsFile.getTitle());
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
+                break;
+
+            case TREE:
+                try {
+                    final FileManager.TreeFile treeFile = new FileManager.TreeFile(file);
+                    holder.fileName.setText(treeFile.getTitle());
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
+                break;
+        }
 
         //Format icon
         if (!holder.isSelected()){
             switch (FileManager.getFileType(directory)) {
                 case PRIMES:
+                    holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.purple)));
                     holder.icon.setImageResource(R.drawable.find_primes_icon);
-                    holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.purple)));
-                    try{
-                        final FileManager.PrimesFile primesFile = new FileManager.PrimesFile(file);
-                        holder.fileName.setText(primesFile.getTitle());
-                    }catch (IOException e){
-                        e.printStackTrace();
-                    }
                     break;
 
                 case FACTORS:
+                    holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.orange)));
                     holder.icon.setImageResource(R.drawable.find_factors_icon);
-                    holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.orange)));
                     break;
 
                 case TREE:
+                    holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.green)));
                     holder.icon.setImageResource(R.drawable.prime_factorization_icon);
-                    holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.green)));
                     break;
             }
         }
 
         if (holder.isSelected()){
             holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.accent)));
-            holder.fileSize.setTextColor(ContextCompat.getColor(context, R.color.secondary_text));
+            holder.fileSize.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.secondary_text));
         }else{
             holder.fileSize.setTextColor(Color.parseColor("#bebebe"));
         }
@@ -214,12 +242,12 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
             if (!isSelectionMode()){
                 final FileType fileType = FileManager.getFileType(directory);
                 if (fileType.getOpeningClass() != null){
+                    final Context context = itemView.getContext();
                     final Intent intent = new Intent(context, fileType.getOpeningClass());
                     intent.putExtra("filePath", files.get(getAdapterPosition()).getAbsolutePath());
                     intent.putExtra("allowExport", true);
                     intent.putExtra("enableSearch", true);
                     intent.putExtra("allowDelete", true);
-                    intent.putExtra("title", true);
                     context.startActivity(intent);
                 }
             }else{
