@@ -127,7 +127,7 @@ public final class FileManager {
         if (task instanceof FindPrimesTask) {
             return new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + ((FindPrimesTask) task).getStartValue() + "-" + (((FindPrimesTask) task).isEndless() ? "INF" : ((FindPrimesTask) task).getEndValue()) + ".primes");
         }else if (task instanceof FindFactorsTask){
-            return new File(FileManager.getInstance().getSavedFactorsDirectory() + File.separator + "Factors of " + ((FindFactorsTask) task).getNumber() + ".factors");
+            return new File(FileManager.getInstance().getSavedFactorsDirectory() + File.separator + ((FindFactorsTask) task).getNumber() + ".factors");
         }
         return new File(FileManager.getInstance() + File.separator + task.getId().toString() + ".unknown");
     }
@@ -414,7 +414,8 @@ public final class FileManager {
     }
 
     public static void upgradeFileSystem_1_4() {
-        final File[] files = FileManager.getInstance().getSavedPrimesDirectory().listFiles();
+        //Upgrade saved primes
+        File[] files = FileManager.getInstance().getSavedPrimesDirectory().listFiles();
         for (File file : files) {
             Log.d(TAG, "Upgrading: " + file);
             final int BUFFER_SIZE = 1024 * 128;
@@ -448,6 +449,49 @@ public final class FileManager {
                         dataOutputStream.writeLong(number);
                     }
                     primes.clear();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        for (File file : files) {
+            file.delete();
+        }
+
+        //Upgrade saved factors
+        files = FileManager.getInstance().getSavedFactorsDirectory().listFiles();
+        for (File file : files) {
+            Log.d(TAG, "Upgrading: " + file);
+            final int BUFFER_SIZE = 1024 * 128;
+            final List<Long> factors = new ArrayList<>(BUFFER_SIZE);
+            final long number = getNumberFromTitle(file);
+            final File dest = new File(FileManager.getInstance().getSavedFactorsDirectory() + File.separator + number + ".primes");
+
+            try (final DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(dest)))) {
+                //Write header
+                dataOutputStream.writeByte(1); //Version
+                dataOutputStream.writeByte(3 + 8); //Header length
+                dataOutputStream.writeByte(8); //Number size
+                dataOutputStream.writeLong(number); //Number
+
+                final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+                boolean endOfFile = false;
+                while (!endOfFile) {
+                    try {
+                        //Read from source
+                        for (int i = 0; i < BUFFER_SIZE; ++i) {
+                            factors.add(dataInputStream.readLong());
+                        }
+                    } catch (EOFException e) {
+                        endOfFile = true;
+                        dataInputStream.close();
+                    }
+
+                    //Write to destination
+                    for (long n : factors) {
+                        dataOutputStream.writeLong(n);
+                    }
+                    factors.clear();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
