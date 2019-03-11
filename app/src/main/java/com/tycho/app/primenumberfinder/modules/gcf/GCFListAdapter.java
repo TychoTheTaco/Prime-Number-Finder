@@ -65,6 +65,12 @@ public class GCFListAdapter extends RecyclerView.Adapter<GCFListAdapter.ViewHold
         notifyDataSetChanged();
     }
 
+    public void clear(){
+        this.gcf = 0;
+        this.numbers = new ArrayList<>();
+        notifyDataSetChanged();
+    }
+
     class ViewHolderNumberList extends RecyclerView.ViewHolder{
 
         private final TextView number;

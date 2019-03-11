@@ -27,6 +27,8 @@ public class GreatestCommonFactorTask extends Task implements SearchOptions {
 
     private SearchOptions searchOptions;
 
+    private float progress;
+
     public GreatestCommonFactorTask(final SearchOptions searchOptions){
         this.searchOptions = searchOptions;
         this.numbers.addAll(searchOptions.getNumbers());
@@ -49,6 +51,7 @@ public class GreatestCommonFactorTask extends Task implements SearchOptions {
                     occurrences.put(f, 1);
                 }
             }
+            progress = ((float) numbers.indexOf(number) / numbers.size());
         }
 
         final List<Long> keys = new ArrayList<>(occurrences.keySet());
@@ -59,6 +62,12 @@ public class GreatestCommonFactorTask extends Task implements SearchOptions {
                 break;
             }
         }
+    }
+
+    @Override
+    public float getProgress() {
+        if (getState() != State.STOPPED) return progress;
+        return super.getProgress();
     }
 
     public long getGcf() {

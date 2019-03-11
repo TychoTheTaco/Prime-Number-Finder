@@ -136,7 +136,7 @@ public final class Utils {
     public static String formatTimeHuman(final long millis, final int precision) {
 
         if (millis == -1) {
-            return "infinite";
+            return "infinite time";
         }
 
         if (precision < 1) {

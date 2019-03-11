@@ -67,7 +67,8 @@ public class LeastCommonMultipleTask extends Task implements SearchOptions {
 
     @Override
     public float getProgress() {
-        return progress;
+        if (getState() != State.STOPPED) return progress;
+        return super.getProgress();
     }
 
     public BigInteger getLcm() {

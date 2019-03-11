@@ -129,6 +129,7 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
     @Override
     protected void onResetViews() {
         super.onResetViews();
+        adapter.clear();
         statisticsLayout.setVisibility(View.VISIBLE);
     }
 
