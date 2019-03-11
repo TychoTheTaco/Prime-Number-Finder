@@ -14,22 +14,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import easytasks.MultithreadedTask;
 import easytasks.Task;
 
-public class LeastCommonMultipleTask extends Task implements SearchOptions {
+public class LeastCommonMultipleTask extends MultithreadedTask implements SearchOptions {
 
     /**
      * Tag used for logging and debugging.
      */
     private static final String TAG = LeastCommonMultipleTask.class.getSimpleName();
 
+    /**
+     * List of numbers of which we are finding the least common multiple.
+     */
     private final List<Long> numbers = new ArrayList<>();
 
-    private BigInteger lcm;
+    /**
+     * The resulting least common multiple. This will be equal to 0 if the task has not finished.
+     */
+    private BigInteger lcm = BigInteger.ZERO;
 
     private SearchOptions searchOptions;
-
-    private float progress = 0;
 
     public LeastCommonMultipleTask(final SearchOptions searchOptions){
         this.searchOptions = searchOptions;
@@ -42,33 +47,28 @@ public class LeastCommonMultipleTask extends Task implements SearchOptions {
 
     @Override
     protected void run() {
+        //Find prime factors of each number
+        for (long number : numbers){
+            addTask(new PrimeFactorizationTask(new PrimeFactorizationTask.SearchOptions(number)));
+        }
+        executeTasks();
+
+        //Find most occurrences of each prime factor
         final Map<Long, Integer> occurrences = new TreeMap<>();
-        for (Long number : numbers){
-            //TODO: To support BigInteger input, PrimeFactorizationTask also needs to accept BigInteger input
-            final PrimeFactorizationTask primeFactorizationTask = new PrimeFactorizationTask(new PrimeFactorizationTask.SearchOptions(number));
-            primeFactorizationTask.start();
-            final Map<Long, Integer> treeMap = primeFactorizationTask.getPrimeFactors();
-            for (Long l : treeMap.keySet()){
-                if (!occurrences.containsKey(l) || occurrences.get(l) < treeMap.get(l)){
-                    occurrences.put(l, treeMap.get(l));
+        for (Task task : getTasks()){
+            final Map<Long, Integer> treeMap = ((PrimeFactorizationTask) task).getPrimeFactors();
+            for (long factor : treeMap.keySet()){
+                if (!occurrences.containsKey(factor) || occurrences.get(factor) < treeMap.get(factor)){
+                    occurrences.put(factor, treeMap.get(factor));
                 }
             }
-            Log.d(TAG, "setProgress: " + ((float) numbers.indexOf(number) / numbers.size()));
-            progress = ((float) numbers.indexOf(number) / numbers.size());
         }
 
-
+        //Multiply highest occurrences
         lcm = BigInteger.ONE;
-        Log.e(TAG, "Occurences: " + occurrences);
-        for (Long number : occurrences.keySet()){
+        for (long number : occurrences.keySet()){
             lcm = lcm.multiply(BigInteger.valueOf((long) Math.pow(number, occurrences.get(number))));
         }
-    }
-
-    @Override
-    public float getProgress() {
-        if (getState() != State.STOPPED) return progress;
-        return super.getProgress();
     }
 
     public BigInteger getLcm() {

@@ -1,6 +1,7 @@
 package com.tycho.app.primenumberfinder.modules.gcf;
 
 import android.os.Parcel;
+import android.util.ArraySet;
 
 import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
@@ -8,26 +9,33 @@ import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
+import easytasks.MultithreadedTask;
 import easytasks.Task;
 
-public class GreatestCommonFactorTask extends Task implements SearchOptions {
+public class GreatestCommonFactorTask extends MultithreadedTask implements SearchOptions {
 
     /**
      * Tag used for logging and debugging.
      */
     private static final String TAG = GreatestCommonFactorTask.class.getSimpleName();
 
+    /**
+     * The list of numbers of which we are finding the greatest common factor.
+     */
     private final List<Long> numbers = new ArrayList<>();
 
+    /**
+     * The greatest common factor.
+     */
     private long gcf;
 
     private SearchOptions searchOptions;
-
-    private float progress;
 
     public GreatestCommonFactorTask(final SearchOptions searchOptions){
         this.searchOptions = searchOptions;
@@ -40,34 +48,20 @@ public class GreatestCommonFactorTask extends Task implements SearchOptions {
 
     @Override
     protected void run() {
-        final Map<Long, Integer> occurrences = new TreeMap<>();
-        for (Long number : numbers){
-            final FindFactorsTask findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number));
-            findFactorsTask.start();
-            for (Long f : findFactorsTask.getFactors()){
-                if (occurrences.containsKey(f)){
-                    occurrences.put(f, occurrences.get(f) + 1);
-                }else{
-                    occurrences.put(f, 1);
-                }
-            }
-            progress = ((float) numbers.indexOf(number) / numbers.size());
+        //Find factors of each number
+        for (long number : numbers){
+            addTask(new FindFactorsTask(new FindFactorsTask.SearchOptions(number)));
+        }
+        executeTasks();
+
+        //Find common factors
+        final Set<Long> set = new HashSet<>(((FindFactorsTask) getTasks().get(0)).getFactors());
+        for (int i = 1; i < getTasks().size(); ++i){
+            set.retainAll(((FindFactorsTask) getTasks().get(i)).getFactors());
         }
 
-        final List<Long> keys = new ArrayList<>(occurrences.keySet());
-        Collections.reverse(keys);
-        for (Long number : keys){
-            if (occurrences.get(number) == numbers.size()){
-                gcf = number;
-                break;
-            }
-        }
-    }
-
-    @Override
-    public float getProgress() {
-        if (getState() != State.STOPPED) return progress;
-        return super.getProgress();
+        //Find largest factor
+        gcf = Collections.max(set);
     }
 
     public long getGcf() {

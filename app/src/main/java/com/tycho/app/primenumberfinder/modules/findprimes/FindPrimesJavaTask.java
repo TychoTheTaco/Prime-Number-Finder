@@ -375,7 +375,7 @@ public class FindPrimesJavaTask extends MultithreadedTask implements FindPrimesT
 
     private final File taskDirectory = FileManager.getInstance().getTaskCacheDirectory(this);
 
-    private class BruteForceTask extends MultithreadedTask.SubTask {
+    private class BruteForceTask extends Task {
 
         /**
          * The starting value of the search. (inclusive).
@@ -494,7 +494,7 @@ public class FindPrimesJavaTask extends MultithreadedTask implements FindPrimesT
 
     }
 
-    private class SieveTask extends MultithreadedTask.SubTask {
+    private class SieveTask extends Task {
 
         private String status = "searching";
 
