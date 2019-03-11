@@ -86,13 +86,7 @@ public class DisplayPrimeFactorizationActivity extends DisplayContentActivity {
             //Get the file path from the extras
             final String filePath = intent.getStringExtra("filePath");
             if (filePath != null) {
-
                 file = new File(filePath);
-
-                //Set a custom title if there is one
-                if (intent.getBooleanExtra("title", true)) {
-                    setTitle(Utils.formatTitle(file));
-                }
 
                 //Start loading the file
                 loadFile(file);
@@ -120,6 +114,8 @@ public class DisplayPrimeFactorizationActivity extends DisplayContentActivity {
 
             factorTree = FileManager.getInstance().readTree(file);
             progressDialog.dismiss();
+
+            setTitle("Prime Factorization of " + NUMBER_FORMAT.format(factorTree.getValue()));
 
             runOnUiThread(() -> {
 

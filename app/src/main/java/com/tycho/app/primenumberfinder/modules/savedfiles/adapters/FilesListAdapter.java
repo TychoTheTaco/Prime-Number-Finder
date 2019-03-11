@@ -6,6 +6,7 @@ import android.content.res.ColorStateList;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,6 @@ import com.tycho.app.primenumberfinder.utils.Utils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.ViewHolder>{
@@ -32,7 +32,7 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.View
 
     protected final File directory;
 
-    protected final List<File> files = new ArrayList<>();
+    protected final List<FileManager.DataFile> files = new ArrayList<>();
 
     protected final Context context;
 
@@ -47,24 +47,16 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.View
         return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.saved_file_list_item, parent, false));
     }
 
-    @Override
+  @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        final File file = files.get(position);
+        final FileManager.DataFile file = files.get(position);
 
-        //TODO: We should make this adapter more robust by catching exceptions here and maybe hiding the offending file
-
-        holder.fileName.setText(Utils.formatTitle(file));
+        holder.fileName.setText(file.getTitle());
 
         switch (FileManager.getFileType(directory)){
             case PRIMES:
                 holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.purple)));
                 holder.icon.setImageResource(R.drawable.find_primes_icon);
-                try{
-                    final FileManager.PrimesFile primesFile = new FileManager.PrimesFile(file);
-                    holder.fileName.setText(primesFile.getTitle());
-                }catch (IOException e){
-                    e.printStackTrace();
-                }
                 break;
 
             case FACTORS:
@@ -75,6 +67,10 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.View
             case TREE:
                 holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.green)));
                 holder.icon.setImageResource(R.drawable.prime_factorization_icon);
+                break;
+
+            case UNKNOWN:
+                //TODO: set to default color and generic symbol
                 break;
         }
     }
@@ -90,12 +86,21 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.View
      */
     public synchronized void refresh(){
         files.clear();
-        files.addAll(Arrays.asList(directory.listFiles()));
-        Utils.sortByDate(files, false);
+        for (File file : directory.listFiles()){
+            try{
+                files.add(new FileManager.DataFile(file));
+            }catch (IOException e){
+                e.printStackTrace();
+                Log.w(TAG, "Invalid data file: " + file);
+            }
+        }
+        //files.addAll(Arrays.asList(directory.listFiles()));
+        //Utils.sortByDate(files, false);
+        Utils.sortDataFiesByDate(files, false);
         notifyDataSetChanged();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder{
+    protected class ViewHolder extends RecyclerView.ViewHolder{
 
         private final ImageView icon;
         private final TextView fileName;
@@ -109,11 +114,10 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.View
                 final FileType fileType = FileManager.getFileType(directory);
                 if (fileType.getOpeningClass() != null){
                     final Intent intent = new Intent(context, fileType.getOpeningClass());
-                    intent.putExtra("filePath", files.get(getAdapterPosition()).getAbsolutePath());
+                    intent.putExtra("filePath", files.get(getAdapterPosition()).getFile().getAbsolutePath());
                     intent.putExtra("allowExport", true);
                     intent.putExtra("enableSearch", true);
                     intent.putExtra("allowDelete", true);
-                    intent.putExtra("title", true);
                     context.startActivity(intent);
                 }
             });

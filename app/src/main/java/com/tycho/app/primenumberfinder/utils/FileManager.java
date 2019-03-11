@@ -30,7 +30,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import easytasks.ITask;
-import easytasks.Task;
 import simpletrees.Tokenizer;
 import simpletrees.Tree;
 
@@ -155,14 +154,6 @@ public final class FileManager {
         return cacheDirectory;
     }
 
-    public boolean saveFactors(final List<Long> factors, final long number) {
-        return writeNumbersQuick(factors, new File(savedFactorsDirectory.getAbsolutePath() + File.separator + "Factors of " + number + EXTENSION), false);
-    }
-
-    public boolean saveFactors(final List<Long> factors, final File file) {
-        return writeNumbersQuick(factors, file, false);
-    }
-
     public boolean saveTree(final Tree<?> tree) {
         return saveTree(tree, new File(savedTreesDirectory.getAbsolutePath() + File.separator + "Factor tree of " + tree.getValue() + TREE_EXTENSION));
     }
@@ -211,18 +202,48 @@ public final class FileManager {
         return number;
     }
 
-    private static abstract class NumbersFile {
+    public static class DataFile{
 
         protected final File file;
 
-        protected int version = 0;
-        protected int headerLength = 0;
-        protected int numberSize = 8;
+        //Header
+        private final int version;
+        protected final int headerLength;
 
-        protected int totalNumbers;
-
-        public NumbersFile(final File file){
+        public DataFile(final File file) throws IOException{
             this.file = file;
+
+            //Read header
+            final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+            version = dataInputStream.readUnsignedByte();
+            headerLength = dataInputStream.readUnsignedByte();
+            dataInputStream.close();
+        }
+
+        public File getFile(){
+            return file;
+        }
+
+        public String getTitle(){
+            return file.getName();
+        }
+    }
+
+    private static abstract class NumbersFile extends DataFile{
+
+        protected final int numberSize;
+
+        protected final int totalNumbers;
+
+        public NumbersFile(final File file) throws IOException{
+            super(file);
+
+            final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+            dataInputStream.skipBytes(2);
+            numberSize = dataInputStream.readUnsignedByte();
+            dataInputStream.close();
+
+            totalNumbers = (int) (file.length() - headerLength) / numberSize;
         }
 
         public List<Long> readNumbers(final int startIndex, final int count) {
@@ -283,17 +304,13 @@ public final class FileManager {
 
             //Read header
             final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
-            version = dataInputStream.readUnsignedByte();
-            headerLength = dataInputStream.readUnsignedByte();
-            numberSize = dataInputStream.readUnsignedByte();
+            dataInputStream.skipBytes(2 + 1);
             final byte[] buffer = new byte[numberSize];
             dataInputStream.readFully(buffer);
             startValue = bytesToNumber(buffer);
             dataInputStream.readFully(buffer);
             endValue = bytesToNumber(buffer);
             dataInputStream.close();
-
-            totalNumbers = (int) (file.length() - headerLength) / numberSize;
         }
 
         public long getStartValue() {
@@ -320,18 +337,29 @@ public final class FileManager {
 
             //Read header
             final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
-            version = dataInputStream.readUnsignedByte();
-            headerLength = dataInputStream.readUnsignedByte();
-            numberSize = dataInputStream.readUnsignedByte();
+            dataInputStream.skipBytes(2 + 1);
             final byte[] buffer = new byte[numberSize];
             dataInputStream.readFully(buffer);
             number = bytesToNumber(buffer);
             dataInputStream.close();
-
-            totalNumbers = (int) (file.length() - headerLength) / numberSize;
         }
 
         public long getNumber() {
+            return number;
+        }
+    }
+
+    public static class TreeFile extends DataFile{
+
+        private final long number;
+
+        public TreeFile(final File file) throws IOException{
+            super(file);
+
+            number = 0;
+        }
+
+        public long getNumber(){
             return number;
         }
     }

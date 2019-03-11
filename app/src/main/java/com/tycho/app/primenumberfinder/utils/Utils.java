@@ -225,6 +225,10 @@ public final class Utils {
         Collections.sort(files, (file0, file1) -> (ascending ? 1 : -1) * Long.compare(file0.lastModified(), file1.lastModified()));
     }
 
+    public static void sortDataFiesByDate(final List<FileManager.DataFile> files, final boolean ascending){
+        Collections.sort(files, (file0, file1) -> (ascending ? 1 : -1) * Long.compare(file0.getFile().lastModified(), file1.getFile().lastModified()));
+    }
+
     public static void sortBySize(final List<File> files, final boolean ascending) {
         Collections.sort(files, (file0, file1) -> (ascending ? 1 : -1) * Long.compare(file0.length(), file1.length()));
     }
