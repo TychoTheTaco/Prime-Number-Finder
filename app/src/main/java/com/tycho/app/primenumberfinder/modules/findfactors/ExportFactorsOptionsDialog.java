@@ -34,7 +34,7 @@ public class ExportFactorsOptionsDialog extends ExportOptionsDialog {
 
         //Set up file name
         final EditText fileNameInput = findViewById(R.id.file_name);
-        fileNameInput.setText("Factors of " + "UNKNOWN");
+        fileNameInput.setText("Factors of " + factorsFile.getNumber());
 
     }
 

@@ -51,6 +51,8 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.View
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final File file = files.get(position);
 
+        //TODO: We should make this adapter more robust by catching exceptions here and maybe hiding the offending file
+
         holder.fileName.setText(Utils.formatTitle(file));
 
         switch (FileManager.getFileType(directory)){
