@@ -7,7 +7,13 @@ import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -16,7 +22,7 @@ import easytasks.Task;
 
 /**
  * @author Tycho Bellers
- *         Date Created: 3/3/2017
+ * Date Created: 3/3/2017
  */
 
 public class FindFactorsTask extends Task implements Savable, SearchOptions {
@@ -57,11 +63,11 @@ public class FindFactorsTask extends Task implements Savable, SearchOptions {
     public FindFactorsTask(final SearchOptions searchOptions) {
         this.searchOptions = searchOptions;
         this.number = searchOptions.getNumber();
-         sqrtMax = (int) Math.sqrt(number);
+        sqrtMax = (int) Math.sqrt(number);
     }
 
     @Override
-    protected void run(){
+    protected void run() {
         for (i = 1; i <= sqrtMax; i++) {
 
             //Check if the number divides perfectly
@@ -78,15 +84,16 @@ public class FindFactorsTask extends Task implements Savable, SearchOptions {
             }
         }
 
-        if (!shouldStop()){
+        if (!shouldStop()) {
             factors.addAll(inverse);
+            inverse.clear();
             isFinished = true;
         }
     }
 
     @Override
     public float getProgress() {
-        if (getState() != State.STOPPED){
+        if (getState() != State.STOPPED) {
             return (float) i / sqrtMax;
         }
         return super.getProgress();
@@ -100,11 +107,11 @@ public class FindFactorsTask extends Task implements Savable, SearchOptions {
         return searchOptions;
     }
 
-    public long getMaxValue(){
+    public long getMaxValue() {
         return (long) Math.sqrt(number);
     }
 
-    public long getCurrentValue(){
+    public long getCurrentValue() {
         return i;
     }
 
@@ -167,40 +174,68 @@ public class FindFactorsTask extends Task implements Savable, SearchOptions {
 
     private boolean saved;
 
+    public void saveToFile(final File file) throws IOException {
+        final DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file, false)));
+        //Header format
+        // [1 byte] Version
+        // [1 byte] Header length
+        // [1 byte] Number size (in bytes)
+        // [Variable] Number being factored
+
+        //Write header
+        dataOutputStream.writeByte(1);
+        dataOutputStream.writeByte(3 + 8);
+        dataOutputStream.writeByte(8);
+        dataOutputStream.write(FileManager.numberToBytes(number));
+
+        //Write data
+        for (long factor : factors) {
+            dataOutputStream.write(FileManager.numberToBytes(factor));
+        }
+        for (long factor : inverse) {
+            dataOutputStream.write(FileManager.numberToBytes(factor));
+        }
+
+        dataOutputStream.close();
+    }
+
     @Override
     public boolean save() {
-        saved = FileManager.getInstance().saveFactors(getFactors(), getNumber());
-        if (saved){
+        try {
+            saveToFile(FileManager.buildFile(this));
             sendOnSaved();
-        }else{
+            saved = true;
+        }catch (IOException e){
+            e.printStackTrace();
             sendOnError();
+            saved = false;
         }
         return saved;
     }
 
     private CopyOnWriteArrayList<SaveListener> saveListeners = new CopyOnWriteArrayList<>();
 
-    public void addSaveListener(final SaveListener listener){
+    public void addSaveListener(final SaveListener listener) {
         saveListeners.add(listener);
     }
 
-    public void removeSaveListener(final SaveListener listener){
+    public void removeSaveListener(final SaveListener listener) {
         saveListeners.remove(listener);
     }
 
-    private void sendOnSaved(){
-        for (SaveListener listener : saveListeners){
+    private void sendOnSaved() {
+        for (SaveListener listener : saveListeners) {
             listener.onSaved();
         }
     }
 
-    private void sendOnError(){
-        for (SaveListener listener : saveListeners){
+    private void sendOnError() {
+        for (SaveListener listener : saveListeners) {
             listener.onError();
         }
     }
 
-    public boolean isSaved(){
+    public boolean isSaved() {
         return saved;
     }
 }

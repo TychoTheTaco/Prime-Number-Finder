@@ -24,6 +24,8 @@ import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.List;
 
 /**
@@ -49,6 +51,8 @@ public class DisplayFactorsActivity extends DisplayContentActivity {
 
     private ProgressDialog progressDialog;
 
+    private FileManager.FactorsFile factorsFile;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,18 +72,10 @@ public class DisplayFactorsActivity extends DisplayContentActivity {
         final Intent intent = getIntent();
         if (intent != null) {
             if (file != null) {
-
-                //Set a custom title if there is one
-                if (intent.getBooleanExtra("title", true)) {
-                    setTitle(Utils.formatTitle(file));
-                }
+                setTitle("Loading...");
 
                 //Set up adapter
                 adapter = new FactorsListAdapter(this);
-                final long number = intent.getLongExtra("number",0);
-                if (number != 0) {
-                    adapter.setNumber(number);
-                }
 
                 //Set up RecyclerView
                 recyclerView = findViewById(R.id.recyclerView);
@@ -167,32 +163,37 @@ public class DisplayFactorsActivity extends DisplayContentActivity {
     protected void loadFile(final File file) {
         //Load file in another thread
         new Thread(() -> {
+            try {
+                factorsFile = new FileManager.FactorsFile(file);
+                setTitle("Factors of " + NumberFormat.getInstance().format(factorsFile.getNumber()));
+                final List<Long> numbers = factorsFile.readNumbers(0, -1);
+                adapter.getFactors().addAll(numbers);
 
-            final FileManager.FactorsFile factorsFile = new FileManager.FactorsFile(file);
-            final List<Long> numbers = factorsFile.readNumbers(0, -1);
-            adapter.getFactors().addAll(numbers);
+                //Update UI
+                runOnUiThread(() -> {
 
-            //Update UI
-            runOnUiThread(() -> {
+                    //If there are no numbers, there was probably an error
+                    if (numbers.size() == 0 && file.length() > 0) {
+                        showLoadingError();
+                    } else {
+                        //Set header text
+                        headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.find_factors_subtitle_results, numbers.size()), new String[]{
+                                NUMBER_FORMAT.format(numbers.get(numbers.size() - 1)),
+                                NUMBER_FORMAT.format(numbers.size()),
+                        }, ContextCompat.getColor(getBaseContext(), R.color.white)));
 
-                //If there are no numbers, there was probably an error
-                if (numbers.size() == 0 && file.length() > 0) {
-                    showLoadingError();
-                } else {
-                    //Set header text
-                    headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.find_factors_subtitle_results, numbers.size()), new String[]{
-                            NUMBER_FORMAT.format(numbers.get(numbers.size() - 1)),
-                            NUMBER_FORMAT.format(numbers.size()),
-                    }, ContextCompat.getColor(getBaseContext(), R.color.white)));
+                        resizeCollapsingToolbar();
 
-                    resizeCollapsingToolbar();
+                        //Update adapter
+                        adapter.notifyItemRangeInserted(0, adapter.getItemCount());
+                    }
 
-                    //Update adapter
-                    adapter.notifyItemRangeInserted(0, adapter.getItemCount());
-                }
+                    progressDialog.dismiss();
+                });
+            }catch (IOException e){
+                e.printStackTrace();
+            }
 
-                progressDialog.dismiss();
-            });
         }).start();
     }
 }

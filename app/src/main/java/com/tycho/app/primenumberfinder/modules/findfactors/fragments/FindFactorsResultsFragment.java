@@ -27,6 +27,7 @@ import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -107,26 +108,36 @@ public class FindFactorsResultsFragment extends ResultsFragment {
 
         viewAllButton.setOnClickListener(v -> new Thread(() -> {
 
-            handler.post(() -> Toast.makeText(getActivity(), getString(R.string.loading), Toast.LENGTH_SHORT).show());
-
+            //Pause the task
             final Task.State state = getTask().getState();
             try {
                 getTask().pauseAndWait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            final File file = new File(getActivity().getCacheDir() + File.separator + "temp");
-            final boolean success = FileManager.getInstance().saveFactors(getTask().getFactors(), file);
-            if (!success) {
-                handler.post(() -> Toast.makeText(getActivity(), getString(R.string.general_error), Toast.LENGTH_SHORT).show());
+
+            //Save to file
+            final File file;
+            if (getTask().getState() == Task.State.STOPPED && getTask().isSaved()){
+                // Task is stopped and saved already, load saved file
+                file = FileManager.buildFile(getTask());
+            }else{
+                // Task has not finished or is not saved, saved to temp file
+                file = new File(getContext().getCacheDir() + File.separator + "factors");
+                try {
+                    getTask().saveToFile(file);
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
             }
+
+            //Restore task state
             if (state == Task.State.RUNNING) {
                 getTask().resume();
             }
 
             final Intent intent = new Intent(getActivity(), DisplayFactorsActivity.class);
             intent.putExtra("filePath", file.getAbsolutePath());
-            intent.putExtra("number", getTask().getNumber());
             getActivity().startActivity(intent);
         }).start());
 

@@ -3,6 +3,7 @@ package com.tycho.app.primenumberfinder.utils;
 import android.content.Context;
 import android.util.Log;
 
+import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 
 import java.io.BufferedInputStream;
@@ -125,6 +126,8 @@ public final class FileManager {
     public static File buildFile(final ITask task) {
         if (task instanceof FindPrimesTask) {
             return new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + ((FindPrimesTask) task).getStartValue() + "-" + (((FindPrimesTask) task).isEndless() ? "INF" : ((FindPrimesTask) task).getEndValue()) + ".primes");
+        }else if (task instanceof FindFactorsTask){
+            return new File(FileManager.getInstance().getSavedFactorsDirectory() + File.separator + "Factors of " + ((FindFactorsTask) task).getNumber() + ".factors");
         }
         return new File(FileManager.getInstance() + File.separator + task.getId().toString() + ".unknown");
     }
@@ -212,12 +215,13 @@ public final class FileManager {
 
         protected final File file;
 
+        protected int version = 0;
         protected int headerLength = 0;
         protected int numberSize = 8;
 
         protected int totalNumbers;
 
-        public NumbersFile(final File file) {
+        public NumbersFile(final File file){
             this.file = file;
         }
 
@@ -271,9 +275,6 @@ public final class FileManager {
     }
 
     public static class PrimesFile extends NumbersFile {
-        private final int version;
-        //private final int headerLength;
-        //private final int numberSize;
         private final long startValue;
         private final long endValue;
 
@@ -311,13 +312,31 @@ public final class FileManager {
     }
 
     public static class FactorsFile extends NumbersFile {
-        public FactorsFile(final File file) {
+
+        private final long number;
+
+        public FactorsFile(final File file) throws IOException{
             super(file);
+
+            //Read header
+            final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+            version = dataInputStream.readUnsignedByte();
+            headerLength = dataInputStream.readUnsignedByte();
+            numberSize = dataInputStream.readUnsignedByte();
+            final byte[] buffer = new byte[numberSize];
+            dataInputStream.readFully(buffer);
+            number = bytesToNumber(buffer);
+            dataInputStream.close();
+
             totalNumbers = (int) (file.length() - headerLength) / numberSize;
+        }
+
+        public long getNumber() {
+            return number;
         }
     }
 
-    private static byte[] numberToBytes(final long number) {
+    public static byte[] numberToBytes(final long number) {
         final byte[] bytes = new byte[8];
         for (int i = 0, offset = 8 * 8 - 8; i < 8; ++i, offset -= 8) {
             bytes[i] = (byte) ((number >> offset) & 0xFF);

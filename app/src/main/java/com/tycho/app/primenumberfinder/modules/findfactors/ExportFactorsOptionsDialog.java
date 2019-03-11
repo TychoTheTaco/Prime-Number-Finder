@@ -21,7 +21,11 @@ public class ExportFactorsOptionsDialog extends ExportOptionsDialog {
 
     public ExportFactorsOptionsDialog(final Context context, final File file, final int style){
         super(context, file, style);
-        factorsFile = new FileManager.FactorsFile(file);
+        try {
+            factorsFile = new FileManager.FactorsFile(file);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
     @Override
