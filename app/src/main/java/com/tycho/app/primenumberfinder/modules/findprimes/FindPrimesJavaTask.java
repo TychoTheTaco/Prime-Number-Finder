@@ -479,7 +479,15 @@ public class FindPrimesJavaTask extends MultithreadedTask implements FindPrimesT
                 }
 
                 //Write to 1 file with no commas use byte offset for quick reads
-                FileManager.getInstance().writeNumbersQuick(primes, new File(FileManager.getInstance().getTaskCacheDirectory(FindPrimesJavaTask.this) + File.separator + getId() + ".cache"), true);
+                try {
+                    final DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(new File(FileManager.getInstance().getTaskCacheDirectory(FindPrimesJavaTask.this) + File.separator + getId() + ".cache"), true)));
+                    for (long n : primes) {
+                        dataOutputStream.writeLong(n);
+                    }
+                    dataOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 primes.clear();
             }
         }

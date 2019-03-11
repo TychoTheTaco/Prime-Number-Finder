@@ -40,9 +40,9 @@ public class SavedFilesFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         cards.clear();
-        cards.add(new SavedFilesCard(context, "primeNumbers", "Prime Numbers", R.color.purple, FileManager.getInstance().getSavedPrimesDirectory()));
-        cards.add(new SavedFilesCard(context, "factors", "Factors", R.color.orange, FileManager.getInstance().getSavedFactorsDirectory()));
-        cards.add(new SavedFilesCard(context, "factorTree", "Factor Trees", R.color.green, FileManager.getInstance().getSavedTreesDirectory()));
+        cards.add(new SavedFilesCard("primeNumbers", "Prime Numbers", R.color.purple, FileManager.getInstance().getSavedPrimesDirectory()));
+        cards.add(new SavedFilesCard("factors", "Factors", R.color.orange, FileManager.getInstance().getSavedFactorsDirectory()));
+        cards.add(new SavedFilesCard("factorTree", "Factor Trees", R.color.green, FileManager.getInstance().getSavedTreesDirectory()));
         cardAdapter = new SavedFilesCardAdapter(context);
     }
 

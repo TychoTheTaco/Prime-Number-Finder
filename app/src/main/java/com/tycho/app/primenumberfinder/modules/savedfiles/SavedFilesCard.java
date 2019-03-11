@@ -34,12 +34,12 @@ public class SavedFilesCard {
 
     private FilesListAdapter filesListAdapter;
 
-    public SavedFilesCard(final Context context, String tag, String title, int backgroundColor, final File directory){
+    public SavedFilesCard(String tag, String title, int backgroundColor, final File directory){
         this.title = title;
         this.tag = tag;
         this.backgroundColor = backgroundColor;
         this.directory = directory;
-        this.filesListAdapter = new FilesListAdapter(directory, context);
+        this.filesListAdapter = new FilesListAdapter(directory);
     }
 
     public FilesListAdapter getFilesListAdapter() {

@@ -5,6 +5,8 @@ import android.util.Log;
 
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
+import com.tycho.app.primenumberfinder.modules.savedfiles.DataFile;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -56,10 +58,6 @@ public final class FileManager {
     private final File savedPrimesDirectory;
     private final File savedFactorsDirectory;
     private final File savedTreesDirectory;
-
-    private static final char LIST_ITEM_SEPARATOR = '\n';
-    public static final String EXTENSION = ".txt";
-    public static final String TREE_EXTENSION = ".tree";
 
     private final WeakReference<Context> context;
 
@@ -127,6 +125,8 @@ public final class FileManager {
             return new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + ((FindPrimesTask) task).getStartValue() + "-" + (((FindPrimesTask) task).isEndless() ? "INF" : ((FindPrimesTask) task).getEndValue()) + ".primes");
         }else if (task instanceof FindFactorsTask){
             return new File(FileManager.getInstance().getSavedFactorsDirectory() + File.separator + ((FindFactorsTask) task).getNumber() + ".factors");
+        }else if (task instanceof PrimeFactorizationTask){
+            return new File(FileManager.getInstance().getSavedTreesDirectory() + File.separator + ((PrimeFactorizationTask) task).getNumber() + ".tree");
         }
         return new File(FileManager.getInstance() + File.separator + task.getId().toString() + ".unknown");
     }
@@ -154,45 +154,6 @@ public final class FileManager {
         return cacheDirectory;
     }
 
-    public boolean saveTree(final Tree<?> tree) {
-        return saveTree(tree, new File(savedTreesDirectory.getAbsolutePath() + File.separator + "Factor tree of " + tree.getValue() + TREE_EXTENSION));
-    }
-
-    public boolean saveTree(final Tree<?> tree, final File file) {
-        try {
-
-            final PrintWriter printWriter = new PrintWriter(file);
-            printWriter.write(tree.toString());
-            printWriter.flush();
-            printWriter.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        return true;
-    }
-
-    public boolean writeNumbersQuick(final List<Long> numbers, final File file, final boolean append) {
-
-        try {
-            final DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file, append)));
-
-            for (long number : numbers) {
-                dataOutputStream.writeLong(number);
-            }
-
-            dataOutputStream.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        return true;
-    }
-
     private static long bytesToNumber(final byte[] bytes) {
         long number = 0;
         for (int i = 0, offset = 8 * 8 - 8; i < 8; ++i, offset -= 8) {
@@ -202,41 +163,14 @@ public final class FileManager {
         return number;
     }
 
-    public static class DataFile{
-
-        protected final File file;
-
-        //Header
-        private final int version;
-        protected final int headerLength;
-
-        public DataFile(final File file) throws IOException{
-            this.file = file;
-
-            //Read header
-            final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
-            version = dataInputStream.readUnsignedByte();
-            headerLength = dataInputStream.readUnsignedByte();
-            dataInputStream.close();
-        }
-
-        public File getFile(){
-            return file;
-        }
-
-        public String getTitle(){
-            return file.getName();
-        }
-    }
-
-    private static abstract class NumbersFile extends DataFile{
+    private static abstract class NumbersFile extends DataFile {
 
         protected final int numberSize;
 
         protected final int totalNumbers;
 
         public NumbersFile(final File file) throws IOException{
-            super(file);
+            super(file, true);
 
             final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
             dataInputStream.skipBytes(2);
@@ -347,20 +281,51 @@ public final class FileManager {
         public long getNumber() {
             return number;
         }
+
+        @Override
+        public String getTitle() {
+            final NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
+            return "Factors of " +  numberFormat.format(number);
+        }
     }
 
     public static class TreeFile extends DataFile{
 
         private final long number;
 
-        public TreeFile(final File file) throws IOException{
-            super(file);
+        private final Tree<Long> tree;
 
-            number = 0;
+        public TreeFile(final File file) throws IOException{
+            super(file, false);
+
+            final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            String line = bufferedReader.readLine();
+            StringBuilder stringBuilder = new StringBuilder();
+
+            while (line != null) {
+                stringBuilder.append(line);
+                line = bufferedReader.readLine();
+            }
+
+            Tree<Long> t;
+            try {
+                t = Tree.parse(stringBuilder.toString()).toLongTree();
+            }catch (Tokenizer.InvalidTokenException e){
+                e.printStackTrace();
+                t = null;
+            }
+            this.tree = t;
+            number = tree.getValue();
         }
 
         public long getNumber(){
             return number;
+        }
+
+        @Override
+        public String getTitle() {
+            final NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
+            return "Factor tree of " +  numberFormat.format(number);
         }
     }
 

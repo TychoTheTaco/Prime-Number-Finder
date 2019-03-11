@@ -9,6 +9,9 @@ import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -186,13 +189,22 @@ public class PrimeFactorizationTask extends Task implements Savable, SearchOptio
 
     private boolean saved;
 
+    public void saveToFile(final File file) throws IOException {
+        final PrintWriter printWriter = new PrintWriter(file);
+        printWriter.write(factorTree.toString());
+        printWriter.close();
+    }
+
     @Override
     public boolean save() {
-        saved = FileManager.getInstance().saveTree(getFactorTree());
-        if (saved){
+        try {
+            saveToFile(FileManager.buildFile(this));
             sendOnSaved();
-        }else{
+            saved = true;
+        }catch (IOException e){
+            e.printStackTrace();
             sendOnError();
+            saved = false;
         }
         return saved;
     }

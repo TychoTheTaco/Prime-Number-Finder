@@ -43,6 +43,7 @@ import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.gcf.GreatestCommonFactorTask;
 import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
+import com.tycho.app.primenumberfinder.modules.savedfiles.DataFile;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -225,7 +226,7 @@ public final class Utils {
         Collections.sort(files, (file0, file1) -> (ascending ? 1 : -1) * Long.compare(file0.lastModified(), file1.lastModified()));
     }
 
-    public static void sortDataFiesByDate(final List<FileManager.DataFile> files, final boolean ascending){
+    public static void sortDataFiesByDate(final List<DataFile> files, final boolean ascending){
         Collections.sort(files, (file0, file1) -> (ascending ? 1 : -1) * Long.compare(file0.getFile().lastModified(), file1.getFile().lastModified()));
     }
 
