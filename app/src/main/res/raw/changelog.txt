@@ -143,3 +143,8 @@
 - Minor UI changes
 - Various performance improvements
 - Bug fixes
+
+03/11/2019 > Prime Number Finder version 1.4.1
+- Fixed major crashing issue with native code on older devices
+- Minor bug fixes
+- Minor UI changes
