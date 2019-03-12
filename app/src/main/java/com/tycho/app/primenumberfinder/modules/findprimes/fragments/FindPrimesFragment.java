@@ -21,7 +21,6 @@ import android.widget.Toast;
 import com.crashlytics.android.Crashlytics;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.activities.MainActivity;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
 import com.tycho.app.primenumberfinder.modules.ModuleHostFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
@@ -334,6 +333,43 @@ public class FindPrimesFragment extends ModuleHostFragment {
         startActivityForResult(intent, REQUEST_CODE_NEW_TASK);
     }
 
+    @Override
+    public void onTaskSelected(ITask task) {
+        if (task instanceof FindPrimesTask) {
+            findPrimesResultsFragment.setTask(task);
+            checkPrimalityResultsFragment.setTask(null);
+            ((GeneralResultsFragment) resultsFragment).setContent(findPrimesResultsFragment);
+        } else if (task instanceof CheckPrimalityTask) {
+            findPrimesResultsFragment.setTask(null);
+            checkPrimalityResultsFragment.setTask(task);
+            ((GeneralResultsFragment) resultsFragment).setContent(checkPrimalityResultsFragment);
+        } else {
+            ((GeneralResultsFragment) resultsFragment).setContent(null);
+            findPrimesResultsFragment.setTask(null);
+            checkPrimalityResultsFragment.setTask(null);
+        }
+    }
+
+    @Override
+    public void onTaskRemoved(ITask task) {
+        if (findPrimesResultsFragment.getTask() == task) {
+            findPrimesResultsFragment.setTask(null);
+        }
+        if (checkPrimalityResultsFragment.getTask() == task) {
+            checkPrimalityResultsFragment.setTask(null);
+        }
+
+        taskListFragment.update();
+    }
+
+    @Override
+    public void onEditPressed(ITask task) {
+        final Intent intent = new Intent(getActivity(), FindPrimesConfigurationActivity.class);
+        intent.putExtra("searchOptions", ((FindPrimesTask) task).getSearchOptions());
+        intent.putExtra("taskId", task.getId());
+        startActivityForResult(intent, 0);
+    }
+
     private FindPrimesTask.SearchOptions.SearchMethod determineBestSearchMethod() {
 
         //Check if end value is infinity or is greater than int range
@@ -391,42 +427,5 @@ public class FindPrimesFragment extends ModuleHostFragment {
         }
 
         return Utils.textToNumber(input);
-    }
-
-    @Override
-    public void onTaskSelected(ITask task) {
-        if (task instanceof FindPrimesTask) {
-            findPrimesResultsFragment.setTask(task);
-            checkPrimalityResultsFragment.setTask(null);
-            ((GeneralResultsFragment) resultsFragment).setContent(findPrimesResultsFragment);
-        } else if (task instanceof CheckPrimalityTask) {
-            findPrimesResultsFragment.setTask(null);
-            checkPrimalityResultsFragment.setTask(task);
-            ((GeneralResultsFragment) resultsFragment).setContent(checkPrimalityResultsFragment);
-        } else {
-            ((GeneralResultsFragment) resultsFragment).setContent(null);
-            findPrimesResultsFragment.setTask(null);
-            checkPrimalityResultsFragment.setTask(null);
-        }
-    }
-
-    @Override
-    public void onTaskRemoved(ITask task) {
-        if (findPrimesResultsFragment.getTask() == task) {
-            findPrimesResultsFragment.setTask(null);
-        }
-        if (checkPrimalityResultsFragment.getTask() == task) {
-            checkPrimalityResultsFragment.setTask(null);
-        }
-
-        taskListFragment.update();
-    }
-
-    @Override
-    public void onEditPressed(ITask task) {
-        final Intent intent = new Intent(getActivity(), FindPrimesConfigurationActivity.class);
-        intent.putExtra("searchOptions", ((FindPrimesTask) task).getSearchOptions());
-        intent.putExtra("taskId", task.getId());
-        startActivityForResult(intent, 0);
     }
 }

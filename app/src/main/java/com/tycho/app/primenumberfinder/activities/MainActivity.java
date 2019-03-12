@@ -368,11 +368,4 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         }
         return null;
     }
-
-    private Module findModule(final Class<? extends Fragment> cls){
-        for (Module module : modules){
-            if (module.fragmentClass == cls) return module;
-        }
-        return null;
-    }
 }

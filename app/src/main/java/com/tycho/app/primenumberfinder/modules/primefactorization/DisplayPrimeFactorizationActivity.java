@@ -1,7 +1,5 @@
 package com.tycho.app.primenumberfinder.modules.primefactorization;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -14,12 +12,8 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.text.style.SuperscriptSpan;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.activities.DisplayContentActivity;
@@ -39,14 +33,12 @@ import simpletrees.Tree;
  * Created by tycho on 11/12/2017.
  */
 
-public class DisplayPrimeFactorizationActivity extends DisplayContentActivity {
+public class DisplayPrimeFactorizationActivity extends DisplayContentActivity{
 
     /**
      * Tag used for logging and debugging.
      */
     private static final String TAG = DisplayPrimeFactorizationActivity.class.getSimpleName();
-
-    private File file;
 
     private Tree<Long> factorTree;
 
@@ -54,15 +46,10 @@ public class DisplayPrimeFactorizationActivity extends DisplayContentActivity {
     private TextView bodyTextView;
     private TreeView treeView;
 
-    private boolean allowExport;
-    private boolean allowDelete;
-
     private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
-    private ProgressDialog progressDialog;
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.display_prime_factorization_activity);
 
@@ -77,170 +64,97 @@ public class DisplayPrimeFactorizationActivity extends DisplayContentActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Utils.applyTheme(this, ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
 
-        progressDialog = ProgressDialog.show(this, "Loading...", "Loading file.");
-
-        //Get the intent
-        final Intent intent = getIntent();
-        if (intent != null) {
-
-            //Get the file path from the extras
-            final String filePath = intent.getStringExtra("filePath");
-            if (filePath != null) {
-                file = new File(filePath);
-
-                //Start loading the file
-                loadFile(file);
-
-                allowExport = intent.getBooleanExtra("allowExport", false);
-                allowDelete = intent.getBooleanExtra("allowDelete", false);
-
-            } else {
-                Log.e(TAG, "Invalid file path!");
-                Toast.makeText(this, "Error loading file!", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        } else {
-            Log.e(TAG, "Activity was started without an intent!");
-            Toast.makeText(this, "Error loading file!", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-
+        //Start loading the file
+        load();
     }
 
     @Override
-    protected void loadFile(final File file) {
-        //Load file in another thread
-        new Thread(() -> {
+    protected void loadFile(final File file){
+        factorTree = FileManager.getInstance().readTree(file);
 
-            factorTree = FileManager.getInstance().readTree(file);
-            progressDialog.dismiss();
+        setTitle("Prime Factorization of " + NUMBER_FORMAT.format(factorTree.getValue()));
 
-            setTitle("Prime Factorization of " + NUMBER_FORMAT.format(factorTree.getValue()));
+        runOnUiThread(() -> {
 
-            runOnUiThread(() -> {
+            if (factorTree == null){
+                showLoadingError();
+                return;
+            }
 
-                if (factorTree == null) {
-                    showLoadingError();
-                    return;
-                }
+            treeView.setTree(factorTree.formatNumbers());
+            if (PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 1){
+                final TreeView.ExportOptions exportOptions = treeView.getDefaultExportOptions();
+                exportOptions.itemTextColor = Color.WHITE;
+                exportOptions.itemBorderColor = ContextCompat.getColor(this, R.color.accent_light_but_not_that_light);
+                exportOptions.branchColor = Color.WHITE;
+                exportOptions.itemBackgroundColor = Color.BLACK;
+                exportOptions.imageBorderColor = Color.WHITE;
+                exportOptions.imageBackgroundColor = Color.BLACK;
+                exportOptions.primeFactorTextColor = ContextCompat.getColor(this, R.color.red);
+                treeView.setExportOptions(exportOptions);
+            }
 
-                treeView.setTree(factorTree.formatNumbers());
-                if (PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 1){
-                    final TreeView.ExportOptions exportOptions = treeView.getDefaultExportOptions();
-                    exportOptions.itemTextColor = Color.WHITE;
-                    exportOptions.itemBorderColor = ContextCompat.getColor(this, R.color.accent_light_but_not_that_light);
-                    exportOptions.branchColor = Color.WHITE;
-                    exportOptions.itemBackgroundColor = Color.BLACK;
-                    exportOptions.imageBorderColor = Color.WHITE;
-                    exportOptions.imageBackgroundColor = Color.BLACK;
-                    exportOptions.primeFactorTextColor = ContextCompat.getColor(this, R.color.red);
-                    treeView.setExportOptions(exportOptions);
-                }
+            final Map<Long, Integer> map = new TreeMap<>();
+            getPrimeFactors(map, factorTree);
 
-                final Map<Long, Integer> map = new TreeMap<>();
-                getPrimeFactors(map, factorTree);
+            //Subtitle
+            subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder,
+                    getResources().getQuantityString(R.plurals.prime_factorization_subtitle_results, map.keySet().size()),
+                    new String[]{NUMBER_FORMAT.format(factorTree.getValue()), NUMBER_FORMAT.format(map.keySet().size())},
+                    ContextCompat.getColor(getBaseContext(), PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 0 ? R.color.green_dark : R.color.green_light)
+            ));
 
-                //Subtitle
-                subtitleTextView.setText(Utils.formatSpannable(spannableStringBuilder,
-                        getResources().getQuantityString(R.plurals.prime_factorization_subtitle_results, map.keySet().size()),
-                        new String[]{NUMBER_FORMAT.format(factorTree.getValue()), NUMBER_FORMAT.format(map.keySet().size())},
-                        ContextCompat.getColor(getBaseContext(), PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 0 ? R.color.green_dark : R.color.green_light)
-                ));
+            //Body
+            spannableStringBuilder.clear();
+            spannableStringBuilder.clearSpans();
+            spannableStringBuilder.append(NUMBER_FORMAT.format(factorTree.getValue()));
+            spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 0 ? R.color.green_dark : R.color.green_light)), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            int position = spannableStringBuilder.length();
+            spannableStringBuilder.append(" = ");
+            spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            for (Long factor : map.keySet()){
+                position = spannableStringBuilder.length();
+                String content = NUMBER_FORMAT.format(factor);
+                spannableStringBuilder.append(content);
+                spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 0 ? R.color.green_dark : R.color.green_light)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 
-                //Body
-                spannableStringBuilder.clear();
-                spannableStringBuilder.clearSpans();
-                spannableStringBuilder.append(NUMBER_FORMAT.format(factorTree.getValue()));
-                spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 0 ? R.color.green_dark : R.color.green_light)), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                int position = spannableStringBuilder.length();
-                spannableStringBuilder.append(" = ");
+                position = spannableStringBuilder.length();
+                content = NUMBER_FORMAT.format(map.get(factor));
+                spannableStringBuilder.append(content);
+                spannableStringBuilder.setSpan(new SuperscriptSpan(), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                spannableStringBuilder.setSpan(new RelativeSizeSpan(0.8f), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+
+                position = spannableStringBuilder.length();
+                content = " \u00D7 "; //Multiplication sign
+                spannableStringBuilder.append(content);
                 spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                for (Long factor : map.keySet()) {
-                    position = spannableStringBuilder.length();
-                    String content = NUMBER_FORMAT.format(factor);
-                    spannableStringBuilder.append(content);
-                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 0 ? R.color.green_dark : R.color.green_light)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                    spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-
-                    position = spannableStringBuilder.length();
-                    content = NUMBER_FORMAT.format(map.get(factor));
-                    spannableStringBuilder.append(content);
-                    spannableStringBuilder.setSpan(new SuperscriptSpan(), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                    spannableStringBuilder.setSpan(new RelativeSizeSpan(0.8f), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-
-                    position = spannableStringBuilder.length();
-                    content = " \u00D7 "; //Multiplication sign
-                    spannableStringBuilder.append(content);
-                    spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(getBaseContext(), R.color.gray)), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                }
-                spannableStringBuilder.delete(spannableStringBuilder.length() - 3, spannableStringBuilder.length());
-                bodyTextView.setVisibility(View.VISIBLE);
-                bodyTextView.setText(spannableStringBuilder);
-            });
-
-        }).start();
+            }
+            spannableStringBuilder.delete(spannableStringBuilder.length() - 3, spannableStringBuilder.length());
+            bodyTextView.setVisibility(View.VISIBLE);
+            bodyTextView.setText(spannableStringBuilder);
+        });
     }
 
-    private void getPrimeFactors(final Map<Long, Integer> map, final Tree<Long> tree) {
-        if (tree.getChildren().size() > 0) {
-            for (Tree<Long> child : tree.getChildren()) {
+    @Override
+    protected void export(File file){
+        final Intent intent = new Intent(this, FactorTreeExportOptionsActivity.class);
+        intent.putExtra("filePath", file.getAbsolutePath());
+        startActivity(intent);
+    }
+
+    private void getPrimeFactors(final Map<Long, Integer> map, final Tree<Long> tree){
+        if (tree.getChildren().size() > 0){
+            for (Tree<Long> child : tree.getChildren()){
                 getPrimeFactors(map, child);
             }
-        } else {
-            if (map.get(tree.getValue()) == null) {
+        }else{
+            if (map.get(tree.getValue()) == null){
                 map.put(tree.getValue(), 1);
-            } else {
+            }else{
                 map.put(tree.getValue(), map.get(tree.getValue()) + 1);
             }
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.display_content_activity_menu, menu);
-        menu.findItem(R.id.find).setVisible(false);
-        menu.findItem(R.id.export).setVisible(allowExport);
-        menu.findItem(R.id.delete).setVisible(allowDelete);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                break;
-
-            case R.id.export:
-                final Intent intent = new Intent(this, FactorTreeExportOptionsActivity.class);
-                intent.putExtra("filePath", file.getAbsolutePath());
-                startActivity(intent);
-                break;
-
-            case R.id.delete:
-                final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-                alertDialog.setTitle("Warning");
-                alertDialog.setMessage("Are you sure you want to delete this saved file?");
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "DELETE",
-                        (dialog, which) -> {
-                            file.delete();
-                            alertDialog.dismiss();
-                            finish();
-                        });
-                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
-                        (dialog, which) -> alertDialog.dismiss());
-                alertDialog.show();
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        progressDialog.dismiss();
     }
 }
