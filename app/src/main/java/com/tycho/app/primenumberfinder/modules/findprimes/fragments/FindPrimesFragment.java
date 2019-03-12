@@ -112,13 +112,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
 
                 //Create a new task
                 final ITask task = new CheckPrimalityTask(getPrimalityInput().longValue());
-                taskListFragment.addTask(task);
-                PrimeNumberFinder.getTaskManager().registerTask(task);
-
-                //Start the task
-                task.startOnNewThread();
-                taskListFragment.setSelected(task);
-
+                startTask(task);
                 hideKeyboard(getActivity());
 
             } else {

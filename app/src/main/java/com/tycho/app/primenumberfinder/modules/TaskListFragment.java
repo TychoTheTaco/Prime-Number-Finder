@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,19 +49,7 @@ public class TaskListFragment extends Fragment {
 
     private RecyclerView recyclerView;
 
-    private Queue<AbstractTaskListAdapter.EventListener> eventListenerQueue = new LinkedBlockingQueue<>(5);
-    private Queue<ActionViewListener> actionViewListenerQueue = new LinkedBlockingQueue<>(5);
-
     private final List<Class<? extends ITask>> whitelist = new ArrayList<>();
-
-    /**
-     * All UI updates are posted to this {@link Handler} on the main thread.
-     */
-    protected final Handler handler = new Handler(Looper.getMainLooper());
-
-    public void setAdapter(final AbstractTaskListAdapter adapter){
-        this.taskListAdapter = adapter;
-    }
 
     @Nullable
     @Override
@@ -112,12 +101,12 @@ public class TaskListFragment extends Fragment {
         outState.putIntegerArrayList("savedItemPositions", savedItemPositions);
     }
 
+    public void setAdapter(final AbstractTaskListAdapter adapter){
+        this.taskListAdapter = adapter;
+    }
+
     public void addEventListener(final AbstractTaskListAdapter.EventListener eventListener) {
-        if (taskListAdapter == null) {
-            eventListenerQueue.add(eventListener);
-        } else {
-            taskListAdapter.addEventListener(eventListener);
-        }
+        taskListAdapter.addEventListener(eventListener);
     }
 
     public void addTask(final ITask task) {
@@ -130,16 +119,12 @@ public class TaskListFragment extends Fragment {
 
                 @Override
                 public void onError() {
-
+                    Log.e(TAG, "Failed to save task!");
                 }
             });
         }
         taskListAdapter.addTask(task);
         update();
-    }
-
-    public void setSelected(final int index) {
-        taskListAdapter.setSelected(index);
     }
 
     public void setSelected(final ITask task) {
@@ -155,11 +140,7 @@ public class TaskListFragment extends Fragment {
     }
 
     public void addActionViewListener(final ActionViewListener actionViewListener) {
-        if (taskListAdapter == null) {
-            actionViewListenerQueue.add(actionViewListener);
-        } else {
-            taskListAdapter.addActionViewListener(actionViewListener);
-        }
+        taskListAdapter.addActionViewListener(actionViewListener);
     }
 
     public void whitelist(final Class<? extends ITask>... classes){

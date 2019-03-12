@@ -81,18 +81,6 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
 
     private final int defaultDrawerIconTint = PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 0 ? Color.BLACK : Color.WHITE;
 
-    private class Module{
-        private final int drawerId;
-        private final String tag;
-        private final Class<? extends Fragment> fragmentClass;
-
-        public Module(int drawerId, String tag, Class<? extends Fragment> fragmentClass) {
-            this.drawerId = drawerId;
-            this.tag = tag;
-            this.fragmentClass = fragmentClass;
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -226,6 +214,18 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
     public void onTaskStatesChanged(final int taskType, final boolean active) {
         if (navigationView != null && taskType != -1) {
             navigationView.post(() -> setActionViewVisibility(navigationView.getMenu().getItem(taskType), active));
+        }
+    }
+
+    private class Module{
+        private final int drawerId;
+        private final String tag;
+        private final Class<? extends Fragment> fragmentClass;
+
+        public Module(int drawerId, String tag, Class<? extends Fragment> fragmentClass) {
+            this.drawerId = drawerId;
+            this.tag = tag;
+            this.fragmentClass = fragmentClass;
         }
     }
 

@@ -11,7 +11,7 @@ public:
     NativeListener(JNIEnv* env, std::string listener_id, jobject native_task_object): listener_id(listener_id), native_task_object(env->NewGlobalRef(native_task_object)){
         int result = env->GetJavaVM(&jvm);
         assert(result == JNI_OK);
-        jclass cls = env->GetObjectClass(native_task_object);
+        jclass cls = env->FindClass("com/tycho/app/primenumberfinder/NativeTask");
         method_ids[0] = env->GetMethodID(cls, "sendOnTaskStarted", "(Ljava/lang/String;)V");
         method_ids[1] = env->GetMethodID(cls, "sendOnTaskPausing", "(Ljava/lang/String;)V");
         method_ids[2] = env->GetMethodID(cls, "sendOnTaskPaused", "(Ljava/lang/String;)V");
@@ -57,10 +57,21 @@ private:
 
     void call(jobject object, jmethodID method_id, Task* task){
         JNIEnv* env;
-        int result = jvm->AttachCurrentThread(&env, 0);
-        assert(result == JNI_OK);
+        bool detach = false;
+        switch (jvm->GetEnv((void**) &env, JNI_VERSION_1_6)){
+            case JNI_EDETACHED:
+                assert(jvm->AttachCurrentThread(&env, 0) == JNI_OK);
+                detach = true;
+                break;
+
+            case JNI_OK:
+                break;
+
+            default:
+                break;
+        }
         env->CallVoidMethod(object, method_id, env->NewStringUTF(listener_id.c_str()));
-        //jvm->DetachCurrentThread(); // This causes a crash when pausing tasks
+        if (detach) jvm->DetachCurrentThread();
     }
 };
 
