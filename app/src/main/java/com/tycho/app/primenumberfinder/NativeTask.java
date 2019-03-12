@@ -20,18 +20,21 @@ public abstract class NativeTask implements ITask{
         System.loadLibrary("native-utils");
     }
 
+    private final UUID id;
+
     /**
      * Pointer to the native Task object.
      */
     protected final long native_task_pointer;
 
     public NativeTask(final long native_task_pointer){
+        this.id = UUID.randomUUID();
         this.native_task_pointer = native_task_pointer;
     }
 
     @Override
     public UUID getId(){
-        return UUID.randomUUID();
+        return id;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
