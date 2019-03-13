@@ -7,7 +7,6 @@ import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
-import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
@@ -25,7 +24,7 @@ import easytasks.Task;
  * Date Created: 3/3/2017
  */
 
-public class FindFactorsTask extends Task implements Savable, SearchOptions {
+public class FindFactorsTask extends Task implements Savable, SearchOptions{
 
     /**
      * Tag used for logging and debugging.
@@ -52,129 +51,118 @@ public class FindFactorsTask extends Task implements Savable, SearchOptions {
      */
     private final List<Long> inverse = new LinkedList<>();
 
-    private boolean isFinished = false;
-
     private SearchOptions searchOptions;
 
     private long i;
 
     private final int sqrtMax;
 
-    public FindFactorsTask(final SearchOptions searchOptions) {
+    public FindFactorsTask(final SearchOptions searchOptions){
         this.searchOptions = searchOptions;
         this.number = searchOptions.getNumber();
         sqrtMax = (int) Math.sqrt(number);
     }
 
     @Override
-    protected void run() {
-        for (i = 1; i <= sqrtMax; i++) {
+    protected void run(){
+        for (i = 1; isRunning() && i <= sqrtMax; i++){
 
             //Check if the number divides perfectly
-            if (number % i == 0) {
+            if (number % i == 0){
                 factors.add(i);
-                if ((number / i) != i) {
-                    inverse.add(0, number / i);
+                final long inv = number / i;
+                if (inv != i){
+                    inverse.add(0, inv);
                 }
             }
-
-            tryPause();
-            if (shouldStop()) {
-                return;
-            }
         }
 
-        if (!shouldStop()) {
-            factors.addAll(inverse);
-            inverse.clear();
-            isFinished = true;
-        }
+        factors.addAll(inverse);
+        inverse.clear();
     }
 
     @Override
-    public float getProgress() {
-        if (getState() != State.STOPPED) {
+    public float getProgress(){
+        if (getState() != State.STOPPED){
             return (float) i / sqrtMax;
         }
         return super.getProgress();
     }
 
-    public void setSearchOptions(SearchOptions searchOptions) {
+    public void setSearchOptions(SearchOptions searchOptions){
         this.searchOptions = searchOptions;
     }
 
-    public SearchOptions getSearchOptions() {
+    public SearchOptions getSearchOptions(){
         return searchOptions;
     }
 
-    public long getMaxValue() {
+    public long getMaxValue(){
         return (long) Math.sqrt(number);
     }
 
-    public long getCurrentValue() {
+    public long getCurrentValue(){
         return i;
     }
 
-    public List<Long> getFactors() {
+    public List<Long> getFactors(){
         return factors;
     }
 
-    public static class SearchOptions extends GeneralSearchOptions {
+    public static class SearchOptions extends GeneralSearchOptions{
 
         /**
          * The number we are finding factors of.
          */
         private long number;
 
-        public SearchOptions(final long number, final int threadCount, final boolean notifyWhenFinished, final boolean autoSave) {
+        public SearchOptions(final long number, final int threadCount, final boolean notifyWhenFinished, final boolean autoSave){
             super(threadCount, notifyWhenFinished, autoSave);
             this.number = number;
         }
 
-        public SearchOptions(final long number) {
+        public SearchOptions(final long number){
             this(number, 1, false, false);
         }
 
         @Override
-        public void writeToParcel(Parcel dest, int flags) {
+        public void writeToParcel(Parcel dest, int flags){
             super.writeToParcel(dest, flags);
             dest.writeLong(this.number);
         }
 
-        public static final Parcelable.Creator<SearchOptions> CREATOR = new Parcelable.Creator<SearchOptions>() {
+        public static final Parcelable.Creator<SearchOptions> CREATOR = new Parcelable.Creator<SearchOptions>(){
 
             @Override
-            public SearchOptions createFromParcel(Parcel in) {
+            public SearchOptions createFromParcel(Parcel in){
                 return new SearchOptions(in);
             }
 
             @Override
-            public SearchOptions[] newArray(int size) {
+            public SearchOptions[] newArray(int size){
                 return new SearchOptions[size];
             }
         };
 
-        private SearchOptions(final Parcel parcel) {
+        private SearchOptions(final Parcel parcel){
             super(parcel);
             this.number = parcel.readLong();
         }
 
-        public void setNumber(long number) {
+        public void setNumber(long number){
             this.number = number;
         }
 
-        public long getNumber() {
+        public long getNumber(){
             return number;
         }
     }
 
-    public long getNumber() {
+    public long getNumber(){
         return number;
     }
 
-    private boolean saved;
-
-    public void saveToFile(final File file) throws IOException {
+    public void saveToFile(final File file) throws IOException{
         final DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file, false)));
         //Header format
         // [1 byte] Version
@@ -189,19 +177,27 @@ public class FindFactorsTask extends Task implements Savable, SearchOptions {
         dataOutputStream.write(FileManager.numberToBytes(number));
 
         //Write data
-        for (long factor : factors) {
+        for (long factor : factors){
             dataOutputStream.write(FileManager.numberToBytes(factor));
         }
-        for (long factor : inverse) {
+        for (long factor : inverse){
             dataOutputStream.write(FileManager.numberToBytes(factor));
         }
 
         dataOutputStream.close();
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // [Savable]
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private boolean saved;
+
+    private final CopyOnWriteArrayList<SaveListener> saveListeners = new CopyOnWriteArrayList<>();
+
     @Override
-    public boolean save() {
-        try {
+    public boolean save(){
+        try{
             saveToFile(FileManager.buildFile(this));
             sendOnSaved();
             saved = true;
@@ -213,29 +209,27 @@ public class FindFactorsTask extends Task implements Savable, SearchOptions {
         return saved;
     }
 
-    private CopyOnWriteArrayList<SaveListener> saveListeners = new CopyOnWriteArrayList<>();
-
-    public void addSaveListener(final SaveListener listener) {
+    public void addSaveListener(final SaveListener listener){
         saveListeners.add(listener);
     }
 
-    public void removeSaveListener(final SaveListener listener) {
+    public void removeSaveListener(final SaveListener listener){
         saveListeners.remove(listener);
     }
 
-    private void sendOnSaved() {
-        for (SaveListener listener : saveListeners) {
+    private void sendOnSaved(){
+        for (SaveListener listener : saveListeners){
             listener.onSaved();
         }
     }
 
-    private void sendOnError() {
-        for (SaveListener listener : saveListeners) {
+    private void sendOnError(){
+        for (SaveListener listener : saveListeners){
             listener.onError();
         }
     }
 
-    public boolean isSaved() {
+    public boolean isSaved(){
         return saved;
     }
 }

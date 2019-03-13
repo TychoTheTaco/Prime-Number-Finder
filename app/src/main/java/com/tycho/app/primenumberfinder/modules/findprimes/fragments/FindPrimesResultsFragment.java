@@ -336,6 +336,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         }
         if (getView() != null) {
             init();
+        }else{
+            throw new RuntimeException("setTask() when getView() is null!");
         }
     }
 

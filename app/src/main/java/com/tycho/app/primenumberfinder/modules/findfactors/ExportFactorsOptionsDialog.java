@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.content.FileProvider;
 import android.widget.EditText;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.savedfiles.ExportOptionsDialog;
 import com.tycho.app.primenumberfinder.utils.FileManager;
@@ -40,6 +41,7 @@ public class ExportFactorsOptionsDialog extends ExportOptionsDialog {
 
     @Override
     protected void export(final String fileName, final String separator, final boolean formatNumber, final NumberFormat numberFormat) {
+        FirebaseAnalytics.getInstance(getContext()).logEvent("export_factors", null);
         final File output = factorsFile.export(fileName + ".txt", separator, formatNumber ? numberFormat : null);
         final Uri path = FileProvider.getUriForFile(context, "com.tycho.app.primenumberfinder", output);
         final Intent intent = new Intent(Intent.ACTION_SEND);

@@ -147,9 +147,7 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
 
             if (numbers.size() > 0){
                 //Remove items from end
-                for (int i = 0;  i < INCREMENT; ++i){
-                    primesAdapter.getPrimes().remove(primesAdapter.getPrimes().size() - 1);
-                }
+                primesAdapter.getPrimes().subList(primesAdapter.getItemCount() - INCREMENT, primesAdapter.getItemCount() - 1).clear();
                 recyclerView.post(() -> primesAdapter.notifyItemRangeRemoved(primesAdapter.getPrimes().size(), INCREMENT));
 
                 //Add items to beginning
@@ -175,11 +173,7 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
 
                 if (!endOfFile) {
                     //Remove items from beginning
-                    final Iterator<Long> iterator = primesAdapter.getPrimes().iterator();
-                    for (int i = 0; i < INCREMENT; i++) {
-                        iterator.next();
-                        iterator.remove();
-                    }
+                    primesAdapter.getPrimes().subList(0, INCREMENT).clear();
                     recyclerView.post(() -> primesAdapter.notifyItemRangeRemoved(0, INCREMENT));
                 }
 
@@ -317,7 +311,6 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
 
     @Override
     protected void export(File file) {
-        FirebaseAnalytics.getInstance(this).logEvent("export_primes", null);
         final ExportOptionsDialog exportOptionsDialog = new ExportPrimesOptionsDialog(this, file, R.style.FindPrimes_Dialog);
         exportOptionsDialog.show();
     }
