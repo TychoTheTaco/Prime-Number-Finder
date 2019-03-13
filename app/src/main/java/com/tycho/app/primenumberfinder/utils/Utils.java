@@ -78,7 +78,7 @@ public final class Utils {
      *
      * @param context Context used by display metrics.
      * @param dp      DP value to convert.
-     * @return Equivalent value in pixels
+     * @return Equivalent value in pixels.
      */
     public static float dpToPx(final Context context, final float dp) {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
@@ -86,51 +86,6 @@ public final class Utils {
 
     public static int dpToPx(final Context context, final int dp) {
         return (int) dpToPx(context, (float) dp);
-    }
-
-    /**
-     * Map a value between a and b to a value between c and d.
-     *
-     * @param value The value to map.
-     * @param a     Minimum value of original value's range.
-     * @param b     Maximum value of original value's range.
-     * @param c     Minimum value of new range.
-     * @param d     Maximum value of new range.
-     * @return The mapped value between c and d.
-     */
-    public static float map(float value, float a, float b, float c, float d) {
-        return (value - a) / (b - a) * (d - c) + c;
-    }
-
-    /**
-     * Format the time like a stopwatch.
-     *
-     * @param millis The time in milliseconds.
-     * @return A string with the corresponding time formatted like a stopwatch.
-     */
-    public static String formatTime(final long millis) {
-
-        if (millis == -1) {
-            return "infinity";
-        }
-
-        final int milliseconds = (int) (millis % 1000);
-        final int seconds = (int) ((millis / 1000) % 60);
-        final int minutes = (int) ((millis / (1000 * 60)) % 60);
-        final int hours = (int) ((millis / (1000 * 60 * 60)) % 24);
-        final int days = (int) ((millis / (1000 * 60 * 60 * 24)) % 7);
-
-        final String time;
-
-        if (days > 0) {
-            time = String.format(Locale.getDefault(), "%03d:%02d:%02d:%02d.%03d", days, hours, minutes, seconds, milliseconds);
-        } else if (hours > 0) {
-            time = String.format(Locale.getDefault(), "%02d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds);
-        } else {
-            time = String.format(Locale.getDefault(), "%02d:%02d.%03d", minutes, seconds, milliseconds);
-        }
-
-        return time;
     }
 
     public static String formatTimeHuman(final long millis, final int precision) {
@@ -224,10 +179,6 @@ public final class Utils {
      */
     public static void sortByDate(final List<File> files, final boolean ascending) {
         Collections.sort(files, (file0, file1) -> (ascending ? 1 : -1) * Long.compare(file0.lastModified(), file1.lastModified()));
-    }
-
-    public static void sortDataFiesByDate(final List<DataFile> files, final boolean ascending){
-        Collections.sort(files, (file0, file1) -> (ascending ? 1 : -1) * Long.compare(file0.getFile().lastModified(), file1.getFile().lastModified()));
     }
 
     public static void sortBySize(final List<File> files, final boolean ascending) {
@@ -341,48 +292,6 @@ public final class Utils {
         return String.format(Locale.getDefault(), "%.1f %sB", bytes / Math.pow(unit, exp), pre);
     }
 
-    public static String formatTitle(final File file) {
-
-        final Pattern pattern = Pattern.compile("(.+)\\.");
-        final Matcher matcher = pattern.matcher(file.getName());
-
-        final String input;
-        if (matcher.find()) {
-            input = matcher.group(1);
-        } else {
-            input = file.getName();
-        }
-
-        //Replace all the numbers
-        String replaceNumbers = input.replaceAll("\\d+", "<number>");
-
-        //Replace all the text
-        String onlyNumbers = input.replaceAll("[^\\d]+", "<text>");
-
-        //Get all numbers from the string
-        try {
-            String numbers[] = onlyNumbers.trim().split("<text>");
-            final List<Long> formattedNumbers = new ArrayList<>();
-            for (String numberString : numbers) {
-                if (!numberString.equals("")) {
-                    formattedNumbers.add(Long.valueOf(numberString));
-                }
-            }
-
-            //Replace all place holders with formatted numbers
-            String title = replaceNumbers;
-            for (int i = 0; i < formattedNumbers.size(); i++) {
-                title = title.replaceFirst("<number>", NumberFormat.getInstance(Locale.getDefault()).format(formattedNumbers.get(i)));
-            }
-            return title;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return input;
-    }
-
     public static void reLayoutChildren(View view) {
         view.measure(
                 View.MeasureSpec.makeMeasureSpec(view.getMeasuredWidth(), View.MeasureSpec.EXACTLY),
@@ -429,7 +338,7 @@ public final class Utils {
         final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
         for (int i = 0; i < numbers.size(); i++) {
             spannableStringBuilder.append(numberFormat.format(numbers.get(i)));
-            Utils.separateNumbers(spannableStringBuilder, numbers, i, ",");
+            Utils.separateNumbers(spannableStringBuilder, numbers, i, separator);
         }
         return spannableStringBuilder.toString();
     }

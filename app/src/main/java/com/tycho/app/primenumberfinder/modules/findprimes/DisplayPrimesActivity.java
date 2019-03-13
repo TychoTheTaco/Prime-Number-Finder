@@ -18,8 +18,11 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.activities.DisplayContentActivity;
+import com.tycho.app.primenumberfinder.modules.findfactors.ExportFactorsOptionsDialog;
 import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.ExportOptionsDialog;
 import com.tycho.app.primenumberfinder.modules.savedfiles.FindNthNumberDialog;
@@ -40,7 +43,7 @@ import examples.FindPrimesTask;
  * Date Created: 11/5/2016
  */
 
-public class DisplayPrimesActivity extends DisplayContentActivity{
+public class DisplayPrimesActivity extends DisplayContentActivity {
 
     /**
      * Tag used for logging and debugging.
@@ -66,7 +69,7 @@ public class DisplayPrimesActivity extends DisplayContentActivity{
     private FileManager.PrimesFile primesFile;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTheme(R.style.FindPrimes);
         setContentView(R.layout.display_primes_activity);
@@ -93,16 +96,11 @@ public class DisplayPrimesActivity extends DisplayContentActivity{
         //Header text
         headerTextView = findViewById(R.id.subtitle);
 
-        //Start loading the file
-        load();
-
         //Set up toolbar animation
         ((AppBarLayout) findViewById(R.id.app_bar)).addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
             final int height = appBarLayout.getTotalScrollRange();
             headerTextView.setAlpha(1.0f - ((float) -verticalOffset) / height);
         });
-
-        setTitle("Loading...");
 
         //Set up scroll to top button
         scrollToTopFab = findViewById(R.id.scroll_to_top_fab);
@@ -117,9 +115,12 @@ public class DisplayPrimesActivity extends DisplayContentActivity{
             appBarLayout.setExpanded(false);
             scrollListener.specialScrollToPosition(scrollListener.totalNumbers - 1, false);
         });
+
+        //Start loading the file
+        load();
     }
 
-    private class CustomScrollListener extends RecyclerView.OnScrollListener{
+    private class CustomScrollListener extends RecyclerView.OnScrollListener {
         private int totalNumbers = 0;
 
         private int totalItemCount, lastVisibleItem, visibleThreshold = 0;
@@ -128,211 +129,202 @@ public class DisplayPrimesActivity extends DisplayContentActivity{
         private int firstItemIndex;
 
         @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy){
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
 
             totalItemCount = linearLayoutManager.getItemCount();
             lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
 
-            if (totalItemCount - 1 <= (lastVisibleItem + visibleThreshold)){
+            if (totalItemCount - 1 <= (lastVisibleItem + visibleThreshold)) {
                 loadDown();
-            }else if (linearLayoutManager.findFirstVisibleItemPosition() <= visibleThreshold){
-                if (firstItemIndex > 0){
+            } else if (linearLayoutManager.findFirstVisibleItemPosition() <= visibleThreshold) {
+                if (firstItemIndex > 0) {
                     loadUp();
                 }
             }
             primesAdapter.setOffset(firstItemIndex);
         }
 
-        private void loadUp(){
-            //Log.d(TAG, "Size before: " + primesAdapter.getPrimes().size());
-
+        private void loadUp() {
             //Remove items from end
             final Iterator<Long> iterator = primesAdapter.getPrimes().iterator();
             final int size = primesAdapter.getItemCount();
-            for (int i = 0; i < size; i++){
+            for (int i = 0; i < size; i++) {
                 iterator.next();
-                if (i >= size - INCREMENT){
+                if (i >= size - INCREMENT) {
                     iterator.remove();
                 }
             }
             recyclerView.post(() -> primesAdapter.notifyItemRangeRemoved(size - INCREMENT, INCREMENT));
 
             //Add items to beginning
-            Log.d(TAG, "Adding from " + (firstItemIndex - INCREMENT));
-            final List<Long> numbers = primesFile.readNumbers(firstItemIndex - INCREMENT, INCREMENT);
-            for (int i = numbers.size() - 1; i >= 0; i--){
-                primesAdapter.getPrimes().add(0, numbers.get(i));
+            try {
+                Log.d(TAG, "Adding from " + (firstItemIndex - INCREMENT));
+                final List<Long> numbers = primesFile.readNumbers(firstItemIndex - INCREMENT, INCREMENT);
+                for (int i = numbers.size() - 1; i >= 0; i--) {
+                    primesAdapter.getPrimes().add(0, numbers.get(i));
+                }
+                recyclerView.post(() -> primesAdapter.notifyItemRangeInserted(0, numbers.size()));
+                firstItemIndex -= numbers.size();
+            }catch (IOException e){
+                e.printStackTrace();
             }
-            recyclerView.post(() -> primesAdapter.notifyItemRangeInserted(0, numbers.size()));
-
-            firstItemIndex -= numbers.size();
-            // Log.d(TAG, "Size after: " + primesAdapter.getPrimes().size());
         }
 
-        private void loadDown(){
-            //Log.d(TAG, "Size before: " + primesAdapter.getPrimes().size());
-
+        private void loadDown() {
             //Read new items
-            final List<Long> numbers = primesFile.readNumbers(firstItemIndex + totalItemCount, INCREMENT);
-            final boolean endOfFile = numbers.size() < INCREMENT;
+            try{
+                final List<Long> numbers = primesFile.readNumbers(firstItemIndex + totalItemCount, INCREMENT);
+                final boolean endOfFile = numbers.size() < INCREMENT;
 
-            if (!endOfFile){
-                //Remove items
-                final Iterator<Long> iterator = primesAdapter.getPrimes().iterator();
-                for (int i = 0; i < INCREMENT; i++){
-                    iterator.next();
-                    iterator.remove();
+                if (!endOfFile) {
+                    //Remove items
+                    final Iterator<Long> iterator = primesAdapter.getPrimes().iterator();
+                    for (int i = 0; i < INCREMENT; i++) {
+                        iterator.next();
+                        iterator.remove();
+                    }
+                    recyclerView.post(() -> primesAdapter.notifyItemRangeRemoved(0, INCREMENT));
                 }
-                recyclerView.post(() -> primesAdapter.notifyItemRangeRemoved(0, INCREMENT));
+
+                //Add new items
+                primesAdapter.getPrimes().addAll(numbers);
+                recyclerView.post(() -> primesAdapter.notifyItemRangeInserted(primesAdapter.getItemCount(), numbers.size()));
+
+                if (!endOfFile) {
+                    firstItemIndex += numbers.size();
+                }
+            }catch (IOException e){
+                e.printStackTrace();
             }
-
-            //Add new items
-            primesAdapter.getPrimes().addAll(numbers);
-            recyclerView.post(() -> primesAdapter.notifyItemRangeInserted(primesAdapter.getItemCount(), numbers.size()));
-
-            if (!endOfFile){
-                firstItemIndex += numbers.size();
-            }
-
-            //Log.d(TAG, "Size after: " + primesAdapter.getPrimes().size());
         }
 
-        private void specialScrollToPosition(final int position, final boolean animate){
-            //Scroll to correct position
-            int startIndex = (position / scrollListener.INCREMENT) * (scrollListener.INCREMENT);
+        private void specialScrollToPosition(final int position, final boolean animate) {
+            try {
+                //Scroll to correct position
+                int startIndex = (position / scrollListener.INCREMENT) * (scrollListener.INCREMENT);
 
-            //Try to read from start
-            startIndex -= INCREMENT;
-            if (startIndex < 0){
-                startIndex = 0;
-            }
-            List<Long> numbers = primesFile.readNumbers(startIndex, primesAdapter.getItemCount());
-            final boolean endOfFile = numbers.size() < INCREMENT;
-
-            if (endOfFile){
-                int previousSize = 0;
-                while ((numbers = primesFile.readNumbers(startIndex, primesAdapter.getItemCount())).size() > INCREMENT && previousSize != numbers.size()){
-                    //Log.d(TAG, "Read " + numbers.size());
-                    startIndex -= (primesAdapter.getItemCount() - numbers.size());
-                    previousSize = numbers.size();
-                    numbers.clear();
+                //Try to read from start
+                startIndex -= INCREMENT;
+                if (startIndex < 0) {
+                    startIndex = 0;
                 }
-            }
+                List<Long> numbers = primesFile.readNumbers(startIndex, primesAdapter.getItemCount());
+                final boolean endOfFile = numbers.size() < INCREMENT;
 
-            //Log.d(TAG, "startIndex: " + startIndex);
-            //Log.d(TAG, "Numbers: (" + numbers.get(0) + ", " + numbers.get(numbers.size() - 1) + ")");
-            //Log.d(TAG, "size: " + numbers.size());
-            primesAdapter.getPrimes().clear();
-            primesAdapter.getPrimes().addAll(numbers);
-            scrollListener.setFirstItemIndex(startIndex);
-            runOnUiThread(() -> {
-                primesAdapter.notifyItemRangeInserted(0, primesAdapter.getItemCount());
-                final int pos = position - scrollListener.firstItemIndex;
-                recyclerView.scrollToPosition(pos);
-                if (animate){
-                    primesAdapter.animate(pos);
+                if (endOfFile) {
+                    int previousSize = 0;
+                    while ((numbers = primesFile.readNumbers(startIndex, primesAdapter.getItemCount())).size() > INCREMENT && previousSize != numbers.size()) {
+                        startIndex -= (primesAdapter.getItemCount() - numbers.size());
+                        previousSize = numbers.size();
+                        numbers.clear();
+                    }
                 }
-            });
+
+                primesAdapter.getPrimes().clear();
+                primesAdapter.getPrimes().addAll(numbers);
+                scrollListener.setFirstItemIndex(startIndex);
+                runOnUiThread(() -> {
+                    primesAdapter.notifyItemRangeInserted(0, primesAdapter.getItemCount());
+                    final int pos = position - scrollListener.firstItemIndex;
+                    recyclerView.scrollToPosition(pos);
+                    if (animate) {
+                        primesAdapter.animate(pos);
+                    }
+                });
+            }catch (IOException e){
+                e.printStackTrace();
+            }
         }
 
-        public void setTotalNumbers(final int count){
+        public void setTotalNumbers(final int count) {
             this.totalNumbers = count;
         }
 
-        public int getTotalNumbers(){
+        public int getTotalNumbers() {
             return this.totalNumbers;
         }
 
-        public void setFirstItemIndex(final int index){
+        public void setFirstItemIndex(final int index) {
             firstItemIndex = index;
             primesAdapter.setOffset(index);
         }
     }
 
     @Override
-    protected void loadFile(final File file){
-        try{
-            primesFile = new FileManager.PrimesFile(file);
-            setTitle("Prime numbers from " + primesFile.getStartValue() + " to " + primesFile.getEndValue());
-            scrollListener.setTotalNumbers(primesFile.getTotalNumbers());
+    protected void loadFile(final File file) throws Exception {
+        //Read header
+        primesFile = new FileManager.PrimesFile(file);
+        scrollListener.setTotalNumbers(primesFile.getTotalNumbers());
 
-            //Read numbers
-            final List<Long> numbers = primesFile.readNumbers(0, 1000);
-            primesAdapter.getPrimes().addAll(numbers);
-
-            //Update UI
-            runOnUiThread(() -> {
-
-                //If there are no numbers, there was probably an error
-                if (numbers.size() == 0 && primesFile.getTotalNumbers() > 0){
-                    showLoadingError();
-                }else{
-                    //Set header text
-                    headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.find_primes_subtitle_result, primesFile.getTotalNumbers()), new String[]{
-                            NUMBER_FORMAT.format(primesFile.getTotalNumbers()),
-                            NUMBER_FORMAT.format(primesFile.getStartValue()),
-                            primesFile.getEndValue() == 0 ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(primesFile.getEndValue()),
-                    }, ContextCompat.getColor(getBaseContext(), R.color.white)));
-
-                    resizeCollapsingToolbar();
-
-                    //Update adapter
-                    primesAdapter.notifyItemRangeInserted(0, primesAdapter.getItemCount());
-                    recyclerView.post(new Runnable(){
-
-                        /**
-                         * Minimum number of extra adapter items before displaying the
-                         * scroll to top and scroll to bottom buttons.
-                         */
-                        private final int SCROLL_BUTTON_MIN_OVERFLOW = 20;
-
-                        @Override
-                        public void run(){
-                            final int visibility = ((linearLayoutManager.findLastVisibleItemPosition() - linearLayoutManager.findFirstVisibleItemPosition()) >= scrollListener.totalNumbers - SCROLL_BUTTON_MIN_OVERFLOW) ? View.GONE : View.VISIBLE;
-                            scrollToTopFab.setVisibility(visibility);
-                            scrollToBottomFab.setVisibility(visibility);
-                            findButton.setVisible(hasFlag(Flag.ALLOW_SEARCH) && visibility == View.VISIBLE);
-                        }
-                    });
-                }
-            });
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+        //Read numbers
+        primesAdapter.getPrimes().addAll(primesFile.readNumbers(0, 1000));
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    protected void onFileLoaded() {
+        setTitle("Prime numbers from " + primesFile.getStartValue() + " to " + primesFile.getEndValue());
+
+        //Set header text
+        headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.find_primes_subtitle_result, primesFile.getTotalNumbers()), new String[]{
+                NUMBER_FORMAT.format(primesFile.getTotalNumbers()),
+                NUMBER_FORMAT.format(primesFile.getStartValue()),
+                primesFile.getEndValue() == 0 ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(primesFile.getEndValue()),
+        }, ContextCompat.getColor(getBaseContext(), R.color.white)));
+
+        resizeCollapsingToolbar();
+
+        //Update adapter
+        primesAdapter.notifyItemRangeInserted(0, primesAdapter.getItemCount());
+        recyclerView.post(new Runnable() {
+
+            /**
+             * Minimum number of extra adapter items before displaying the
+             * scroll to top and scroll to bottom buttons.
+             */
+            private final int SCROLL_BUTTON_MIN_OVERFLOW = 20;
+
+            @Override
+            public void run() {
+                final int visibility = ((linearLayoutManager.findLastVisibleItemPosition() - linearLayoutManager.findFirstVisibleItemPosition()) >= scrollListener.totalNumbers - SCROLL_BUTTON_MIN_OVERFLOW) ? View.GONE : View.VISIBLE;
+                scrollToTopFab.setVisibility(visibility);
+                scrollToBottomFab.setVisibility(visibility);
+                findButton.setVisible(hasFlag(Flag.ALLOW_SEARCH) && visibility == View.VISIBLE);
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         findButton = menu.findItem(R.id.find);
         return true;
     }
 
-    /*@Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        getMenuInflater().inflate(R.menu.display_content_activity_menu, menu);
-        findButton = menu.findItem(R.id.find);
-        findButton.setVisible(enableSearch);
-        return true;
-    }*/
-
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()){
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case R.id.find:
                 final FindNthNumberDialog findNthNumberDialog = new FindNthNumberDialog(this, scrollListener.totalNumbers);
                 findNthNumberDialog.addListener(number -> {
-                    if (number > 0 && number <= scrollListener.getTotalNumbers()){
+                    if (number > 0 && number <= scrollListener.getTotalNumbers()) {
                         appBarLayout.setExpanded(false);
                         scrollListener.specialScrollToPosition(number - 1, true);
-                    }else{
+                    } else {
                         Toast.makeText(DisplayPrimesActivity.this, "Invalid number", Toast.LENGTH_SHORT).show();
                     }
                 });
                 findNthNumberDialog.show();
+                FirebaseAnalytics.getInstance(this).logEvent("display_primes_activity_find", null);
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void export(File file) {
+        FirebaseAnalytics.getInstance(this).logEvent("export_primes", null);
+        final ExportOptionsDialog exportOptionsDialog = new ExportPrimesOptionsDialog(this, file, R.style.FindPrimes_Dialog);
+        exportOptionsDialog.show();
     }
 }

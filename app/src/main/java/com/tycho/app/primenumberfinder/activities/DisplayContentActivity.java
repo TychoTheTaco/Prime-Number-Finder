@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
@@ -47,7 +48,6 @@ public abstract class DisplayContentActivity extends AbstractActivity{
         setFlag(Flag.ALLOW_DELETE, intent.getBooleanExtra("allowDelete", false));
         setFlag(Flag.ALLOW_EXPORT, intent.getBooleanExtra("allowExport", false));
         setFlag(Flag.ALLOW_SEARCH, intent.getBooleanExtra("enableSearch", false));
-        load();
     }
 
     @Override
@@ -90,10 +90,16 @@ public abstract class DisplayContentActivity extends AbstractActivity{
     }
 
     protected void load(){
+        setTitle("Loading...");
         final ProgressDialog progressDialog = ProgressDialog.show(this, "Loading...", "Loading file.");
         new Thread(() -> {
-            loadFile(file);
-            onFileLoaded();
+            try {
+                loadFile(file);
+                runOnUiThread(this::onFileLoaded);
+            }catch (Exception e){
+                e.printStackTrace();
+                runOnUiThread(this::showLoadingError);
+            }
             progressDialog.dismiss();
         }).start();
     }
@@ -128,7 +134,7 @@ public abstract class DisplayContentActivity extends AbstractActivity{
         alertDialog.show();
     }
 
-    protected abstract void loadFile(final File file);
+    protected abstract void loadFile(final File file) throws Exception;
 
     protected void onFileLoaded(){
 
@@ -137,7 +143,7 @@ public abstract class DisplayContentActivity extends AbstractActivity{
     protected void showLoadingError(){
         final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle("Error!");
-        alertDialog.setMessage("An unknown error occurred while reading this file.");
+        alertDialog.setMessage("An unknown error occurred while loading this file.");
         alertDialog.setCancelable(false);
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Okay",
                 (dialog, which) -> {

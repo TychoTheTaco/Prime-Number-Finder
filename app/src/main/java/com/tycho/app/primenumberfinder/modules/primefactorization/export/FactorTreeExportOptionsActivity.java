@@ -296,6 +296,7 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
                             intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             intent1.setType("image/*");
                             startActivity(intent1);
+                            FirebaseAnalytics.getInstance(this).logEvent("export_tree", null);
                         }).start();
                     } else {
                         Toast.makeText(getBaseContext(), "Invalid inputs!", Toast.LENGTH_LONG).show();

@@ -180,7 +180,7 @@ public final class FileManager {
             totalNumbers = (int) (file.length() - headerLength) / numberSize;
         }
 
-        public List<Long> readNumbers(final int startIndex, final int count) {
+        public List<Long> readNumbers(final int startIndex, final int count) throws IOException{
             final List<Long> numbers = new ArrayList<>();
             try (final DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))) {
                 dataInputStream.skipBytes(headerLength + (startIndex * numberSize));
@@ -189,8 +189,6 @@ public final class FileManager {
                 }
             } catch (EOFException e) {
                 //Ignore
-            } catch (IOException e) {
-                e.printStackTrace();
             }
             return numbers;
         }
