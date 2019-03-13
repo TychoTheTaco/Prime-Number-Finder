@@ -37,6 +37,7 @@ import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,6 +86,10 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
+
+        FileManager.generateDebugFileWithHeader(new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "debug_b"), 250);
+        FileManager.generateDebugFileWithHeader(new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "debug_c"), 300);
+        FileManager.generateDebugFileWithHeader(new File(FileManager.getInstance().getSavedPrimesDirectory() + File.separator + "debug_d"), 1031);
 
         //Set the actionbar to a custom toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);

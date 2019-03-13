@@ -260,6 +260,24 @@ public final class FileManager {
         }
     }
 
+    public static void generateDebugFileWithHeader(final File file, final int count){
+        try(final DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file, false)))){
+            //Write header
+            dataOutputStream.writeByte(1); //Version
+            dataOutputStream.writeByte(3 + 8 * 2); //Header size
+            dataOutputStream.writeByte(8); //Number size
+            dataOutputStream.writeLong(0); //Start number
+            dataOutputStream.writeLong(count); //End number
+
+            //Write data
+            for (int i = 0; i < count; ++i){
+                dataOutputStream.writeLong((long) i);
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
     public static class FactorsFile extends NumbersFile {
 
         private final long number;
