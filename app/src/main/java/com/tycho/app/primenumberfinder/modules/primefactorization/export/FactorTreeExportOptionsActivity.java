@@ -25,6 +25,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.jaredrummler.android.colorpicker.ColorPickerDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.activities.AbstractActivity;
+import com.tycho.app.primenumberfinder.activities.DisplayContentActivity;
 import com.tycho.app.primenumberfinder.modules.savedfiles.ColorPickerListener;
 import com.tycho.app.primenumberfinder.ui.TreeView;
 import com.tycho.app.primenumberfinder.utils.FileManager;
@@ -44,7 +45,7 @@ import simpletrees.Tree;
  * Created by tycho on 2/9/2018.
  */
 
-public class FactorTreeExportOptionsActivity extends AbstractActivity implements ColorPickerListener {
+public class FactorTreeExportOptionsActivity extends DisplayContentActivity implements ColorPickerListener {
 
     /**
      * Tag used for logging and debugging.
@@ -52,8 +53,6 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
     private static final String TAG = FactorTreeExportOptionsActivity.class.getSimpleName();
 
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
-
-    private File file;
 
     private Tree<Long> factorTree;
 
@@ -75,248 +74,240 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
         setTheme(R.style.PrimeFactorization);
         setContentView(R.layout.factor_tree_export_options_activity);
 
-        //Get the intent
-        final Intent intent = getIntent();
-        if (intent != null) {
+        //Set up the toolbar
+        final Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Utils.applyTheme(this, ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
 
-            //Get the file path from the extras
-            final String filePath = intent.getStringExtra("filePath");
-            if (filePath != null) {
+        fileNameInput = findViewById(R.id.file_name);
+        treeView = findViewById(R.id.factor_tree_preview);
+        exportOptions = treeView.getDefaultExportOptions();
 
-                //Set up the toolbar
-                final Toolbar toolbar = findViewById(R.id.toolbar);
-                setSupportActionBar(toolbar);
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                Utils.applyTheme(this, ContextCompat.getColor(this, R.color.green_dark), ContextCompat.getColor(this, R.color.green));
-
-                fileNameInput = findViewById(R.id.file_name);
-                treeView = findViewById(R.id.factor_tree_preview);
-                exportOptions = treeView.getDefaultExportOptions();
-
-                //Image style
-                final Section imageStyleSection = new Section(this, "Image Style");
-                imageStyleSection.addOption(new ColorOption(this, "Background color", exportOptions.imageBackgroundColor){
-                    @Override
-                    public void onClick(View v) {
-                        Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
-                        ColorPickerDialog.newBuilder().setColor(exportOptions.imageBackgroundColor).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
-                        selectedItemIndex = 0;
-                    }
-                });
-                imageStyleSection.addOption(new SliderOption(this, "Vertical item spacing", 0, 400, exportOptions.verticalSpacing){
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        super.onProgressChanged(seekBar, progress, fromUser);
-                        exportOptions.verticalSpacing = rangedSeekBar.getFloatValue();
-                        ((SliderOption) sections.get(1).getOptions().get(2)).setMax(exportOptions.verticalSpacing / 2);
-                        treeView.recalculate();
-                        waitAndUpdateDimensions();
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-                        findViewById(R.id.root).requestFocus();
-                    }
-                });
-
-                //Branch style
-                final Section branchStyleSection = new Section(this, "Branch Style");
-                branchStyleSection.addOption(new ColorOption(this, "Color", exportOptions.branchColor){
-                    @Override
-                    public void onClick(View v) {
-                        Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
-                        ColorPickerDialog.newBuilder().setColor(exportOptions.branchColor).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
-                        selectedItemIndex = 4;
-                    }
-                });
-                branchStyleSection.addOption(new SliderOption(this, "Width", 1, 10, 10, exportOptions.branchWidth){
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        super.onProgressChanged(seekBar, progress, fromUser);
-                        exportOptions.branchWidth = rangedSeekBar.getFloatValue();
-                        treeView.redraw();
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-                        findViewById(R.id.root).requestFocus();
-                    }
-                });
-                branchStyleSection.addOption(new SliderOption(this, "Padding", 0, exportOptions.verticalSpacing / 2, 10, exportOptions.branchPadding){
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        super.onProgressChanged(seekBar, progress, fromUser);
-                        exportOptions.branchPadding = rangedSeekBar.getFloatValue();
-                        treeView.redraw();
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-                        findViewById(R.id.root).requestFocus();
-                    }
-                });
-
-                //Text style
-                final Section textStyleSection = new Section(this, "Text Style");
-                textStyleSection.addOption(new CheckboxOption(this, "Format numbers", true){
-                    @Override
-                    public void onClick(View v) {
-                        super.onClick(v);
-                        treeView.setTree(checkBox.isChecked() ? factorTree.formatNumbers() : factorTree);
-                    }
-                });
-                textStyleSection.addOption(new ColorOption(this, "Text color", exportOptions.itemTextColor){
-                    @Override
-                    public void onClick(View v) {
-                        Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
-                        ColorPickerDialog.newBuilder().setColor(exportOptions.branchColor).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
-                        selectedItemIndex = 1;
-                    }
-                });
-                textStyleSection.addOption(new ColorOption(this, "Prime factor text color", exportOptions.primeFactorTextColor){
-                    @Override
-                    public void onClick(View v) {
-                        Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
-                        ColorPickerDialog.newBuilder().setColor(color).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
-                        selectedItemIndex = 3;
-                    }
-                });
-                textStyleSection.addOption(new SliderOption(this, "Text size", 8, 100, exportOptions.itemTextSize){
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        super.onProgressChanged(seekBar, progress, fromUser);
-                        exportOptions.itemTextSize = rangedSeekBar.getIntValue();
-                        treeView.recalculate();
-                        waitAndUpdateDimensions();
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-                        findViewById(R.id.root).requestFocus();
-                    }
-                });
-
-                //Item background style
-                final Section itemBackgroundSection = new Section(this, "Item Background Style");
-                itemBackgroundSection.addOption(new CheckboxOption(this, "Item backgrounds", exportOptions.itemBackgrounds){
-                    @Override
-                    public void onClick(View v) {
-                        super.onClick(v);
-
-                        //Change dependent visibility
-                        sections.get(3).getOptions().get(1).setEnabled(checkBox.isChecked());
-                        sections.get(3).getOptions().get(2).setEnabled(checkBox.isChecked());
-                        sections.get(3).getOptions().get(3).setEnabled(checkBox.isChecked());
-
-                        exportOptions.itemBackgrounds = checkBox.isChecked();
-                        treeView.redraw();
-                    }
-                });
-                itemBackgroundSection.addOption(new ColorOption(this, "Background color", exportOptions.itemBackgroundColor){
-                    @Override
-                    public void onClick(View v) {
-                        Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
-                        ColorPickerDialog.newBuilder().setColor(exportOptions.itemBackgroundColor).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
-                        selectedItemIndex = 2;
-                    }
-                });
-                itemBackgroundSection.addOption(new ColorOption(this, "Border color", exportOptions.itemBorderColor){
-                    @Override
-                    public void onClick(View v) {
-                        Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
-                        ColorPickerDialog.newBuilder().setColor(exportOptions.itemBorderColor).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
-                        selectedItemIndex = 5;
-                    }
-                });
-                itemBackgroundSection.addOption(new SliderOption(this, "Border width", 1, 10, 10, exportOptions.itemBorderWidth){
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        super.onProgressChanged(seekBar, progress, fromUser);
-                        exportOptions.itemBorderWidth = rangedSeekBar.getFloatValue();
-                        treeView.redraw();
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-                        findViewById(R.id.root).requestFocus();
-                    }
-                });
-
-                sections.add(imageStyleSection);
-                sections.add(branchStyleSection);
-                sections.add(textStyleSection);
-                sections.add(itemBackgroundSection);
-
-                //Add sections
-                final ViewGroup optionsLayout = findViewById(R.id.options_layout);
-                final LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                layoutParams.topMargin = (int) Utils.dpToPx(this, 24);
-                for (Section section : sections){
-                    final View view = section.inflate(null, false);
-                    view.setLayoutParams(layoutParams);
-                    optionsLayout.addView(view);
-                }
-
-                imageSizeTextView = findViewById(R.id.image_size);
-                imageSizeTextView.post(() -> {
-                    if (treeView.isGenerated()) {
-                        imageSizeTextView.setText("(" + NUMBER_FORMAT.format(treeView.getBoundingRect().width()) + " x " + NUMBER_FORMAT.format(Math.abs(treeView.getBoundingRect().height())) + ")");
-                    }
-                });
-
-                //Set up export button
-                final Button exportButton = findViewById(R.id.export_button);
-                exportButton.setOnClickListener(v -> {
-                    if (checkInputs()) {
-                        final com.tycho.app.primenumberfinder.ProgressDialog progressDialog = new com.tycho.app.primenumberfinder.ProgressDialog(FactorTreeExportOptionsActivity.this);
-                        progressDialog.setTitle("Exporting...");
-                        progressDialog.show();
-
-                        new Thread(() -> {
-
-                            //Convert the file to the requested format
-                            final File image = new File(FileManager.getInstance().getExportCacheDirectory() + File.separator + fileNameInput.getText().toString().trim() + ".png");
-                            try {
-                                final OutputStream stream = new FileOutputStream(image);
-                                treeView.drawToBitmap(exportOptions).compress(Bitmap.CompressFormat.PNG, 100, stream);
-                                stream.close();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-
-                            progressDialog.dismiss();
-
-                            final Bundle bundle = new Bundle();
-                            bundle.putLong("number", factorTree.getValue());
-                            FirebaseAnalytics.getInstance(getBaseContext()).logEvent("tree_exported", bundle);
-
-                            final Uri path = FileProvider.getUriForFile(FactorTreeExportOptionsActivity.this, "com.tycho.app.primenumberfinder", image);
-                            final Intent intent1 = new Intent(Intent.ACTION_SEND);
-                            intent1.putExtra(Intent.EXTRA_STREAM, path);
-                            intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            intent1.setType("image/*");
-                            startActivity(intent1);
-                            FirebaseAnalytics.getInstance(this).logEvent("export_tree", null);
-                        }).start();
-                    } else {
-                        Toast.makeText(getBaseContext(), "Invalid inputs!", Toast.LENGTH_LONG).show();
-                    }
-                });
-
-                //Read the tree from the file
-                file = new File(filePath);
-                loadFile(file);
-
-            } else {
-                Log.e(TAG, "Invalid file path!");
-                Toast.makeText(this, "Error loading file!", Toast.LENGTH_SHORT).show();
-                finish();
+        //Image style
+        final Section imageStyleSection = new Section(this, "Image Style");
+        imageStyleSection.addOption(new ColorOption(this, "Background color", exportOptions.imageBackgroundColor) {
+            @Override
+            public void onClick(View v) {
+                Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
+                ColorPickerDialog.newBuilder().setColor(exportOptions.imageBackgroundColor).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
+                selectedItemIndex = 0;
             }
-        } else {
-            Log.e(TAG, "Activity was started without an intent!");
-            Toast.makeText(this, "Error loading file!", Toast.LENGTH_SHORT).show();
-            finish();
+        });
+        imageStyleSection.addOption(new SliderOption(this, "Vertical item spacing", 0, 400, exportOptions.verticalSpacing) {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                super.onProgressChanged(seekBar, progress, fromUser);
+                exportOptions.verticalSpacing = rangedSeekBar.getFloatValue();
+                ((SliderOption) sections.get(1).getOptions().get(2)).setMax(exportOptions.verticalSpacing / 2);
+                treeView.recalculate();
+                waitAndUpdateDimensions();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                findViewById(R.id.root).requestFocus();
+            }
+        });
+
+        //Branch style
+        final Section branchStyleSection = new Section(this, "Branch Style");
+        branchStyleSection.addOption(new ColorOption(this, "Color", exportOptions.branchColor) {
+            @Override
+            public void onClick(View v) {
+                Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
+                ColorPickerDialog.newBuilder().setColor(exportOptions.branchColor).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
+                selectedItemIndex = 4;
+            }
+        });
+        branchStyleSection.addOption(new SliderOption(this, "Width", 1, 10, 10, exportOptions.branchWidth) {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                super.onProgressChanged(seekBar, progress, fromUser);
+                exportOptions.branchWidth = rangedSeekBar.getFloatValue();
+                treeView.redraw();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                findViewById(R.id.root).requestFocus();
+            }
+        });
+        branchStyleSection.addOption(new SliderOption(this, "Padding", 0, exportOptions.verticalSpacing / 2, 10, exportOptions.branchPadding) {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                super.onProgressChanged(seekBar, progress, fromUser);
+                exportOptions.branchPadding = rangedSeekBar.getFloatValue();
+                treeView.redraw();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                findViewById(R.id.root).requestFocus();
+            }
+        });
+
+        //Text style
+        final Section textStyleSection = new Section(this, "Text Style");
+        textStyleSection.addOption(new CheckboxOption(this, "Format numbers", true) {
+            @Override
+            public void onClick(View v) {
+                super.onClick(v);
+                treeView.setTree(checkBox.isChecked() ? factorTree.formatNumbers() : factorTree);
+            }
+        });
+        textStyleSection.addOption(new ColorOption(this, "Text color", exportOptions.itemTextColor) {
+            @Override
+            public void onClick(View v) {
+                Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
+                ColorPickerDialog.newBuilder().setColor(exportOptions.itemTextColor).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
+                selectedItemIndex = 1;
+            }
+        });
+        textStyleSection.addOption(new ColorOption(this, "Prime factor text color", exportOptions.primeFactorTextColor) {
+            @Override
+            public void onClick(View v) {
+                Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
+                ColorPickerDialog.newBuilder().setColor(color).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
+                selectedItemIndex = 3;
+            }
+        });
+        textStyleSection.addOption(new SliderOption(this, "Text size", 8, 100, exportOptions.itemTextSize) {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                super.onProgressChanged(seekBar, progress, fromUser);
+                exportOptions.itemTextSize = rangedSeekBar.getIntValue();
+                treeView.recalculate();
+                waitAndUpdateDimensions();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                findViewById(R.id.root).requestFocus();
+            }
+        });
+
+        //Item background style
+        final Section itemBackgroundSection = new Section(this, "Item Background Style");
+        itemBackgroundSection.addOption(new CheckboxOption(this, "Item backgrounds", exportOptions.itemBackgrounds) {
+            @Override
+            public void onClick(View v) {
+                super.onClick(v);
+
+                //Change dependent visibility
+                sections.get(3).getOptions().get(1).setEnabled(checkBox.isChecked());
+                sections.get(3).getOptions().get(2).setEnabled(checkBox.isChecked());
+                sections.get(3).getOptions().get(3).setEnabled(checkBox.isChecked());
+
+                exportOptions.itemBackgrounds = checkBox.isChecked();
+                treeView.redraw();
+            }
+        });
+        itemBackgroundSection.addOption(new ColorOption(this, "Background color", exportOptions.itemBackgroundColor) {
+            @Override
+            public void onClick(View v) {
+                Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
+                ColorPickerDialog.newBuilder().setColor(exportOptions.itemBackgroundColor).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
+                selectedItemIndex = 2;
+            }
+        });
+        itemBackgroundSection.addOption(new ColorOption(this, "Border color", exportOptions.itemBorderColor) {
+            @Override
+            public void onClick(View v) {
+                Utils.hideKeyboard(FactorTreeExportOptionsActivity.this);
+                ColorPickerDialog.newBuilder().setColor(exportOptions.itemBorderColor).setShowAlphaSlider(true).show(FactorTreeExportOptionsActivity.this);
+                selectedItemIndex = 5;
+            }
+        });
+        itemBackgroundSection.addOption(new SliderOption(this, "Border width", 1, 10, 10, exportOptions.itemBorderWidth) {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                super.onProgressChanged(seekBar, progress, fromUser);
+                exportOptions.itemBorderWidth = rangedSeekBar.getFloatValue();
+                treeView.redraw();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                findViewById(R.id.root).requestFocus();
+            }
+        });
+
+        sections.add(imageStyleSection);
+        sections.add(branchStyleSection);
+        sections.add(textStyleSection);
+        sections.add(itemBackgroundSection);
+
+        //Add sections
+        final ViewGroup optionsLayout = findViewById(R.id.options_layout);
+        final LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.topMargin = Utils.dpToPx(this, 24);
+        for (Section section : sections) {
+            final View view = section.inflate(null, false);
+            view.setLayoutParams(layoutParams);
+            optionsLayout.addView(view);
         }
+
+        imageSizeTextView = findViewById(R.id.image_size);
+        imageSizeTextView.post(() -> {
+            if (treeView.isGenerated()) {
+                imageSizeTextView.setText("(" + NUMBER_FORMAT.format(treeView.getBoundingRect().width()) + " x " + NUMBER_FORMAT.format(Math.abs(treeView.getBoundingRect().height())) + ")");
+            }
+        });
+
+        //Set up export button
+        final Button exportButton = findViewById(R.id.export_button);
+        exportButton.setOnClickListener(v -> {
+            if (checkInputs()) {
+                final com.tycho.app.primenumberfinder.ProgressDialog progressDialog = new com.tycho.app.primenumberfinder.ProgressDialog(FactorTreeExportOptionsActivity.this);
+                progressDialog.setTitle("Exporting...");
+                progressDialog.show();
+
+                new Thread(() -> {
+
+                    //Convert the file to the requested format
+                    final File image = new File(FileManager.getInstance().getExportCacheDirectory() + File.separator + fileNameInput.getText().toString().trim() + ".png");
+                    try {
+                        final OutputStream stream = new FileOutputStream(image);
+                        treeView.drawToBitmap(exportOptions).compress(Bitmap.CompressFormat.PNG, 100, stream);
+                        stream.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    progressDialog.dismiss();
+
+                    final Bundle bundle = new Bundle();
+                    bundle.putLong("number", factorTree.getValue());
+                    FirebaseAnalytics.getInstance(getBaseContext()).logEvent("tree_exported", bundle);
+
+                    final Uri path = FileProvider.getUriForFile(FactorTreeExportOptionsActivity.this, "com.tycho.app.primenumberfinder", image);
+                    final Intent intent1 = new Intent(Intent.ACTION_SEND);
+                    intent1.putExtra(Intent.EXTRA_STREAM, path);
+                    intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    intent1.setType("image/*");
+                    startActivity(intent1);
+                    FirebaseAnalytics.getInstance(this).logEvent("export_tree", null);
+                }).start();
+            } else {
+                Toast.makeText(getBaseContext(), "Invalid inputs!", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        //Read the tree from the file
+        load();
+    }
+
+    @Override
+    protected void loadFile(File file) {
+        factorTree = FileManager.getInstance().readTree(file);
+    }
+
+    @Override
+    protected void onFileLoaded() {
+        setTitle(getString(R.string.export_options_title));
+        fileNameInput.setText("Factor tree of " + factorTree.getValue());
+        treeView.setTree(factorTree.formatNumbers());
     }
 
     @Override
@@ -325,54 +316,6 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
 
         //Give the root view focus to prevent EditTexts from initially getting focus
         findViewById(R.id.root).requestFocus();
-    }
-
-    private void waitAndUpdateDimensions() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //Log.d(TAG, "Waiting...");
-                while (!treeView.isGenerated()) {
-                    //TODO: This is bad
-                }
-                //Log.d(TAG, "Done waiting.");
-                new Handler(getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        imageSizeTextView.setText("(" + NUMBER_FORMAT.format(treeView.getBoundingRect().width()) + " x " + NUMBER_FORMAT.format(Math.abs(treeView.getBoundingRect().height())) + ")");
-                    }
-                });
-            }
-        }).start();
-    }
-
-    private void loadFile(final File file) {
-        final ProgressDialog progressDialog = ProgressDialog.show(this, "Loading...", "Loading file.");
-
-        //Load file in another thread
-        new Thread(() -> {
-
-            factorTree = FileManager.getInstance().readTree(file);
-            progressDialog.dismiss();
-
-            runOnUiThread(() -> {
-                fileNameInput.setText("Factor tree of " + factorTree.getValue());
-                treeView.setTree(factorTree.formatNumbers());
-            });
-
-        }).start();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -414,6 +357,25 @@ public class FactorTreeExportOptionsActivity extends AbstractActivity implements
 
     @Override
     public void onDialogDismissed(int dialogId) {
+    }
+
+    private void waitAndUpdateDimensions() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //Log.d(TAG, "Waiting...");
+                while (!treeView.isGenerated()) {
+                    //TODO: This is bad
+                }
+                //Log.d(TAG, "Done waiting.");
+                new Handler(getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        imageSizeTextView.setText("(" + NUMBER_FORMAT.format(treeView.getBoundingRect().width()) + " x " + NUMBER_FORMAT.format(Math.abs(treeView.getBoundingRect().height())) + ")");
+                    }
+                });
+            }
+        }).start();
     }
 
     private boolean checkInputs() {
