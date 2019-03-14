@@ -78,7 +78,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         statisticsLayout.add("eta", R.drawable.ic_timer_white_24dp);
         statisticsLayout.inflate();
 
-        init();
+        initDefaultState();
 
         return rootView;
     }
@@ -191,7 +191,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     public synchronized void setTask(ITask task) {
         super.setTask(task);
         if (getView() != null){
-            init();
+            initDefaultState();
         }
     }
 

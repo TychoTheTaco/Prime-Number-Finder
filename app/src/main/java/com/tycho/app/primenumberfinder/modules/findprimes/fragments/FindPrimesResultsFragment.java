@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.SpannableStringBuilder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -134,7 +135,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             }).start();
         });
 
-        init();
+        Log.d(TAG, "onCreate(): init()");
+        initDefaultState();
 
         return rootView;
     }
@@ -333,11 +335,10 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             if (!statisticsMap.containsKey(getTask())) {
                 statisticsMap.put(getTask(), new Statistics());
             }
-        }
-        if (getView() != null) {
-            init();
-        }else{
-            throw new RuntimeException("setTask() when getView() is null!");
+
+            if (getView() != null) {
+                initDefaultState();
+            }
         }
     }
 

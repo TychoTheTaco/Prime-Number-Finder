@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.R;
@@ -141,7 +140,7 @@ public class FindFactorsResultsFragment extends ResultsFragment {
             getActivity().startActivity(intent);
         }).start());
 
-        init();
+        initDefaultState();
 
         return rootView;
     }
@@ -235,7 +234,7 @@ public class FindFactorsResultsFragment extends ResultsFragment {
             }
         }
         if (getView() != null) {
-            init();
+            initDefaultState();
         }
     }
 

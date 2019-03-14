@@ -59,11 +59,12 @@ public abstract class ResultsFragment extends TaskFragment {
     };
 
     //Views
-    protected ViewGroup resultsView;
     protected TextView noTaskView;
     protected TextView title;
     protected ProgressBar progressBar;
     protected TextView progress;
+    protected TextView timeElapsedTextView;
+    protected ViewGroup resultsView;
 
     //Buttons
     protected ImageButton pauseButton;
@@ -71,9 +72,10 @@ public abstract class ResultsFragment extends TaskFragment {
     protected ImageButton saveButton;
     protected View centerView;
 
-    protected TextView timeElapsedTextView;
-
-    protected final RotateAnimation rotateAnimation = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f){
+    /**
+     * Rotate animation for the circular progress bar.
+     */
+    private final RotateAnimation rotateAnimation = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f){
 
         @Override
         protected void applyTransformation(float interpolatedTime, Transformation t) {
@@ -82,7 +84,10 @@ public abstract class ResultsFragment extends TaskFragment {
         }
     };
 
-    protected float rotation;
+    /**
+     * Current rotation, in degrees, of the progress bar.
+     */
+    private float rotation;
 
     protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
@@ -143,7 +148,7 @@ public abstract class ResultsFragment extends TaskFragment {
                 //Buttons
                 if (centerView != null){
                     final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                    layoutParams.width = (int) Utils.dpToPx(getContext(), 64);
+                    layoutParams.width = Utils.dpToPx(getContext(), 64);
                     centerView.setLayoutParams(layoutParams);
                 }
                 if (pauseButton != null){
@@ -178,7 +183,7 @@ public abstract class ResultsFragment extends TaskFragment {
                 //Buttons
                 if (centerView != null){
                     final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                    layoutParams.width = (int) Utils.dpToPx(getContext(), 64);
+                    layoutParams.width = Utils.dpToPx(getContext(), 64);
                     centerView.setLayoutParams(layoutParams);
                 }
                 if (pauseButton != null){
@@ -212,7 +217,7 @@ public abstract class ResultsFragment extends TaskFragment {
                 //Buttons
                 if (centerView != null){
                     final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                    layoutParams.width = (int) Utils.dpToPx(getContext(), 64);
+                    layoutParams.width = Utils.dpToPx(getContext(), 64);
                     centerView.setLayoutParams(layoutParams);
                 }
                 if (pauseButton != null){
@@ -247,7 +252,7 @@ public abstract class ResultsFragment extends TaskFragment {
                 //Buttons
                 if (centerView != null){
                     final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                    layoutParams.width = (int) Utils.dpToPx(getContext(), 64);
+                    layoutParams.width = Utils.dpToPx(getContext(), 64);
                     centerView.setLayoutParams(layoutParams);
                 }
                 if (pauseButton != null){
@@ -282,7 +287,7 @@ public abstract class ResultsFragment extends TaskFragment {
                 //Buttons
                 if (centerView != null){
                     final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                    layoutParams.width = (int) Utils.dpToPx(getContext(), 64);
+                    layoutParams.width = Utils.dpToPx(getContext(), 64);
                     centerView.setLayoutParams(layoutParams);
                 }
                 if (pauseButton != null){
@@ -515,14 +520,10 @@ public abstract class ResultsFragment extends TaskFragment {
         }
     }
 
-    protected final void init(){
+    protected final void initDefaultState(){
         if (getTask() != null) {
-
-            //Reset view states
             onResetViews();
-
             switchState();
-
         } else {
             noTaskView.setVisibility(View.VISIBLE);
             resultsView.setVisibility(View.GONE);
