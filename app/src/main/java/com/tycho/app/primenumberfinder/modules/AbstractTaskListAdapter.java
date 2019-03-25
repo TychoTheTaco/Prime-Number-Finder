@@ -494,7 +494,6 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
 
             if (deleteButton != null) {
                 deleteButton.setOnClickListener(v -> {
-
                     getTask(getAdapterPosition()).pause();
 
                     if (getAdapterPosition() < selectedItemPosition) {
