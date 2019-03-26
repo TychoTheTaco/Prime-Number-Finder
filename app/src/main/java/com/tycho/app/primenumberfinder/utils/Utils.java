@@ -23,7 +23,6 @@ import android.text.style.StyleSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,24 +32,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
-
 import com.tycho.app.primenumberfinder.LongClickableSpan;
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.gcf.GreatestCommonFactorTask;
 import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
-import com.tycho.app.primenumberfinder.modules.savedfiles.DataFile;
 
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -386,13 +382,8 @@ public final class Utils {
                 popupWindow.setAnimationStyle(R.style.PopupWindowAnimationStyle);
                 popupWindow.setBackgroundDrawable(null);
                 popupWindow.setElevation(Utils.dpToPx(context, 4));
-                popupWindow.getContentView().measure(View.MeasureSpec.makeMeasureSpec(9999, View.MeasureSpec.AT_MOST), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-                final int[] coords = new int[2];
-                view.getLocationOnScreen(coords);
-                popupWindow.showAtLocation(view, Gravity.NO_GRAVITY, coords[0] + x - (popupWindow.getContentView().getMeasuredWidth() / 2), coords[1] + y - (popupWindow.getContentView().getMeasuredWidth() / 1));
-                Log.w(TAG, "X: " + x + " Y: " + y);
-                Log.w(TAG, "MW: " + popupWindow.getContentView().getMeasuredWidth() + " W: " + popupWindow.getContentView().getWidth() + " S: " + View.MeasureSpec.getSize(View.MeasureSpec.UNSPECIFIED));
-                Log.w(TAG, "MH: " + popupWindow.getContentView().getMeasuredHeight() + " H: " + popupWindow.getContentView().getHeight() + " S: " + View.MeasureSpec.getSize(View.MeasureSpec.UNSPECIFIED));
+                popupWindow.getContentView().measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+                popupWindow.showAsDropDown(view, x - (popupWindow.getContentView().getMeasuredWidth() / 2), -view.getHeight() + y - popupWindow.getContentView().getMeasuredHeight() - Utils.dpToPx(context, 16));
 
                 //Apply highlight span
                 final UnderlineSpan span = new UnderlineSpan();
@@ -401,8 +392,6 @@ public final class Utils {
                 view.postDelayed(() -> {
                     spannableStringBuilder.removeSpan(span);
                     ((TextView) view).setText(spannableStringBuilder);
-                    Log.w(TAG, "2 MW: " + popupWindow.getContentView().getMeasuredWidth() + " W: " + popupWindow.getContentView().getWidth());
-                    Log.w(TAG, "2 MH: " + popupWindow.getContentView().getMeasuredHeight() + " H: " + popupWindow.getContentView().getHeight());
                     popupWindow.dismiss();
                 }, 600);
             }
