@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.widget.CheckBox;
@@ -54,12 +54,11 @@ public class LCMConfigurationActivity extends TaskConfigurationActivity{
         numbersListAdapter.getNumbers().add(BigInteger.ZERO);
         numbersListAdapter.getNumbers().add(BigInteger.ZERO);
         numbersListAdapter.getNumbers().add(BigInteger.ZERO);
-        numbersListAdapter.getNumbers().add(BigInteger.ZERO);
 
         //Set up number input
         final RecyclerView recyclerView = findViewById(R.id.numbers_list);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 4));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(numbersListAdapter);
         recyclerView.setItemAnimator(null);
 
