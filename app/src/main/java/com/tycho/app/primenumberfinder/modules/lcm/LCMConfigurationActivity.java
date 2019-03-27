@@ -45,7 +45,12 @@ public class LCMConfigurationActivity extends TaskConfigurationActivity{
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Utils.applyTheme(this, ContextCompat.getColor(this, R.color.yellow_dark), ContextCompat.getColor(this, R.color.yellow));
 
-        numbersListAdapter = new NumbersListAdapter();
+        numbersListAdapter = new NumbersListAdapter(){
+            @Override
+            protected boolean isValidNumber(BigInteger number){
+                return Validator.isValidLCMInput(number);
+            }
+        };
         numbersListAdapter.getNumbers().add(BigInteger.ZERO);
         numbersListAdapter.getNumbers().add(BigInteger.ZERO);
         numbersListAdapter.getNumbers().add(BigInteger.ZERO);

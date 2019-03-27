@@ -123,8 +123,6 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
         super.setTask(task);
         if (getView() != null) {
             initDefaultState();
-        }else{
-            throw new RuntimeException("setTask() when getView() is null!");
         }
     }
 

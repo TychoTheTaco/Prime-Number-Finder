@@ -7,7 +7,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.widget.CheckBox;
 
 import com.tycho.app.primenumberfinder.R;
@@ -46,7 +45,12 @@ public class GCFConfigurationActivity extends TaskConfigurationActivity{
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Utils.applyTheme(this, ContextCompat.getColor(this, R.color.blue_dark), ContextCompat.getColor(this, R.color.lt_blue));
 
-        numbersListAdapter = new NumbersListAdapter();
+        numbersListAdapter = new NumbersListAdapter(){
+            @Override
+            protected boolean isValidNumber(BigInteger number){
+                return Validator.isValidLCMInput(number);
+            }
+        };
         numbersListAdapter.getNumbers().add(BigInteger.ZERO);
         numbersListAdapter.getNumbers().add(BigInteger.ZERO);
         numbersListAdapter.getNumbers().add(BigInteger.ZERO);
@@ -61,25 +65,8 @@ public class GCFConfigurationActivity extends TaskConfigurationActivity{
 
         notifyWhenFinishedCheckbox = findViewById(R.id.notify_when_finished);
         notifyWhenFinishedCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            //searchOptions.setNotifyWhenFinished(isChecked);
+            searchOptions.setNotifyWhenFinished(isChecked);
         });
-
-        //Get search options from intent
-        if (getIntent().getExtras() != null) {
-            if (getIntent().getExtras().getParcelable("searchOptions") != null) {
-                //searchOptions = getIntent().getExtras().getParcelable("searchOptions");
-            }
-
-            try {
-                //task = (FindPrimesJavaTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) getIntent().getExtras().get("taskId"));
-                //searchOptions = task.getSearchOptions();
-            } catch (NullPointerException e) {
-                Log.w(TAG, "Task not found.");
-            }
-        }
-
-        //Apply config
-        //applyConfig(searchOptions);
 
         //Give the root view focus to prevent EditTexts from initially getting focus
         findViewById(R.id.root).requestFocus();

@@ -83,6 +83,10 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
         return numbers;
     }
 
+    protected boolean isValidNumber(final BigInteger number){
+        return true;
+    }
+
     class ViewHolder extends RecyclerView.ViewHolder{
 
         private final ValidEditText input;
@@ -104,7 +108,7 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
                 @Override
                 public void afterTextChanged(Editable editable) {
                     final BigInteger number = getInput();
-                    input.setValid(Validator.isValidFactorInput(number));
+                    input.setValid(isValidNumber(number));
                     numbers.set(getAdapterPosition(), number);
                 }
             });

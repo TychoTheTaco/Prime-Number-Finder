@@ -149,7 +149,6 @@ public class FindPrimesConfigurationActivity extends TaskConfigurationActivity{
         radioGroupSearchMethod = findViewById(R.id.radio_group_search_method);
         radioGroupSearchMethod.addOnCheckChangedListener((radioButton, isChecked) -> {
             switch (radioButton.getId()) {
-
                 case R.id.brute_force:
                     searchOptions.setSearchMethod(BRUTE_FORCE);
                     break;
