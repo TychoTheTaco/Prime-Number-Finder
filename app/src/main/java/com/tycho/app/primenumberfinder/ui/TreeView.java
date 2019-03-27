@@ -21,7 +21,6 @@ import simpletrees.Tree;
  * @author Tycho Bellers
  *         Date Created: 3/2/2017
  */
-
 public class TreeView extends View {
 
     /**
@@ -49,7 +48,7 @@ public class TreeView extends View {
     private float paddingTop = -2;
     private float paddingBottom = -2;
 
-    private ExportOptions exportOptions;
+    private ExportOptions exportOptions = new ExportOptions();
 
     private boolean touchEnabled;
 
@@ -76,24 +75,12 @@ public class TreeView extends View {
     private void init(final Context context, final AttributeSet attributeSet) {
         paint.setAntiAlias(true);
         paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
-        exportOptions = new ExportOptions();
-        exportOptions.imageBackgroundColor = Color.WHITE;
-        exportOptions.itemTextSize = 14;
-        exportOptions.itemTextColor = Color.BLACK;
-        exportOptions.itemBackgrounds = true;
-        exportOptions.itemBackgroundColor = Color.argb(50, 0, 100, 0);
-        exportOptions.verticalSpacing = 40;
-        exportOptions.primeFactorTextColor = Color.RED;
-        exportOptions.itemBorderColor = Color.argb(255, 0, 130, 0);
-        exportOptions.itemBorderWidth = 1;
-        exportOptions.branchColor = Color.BLACK;
-        exportOptions.branchWidth = 2;
 
         //Set custom attributes
         final TypedArray typedArray = context.getTheme().obtainStyledAttributes(attributeSet, R.styleable.TreeView, 0, 0);
         try {
             touchEnabled = typedArray.getBoolean(R.styleable.TreeView_touchEnabled, true);
-            exportOptions.imageBackgroundColor = typedArray.getColor(R.styleable.TreeView_backgroundColor, Color.WHITE);
+            exportOptions.imageBackgroundColor = typedArray.getColor(R.styleable.TreeView_backgroundColor, exportOptions.imageBackgroundColor);
         }finally {
             typedArray.recycle();
         }
@@ -219,22 +206,6 @@ public class TreeView extends View {
         paint.setStrokeWidth(0);
         canvas.drawRect(0, 0, getWidth(), getHeight(), paint);
     }
-
-    /*public void recalculateBounds(){
-        translationX = 0;
-        translationY = scrollPaddingTop;
-        horizontalSpacing = new float[tree.getLevels()];
-        generated = false;
-        dirty = true;
-        do{
-            dirty = false;
-            while (true) {
-                itemTree = generateRectangleTree(tree, exportOptions);
-                if (!checkChildren(itemTree, 0)) break;
-            }
-            generated = true;
-        }while(dirty);
-    }*/
 
     private float scrollPaddingLeft = 20;
     private float scrollPaddingRight = 20;
@@ -370,7 +341,6 @@ public class TreeView extends View {
     }
 
     private void drawItemBackgrounds(final Tree<Item> itemTree, final Canvas canvas, final ExportOptions options) {
-
         if (options.itemBackgrounds){
 
             //Draw item background
@@ -449,26 +419,34 @@ public class TreeView extends View {
     }
 
     private void drawContents(final Tree<Item> itemTree, final Canvas canvas, final ExportOptions options) {
-
         //Draw text
-        final String text = itemTree.getValue().text;
         paint.setStyle(Paint.Style.FILL);
         paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, options.itemTextSize, getResources().getDisplayMetrics()));
         paint.setColor(itemTree.getChildren().size() == 0 ? options.primeFactorTextColor : options.itemTextColor);
-        canvas.drawText(text, itemTree.getValue().textX, itemTree.getValue().textY, paint);
+        canvas.drawText(itemTree.getValue().text, itemTree.getValue().textX, itemTree.getValue().textY, paint);
 
-        for (int i = 0; i < itemTree.getChildren().size(); i++) {
+        for (Tree<Item> child : itemTree.getChildren()) {
 
             //Draw branches connecting nodes to parent
             paint.setColor(options.branchColor);
             paint.setStrokeWidth(options.branchWidth);
             paint.setStrokeCap(options.branchStyle);
-            canvas.drawLine(itemTree.getValue().bounds.exactCenterX(), itemTree.getValue().bounds.bottom + options.branchPadding, itemTree.getChildren().get(i).getValue().bounds.exactCenterX(), itemTree.getChildren().get(i).getValue().bounds.top - options.branchPadding, paint);
+            final float[] branch = new float[]{
+                    itemTree.getValue().bounds.exactCenterX(), itemTree.getValue().bounds.bottom + options.branchPadding,
+                    child.getValue().bounds.exactCenterX(), child.getValue().bounds.top - options.branchPadding
+            };
+            final float[] length = new float[]{(branch[0] - branch[2]), (branch[1] - branch[3])};
+            length[0] *= 1 - options.branchLength;
+            length[1] *= 1 - options.branchLength;
+            branch[0] -= (length[0] / 2);
+            branch[1] -= (length[1] / 2);
+            branch[2] += (length[0] / 2);
+            branch[3] += (length[1] / 2);
+            canvas.drawLine(branch[0], branch[1], branch[2], branch[3], paint);
             paint.setStrokeCap(Paint.Cap.BUTT);
 
-            drawContents(itemTree.getChildren().get(i), canvas, options);
+            drawContents(child, canvas, options);
         }
-
     }
 
     private boolean fixOverlaps(final Tree<Item> itemTree, int level) {
@@ -570,7 +548,6 @@ public class TreeView extends View {
     }
 
     private boolean checkOverlaps(final Tree<Item> itemTree, final float border, final int level, int side) {
-
         final Rect rect = itemTree.getValue().bounds;
 
         float off = 0;
@@ -623,16 +600,14 @@ public class TreeView extends View {
         invalidate();
     }
 
-    private float getStringWidth(final String text, final Paint paint) {
-        final Rect bounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), bounds);
-        return Math.abs(bounds.width());
-    }
-
     private Rect getStringBounds(final String text, final Paint paint){
         final Rect bounds = new Rect();
         paint.getTextBounds(text, 0, text.length(), bounds);
         return bounds;
+    }
+
+    private float getStringWidth(final String text, final Paint paint) {
+        return Math.abs(getStringBounds(text, paint).width());
     }
 
     private float getStringHeight(final Paint paint) {
@@ -641,29 +616,47 @@ public class TreeView extends View {
 
     public static class ExportOptions implements Cloneable {
 
-        public int imageBackgroundColor;
+        //Image
         public int imageBorderColor = Color.BLACK;
+        public int imageBackgroundColor = Color.WHITE;
+        public float verticalSpacing = 50;
 
-        public int itemTextSize;
-        public int itemTextColor;
-        public boolean itemBackgrounds;
-        public int itemBackgroundColor;
-        public int itemBorderColor;
-        public float itemBorderWidth;
+        //Item
         public Paint.Join itemStyle = Paint.Join.ROUND;
+        public int itemTextSize = 15;
+        public int itemTextColor = Color.BLACK;
+        public int primeFactorTextColor = Color.argb(255, 255, 42, 42);
 
-        public int primeFactorTextColor;
+        //Item background
+        public boolean itemBackgrounds = false;
+        public int itemBackgroundColor = Color.argb(50, 0, 100, 0);
+        public int itemBorderColor = Color.argb(255, 0, 130, 0);
+        public float itemBorderWidth = 1;
 
-        public int branchColor;
-        public float branchWidth;
+        //Branch
         public Paint.Cap branchStyle = Paint.Cap.ROUND;
-        public float branchPadding = 2;
-
-        public float verticalSpacing;
+        public int branchColor = Color.argb(255, 128, 128, 128);
+        public float branchWidth = 2;
+        public float branchPadding = 5;
+        public float branchLength = 0.85f;
 
         @Override
         public ExportOptions clone() throws CloneNotSupportedException {
             return (ExportOptions) super.clone();
+        }
+    }
+
+    public static class DarkThemeExportOptions extends ExportOptions{
+        public DarkThemeExportOptions(){
+            this.imageBackgroundColor = Color.argb(255, 74, 74, 74);
+
+            this.branchColor = Color.argb(187, 172, 172, 172);
+
+            this.itemTextColor = Color.argb(255, 230, 230, 230);
+            this.primeFactorTextColor = Color.argb(255, 255, 43, 43);
+
+            this.itemBackgroundColor = Color.BLACK;
+            this.itemBorderColor = Color.argb(255, 230, 243, 230);
         }
     }
 

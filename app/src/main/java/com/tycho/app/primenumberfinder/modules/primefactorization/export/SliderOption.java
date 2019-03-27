@@ -4,7 +4,6 @@ import android.content.Context;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +14,6 @@ import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.ui.RangedSeekBar;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.Utils;
-
-import java.awt.font.TextAttribute;
 
 public class SliderOption extends Option implements SeekBar.OnSeekBarChangeListener{
 
@@ -30,17 +27,24 @@ public class SliderOption extends Option implements SeekBar.OnSeekBarChangeListe
     private int step;
     private float value;
 
+    private String unit;
+
     public SliderOption(final Context context, final String text, final float min, final float max, final float value){
         this (context, text, min, max, 1, value);
     }
 
     public SliderOption(final Context context, final String text, final float min, final float max, final int step, final float value){
+        this(context, text, min, max, step, value, "px.");
+    }
+
+    public SliderOption(final Context context, final String text, final float min, final float max, final int step, final float value, final String unit){
         super(text);
         this.context = context;
         this.min = min;
         this.max = max;
         this.step = step;
         this.value = value;
+        this.unit = unit;
     }
 
     @Override
@@ -71,6 +75,10 @@ public class SliderOption extends Option implements SeekBar.OnSeekBarChangeListe
                 rangedSeekBar.setValue(value);
             }
         });
+
+        //Unit
+        final TextView unitTextView = view.findViewById(R.id.unit);
+        unitTextView.setText(unit);
 
         rangedSeekBar = view.findViewById(R.id.slider);
         rangedSeekBar.setRange(min, max);

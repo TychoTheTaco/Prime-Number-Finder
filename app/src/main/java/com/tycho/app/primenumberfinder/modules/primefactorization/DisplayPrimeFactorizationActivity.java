@@ -1,7 +1,6 @@
 package com.tycho.app.primenumberfinder.modules.primefactorization;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -15,7 +14,6 @@ import android.text.style.SuperscriptSpan;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.activities.DisplayContentActivity;
 import com.tycho.app.primenumberfinder.modules.primefactorization.export.FactorTreeExportOptionsActivity;
@@ -83,15 +81,7 @@ public class DisplayPrimeFactorizationActivity extends DisplayContentActivity {
 
         treeView.setTree(factorTree.formatNumbers());
         if (PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 1) {
-            final TreeView.ExportOptions exportOptions = treeView.getDefaultExportOptions();
-            exportOptions.itemTextColor = Color.WHITE;
-            exportOptions.itemBorderColor = ContextCompat.getColor(this, R.color.accent_light_but_not_that_light);
-            exportOptions.branchColor = Color.WHITE;
-            exportOptions.itemBackgroundColor = Color.BLACK;
-            exportOptions.imageBorderColor = Color.WHITE;
-            exportOptions.imageBackgroundColor = Color.BLACK;
-            exportOptions.primeFactorTextColor = ContextCompat.getColor(this, R.color.red);
-            treeView.setExportOptions(exportOptions);
+            treeView.setExportOptions(new TreeView.DarkThemeExportOptions());
         }
 
         final Map<Long, Integer> map = new TreeMap<>();

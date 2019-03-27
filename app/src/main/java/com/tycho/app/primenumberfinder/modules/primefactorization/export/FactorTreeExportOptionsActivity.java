@@ -1,6 +1,5 @@
 package com.tycho.app.primenumberfinder.modules.primefactorization.export;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -10,8 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -24,11 +21,11 @@ import android.widget.Toast;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.jaredrummler.android.colorpicker.ColorPickerDialog;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.activities.AbstractActivity;
 import com.tycho.app.primenumberfinder.activities.DisplayContentActivity;
 import com.tycho.app.primenumberfinder.modules.savedfiles.ColorPickerListener;
 import com.tycho.app.primenumberfinder.ui.TreeView;
 import com.tycho.app.primenumberfinder.utils.FileManager;
+import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
@@ -83,6 +80,10 @@ public class FactorTreeExportOptionsActivity extends DisplayContentActivity impl
         fileNameInput = findViewById(R.id.file_name);
         treeView = findViewById(R.id.factor_tree_preview);
         exportOptions = treeView.getDefaultExportOptions();
+        if (PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 1) {
+            exportOptions = new TreeView.DarkThemeExportOptions();
+        }
+        treeView.setExportOptions(exportOptions);
 
         //Image style
         final Section imageStyleSection = new Section(this, "Image Style");
@@ -138,6 +139,19 @@ public class FactorTreeExportOptionsActivity extends DisplayContentActivity impl
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 super.onProgressChanged(seekBar, progress, fromUser);
                 exportOptions.branchPadding = rangedSeekBar.getFloatValue();
+                treeView.redraw();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                findViewById(R.id.root).requestFocus();
+            }
+        });
+        branchStyleSection.addOption(new SliderOption(this, "Length", 0, 100, 10, exportOptions.branchLength * 100, "%") {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                super.onProgressChanged(seekBar, progress, fromUser);
+                exportOptions.branchLength = rangedSeekBar.getFloatValue() / 100;
                 treeView.redraw();
             }
 
@@ -247,6 +261,11 @@ public class FactorTreeExportOptionsActivity extends DisplayContentActivity impl
             view.setLayoutParams(layoutParams);
             optionsLayout.addView(view);
         }
+
+        //Change dependent visibility
+        sections.get(3).getOptions().get(1).setEnabled(exportOptions.itemBackgrounds);
+        sections.get(3).getOptions().get(2).setEnabled(exportOptions.itemBackgrounds);
+        sections.get(3).getOptions().get(3).setEnabled(exportOptions.itemBackgrounds);
 
         imageSizeTextView = findViewById(R.id.image_size);
         imageSizeTextView.post(() -> {

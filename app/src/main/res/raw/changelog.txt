@@ -150,4 +150,5 @@
 - Minor UI changes
 
 04/0?/2019 > Prime Number Finder version 1.4.2
+- Added new export option
 - Bug fixes
