@@ -148,3 +148,6 @@
 - Fixed major crashing issue with native code on older devices
 - Minor bug fixes
 - Minor UI changes
+
+04/0?/2019 > Prime Number Finder version 1.4.2
+- Bug fixes

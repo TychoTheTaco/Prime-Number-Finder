@@ -344,8 +344,7 @@ public final class Utils {
             if (numbers.size() > 2) spannableStringBuilder.append(separator);
             spannableStringBuilder.append(" and ");
         } else if (index != numbers.size() - 1) {
-            spannableStringBuilder.append(separator);
-            spannableStringBuilder.append(' ');
+            spannableStringBuilder.append(separator).append(' ');
         }
     }
 
@@ -393,7 +392,7 @@ public final class Utils {
                     spannableStringBuilder.removeSpan(span);
                     ((TextView) view).setText(spannableStringBuilder);
                     popupWindow.dismiss();
-                }, 600);
+                }, 500);
             }
 
             @Override
