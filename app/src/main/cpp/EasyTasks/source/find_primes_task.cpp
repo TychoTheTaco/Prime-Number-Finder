@@ -97,12 +97,10 @@ void FindPrimesTask::executeThreadPool() {
 
 void FindPrimesTask::searchPartitionMode() {
 	const num_type partition_size = this->getRange() / this->thread_count;
-	std::cout << "Partition Size: " << partition_size << std::endl;
 	for (unsigned int i = 0; i < this->thread_count; ++i) {
 		num_type start = this->start_value + (i * partition_size + 1);
 		if (start % 2 == 0) ++start;
 		BruteForceTask* task = new BruteForceTask(this, start, this->start_value + (i + 1) * partition_size, 2);
-		task->addTaskListener(new DebugListener());
 		this->addSubTask(task);
 	}
 	this->startSubTasks();
@@ -120,7 +118,6 @@ void FindPrimesTask::searchAlternateMode() {
 		}
 		startValues[i] = s;
 		BruteForceTask* task = new BruteForceTask(this, s, this->end_value, increment);
-		task->addTaskListener(new DebugListener());
 		this->addSubTask(task);
 	}
 	delete[] startValues;
@@ -133,7 +130,6 @@ void FindPrimesTask::searchPacketMode(num_type packet_size) {
 		num_type start = this->start_value + (i * packet_size + 1);
 		if (start % 2 == 0) start++;
 		BruteForceTask* task = new BruteForceTask(this, start, std::min(this->start_value + (i + 1) * packet_size, this->end_value), 2);
-		task->addTaskListener(new DebugListener());
 		this->addSubTask(task);;
 	}
 	executeThreadPool();
@@ -172,12 +168,18 @@ void FindPrimesTask::saveToFile(const std::string file_path) {
 	numberToBytes(this->isEndless() ? 0 : this->end_value, &header[3 + sizeof(num_type)]);
 	output.write(header, sizeof(header) / sizeof(*header));
 
+	//Pause the task before saving
+	const State initial_state = this->getState();
+	this->pauseAndWait();
+
 	if (this->search_method == BRUTE_FORCE) {
 
-		// Find cache files
+		// Write all data to cache files before sorting
 		std::string* cache_files = new std::string[this->getTasks().size()];
 		for (int i = 0; i < this->getTasks().size(); ++i) {
-			cache_files[i] = dynamic_cast<FindPrimesTask::BruteForceTask*>(this->getTasks().at(i))->cache_file;
+			BruteForceTask* task = dynamic_cast<FindPrimesTask::BruteForceTask*>(this->getTasks().at(i));
+			task->writeToCache();
+			cache_files[i] = task->cache_file;
 		}
 
 		switch (this->search_mode) {
@@ -192,7 +194,7 @@ void FindPrimesTask::saveToFile(const std::string file_path) {
 
 			case ALTERNATE:
 				// Each cache file is sorted, but we need to interleave the numbers of each file
-				const int BUFFER_SIZE = sizeof(num_type) * 10;
+				const int BUFFER_SIZE = sizeof(num_type) * 1024;
 				std::vector<std::queue<num_type>*> buffers;
 				for (int i = 0; i < this->getTasks().size(); ++i) {
 					buffers.push_back(new std::queue<num_type>());
@@ -254,7 +256,6 @@ void FindPrimesTask::saveToFile(const std::string file_path) {
 				}
 
 				delete[] offsets;
-
 				break;
 		}
 
@@ -269,6 +270,14 @@ void FindPrimesTask::saveToFile(const std::string file_path) {
 	}
 
 	output.close();
+
+	// Restore state
+	switch (initial_state) {
+		case RUNNING:
+		case RESUMING:
+			this->resumeAndWait();
+	}
+
 	std::cout << "Saved!" << std::endl;
 }
 
@@ -425,7 +434,6 @@ void FindPrimesTask::BruteForceTask::run() {
 
 		current_number += increment;
 	}
-	std::cout << "Final cache write." << std::endl;
 	writeToCache();
 }
 
@@ -443,12 +451,13 @@ void FindPrimesTask::BruteForceTask::dispatchPrimeFound(num_type number) {
 	++prime_count;
 
 	if (buffer_size > 0 && primes.size() >= buffer_size) {
-		std::cout << "Writing to cache!" << std::endl;
 		writeToCache();
-		primes.clear();
 	}
 }
 
+/*
+Writes the numbers in the primes list to a cache file, then clears the primes list. The cache file is always appended to.
+*/
 void FindPrimesTask::BruteForceTask::writeToCache() {
 	std::ofstream fos;
 	fos.open(cache_file, std::ios::binary | std::ios::out | std::ios::app);
@@ -464,6 +473,7 @@ void FindPrimesTask::BruteForceTask::writeToCache() {
 		fos.write(data, 8);
 	}
 	fos.close();
+	primes.clear();
 }
 
 unsigned int FindPrimesTask::BruteForceTask::getPrimeCount() {

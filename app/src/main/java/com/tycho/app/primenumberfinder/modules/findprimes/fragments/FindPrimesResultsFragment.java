@@ -102,14 +102,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
             new Thread(() -> {
 
-                //Pause the task
-                final Task.State state = getTask().getState();
-                try {
-                    getTask().pauseAndWait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
                 //Save to file
                 final File file;
                 if (getTask().getState() == Task.State.STOPPED && getTask().isSaved()){
@@ -119,11 +111,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                     // Task has not finished or is not saved, saved to temp file
                     file = new File(getTask().getCacheDirectory() + File.separator + "primes");
                     getTask().saveToFile(file);
-                }
-
-                //Restore task state
-                if (state == Task.State.RUNNING) {
-                    getTask().resume();
                 }
 
                 handler.post(progressDialog::dismiss);
