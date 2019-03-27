@@ -113,12 +113,6 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
                     holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
                 }
 
-                //Edit button
-                if (holder.editButton != null) {
-                    holder.editButton.setEnabled(false);
-                    holder.editButton.setVisibility(View.VISIBLE);
-                }
-
                 //Delete button
                 if (holder.deleteButton != null) {
                     holder.deleteButton.setEnabled(false);
@@ -137,12 +131,6 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
                     holder.pauseButton.setEnabled(false);
                     holder.pauseButton.setVisibility(View.VISIBLE);
                     holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                }
-
-                //Edit button
-                if (holder.editButton != null) {
-                    holder.editButton.setEnabled(false);
-                    holder.editButton.setVisibility(View.VISIBLE);
                 }
 
                 //Delete button
@@ -165,12 +153,6 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
                     holder.pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
                 }
 
-                //Edit button
-                if (holder.editButton != null) {
-                    holder.editButton.setEnabled(true);
-                    holder.editButton.setVisibility(View.VISIBLE);
-                }
-
                 //Delete button
                 if (holder.deleteButton != null) {
                     holder.deleteButton.setEnabled(true);
@@ -191,12 +173,6 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
                     holder.pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
                 }
 
-                //Edit button
-                if (holder.editButton != null) {
-                    holder.editButton.setEnabled(false);
-                    holder.editButton.setVisibility(View.VISIBLE);
-                }
-
                 //Delete button
                 if (holder.deleteButton != null) {
                     holder.deleteButton.setEnabled(false);
@@ -213,11 +189,6 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
                 //Pause button
                 if (holder.pauseButton != null) {
                     holder.pauseButton.setVisibility(View.GONE);
-                }
-
-                //Edit button
-                if (holder.editButton != null) {
-                    holder.editButton.setVisibility(View.GONE);
                 }
 
                 //Delete button
@@ -382,12 +353,6 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
         }
     }
 
-    private void sendOnEditClicked(final ITask task) {
-        for (EventListener eventListener : eventListeners) {
-            eventListener.onEditPressed(task);
-        }
-    }
-
     private void sendOnDeletePressed(final ITask task) {
         for (EventListener eventListener : eventListeners) {
             eventListener.onTaskRemoved(task);
@@ -410,7 +375,6 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
         public final TextView subtitle;
         public final TextView progress;
         public ImageButton pauseButton;
-        public ImageButton editButton;
         public ImageButton deleteButton;
         public ImageButton saveButton;
 
@@ -440,17 +404,12 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
             subtitle = itemView.findViewById(R.id.task_state);
             progress = itemView.findViewById(R.id.search_progress);
             pauseButton = itemView.findViewById(R.id.pause_button);
-            editButton = itemView.findViewById(R.id.edit_button);
             deleteButton = itemView.findViewById(R.id.delete_button);
             saveButton = itemView.findViewById(R.id.save_button);
 
             if (!buttons.contains(Button.PAUSE)) {
                 pauseButton.setVisibility(View.GONE);
                 pauseButton = null;
-            }
-            if (!buttons.contains(Button.EDIT)) {
-                editButton.setVisibility(View.GONE);
-                editButton = null;
             }
             if (!buttons.contains(Button.DELETE)) {
                 deleteButton.setVisibility(View.GONE);
@@ -486,10 +445,6 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
                     onPausePressed();
                     sendOnPausePressed(getTask(getAdapterPosition()));
                 });
-            }
-
-            if (editButton != null) {
-                editButton.setOnClickListener(v -> sendOnEditClicked(getTask(getAdapterPosition())));
             }
 
             if (deleteButton != null) {
@@ -692,7 +647,6 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
     public enum Button {
         SAVE,
         PAUSE,
-        EDIT,
         DELETE
     }
 }

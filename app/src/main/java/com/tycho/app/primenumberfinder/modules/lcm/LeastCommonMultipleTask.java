@@ -2,7 +2,6 @@ package com.tycho.app.primenumberfinder.modules.lcm;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
@@ -83,6 +82,10 @@ public class LeastCommonMultipleTask extends MultithreadedTask implements Search
 
         private final List<Long> numbers = new ArrayList<>();
 
+        public SearchOptions(){
+            super(1, false, false);
+        }
+
         public SearchOptions(final List<Long> numbers){
             super(1, false, false);
             this.numbers.addAll(numbers);
@@ -114,6 +117,11 @@ public class LeastCommonMultipleTask extends MultithreadedTask implements Search
 
         public List<Long> getNumbers() {
             return numbers;
+        }
+
+        public void setNumbers(final List<Long> numbers){
+            this.numbers.clear();
+            this.numbers.addAll(numbers);
         }
     }
 

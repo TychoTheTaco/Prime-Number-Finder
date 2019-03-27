@@ -117,8 +117,8 @@ public class Validator {
             return false;
         }
 
-        //Number cannot be 0, 1, or -1
-        if (number.compareTo(BigInteger.ZERO) == 0 || number.compareTo(BigInteger.ONE) == 0 || number.compareTo(BigInteger.valueOf(-1)) == 0){
+        //Number cannot be 0
+        if (number.compareTo(BigInteger.ZERO) == 0){
             return false;
         }
 

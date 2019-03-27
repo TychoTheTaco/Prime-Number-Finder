@@ -41,29 +41,6 @@
 
     </LinearLayout>
 
-    <!-- Thread count -->
-    <!--<LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <TextView
-            style="@style/DefaultText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Threads" />
-
-        <Spinner
-            android:id="@+id/thread_count_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-    </LinearLayout>-->
-
     <CheckBox
         android:id="@+id/notify_when_finished"
         android:layout_width="wrap_content"

@@ -194,6 +194,7 @@
     <string name="error_invalid_number">Invalid number!</string>
     <string name="error_invalid_range">Invalid range!</string>
     <string name="error_invalid_input">Invalid input!</string>
+    <string name="error_invalid_configuration">Invalid configuration!</string>
 
     <!-- Miscellaneous -->
     <string name="unicode_bullet">&#8226;</string>

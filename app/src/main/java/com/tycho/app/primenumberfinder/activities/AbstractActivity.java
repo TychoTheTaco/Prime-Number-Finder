@@ -14,7 +14,7 @@ import java.util.Locale;
 public abstract class AbstractActivity extends AppCompatActivity {
 
     /**
-     * {@linkplain NumberFormat} used for formatting numbers.
+     * Default {@linkplain NumberFormat} used for formatting numbers.
      */
     protected final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 

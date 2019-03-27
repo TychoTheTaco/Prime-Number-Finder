@@ -9,10 +9,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -21,23 +18,16 @@ import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.activities.AbstractActivity;
+import com.tycho.app.primenumberfinder.modules.TaskConfigurationActivity;
 import com.tycho.app.primenumberfinder.ui.CustomRadioGroup;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
 import java.math.BigInteger;
-import java.text.NumberFormat;
-import java.util.Locale;
 import java.util.Random;
-import java.util.UUID;
-
-import easytasks.Task;
 
 import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
 import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.SIEVE_OF_ERATOSTHENES;
@@ -46,7 +36,7 @@ import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.
  * Created by tycho on 1/24/2018.
  */
 
-public class FindPrimesConfigurationActivity extends AbstractActivity {
+public class FindPrimesConfigurationActivity extends TaskConfigurationActivity{
 
     /**
      * Tag used for logging and debugging.
@@ -60,22 +50,15 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
 
     private CustomRadioGroup radioGroupSearchMethod;
 
-    /**
-     * {@linkplain NumberFormat} instance used to format numbers with commas.
-     */
-    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
-
     private Spinner threadCountSpinner;
 
     private CheckBox notifyWhenFinishedCheckbox;
     private CheckBox autoSaveCheckbox;
 
-    private FindPrimesTask task;
-
     /**
      * The search options currently representing the user's selection
      */
-    private FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(0, 0, BRUTE_FORCE, 1, false, false);
+    private final FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(0, 0, BRUTE_FORCE, 1, false, false);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -203,20 +186,6 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
         autoSaveCheckbox = findViewById(R.id.auto_save);
         autoSaveCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> searchOptions.setAutoSave(isChecked));
 
-        //Get search options from intent
-        if (getIntent().getExtras() != null) {
-            if (getIntent().getExtras().getParcelable("searchOptions") != null) {
-                searchOptions = getIntent().getExtras().getParcelable("searchOptions");
-            }
-
-            try {
-                task = (FindPrimesTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) getIntent().getExtras().get("taskId"));
-                searchOptions = task.getSearchOptions();
-            } catch (NullPointerException e) {
-                Log.w(TAG, "Task not found.");
-            }
-        }
-
         //Apply config
         applyConfig(searchOptions);
     }
@@ -244,45 +213,13 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.task_configuration_menu, menu);
-
-        if (task != null) {
-            menu.findItem(R.id.start).setIcon(R.drawable.ic_save_white_24dp);
-        }
-
-        return true;
+    protected boolean isConfigurationValid(){
+        return Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod());
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-
-            case android.R.id.home:
-                onBackPressed();
-                break;
-
-            case R.id.start:
-                if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
-                    final Intent intent = new Intent();
-                    intent.putExtra("searchOptions", searchOptions);
-                    if (task != null) intent.putExtra("taskId", task.getId());
-                    setResult(0, intent);
-                    finish();
-                } else {
-                    Toast.makeText(this, getString(R.string.error_invalid_range), Toast.LENGTH_SHORT).show();
-                }
-                break;
-        }
-        return true;
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-
-        //Give the root view focus to prevent EditTexts from initially getting focus
-        findViewById(R.id.root).requestFocus();
+    protected void buildReturnIntent(Intent intent){
+        intent.putExtra("searchOptions", searchOptions);
     }
 
     private BigInteger getStartValue() {
@@ -341,25 +278,6 @@ public class FindPrimesConfigurationActivity extends AbstractActivity {
         } else {
             notifyWhenFinishedCheckbox.setEnabled(true);
             autoSaveCheckbox.setEnabled(true);
-        }
-
-        //Task subtitle dependent
-        if (task != null) {
-            if (task.getState() != Task.State.NOT_STARTED) {
-                editTextSearchRangeStart.setEnabled(false);
-
-                if (task.getState() != Task.State.STOPPING && task.getState() != Task.State.STOPPED) {
-                    editTextSearchRangeEnd.setEnabled(false);
-                    infinityButton.setEnabled(false);
-                    threadCountSpinner.setEnabled(false);
-                } else {
-                    editTextSearchRangeEnd.setEnabled(false);
-                    infinityButton.setEnabled(false);
-                    threadCountSpinner.setEnabled(false);
-                }
-
-                radioGroupSearchMethod.setEnabled(false);
-            }
         }
 
         //Set cache directory

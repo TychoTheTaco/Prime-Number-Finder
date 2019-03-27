@@ -284,7 +284,6 @@ public class FindPrimesFragment extends ModuleHostFragment {
 
                 if (task instanceof CheckPrimalityTask) {
                     if (holder.saveButton != null) holder.saveButton.setVisibility(View.GONE);
-                    if (holder.editButton != null) holder.editButton.setVisibility(View.GONE);
                 }
 
                 //Set progress

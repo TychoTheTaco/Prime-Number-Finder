@@ -74,6 +74,8 @@
             android:label="Export Options"
             android:windowSoftInputMode="adjustPan" />
 
+        <activity android:name=".modules.TaskConfigurationActivity"/>
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.tycho.app.primenumberfinder"

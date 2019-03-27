@@ -1,7 +1,6 @@
 package com.tycho.app.primenumberfinder.modules.gcf;
 
 import android.os.Parcel;
-import android.util.ArraySet;
 
 import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
@@ -11,12 +10,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import easytasks.MultithreadedTask;
-import easytasks.Task;
 
 public class GreatestCommonFactorTask extends MultithreadedTask implements SearchOptions {
 
@@ -76,6 +72,10 @@ public class GreatestCommonFactorTask extends MultithreadedTask implements Searc
 
         private final List<Long> numbers = new ArrayList<>();
 
+        public SearchOptions(){
+            super(1, false, false);
+        }
+
         public SearchOptions(final List<Long> numbers){
             super(1, false, false);
             this.numbers.addAll(numbers);
@@ -107,6 +107,11 @@ public class GreatestCommonFactorTask extends MultithreadedTask implements Searc
 
         public List<Long> getNumbers() {
             return numbers;
+        }
+
+        public void setNumbers(final List<Long> numbers){
+            this.numbers.clear();
+            this.numbers.addAll(numbers);
         }
     }
 

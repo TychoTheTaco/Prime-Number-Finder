@@ -1,28 +1,16 @@
 package com.tycho.app.primenumberfinder.modules.findfactors;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.activities.AbstractActivity;
+import com.tycho.app.primenumberfinder.modules.TaskConfigurationActivity;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
@@ -31,15 +19,12 @@ import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Random;
-import java.util.UUID;
-
-import easytasks.Task;
 
 /**
  * Created by tycho on 1/24/2018.
  */
 
-public class FindFactorsConfigurationActivity extends AbstractActivity {
+public class FindFactorsConfigurationActivity extends TaskConfigurationActivity{
 
     /**
      * Tag used for logging and debugging.
@@ -48,14 +33,10 @@ public class FindFactorsConfigurationActivity extends AbstractActivity {
 
     private ValidEditText editTextNumberToFactor;
 
-    //private Spinner threadCountSpinner;
-
     private CheckBox notifyWhenFinishedCheckbox;
     private CheckBox autoSaveCheckbox;
 
-    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
-
-    private FindFactorsTask task;
+    private final FindFactorsTask.SearchOptions searchOptions = new FindFactorsTask.SearchOptions(0);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -87,97 +68,26 @@ public class FindFactorsConfigurationActivity extends AbstractActivity {
             public void afterTextChanged(Editable editable) {
                 //Check if the number is valid
                 editTextNumberToFactor.setValid(Validator.isValidFactorInput(getNumberToFactor()));
+                searchOptions.setNumber(getNumberToFactor().longValue());
             }
         });
-
-        //Set up thread count
-        /*threadCountSpinner = findViewById(R.id.thread_count_spinner);
-        final String[] items = new String[Runtime.getRuntime().availableProcessors()];
-        for (int i = 0; i < items.length; i++) {
-            items[i] = String.valueOf(i + 1);
-        }
-        threadCountSpinner.setAdapter(new ThreadCountAdapter(this, items));*/
 
         notifyWhenFinishedCheckbox = findViewById(R.id.notify_when_finished);
         autoSaveCheckbox = findViewById(R.id.auto_save);
 
-        try {
-            final FindFactorsTask.SearchOptions searchOptions = getIntent().getExtras().getParcelable("searchOptions");
-            applyConfig(searchOptions);
-        } catch (NullPointerException e) {
-            Log.w(TAG, "SearchOptions not found! Using defaults.");
-            applyConfig(null);
-        }
-
-        try {
-            task = (FindFactorsTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) getIntent().getExtras().get("taskId"));
-            if (task.getState() != Task.State.NOT_STARTED) {
-                editTextNumberToFactor.setEnabled(false);
-                //threadCountSpinner.setEnabled(false);
-            }
-        } catch (NullPointerException e) {
-            Log.w(TAG, "Task not found.");
-        }
-    }
-
-    class ThreadCountAdapter extends ArrayAdapter<String> {
-
-        private final LayoutInflater layoutInflater;
-
-        private final String[] items;
-
-        public ThreadCountAdapter(final Context context, final String[] items) {
-            super(context, R.layout.thread_count_list_item, R.id.text, items);
-            layoutInflater = getLayoutInflater();
-            this.items = items;
-        }
-
-        @Override
-        public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            if (convertView == null) {
-                convertView = layoutInflater.inflate(R.layout.thread_count_list_item, parent, false);
-            }
-            ((TextView) convertView.findViewById(R.id.text)).setText(items[position]);
-            return convertView;
-        }
+        applyConfig(searchOptions);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.task_configuration_menu, menu);
-
-        if (task != null) {
-            menu.findItem(R.id.start).setIcon(R.drawable.ic_save_white_24dp);
-        }
-
-        return true;
+    protected boolean isConfigurationValid(){
+        return Validator.isValidFactorInput(getNumberToFactor());
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-
-            case android.R.id.home:
-                onBackPressed();
-                break;
-
-            case R.id.start:
-                if (Validator.isValidFactorInput(getNumberToFactor())) {
-                    final Intent intent = new Intent();
-                    final FindFactorsTask.SearchOptions searchOptions = new FindFactorsTask.SearchOptions(getNumberToFactor().longValue());
-                    //searchOptions.setThreadCount(Integer.valueOf((String) threadCountSpinner.getSelectedItem()));
-                    searchOptions.setNotifyWhenFinished(notifyWhenFinishedCheckbox.isChecked());
-                    searchOptions.setAutoSave(autoSaveCheckbox.isChecked());
-                    intent.putExtra("searchOptions", searchOptions);
-                    if (task != null) intent.putExtra("taskId", task.getId());
-                    setResult(0, intent);
-                    finish();
-                } else {
-                    Toast.makeText(this, getString(R.string.error_invalid_number), Toast.LENGTH_SHORT).show();
-                }
-                break;
-        }
-        return true;
+    protected void buildReturnIntent(Intent intent){
+        searchOptions.setNotifyWhenFinished(notifyWhenFinishedCheckbox.isChecked());
+        searchOptions.setAutoSave(autoSaveCheckbox.isChecked());
+        intent.putExtra("searchOptions", searchOptions);
     }
 
     private BigInteger getNumberToFactor() {
