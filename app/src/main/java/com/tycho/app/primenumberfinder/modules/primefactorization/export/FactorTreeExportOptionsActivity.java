@@ -49,7 +49,7 @@ public class FactorTreeExportOptionsActivity extends DisplayContentActivity impl
      */
     private static final String TAG = FactorTreeExportOptionsActivity.class.getSimpleName();
 
-    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
+    private final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
     private Tree<Long> factorTree;
 
