@@ -1,6 +1,6 @@
 package com.tycho.app.primenumberfinder;
 
-import android.support.design.widget.FloatingActionButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public interface FloatingActionButtonHost {
 

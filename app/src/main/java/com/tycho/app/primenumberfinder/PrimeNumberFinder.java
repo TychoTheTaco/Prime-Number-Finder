@@ -7,13 +7,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.core.CrashlyticsCore;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.TaskManager;
 
-import io.fabric.sdk.android.Fabric;
 
 /**
  * @author Tycho Bellers
@@ -40,13 +37,14 @@ public class PrimeNumberFinder extends Application {
         PreferenceManager.initialize(this);
 
         //Initialize analytics
-        if (PreferenceManager.getBoolean(PreferenceManager.Preference.ALLOW_ANALYTICS) && !BuildConfig.DEBUG) {
+        //TODO: Fix this
+        /*if (PreferenceManager.getBoolean(PreferenceManager.Preference.ALLOW_ANALYTICS) && !BuildConfig.DEBUG) {
             Fabric.with(this, new Crashlytics());
             Log.d(TAG, "Enabled Crashlytics");
         } else {
             Fabric.with(this, new Crashlytics.Builder().core(new CrashlyticsCore.Builder().disabled(true).build()).build());
             Log.d(TAG, "Disabled Crashlytics");
-        }
+        }*/
     }
 
     public static String getVersionName(final Context context) {

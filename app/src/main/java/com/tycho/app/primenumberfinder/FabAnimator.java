@@ -1,11 +1,9 @@
 package com.tycho.app.primenumberfinder;
 
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.view.ViewPager;
-import android.util.Log;
-import android.view.View;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.viewpager.widget.ViewPager;
 
-import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesFragment;
+import android.view.View;
 
 public class FabAnimator implements ViewPager.OnPageChangeListener {
 

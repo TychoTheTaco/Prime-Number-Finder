@@ -18,7 +18,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FormattedEditText extends android.support.v7.widget.AppCompatEditText {
+public class FormattedEditText extends androidx.appcompat.widget.AppCompatEditText {
 
     /**
      * Tag used for logging and debugging.

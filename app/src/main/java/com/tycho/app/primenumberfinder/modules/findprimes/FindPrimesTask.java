@@ -9,7 +9,6 @@ import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
 import java.io.File;
 
 import easytasks.ITask;
-import io.fabric.sdk.android.services.concurrency.Task;
 
 public interface FindPrimesTask extends ITask, Savable {
 

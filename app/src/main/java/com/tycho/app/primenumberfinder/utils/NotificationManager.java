@@ -5,13 +5,11 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 
-import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.activities.MainActivity;
 
 import easytasks.ITask;
-import easytasks.Task;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 

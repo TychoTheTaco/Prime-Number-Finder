@@ -2,9 +2,9 @@ package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -18,7 +18,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
@@ -164,7 +164,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
             @Override
             public void afterTextChanged(Editable editable) {
 
-                Crashlytics.log("Editable: '" + editable + "'");
+                FirebaseCrashlytics.getInstance().log("Editable: '" + editable + "'");
 
                 //Check if infinity
                 if (!editable.toString().equals(getString(R.string.infinity_text))) {
@@ -172,7 +172,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
                     //Format text
                     final String formatted = NUMBER_FORMAT.format(getEndValue());
                     if (editable.length() > 0 && !editable.toString().equals(formatted)) {
-                        Crashlytics.log("Setting text: '" + formatted + "'");
+                        FirebaseCrashlytics.getInstance().log("Setting text: '" + formatted + "'");
                         editTextSearchRangeEnd.setText(formatted, formatted.length() > 1);
                     } else if (editable.toString().equals(NUMBER_FORMAT.format(0))) {
                         editTextSearchRangeEnd.getText().clear();
@@ -181,7 +181,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
 
                 searchOptions.setEndValue(getEndValue().longValue());
 
-                Crashlytics.log("Checking valid...");
+                FirebaseCrashlytics.getInstance().log("Checking valid...");
 
                 //Check if the number is valid
                 editTextSearchRangeStart.setValid(editTextSearchRangeStart.length() > 0);
@@ -403,8 +403,8 @@ public class FindPrimesFragment extends ModuleHostFragment {
         //Log.d(TAG, "RAM: " + usedMemInMB + " / " + maxHeapSizeInMB);
         //Log.d(TAG, "Avail: " + availHeapSizeInMB);
         //Log.d(TAG, "Req: " + requiredMB);
-        Crashlytics.setLong("requiredMB", requiredMB);
-        Crashlytics.setLong("availableHeapMB", availHeapSizeInMB);
+        FirebaseCrashlytics.getInstance().setCustomKey("requiredMB", requiredMB);
+        FirebaseCrashlytics.getInstance().setCustomKey("availableHeapMB", availHeapSizeInMB);
 
         return requiredMB <= availHeapSizeInMB;
     }
