@@ -11,6 +11,8 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.widget.Toast;
 
+import com.google.android.gms.measurement.module.Analytics;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
@@ -53,7 +55,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
             case "allowAnalytics":
                 PreferenceManager.set(PreferenceManager.Preference.ALLOW_ANALYTICS, ((CheckBoxPreference) preference).isChecked());
-                Toast.makeText(getActivity(), "You must restart the app for changes to take effect.", Toast.LENGTH_LONG).show();
+                FirebaseAnalytics.getInstance(getContext()).setAnalyticsCollectionEnabled(PreferenceManager.getBoolean(PreferenceManager.Preference.ALLOW_ANALYTICS));
                 break;
 
             case "quickCopy":

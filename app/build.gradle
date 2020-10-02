@@ -23,10 +23,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             firebaseCrashlytics {
-                // Enable processing and uploading of native symbols to Crashlytics
-                // servers. By default, this is disabled to improve build speeds.
-                // This flag must be enabled to see properly-symbolicated native
-                // stack traces in the Crashlytics dashboard.
                 nativeSymbolUploadEnabled true
                 strippedNativeLibsDir 'build\\intermediates\\stripped_native_libs\\release\\out\\lib'
                 unstrippedNativeLibsDir 'build\\intermediates\\cmake\\release\\obj'

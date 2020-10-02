@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.TaskManager;
@@ -37,14 +38,7 @@ public class PrimeNumberFinder extends Application {
         PreferenceManager.initialize(this);
 
         //Initialize analytics
-        //TODO: Fix this
-        /*if (PreferenceManager.getBoolean(PreferenceManager.Preference.ALLOW_ANALYTICS) && !BuildConfig.DEBUG) {
-            Fabric.with(this, new Crashlytics());
-            Log.d(TAG, "Enabled Crashlytics");
-        } else {
-            Fabric.with(this, new Crashlytics.Builder().core(new CrashlyticsCore.Builder().disabled(true).build()).build());
-            Log.d(TAG, "Disabled Crashlytics");
-        }*/
+        FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(PreferenceManager.getBoolean(PreferenceManager.Preference.ALLOW_ANALYTICS) && !BuildConfig.DEBUG);
     }
 
     public static String getVersionName(final Context context) {

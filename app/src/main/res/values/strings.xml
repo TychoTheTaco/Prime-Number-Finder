@@ -10,8 +10,8 @@
     <string name="preference_title_allow_background_threads">Allow background tasks</string>
     <string name="preference_summary_allow_background_threads">Allow the app to run tasks in the background (such as searching for prime numbers). Warning: this can cause significant battery loss if you are not careful.</string>
     <string name="privacy">Privacy</string>
-    <string name="allow_analytics_title">Send crash logs</string>
-    <string name="allow_analytics_description">Allow the app to send anonymous usage statistics and crash logs to the developer to help improve the app.</string>
+    <string name="allow_analytics_title">Usage statistics</string>
+    <string name="allow_analytics_description">Allow the app to send anonymous usage statistics to the developer to help improve the app.</string>
     <string name="quick_copy">Quick Copy</string>
     <string name="quick_copy_title">Quick Number Copy</string>
     <string name="quick_copy_description">Hold bolded numbers to copy them to the clipboard.</string>

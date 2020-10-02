@@ -65,6 +65,7 @@ public class LeastCommonMultipleFragment extends ModuleHostFragment{
         inputs.add(rootView.findViewById(R.id.input1).findViewById(R.id.input));
         inputs.add(rootView.findViewById(R.id.input2).findViewById(R.id.input));
         for (ValidEditText editText : inputs){
+            editText.setValid(Validator.isValidLCMInput((BigInteger) editText.getNumberValue()));
             editText.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -115,6 +116,7 @@ public class LeastCommonMultipleFragment extends ModuleHostFragment{
     private List<Long> getNumbers(){
         final List<Long> numbers = new ArrayList<>();
         for (ValidEditText editText : inputs){
+            System.out.println("COMPARE: " + editText + " TET: " + editText.getText() + " LONG: " + editText.getLongValue() + " VALID: " + editText.isValid());
             if (editText.isValid()) numbers.add(editText.getLongValue());
         }
         return numbers;

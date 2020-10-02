@@ -112,16 +112,21 @@ public class Validator {
     }
 
     public static boolean isValidLCMInput(final BigInteger number) {
+        System.out.println("IS VALID: " + number);
+
         //Number must be less than or equal to max long value
         if (number.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) >= 0) {
+            System.out.println(number + ": false");
             return false;
         }
 
         //Number cannot be 0
         if (number.compareTo(BigInteger.ZERO) == 0){
+            System.out.println(number + ": false");
             return false;
         }
 
+        System.out.println(number + ": true");
         return true;
     }
 }

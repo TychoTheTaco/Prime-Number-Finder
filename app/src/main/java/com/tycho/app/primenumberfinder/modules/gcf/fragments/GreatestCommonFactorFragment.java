@@ -56,6 +56,7 @@ public class GreatestCommonFactorFragment extends ModuleHostFragment{
         inputs.add(rootView.findViewById(R.id.input1).findViewById(R.id.input));
         inputs.add(rootView.findViewById(R.id.input2).findViewById(R.id.input));
         for (ValidEditText editText : inputs){
+            editText.setValid(Validator.isValidLCMInput((BigInteger) editText.getNumberValue()));
             editText.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {

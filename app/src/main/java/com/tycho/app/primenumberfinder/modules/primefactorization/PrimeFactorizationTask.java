@@ -2,6 +2,7 @@ package com.tycho.app.primenumberfinder.modules.primefactorization;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.SearchOptions;
@@ -69,7 +70,6 @@ public class PrimeFactorizationTask extends Task implements Savable, SearchOptio
     }
 
     private Tree<Long> generateTree(long number) {
-
         final Tree<Long> tree = new Tree<>(number);
 
         findFactorsTask = new FindFactorsTask(new FindFactorsTask.SearchOptions(number));
@@ -105,11 +105,10 @@ public class PrimeFactorizationTask extends Task implements Savable, SearchOptio
 
             if (size % 2 == 0) {
                 number1 = findFactorsTask.getFactors().get((size / 2) - 1);
-                number2 = findFactorsTask.getFactors().get((size / 2));
             } else {
                 number1 = findFactorsTask.getFactors().get((size / 2));
-                number2 = findFactorsTask.getFactors().get((size / 2));
             }
+            number2 = findFactorsTask.getFactors().get((size / 2));
 
             tree.addNode(generateTree(number1));
             tree.addNode(generateTree(number2));
