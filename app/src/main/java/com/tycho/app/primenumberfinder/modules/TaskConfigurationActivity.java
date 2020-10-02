@@ -1,10 +1,12 @@
 package com.tycho.app.primenumberfinder.modules;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.activities.AbstractActivity;
 
@@ -13,6 +15,11 @@ import com.tycho.app.primenumberfinder.activities.AbstractActivity;
  * Date Created: 3/26/2019
  */
 public abstract class TaskConfigurationActivity extends AbstractActivity{
+
+    /**
+     * Tag used for logging and debugging.
+     */
+    private static final String TAG = TaskConfigurationActivity.class.getSimpleName();
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -49,11 +56,8 @@ public abstract class TaskConfigurationActivity extends AbstractActivity{
         findViewById(R.id.root).requestFocus();
     }
 
-    protected void buildReturnIntent(final Intent intent){
 
-    }
+    protected abstract void buildReturnIntent(final Intent intent);
 
-    protected boolean isConfigurationValid(){
-        return true;
-    }
+    protected abstract boolean isConfigurationValid();
 }
