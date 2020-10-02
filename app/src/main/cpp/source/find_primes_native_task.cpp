@@ -39,7 +39,7 @@ class DListener : public DebugListener {
 extern "C" {
 
 JNIEXPORT jlong JNICALL
-Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeInit(JNIEnv *env, jobject self, jlong start_value, jlong end_value,
+Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeInit(JNIEnv *env, jclass self, jlong start_value, jlong end_value,
                                                                                         jobject search_method,
                                                                                         jint thread_count, jstring cache_directory) {
     //Get enum value

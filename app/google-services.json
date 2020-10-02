@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "88668641090-9qaodtcq8gqof5nah5pit7skbprggvv9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tycho.app.primenumberfinder",
+            "certificate_hash": "fc6eee970ec410c083c40e754c5956a23d3f411d"
+          }
+        },
+        {
           "client_id": "88668641090-bq3cos2epc71saiqqeicsgf47l5onurn.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -25,15 +33,13 @@
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
+          "other_platform_oauth_client": [
+            {
+              "client_id": "88668641090-bq3cos2epc71saiqqeicsgf47l5onurn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

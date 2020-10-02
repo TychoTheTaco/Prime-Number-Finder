@@ -13,14 +13,32 @@ android {
         applicationId "com.tycho.app.primenumberfinder"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 35
-        versionName "1.4.2.DEV"
+        versionCode 38
+        versionName "1.4.4.DEV"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            firebaseCrashlytics {
+                // Enable processing and uploading of native symbols to Crashlytics
+                // servers. By default, this is disabled to improve build speeds.
+                // This flag must be enabled to see properly-symbolicated native
+                // stack traces in the Crashlytics dashboard.
+                nativeSymbolUploadEnabled true
+                strippedNativeLibsDir 'build\\intermediates\\stripped_native_libs\\release\\out\\lib'
+                unstrippedNativeLibsDir 'build\\intermediates\\cmake\\release\\obj'
+            }
+        }
+
+        debug {
+            firebaseCrashlytics {
+                nativeSymbolUploadEnabled true
+                strippedNativeLibsDir 'build\\intermediates\\stripped_native_libs\\debug\\out\\lib'
+                unstrippedNativeLibsDir 'build\\intermediates\\cmake\\debug\\obj'
+            }
         }
     }
     compileOptions {
@@ -29,7 +47,7 @@ android {
     }
     externalNativeBuild {
         cmake {
-            path file('CMakeLists.txt')
+            path "CMakeLists.txt"
         }
     }
     ndkVersion '21.0.6113669'
@@ -38,9 +56,9 @@ android {
 dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
 
-    //Firebase and Crashlytics
+    //Firebase
     implementation 'com.google.firebase:firebase-analytics:17.5.0'
-    implementation 'com.google.firebase:firebase-crashlytics:17.2.2'
+    implementation 'com.google.firebase:firebase-crashlytics-ndk:17.2.2'
 
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.preference:preference:1.1.1'
