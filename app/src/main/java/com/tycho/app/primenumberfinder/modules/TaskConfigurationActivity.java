@@ -1,12 +1,10 @@
 package com.tycho.app.primenumberfinder.modules;
 
 import android.content.Intent;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.activities.AbstractActivity;
 
@@ -53,7 +51,7 @@ public abstract class TaskConfigurationActivity extends AbstractActivity{
         super.onBackPressed();
 
         //Give the root view focus to prevent EditTexts from initially getting focus
-        findViewById(R.id.root).requestFocus();
+        //findViewById(R.id.root).requestFocus();
     }
 
 

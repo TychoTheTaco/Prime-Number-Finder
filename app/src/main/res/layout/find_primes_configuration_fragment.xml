@@ -4,7 +4,6 @@
     android:layout_height="match_parent"
     android:clipChildren="false"
     android:orientation="vertical"
-    android:paddingTop="8dp"
     android:theme="@style/FindPrimes">
 
     <!-- Check primality input -->
@@ -62,80 +61,58 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="8dp"
-        android:paddingEnd="8dp">
+        android:paddingEnd="8dp"
+        android:weightSum="2">
 
-        <LinearLayout
-            android:layout_width="0dp"
+        <com.tycho.app.primenumberfinder.ui.ValidEditText
+            android:id="@+id/search_range_start"
+            style="@style/NumberInput"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:weightSum="2">
+            android:imeOptions="actionDone" />
 
-            <com.tycho.app.primenumberfinder.ui.ValidEditText
-                android:id="@+id/search_range_start"
-                style="@style/NumberInput"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:imeOptions="actionDone" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/to" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/to" />
+        <com.tycho.app.primenumberfinder.ui.ValidEditText
+            android:id="@+id/search_range_end"
+            style="@style/NumberInput"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:imeOptions="actionDone" />
 
-            <com.tycho.app.primenumberfinder.ui.ValidEditText
-                android:id="@+id/search_range_end"
-                style="@style/NumberInput"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:imeOptions="actionDone" />
+        <ImageButton
+            android:id="@+id/infinity_button"
+            android:layout_width="32dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/ripple_clear"
+            android:contentDescription="@string/format_numbers_description"
+            android:src="@drawable/ic_infinity_white_24dp"
+            android:tint="@color/text_color" />
 
-            <ImageButton
-                android:id="@+id/infinity_button"
-                android:layout_width="32dp"
-                android:layout_height="match_parent"
-                android:background="@drawable/ripple_clear"
-                android:contentDescription="@string/format_numbers_description"
-                android:src="@drawable/ic_infinity_white_24dp"
-                android:tint="@color/text_color" />
+    </LinearLayout>
 
-        </LinearLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp">
+
+        <include layout="@layout/advanced_button"/>
 
         <Button
             android:id="@+id/button_find_primes"
             style="@style/Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
             android:text="@string/find_primes_button" />
 
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/advanced_search"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:background="?selectableItemBackground"
-        android:drawableLeft="@drawable/ic_settings_white_24dp"
-        android:drawablePadding="4dp"
-        android:drawableTint="@color/black"
-        android:gravity="center_vertical"
-        android:text="Advanced" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_margin="8dp"
-        android:background="@color/gray" />
-
-    <FrameLayout
-        android:id="@+id/container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    </RelativeLayout>
 
 </LinearLayout>

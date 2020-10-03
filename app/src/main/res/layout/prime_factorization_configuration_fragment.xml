@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:orientation="vertical"
+    android:theme="@style/PrimeFactorization">
+
+    <!-- Number input -->
+    <TextView
+        android:id="@+id/number_input_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:labelFor="@+id/editText_input_number"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:text="@string/prime_factorization_input_number_description" />
+
+    <com.tycho.app.primenumberfinder.ui.ValidEditText
+        android:id="@id/editText_input_number"
+        style="@style/NumberInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:imeOptions="actionDone" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:layout_height="wrap_content">
+
+        <include layout="@layout/advanced_button"/>
+
+        <Button
+            android:id="@+id/button_generate_factor_tree"
+            style="@style/Button"
+            android:layout_width="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_height="wrap_content"
+            android:text="@string/generate_factor_tree_button" />
+
+    </RelativeLayout>
+
+</LinearLayout>

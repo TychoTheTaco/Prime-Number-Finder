@@ -1,7 +1,7 @@
 package com.tycho.app.primenumberfinder.modules;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,18 +13,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.viewpager.widget.ViewPager;
 
-import com.google.android.material.tabs.TabLayout;
 import com.tycho.app.primenumberfinder.ActionViewListener;
-import com.tycho.app.primenumberfinder.FabAnimator;
-import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
-import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.SearchOptions;
-import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.gcf.GreatestCommonFactorTask;
@@ -36,7 +30,6 @@ import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.text.NumberFormat;
-import java.util.Locale;
 
 import easytasks.ITask;
 import easytasks.TaskAdapter;
@@ -47,36 +40,24 @@ import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYP
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_LCM;
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_PRIME_FACTORIZATION;
 
-public abstract class ModuleHostFragment extends Fragment implements FloatingActionButtonListener, AbstractTaskListAdapter.EventListener {
+public abstract class ModuleHostFragment extends Fragment implements AbstractTaskListAdapter.EventListener {
 
     /**
      * Tag used for logging and debugging.
      */
     private static final String TAG = ModuleHostFragment.class.getSimpleName();
 
-    protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
-
-    protected FloatingActionButtonHost floatingActionButtonHost;
-
     protected ActionViewListener actionViewListener;
-
-    protected ViewPager viewPager;
-
-    private FabAnimator fabAnimator;
-
-    private SimpleFragmentAdapter simpleFragmentAdapter;
-
-    protected TaskListFragment taskListFragment;
-    protected ResultsFragment resultsFragment;
 
     protected static final int REQUEST_CODE_NEW_TASK = 0;
 
+    private ResultsFragment resultsFragment;
+
+    private Class cls;
+
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (context instanceof FloatingActionButtonHost) {
-            floatingActionButtonHost = (FloatingActionButtonHost) context;
-        }
         if (context instanceof ActionViewListener){
             actionViewListener = (ActionViewListener) context;
         }
@@ -85,73 +66,48 @@ public abstract class ModuleHostFragment extends Fragment implements FloatingAct
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View rootView = createView(inflater, container, savedInstanceState);
-
-        //Apply action button color
-        if (floatingActionButtonHost != null) {
-            floatingActionButtonHost.getFab(0).setBackgroundTintList(new ColorStateList(
-                    new int[][]{
-                            new int[]{}
-                    },
-                    new int[]{
-                            Utils.getAccentColor(rootView.getContext())
-                    }));
-        }
-
-        //Set up fragment adapter and load fragments
-        simpleFragmentAdapter = new SimpleFragmentAdapter(getChildFragmentManager(), getContext());
-        viewPager = rootView.findViewById(R.id.view_pager);
-        loadFragments();
-        afterLoadFragments();
-        taskListFragment.addEventListener(this);
-        taskListFragment.addActionViewListener(actionViewListener);
-
-        //Set up view pager
-        viewPager.setAdapter(simpleFragmentAdapter);
-        fabAnimator = new FabAnimator(floatingActionButtonHost.getFab(0));
-        viewPager.addOnPageChangeListener(fabAnimator);
-        final TabLayout tabLayout = rootView.findViewById(R.id.tab_layout);
-        tabLayout.setupWithViewPager(viewPager);
+        final View rootView = inflater.inflate(R.layout.module_host_fragment, container, false);
 
         //Give the root view focus to prevent EditTexts from initially getting focus
         rootView.requestFocus();
 
-        //Scroll to Results fragment if started from a notification
-        if (getActivity().getIntent().getSerializableExtra("taskId") != null){
-            viewPager.setCurrentItem(1);
-        }
-
         return rootView;
     }
 
-    protected abstract View createView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState);
-
     @Override
-    public void onClick(View view) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
+        final View advanced = view.findViewById(R.id.advanced_search);
+        advanced.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Intent intent = new Intent(getActivity(), cls);
+                startActivityForResult(intent, REQUEST_CODE_NEW_TASK);
+            }
+        });
     }
 
-    @Override
-    public void initFab(View view) {
-        if (fabAnimator != null){
-            fabAnimator.onPageScrolled(viewPager.getCurrentItem(), 0, 0);
+    protected void setConfigurationClass(final Class cls){
+        this.cls = cls;
+    }
 
-            if (getView() != null){
-                floatingActionButtonHost.getFab(0).setBackgroundTintList(new ColorStateList(
-                        new int[][]{
-                                new int[]{}
-                        },
-                        new int[]{
-                                Utils.getAccentColor(getView().getContext())
-                        })
-                );
-            }
-        }
+    protected void setConfigurationContainer(final Fragment fragment){
+        getChildFragmentManager().beginTransaction().replace(R.id.configuration_container, fragment).commit();
+    }
+
+    protected void inflate(final int id){
+        getLayoutInflater().inflate(id, requireView().findViewById(R.id.configuration_container));
+    }
+
+    protected void setResultsFragment(final ResultsFragment fragment){
+        this.resultsFragment = fragment;
+        getChildFragmentManager().beginTransaction().replace(R.id.results_container, fragment).commit();
     }
 
     @Override
     public void onTaskSelected(ITask task) {
-        resultsFragment.setTask(task);
+
     }
 
     @Override
@@ -161,11 +117,7 @@ public abstract class ModuleHostFragment extends Fragment implements FloatingAct
 
     @Override
     public void onTaskRemoved(ITask task) {
-        if (resultsFragment.getTask() == task) {
-            resultsFragment.setTask(null);
-        }
 
-        taskListFragment.update();
     }
 
     @Override
@@ -173,32 +125,9 @@ public abstract class ModuleHostFragment extends Fragment implements FloatingAct
 
     }
 
-    protected <T extends Fragment> T addFragment(final String title, final Class<T> cls){
-        simpleFragmentAdapter.add(title, cls);
-
-        //Instantiate fragments now to save a reference to them
-        simpleFragmentAdapter.startUpdate(viewPager);
-        final Fragment fragment = (Fragment) simpleFragmentAdapter.instantiateItem(viewPager, simpleFragmentAdapter.getCount() - 1);
-        simpleFragmentAdapter.finishUpdate(viewPager);
-
-        return (T) fragment;
-    }
-
-    protected void setTaskListFragment(final Class<? extends TaskListFragment> cls){
-        this.taskListFragment = addFragment("Tasks", cls);
-    }
-
-    protected void setResultsFragment(final Class<? extends ResultsFragment> cls){
-        this.resultsFragment = addFragment("Results", cls);
-    }
-
-    protected void loadFragments(){
-        setTaskListFragment(TaskListFragment.class);
-    }
-
-    protected void afterLoadFragments(){}
-
     protected void startTask(final ITask task){
+        this.resultsFragment.setTask(task);
+
         task.addTaskListener(new TaskAdapter() {
 
             @Override
@@ -220,6 +149,8 @@ public abstract class ModuleHostFragment extends Fragment implements FloatingAct
                         }).start();
                     }
 
+                    final NumberFormat numberFormat = NumberFormat.getNumberInstance();
+
                     //Notify when finished
                     if (searchOptions.isNotifyWhenFinished()) {
                         final String content;
@@ -228,23 +159,23 @@ public abstract class ModuleHostFragment extends Fragment implements FloatingAct
                         if (task instanceof FindPrimesTask){
                             taskType = TASK_TYPE_FIND_PRIMES;
                             smallIconDrawable = R.drawable.find_primes_icon;
-                            content = "Task \"Primes from " + NUMBER_FORMAT.format(((FindPrimesTask) task).getStartValue()) + " to " + NUMBER_FORMAT.format(((FindPrimesTask) task).getEndValue()) + "\" finished.";
+                            content = "Task \"Primes from " + numberFormat.format(((FindPrimesTask) task).getStartValue()) + " to " + numberFormat.format(((FindPrimesTask) task).getEndValue()) + "\" finished.";
                         }else if (task instanceof FindFactorsTask){
                             taskType = TASK_TYPE_FIND_FACTORS;
                             smallIconDrawable = R.drawable.find_factors_icon;
-                            content = "Task \"Factors of " + NUMBER_FORMAT.format(((FindFactorsTask) task).getNumber()) + "\" finished.";
+                            content = "Task \"Factors of " + numberFormat.format(((FindFactorsTask) task).getNumber()) + "\" finished.";
                         }else if (task instanceof PrimeFactorizationTask){
                             taskType = TASK_TYPE_PRIME_FACTORIZATION;
                             smallIconDrawable = R.drawable.prime_factorization_icon;
-                            content = "Task \"Prime factorization of " + NUMBER_FORMAT.format(((PrimeFactorizationTask) task).getNumber()) + "\" finished.";
+                            content = "Task \"Prime factorization of " + numberFormat.format(((PrimeFactorizationTask) task).getNumber()) + "\" finished.";
                         }else if (task instanceof LeastCommonMultipleTask){
                             taskType = TASK_TYPE_LCM;
                             smallIconDrawable = R.drawable.lcm_icon;
-                            content = "Task \"LCM of " + Utils.formatNumberList(((LeastCommonMultipleTask) task).getNumbers(), NUMBER_FORMAT, ",") + "\" finished.";
+                            content = "Task \"LCM of " + Utils.formatNumberList(((LeastCommonMultipleTask) task).getNumbers(), numberFormat, ",") + "\" finished.";
                         }else if (task instanceof GreatestCommonFactorTask){
                             taskType = TASK_TYPE_GCF;
                             smallIconDrawable = R.drawable.gcf_icon;
-                            content = "Task \"GCF of " + Utils.formatNumberList(((GreatestCommonFactorTask) task).getNumbers(), NUMBER_FORMAT, ",") + "\" finished.";
+                            content = "Task \"GCF of " + Utils.formatNumberList(((GreatestCommonFactorTask) task).getNumbers(), numberFormat, ",") + "\" finished.";
                         } else{
                             return;
                         }
@@ -255,14 +186,11 @@ public abstract class ModuleHostFragment extends Fragment implements FloatingAct
                 task.removeTaskListener(this);
             }
         });
-        taskListFragment.addTask(task);
         PrimeNumberFinder.getTaskManager().registerTask(task);
 
         //Start the task
         task.startOnNewThread();
         Utils.logTaskStarted(getContext(), task);
-
-        taskListFragment.setSelected(task);
     }
 
     protected int getTheme(){
