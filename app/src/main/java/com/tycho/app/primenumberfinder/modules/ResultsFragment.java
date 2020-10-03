@@ -452,6 +452,7 @@ public abstract class ResultsFragment extends TaskFragment {
             
             onUiUpdate();
         } else {
+            //TODO: This happens sometimes and its not good
             Log.w(TAG, "Fragment not added or is detached! Dropping UI update: " + this);
         }
     }

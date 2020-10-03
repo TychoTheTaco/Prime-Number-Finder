@@ -1,57 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="false"
-    android:focusableInTouchMode="true"
+    android:orientation="vertical"
+    android:paddingTop="8dp"
     android:theme="@style/FindFactors">
+
+    <!-- Number input -->
+    <TextView
+        android:id="@+id/number_input_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:labelFor="@+id/editText_input_number"
+        android:paddingEnd="8dp"
+        android:paddingStart="8dp"
+        android:text="@string/find_factors_input_number_description" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clipChildren="false"
-        android:orientation="vertical"
-        android:paddingTop="8dp">
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp">
 
-        <!-- Number input -->
-        <TextView
-            android:id="@+id/number_input_label"
-            android:layout_width="match_parent"
+        <com.tycho.app.primenumberfinder.ui.ValidEditText
+            android:id="@id/editText_input_number"
+            style="@style/NumberInput"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:labelFor="@+id/editText_input_number"
-            android:paddingEnd="8dp"
-            android:paddingStart="8dp"
-            android:text="@string/find_factors_input_number_description" />
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:imeOptions="actionDone" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/button_find_factors"
+            style="@style/Button"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:orientation="horizontal"
-            android:paddingEnd="8dp"
-            android:paddingStart="8dp">
-
-            <com.tycho.app.primenumberfinder.ui.ValidEditText
-                android:id="@id/editText_input_number"
-                style="@style/NumberInput"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:imeOptions="actionDone" />
-
-            <Button
-                android:id="@+id/button_find_factors"
-                style="@style/Button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/find_factors_button" />
-
-        </LinearLayout>
-
-        <include layout="@layout/tab_layout" />
+            android:text="@string/find_factors_button" />
 
     </LinearLayout>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <TextView
+        android:id="@+id/advanced_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_settings_white_24dp"
+        android:drawableTint="@color/black"
+        android:drawablePadding="4dp"
+        android:gravity="center_vertical"
+        android:background="?selectableItemBackground"
+        android:layout_gravity="center_horizontal"
+        android:text="Advanced"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_margin="8dp"
+        android:background="@color/gray" />
+
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

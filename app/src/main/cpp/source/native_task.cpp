@@ -60,7 +60,7 @@ private:
         bool detach = false;
         switch (jvm->GetEnv((void**) &env, JNI_VERSION_1_6)){
             case JNI_EDETACHED:
-                assert(jvm->AttachCurrentThread(&env, 0) == JNI_OK);
+                assert(jvm->AttachCurrentThread(&env, nullptr) == JNI_OK);
                 detach = true;
                 break;
 
@@ -120,7 +120,7 @@ JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeSto
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeAddTaskListener(JNIEnv *env, jobject self, jlong task_ptr, jobject task_listener, jstring id) {
-    const char* string = env->GetStringUTFChars(id, 0);
+    const char* string = env->GetStringUTFChars(id, nullptr);
     NativeListener* native_listener = new NativeListener(env, string, self);
     listener_map[string] = native_listener;
     ((Task*) task_ptr)->addTaskListener(native_listener);

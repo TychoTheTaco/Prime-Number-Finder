@@ -2,11 +2,6 @@ package com.tycho.app.primenumberfinder.modules.gcf.fragments;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -16,10 +11,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
-import com.tycho.app.primenumberfinder.modules.StatisticsLayout;
 import com.tycho.app.primenumberfinder.modules.gcf.GCFListAdapter;
 import com.tycho.app.primenumberfinder.modules.gcf.GreatestCommonFactorTask;
 import com.tycho.app.primenumberfinder.utils.Utils;
@@ -39,9 +39,6 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
 
     //Views
     private TextView subtitleTextView;
-
-    //Statistics
-    private StatisticsLayout statisticsLayout;
 
     private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
@@ -66,11 +63,6 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
         subtitleTextView = rootView.findViewById(R.id.subtitle);
         subtitleTextView.setMovementMethod(LongClickLinkMovementMethod.getInstance());
 
-        //Statistics
-        statisticsLayout = new StatisticsLayout(rootView.findViewById(R.id.statistics_layout));
-        statisticsLayout.add("eta", R.drawable.ic_timer_white_24dp);
-        statisticsLayout.inflate();
-
         initDefaultState();
 
         return rootView;
@@ -82,9 +74,6 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
 
         //Subtitle
         subtitleTextView.setText(generateSubtitle());
-
-        //Statistics
-        statisticsLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -95,9 +84,6 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
         subtitleTextView.setText(generateResultSubtitle());
 
         adapter.set(getTask().getNumbers(), getTask().getGcf());
-
-        //Statistics
-        statisticsLayout.setVisibility(View.GONE);
     }
 
     @Override
@@ -107,9 +93,6 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
             //Update progress
             progress.setText(String.valueOf((int) (getTask().getProgress() * 100)));
             progressBar.setProgress((int) (getTask().getProgress() * 100));
-
-            //Time remaining
-            statisticsLayout.set("eta", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
         }
     }
 
@@ -130,7 +113,6 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
     protected void onResetViews() {
         super.onResetViews();
         adapter.clear();
-        statisticsLayout.setVisibility(View.VISIBLE);
     }
 
     private SpannableStringBuilder generateSubtitle(){

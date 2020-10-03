@@ -2,8 +2,6 @@ package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.text.SpannableStringBuilder;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,14 +9,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
-import com.tycho.app.primenumberfinder.modules.StatisticsLayout;
 import com.tycho.app.primenumberfinder.modules.findprimes.DisplayPrimesActivity;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
@@ -45,9 +44,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     //Views
     private TextView subtitleTextView;
     private TextView bodyTextView;
-
-    //Statistics
-    private StatisticsLayout statisticsLayout;
 
     private boolean showStatistics = true;
 
@@ -86,14 +82,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         subtitleTextView = rootView.findViewById(R.id.subtitle);
         subtitleTextView.setMovementMethod(LongClickLinkMovementMethod.getInstance());
         bodyTextView = rootView.findViewById(R.id.text);
-
-        //Statistics
-        statisticsLayout = new StatisticsLayout(rootView.findViewById(R.id.statistics_layout));
-        statisticsLayout.add("eta", R.drawable.ic_timer_white_24dp);
-        statisticsLayout.add("nps", R.drawable.ic_trending_up_white_24dp);
-        statisticsLayout.add("pps", R.drawable.ic_trending_up_white_24dp);
-        statisticsLayout.inflate();
-        statisticsLayout.hide("nps");
 
         viewAllButton.setOnClickListener(v -> {
             final ProgressDialog progressDialog = new ProgressDialog(getActivity());
@@ -142,11 +130,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                 !getTask().isEndless(),
                 false
         }, getTextHighlight(), getContext()));
-
-        //Statistics
-        if (getTask().isEndless()) statisticsLayout.hide("eta");
-        statisticsLayout.hide("nps");
-        statisticsLayout.set("pps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.primes_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalPrimesPerSecond)}, getTextHighlight()));
     }
 
     @Override
@@ -242,18 +225,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
         //Body
         bodyTextView.setVisibility(View.GONE);
-
-        //Statistics
-        statisticsLayout.hide("eta");
-        double elapsed = (double) getTask().getElapsedTime() / 1000;
-        if (elapsed <= 0) {
-            elapsed = 1;
-        }
-
-        statisticsLayout.show("nps");
-        statisticsMap.get(getTask()).finalNumbersPerSecond = (long) ((getTask().getEndValue() - getTask().getStartValue()) / elapsed);
-        statisticsLayout.set("nps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, getTextHighlight()));
-        statisticsLayout.set("pps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_primes_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getPrimeCount() / elapsed))}, getTextHighlight()));
     }
 
     @Override
@@ -290,23 +261,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                     }
                     break;
             }
-
-            //Time remaining
-            if (statisticsLayout.isVisible("eta")) {
-                statisticsLayout.set("eta", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, getTextHighlight()));
-            }
-
-            //Update statistics every second
-            if (showStatistics && getTask().getElapsedTime() - statisticsMap.get(getTask()).lastUpdateTime >= 1000) {
-
-                //Primes per second
-                final long primeCount = getTask().getPrimeCount();
-                statisticsMap.get(getTask()).finalPrimesPerSecond = primeCount - statisticsMap.get(getTask()).lastPrimeCount;
-                statisticsLayout.set("pps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.primes_per_second), new String[]{NUMBER_FORMAT.format(primeCount - statisticsMap.get(getTask()).lastPrimeCount)}, getTextHighlight()));
-                statisticsMap.get(getTask()).lastPrimeCount = primeCount;
-
-                statisticsMap.get(getTask()).lastUpdateTime = getTask().getElapsedTime();
-            }
         }
     }
 
@@ -335,8 +289,5 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         showStatistics = getTask().getSearchOptions().getSearchMethod() == BRUTE_FORCE;
         progress.setVisibility(getTask().isEndless() ? View.GONE : View.VISIBLE);
         bodyTextView.setVisibility(View.VISIBLE);
-        statisticsLayout.show("eta");
-        statisticsLayout.hide("nps");
-        statisticsLayout.setVisibility(showStatistics ? View.VISIBLE : View.GONE);
     }
 }

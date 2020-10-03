@@ -3,8 +3,6 @@ package com.tycho.app.primenumberfinder.modules.primefactorization.fragments;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -17,10 +15,12 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
-import com.tycho.app.primenumberfinder.modules.StatisticsLayout;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.ui.TreeView;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
@@ -45,9 +45,6 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
     private TextView subtitle;
     private TextView bodyTextView;
 
-    //Statistics
-    private StatisticsLayout statisticsLayout;
-
     private TreeView treeView;
 
     private final SpannableStringBuilder subtitleStringBuilder = new SpannableStringBuilder();
@@ -71,11 +68,6 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         bodyTextView.setMovementMethod(LongClickLinkMovementMethod.getInstance());
         treeView = rootView.findViewById(R.id.factor_tree);
 
-        //Statistics
-        statisticsLayout = new StatisticsLayout(rootView.findViewById(R.id.statistics_layout));
-        statisticsLayout.add("eta", R.drawable.ic_timer_white_24dp);
-        statisticsLayout.inflate();
-
         initDefaultState();
 
         return rootView;
@@ -93,9 +85,6 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
                 getTextHighlight(),
                 getContext()
         ));
-
-        //Statistics
-        statisticsLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -156,9 +145,6 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         final RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) saveButton.getLayoutParams();
         layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
         saveButton.setLayoutParams(layoutParams);
-
-        //Statistics
-        statisticsLayout.setVisibility(View.GONE);
     }
 
     @Override
@@ -167,9 +153,6 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
             //Update progress
             progress.setText(String.valueOf((int) (getTask().getProgress() * 100)));
             progressBar.setProgress((int) (getTask().getProgress() * 100));
-
-            //Time remaining
-            statisticsLayout.set("eta", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, getTextHighlight()));
         }
     }
 

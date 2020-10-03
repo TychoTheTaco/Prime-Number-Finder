@@ -2,15 +2,10 @@ package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.TextWatcher;
-import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,40 +13,54 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.Savable;
+import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter;
-import com.tycho.app.primenumberfinder.modules.ModuleHostFragment;
+import com.tycho.app.primenumberfinder.modules.ResultsFragment;
+import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfigurationActivity;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesJavaTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesNativeTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.modules.gcf.GreatestCommonFactorTask;
+import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
+import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
+import com.tycho.app.primenumberfinder.utils.GeneralSearchOptions;
+import com.tycho.app.primenumberfinder.utils.NotificationManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
 import java.math.BigInteger;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.Random;
 import java.util.UUID;
 
 import easytasks.ITask;
-import easytasks.Task;
+import easytasks.TaskAdapter;
 
-import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.DELETE;
-import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.PAUSE;
-import static com.tycho.app.primenumberfinder.modules.AbstractTaskListAdapter.Button.SAVE;
 import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
 import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.SIEVE_OF_ERATOSTHENES;
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_FACTORS;
 import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_FIND_PRIMES;
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_GCF;
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_LCM;
+import static com.tycho.app.primenumberfinder.utils.NotificationManager.TASK_TYPE_PRIME_FACTORIZATION;
 import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
 
 /**
  * @author Tycho Bellers
  * Date Created: 11/12/2016
  */
-public class FindPrimesFragment extends ModuleHostFragment {
+public class FindPrimesFragment extends Fragment implements AbstractTaskListAdapter.EventListener {
 
     /**
      * Tag used for logging and debugging.
@@ -77,8 +86,21 @@ public class FindPrimesFragment extends ModuleHostFragment {
      */
     private static final int REQUEST_CODE_NEW_TASK = 0;
 
+    protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
+
     @Override
-    protected View createView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public void onPausePressed(ITask task) {
+
+    }
+
+    @Override
+    public void onSavePressed(ITask task) {
+
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.find_primes_fragment, container, false);
 
         //Set up number input
@@ -227,85 +249,24 @@ public class FindPrimesFragment extends ModuleHostFragment {
             }
         });
 
+        fragment = findPrimesResultsFragment;
+        getChildFragmentManager().beginTransaction().add(R.id.container, fragment).commit();
+
+        advanced = rootView.findViewById(R.id.advanced_search);
+        advanced.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Intent intent = new Intent(getActivity(), FindPrimesConfigurationActivity.class);
+                startActivityForResult(intent, REQUEST_CODE_NEW_TASK);
+            }
+        });
+
         return rootView;
     }
 
-    @Override
-    protected void loadFragments() {
-        super.loadFragments();
-        setResultsFragment(GeneralResultsFragment.class);
-    }
+    private View advanced;
 
-    @Override
-    protected void afterLoadFragments() {
-        taskListFragment.setAdapter(new AbstractTaskListAdapter<ITask>(getContext(), SAVE, PAUSE, DELETE) {
-
-            /*@Override
-            public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-                super.onBindViewHolder(holder, position);
-
-                if (getTask(position) instanceof CheckPrimalityTask){
-                    holder.saveButton.setVisibility(View.GONE);
-                    holder.editButton.setVisibility(View.GONE);
-                }
-            }*/
-
-            @Override
-            protected CharSequence getTitle(ITask task) {
-                if (task instanceof FindPrimesTask) {
-                    return context.getString(R.string.find_primes_task_list_item_title, NUMBER_FORMAT.format(((FindPrimesTask) task).getStartValue()), ((FindPrimesTask) task).isEndless() ? context.getString(R.string.infinity_text) : NUMBER_FORMAT.format(((FindPrimesTask) task).getEndValue()));
-                } else if (task instanceof CheckPrimalityTask) {
-                    return context.getString(R.string.check_primality_task_list_title, NUMBER_FORMAT.format(((CheckPrimalityTask) task).getNumber()));
-                }
-                return super.getTitle(task);
-            }
-
-            @Override
-            protected CharSequence getSubtitle(ITask task) {
-                if (task.getState() == Task.State.STOPPED) {
-                    final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-                    spannableStringBuilder.append(context.getString(R.string.status_finished));
-                    spannableStringBuilder.append(": ");
-                    if (task instanceof FindPrimesTask) {
-                        spannableStringBuilder.append(context.getString(R.string.find_primes_result, NUMBER_FORMAT.format(((FindPrimesTask) task).getPrimeCount())));
-                        spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, getTheme() == 0 ? R.color.accent_dark : R.color.accent_light_but_not_that_light)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                    } else if (task instanceof CheckPrimalityTask) {
-                        spannableStringBuilder.append(context.getString(R.string.check_primality_result, NUMBER_FORMAT.format(((CheckPrimalityTask) task).getNumber()), ((CheckPrimalityTask) task).isPrime() ? "prime" : "not prime"));
-                        spannableStringBuilder.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, getTheme() == 0 ? R.color.accent_dark : R.color.accent_light_but_not_that_light)), context.getString(R.string.status_finished).length() + 2, spannableStringBuilder.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                    }
-                    return spannableStringBuilder;
-                }
-                return super.getSubtitle(task);
-            }
-
-            @Override
-            protected void onUpdate(AbstractTaskListAdapter.ViewHolder holder) {
-                final ITask task = getTask(holder.getAdapterPosition());
-
-                if (task instanceof CheckPrimalityTask) {
-                    if (holder.saveButton != null) holder.saveButton.setVisibility(View.GONE);
-                }
-
-                //Set progress
-                if (holder.getAdapterPosition() != -1) {
-                    if (task.getState() == Task.State.STOPPED || task instanceof FindPrimesTask && ((FindPrimesTask) task).isEndless()) {
-                        holder.progress.setVisibility(View.GONE);
-                    } else if (task.getState() != Task.State.STOPPED) {
-                        holder.progress.setVisibility(View.VISIBLE);
-                        holder.progress.setText(context.getString(R.string.task_progress, DECIMAL_FORMAT.format(task.getProgress() * 100)));
-                    }
-                } else {
-                    Log.w(TAG, "Warning: Adapter position was -1");
-                }
-            }
-
-            @Override
-            protected int getTaskType() {
-                return TASK_TYPE_FIND_PRIMES;
-            }
-        });
-        taskListFragment.whitelist(FindPrimesJavaTask.class, CheckPrimalityTask.class, FindPrimesNativeTask.class);
-    }
+    private ResultsFragment fragment;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -327,26 +288,8 @@ public class FindPrimesFragment extends ModuleHostFragment {
     }
 
     @Override
-    public void onClick(View view) {
-        final Intent intent = new Intent(getActivity(), FindPrimesConfigurationActivity.class);
-        startActivityForResult(intent, REQUEST_CODE_NEW_TASK);
-    }
-
-    @Override
     public void onTaskSelected(ITask task) {
-        if (task instanceof FindPrimesTask) {
-            findPrimesResultsFragment.setTask(task);
-            checkPrimalityResultsFragment.setTask(null);
-            ((GeneralResultsFragment) resultsFragment).setContent(findPrimesResultsFragment);
-        } else if (task instanceof CheckPrimalityTask) {
-            findPrimesResultsFragment.setTask(null);
-            checkPrimalityResultsFragment.setTask(task);
-            ((GeneralResultsFragment) resultsFragment).setContent(checkPrimalityResultsFragment);
-        } else {
-            ((GeneralResultsFragment) resultsFragment).setContent(null);
-            findPrimesResultsFragment.setTask(null);
-            checkPrimalityResultsFragment.setTask(null);
-        }
+
     }
 
     @Override
@@ -357,16 +300,6 @@ public class FindPrimesFragment extends ModuleHostFragment {
         if (checkPrimalityResultsFragment.getTask() == task) {
             checkPrimalityResultsFragment.setTask(null);
         }
-
-        taskListFragment.update();
-    }
-
-    @Override
-    public void onEditPressed(ITask task) {
-        final Intent intent = new Intent(getActivity(), FindPrimesConfigurationActivity.class);
-        intent.putExtra("searchOptions", ((FindPrimesTask) task).getSearchOptions());
-        intent.putExtra("taskId", task.getId());
-        startActivityForResult(intent, 0);
     }
 
     private FindPrimesTask.SearchOptions.SearchMethod determineBestSearchMethod() {
@@ -426,5 +359,77 @@ public class FindPrimesFragment extends ModuleHostFragment {
         }
 
         return Utils.textToNumber(input);
+    }
+
+    protected void startTask(final ITask task){
+        if (task instanceof CheckPrimalityTask){
+            fragment = checkPrimalityResultsFragment;
+        }else{
+            fragment = findPrimesResultsFragment;
+        }
+        getChildFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
+        fragment.setTask(task);
+
+        task.addTaskListener(new TaskAdapter() {
+
+            @Override
+            public void onTaskStopped(final ITask task) {
+
+                final GeneralSearchOptions searchOptions;
+                if (task instanceof SearchOptions){
+                    searchOptions = ((SearchOptions) task).getSearchOptions();
+                }else{
+                    searchOptions = null;
+                }
+
+                if (searchOptions != null){
+                    //Auto-save
+                    if (task instanceof Savable && searchOptions.isAutoSave()){
+                        new Thread(() -> {
+                            final boolean success = ((Savable) task).save();
+                            new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(getActivity(), success ? getString(R.string.successfully_saved_file) : getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show());
+                        }).start();
+                    }
+
+                    //Notify when finished
+                    if (searchOptions.isNotifyWhenFinished()) {
+                        final String content;
+                        final int taskType;
+                        final int smallIconDrawable;
+                        if (task instanceof FindPrimesTask){
+                            taskType = TASK_TYPE_FIND_PRIMES;
+                            smallIconDrawable = R.drawable.find_primes_icon;
+                            content = "Task \"Primes from " + NUMBER_FORMAT.format(((FindPrimesTask) task).getStartValue()) + " to " + NUMBER_FORMAT.format(((FindPrimesTask) task).getEndValue()) + "\" finished.";
+                        }else if (task instanceof FindFactorsTask){
+                            taskType = TASK_TYPE_FIND_FACTORS;
+                            smallIconDrawable = R.drawable.find_factors_icon;
+                            content = "Task \"Factors of " + NUMBER_FORMAT.format(((FindFactorsTask) task).getNumber()) + "\" finished.";
+                        }else if (task instanceof PrimeFactorizationTask){
+                            taskType = TASK_TYPE_PRIME_FACTORIZATION;
+                            smallIconDrawable = R.drawable.prime_factorization_icon;
+                            content = "Task \"Prime factorization of " + NUMBER_FORMAT.format(((PrimeFactorizationTask) task).getNumber()) + "\" finished.";
+                        }else if (task instanceof LeastCommonMultipleTask){
+                            taskType = TASK_TYPE_LCM;
+                            smallIconDrawable = R.drawable.lcm_icon;
+                            content = "Task \"LCM of " + Utils.formatNumberList(((LeastCommonMultipleTask) task).getNumbers(), NUMBER_FORMAT, ",") + "\" finished.";
+                        }else if (task instanceof GreatestCommonFactorTask){
+                            taskType = TASK_TYPE_GCF;
+                            smallIconDrawable = R.drawable.gcf_icon;
+                            content = "Task \"GCF of " + Utils.formatNumberList(((GreatestCommonFactorTask) task).getNumbers(), NUMBER_FORMAT, ",") + "\" finished.";
+                        } else{
+                            return;
+                        }
+                        NotificationManager.displayNotification(getActivity(), "default", task, taskType, content, smallIconDrawable);
+                    }
+                }
+
+                task.removeTaskListener(this);
+            }
+        });
+        PrimeNumberFinder.getTaskManager().registerTask(task);
+
+        //Start the task
+        task.startOnNewThread();
+        Utils.logTaskStarted(getContext(), task);
     }
 }

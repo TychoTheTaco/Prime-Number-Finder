@@ -2,9 +2,6 @@ package com.tycho.app.primenumberfinder.modules.lcm.fragments;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -14,10 +11,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
-import com.tycho.app.primenumberfinder.modules.StatisticsLayout;
 import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
@@ -37,9 +37,6 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
     //Views
     private TextView subtitleTextView;
 
-    //Statistics
-    private StatisticsLayout statisticsLayout;
-
     private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
     @Nullable
@@ -52,11 +49,6 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
         subtitleTextView = rootView.findViewById(R.id.subtitle);
         subtitleTextView.setMovementMethod(LongClickLinkMovementMethod.getInstance());
 
-        //Statistics
-        statisticsLayout = new StatisticsLayout(rootView.findViewById(R.id.statistics_layout));
-        statisticsLayout.add("eta", R.drawable.ic_timer_white_24dp);
-        statisticsLayout.inflate();
-
         initDefaultState();
 
         return rootView;
@@ -68,9 +60,6 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
 
         //Subtitle
         subtitleTextView.setText(generateSubtitle());
-
-        //Statistics
-        statisticsLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -79,9 +68,6 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
 
         //Subtitle
         subtitleTextView.setText(generateResultSubtitle());
-
-        //Statistics
-        statisticsLayout.setVisibility(View.GONE);
     }
 
     @Override
@@ -91,9 +77,6 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
             //Update progress
             progress.setText(String.valueOf((int) (getTask().getProgress() * 100)));
             progressBar.setProgress((int) (getTask().getProgress() * 100));
-
-            //Time remaining
-            statisticsLayout.set("eta", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
         }
     }
 
@@ -108,12 +91,6 @@ public class LeastCommonMultipleResultsFragment extends ResultsFragment {
         if (getView() != null) {
             initDefaultState();
         }
-    }
-
-    @Override
-    protected void onResetViews() {
-        super.onResetViews();
-        statisticsLayout.setVisibility(View.VISIBLE);
     }
 
     private SpannableStringBuilder generateSubtitle(){

@@ -3,14 +3,15 @@ package com.tycho.app.primenumberfinder.modules;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
@@ -327,8 +328,6 @@ public class AbstractTaskListAdapter<T extends ITask> extends RecyclerView.Adapt
         void onPausePressed(final ITask task);
 
         void onTaskRemoved(final ITask task);
-
-        void onEditPressed(final ITask task);
 
         void onSavePressed(final ITask task);
     }

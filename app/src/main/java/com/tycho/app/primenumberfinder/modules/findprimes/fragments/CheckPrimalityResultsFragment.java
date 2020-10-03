@@ -1,19 +1,19 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
-import com.tycho.app.primenumberfinder.modules.StatisticsLayout;
 import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
@@ -32,9 +32,6 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     //Views
     private TextView subtitle;
 
-    //Statistics
-    private StatisticsLayout statisticsLayout;
-
     private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
     @Nullable
@@ -47,11 +44,6 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
         subtitle = rootView.findViewById(R.id.subtitle);
         subtitle.setMovementMethod(LongClickLinkMovementMethod.getInstance());
 
-        //Statistics
-        statisticsLayout = new StatisticsLayout(rootView.findViewById(R.id.statistics_layout));
-        statisticsLayout.add("eta", R.drawable.ic_timer_white_24dp);
-        statisticsLayout.inflate();
-
         initDefaultState();
 
         return rootView;
@@ -61,9 +53,6 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     protected void postDefaults() {
         //Format subtitle
         subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_subtitle_searching), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, new boolean[]{true}, ContextCompat.getColor(getContext(), R.color.purple_dark), getActivity()));
-
-        //Statistics
-        statisticsLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -90,9 +79,6 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
                     true
             }, getTextHighlight(), getActivity()));
         }
-
-        //Statistics
-        statisticsLayout.setVisibility(View.GONE);
     }
 
     @Override
@@ -101,9 +87,6 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
             //Update progress
             progress.setText(String.valueOf((int) (getTask().getProgress() * 100)));
             progressBar.setProgress((int) (getTask().getProgress() * 100));
-
-            //Time remaining
-            statisticsLayout.set("eta", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, getTextHighlight()));
         }
     }
 

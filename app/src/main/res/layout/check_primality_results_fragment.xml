@@ -33,9 +33,6 @@
 
     </LinearLayout>
 
-    <!-- Statistics -->
-    <include layout="@layout/statistics_layout"/>
-
     <!-- Buttons -->
     <RelativeLayout
         android:id="@+id/button_layout"

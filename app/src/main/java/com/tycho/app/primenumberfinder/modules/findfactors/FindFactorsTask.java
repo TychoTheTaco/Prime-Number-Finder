@@ -24,7 +24,7 @@ import easytasks.Task;
  * Date Created: 3/3/2017
  */
 
-public class FindFactorsTask extends Task implements Savable, SearchOptions{
+public class FindFactorsTask extends Task implements Savable, SearchOptions {
 
     /**
      * Tag used for logging and debugging.
@@ -95,14 +95,6 @@ public class FindFactorsTask extends Task implements Savable, SearchOptions{
 
     public SearchOptions getSearchOptions(){
         return searchOptions;
-    }
-
-    public long getMaxValue(){
-        return (long) Math.sqrt(number);
-    }
-
-    public long getCurrentValue(){
-        return i;
     }
 
     public List<Long> getFactors(){

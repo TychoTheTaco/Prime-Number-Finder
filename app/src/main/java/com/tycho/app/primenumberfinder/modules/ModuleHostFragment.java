@@ -5,19 +5,19 @@ import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.tabs.TabLayout;
-import androidx.fragment.app.Fragment;
-import androidx.viewpager.widget.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.tabs.TabLayout;
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.FabAnimator;
-import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
 import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
@@ -26,6 +26,7 @@ import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.SearchOptions;
 import com.tycho.app.primenumberfinder.SimpleFragmentAdapter;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
 import com.tycho.app.primenumberfinder.modules.gcf.GreatestCommonFactorTask;
 import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
@@ -165,11 +166,6 @@ public abstract class ModuleHostFragment extends Fragment implements FloatingAct
         }
 
         taskListFragment.update();
-    }
-
-    @Override
-    public void onEditPressed(ITask task) {
-
     }
 
     @Override

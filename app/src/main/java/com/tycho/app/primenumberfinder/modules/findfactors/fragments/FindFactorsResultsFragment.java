@@ -3,11 +3,6 @@ package com.tycho.app.primenumberfinder.modules.findfactors.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -15,10 +10,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
-import com.tycho.app.primenumberfinder.modules.StatisticsLayout;
 import com.tycho.app.primenumberfinder.modules.findfactors.DisplayFactorsActivity;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.modules.findfactors.adapters.FactorsListAdapter;
@@ -27,8 +27,6 @@ import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import easytasks.ITask;
 import easytasks.Task;
@@ -49,31 +47,12 @@ public class FindFactorsResultsFragment extends ResultsFragment {
     private RecyclerView recyclerView;
     private TextView bodyTextView;
 
-    //Statistics
-    private StatisticsLayout statisticsLayout;
-
     private FactorsListAdapter adapter;
 
     private int lastAdapterSize = 0;
 
     private final SpannableStringBuilder subtitleStringBuilder = new SpannableStringBuilder();
     private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-
-    /**
-     * This map holds the statistics for each task. When {@linkplain FindFactorsResultsFragment#setTask(ITask)} is called,
-     * the current task's statistics are saved to the map so that they can be used later when
-     * {@linkplain FindFactorsResultsFragment#setTask(ITask)} is called with the same task.
-     */
-    private final Map<FindFactorsTask, FindFactorsResultsFragment.Statistics> statisticsMap = new HashMap<>();
-
-    /**
-     * This class keeps the statistics for a task.
-     */
-    private class Statistics {
-        private long lastCurrentValue;
-        private long lastUpdateTime = -1000;
-        private long finalNumbersPerSecond;
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -98,12 +77,6 @@ public class FindFactorsResultsFragment extends ResultsFragment {
         subtitleTextView = rootView.findViewById(R.id.subtitle);
         subtitleTextView.setMovementMethod(LongClickLinkMovementMethod.getInstance());
         bodyTextView = rootView.findViewById(R.id.text);
-
-        //Statistics
-        statisticsLayout = new StatisticsLayout(rootView.findViewById(R.id.statistics_layout));
-        statisticsLayout.add("eta", R.drawable.ic_timer_white_24dp);
-        statisticsLayout.add("nps", R.drawable.ic_trending_up_white_24dp);
-        statisticsLayout.inflate();
 
         viewAllButton.setOnClickListener(v -> new Thread(() -> {
 
@@ -151,9 +124,6 @@ public class FindFactorsResultsFragment extends ResultsFragment {
 
         //Subtitle
         subtitleTextView.setText(Utils.formatSpannable(subtitleStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, new boolean[]{true}, ContextCompat.getColor(getActivity(), R.color.orange_dark), getContext()));
-
-        //Statistics
-        statisticsLayout.set("nps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
     }
 
     @Override
@@ -172,14 +142,6 @@ public class FindFactorsResultsFragment extends ResultsFragment {
 
         //Body
         bodyTextView.setVisibility(View.GONE);
-
-        //Statistics
-        statisticsLayout.hide("eta");
-        double elapsed = (double) getTask().getElapsedTime() / 1000;
-        if (elapsed <= 0) {
-            elapsed = 1;
-        }
-        statisticsLayout.set("nps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.average_numbers_per_second), new String[]{NUMBER_FORMAT.format((long) (getTask().getMaxValue() / elapsed))}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
     }
 
     @Override
@@ -192,21 +154,6 @@ public class FindFactorsResultsFragment extends ResultsFragment {
 
             //Body
             bodyTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_body_text), new String[]{NUMBER_FORMAT.format(getTask().getFactors().size())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
-
-            //Time remaining
-            statisticsLayout.set("eta", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.time_remaining), new String[]{Utils.formatTimeHuman(getTask().getEstimatedTimeRemaining(), 1)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
-
-            //Update statistics every second
-            if (getTask().getElapsedTime() - statisticsMap.get(getTask()).lastUpdateTime >= 1000) {
-
-                //Numbers per second
-                final long currentValue = getTask().getCurrentValue();
-                statisticsMap.get(getTask()).finalNumbersPerSecond = currentValue - statisticsMap.get(getTask()).lastCurrentValue;
-                statisticsLayout.set("nps", Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.numbers_per_second), new String[]{NUMBER_FORMAT.format(statisticsMap.get(getTask()).finalNumbersPerSecond)}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
-                statisticsMap.get(getTask()).lastCurrentValue = currentValue;
-
-                statisticsMap.get(getTask()).lastUpdateTime = getTask().getElapsedTime();
-            }
 
             //Update recyclerView
             if (lastAdapterSize != adapter.getItemCount()) {
@@ -228,11 +175,6 @@ public class FindFactorsResultsFragment extends ResultsFragment {
     @Override
     public synchronized void setTask(final ITask task) {
         super.setTask(task);
-        if (task != null) {
-            if (!statisticsMap.containsKey(getTask())) {
-                statisticsMap.put(getTask(), new Statistics());
-            }
-        }
         if (getView() != null) {
             initDefaultState();
         }
@@ -243,7 +185,6 @@ public class FindFactorsResultsFragment extends ResultsFragment {
         super.onResetViews();
 
         bodyTextView.setVisibility(View.VISIBLE);
-        statisticsLayout.show("eta");
 
         //Add factors to the adapter
         adapter.setTask(getTask());

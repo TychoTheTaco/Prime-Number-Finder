@@ -40,9 +40,6 @@
             android:layout_marginTop="8dp" />
     </LinearLayout>
 
-    <!-- Statistics -->
-    <include layout="@layout/statistics_layout"/>
-
     <!-- Buttons -->
     <RelativeLayout
         android:id="@+id/button_layout"
