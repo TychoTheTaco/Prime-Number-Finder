@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.ui.ValidEditText;
+import com.tycho.app.primenumberfinder.ui.NumberInput;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
@@ -39,8 +39,7 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.lcm_list_item, parent, false);
-        return new ViewHolder(view);
+        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.lcm_list_item, parent, false));
     }
 
     @Override
@@ -51,7 +50,9 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
                     new int[]{Color.LTGRAY}
             ));
             holder.input.setHint("+");
+            holder.input.setText("");
         }else{
+            holder.input.setNumber(numbers.get(position));
             holder.input.setBackgroundTintList(null);
             holder.input.setHint("");
         }
@@ -90,11 +91,13 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
 
     class ViewHolder extends RecyclerView.ViewHolder{
 
-        private final ValidEditText input;
+        private final NumberInput input;
 
         ViewHolder(final View view){
             super(view);
             input = view.findViewById(R.id.number_input);
+            input.setClearOnTouch(false);
+            input.setShowRandomHint(false);
             input.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {

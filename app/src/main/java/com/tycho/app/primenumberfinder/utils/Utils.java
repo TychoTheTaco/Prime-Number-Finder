@@ -382,7 +382,6 @@ public final class Utils {
                     ((LinearLayout) popupWindow.getContentView().findViewById(R.id.text).getParent()).getBackground().setColorFilter(ContextCompat.getColor(context, R.color.green_light), PorterDuff.Mode.SRC_ATOP);
                 }
                 popupWindow.setAnimationStyle(R.style.PopupWindowAnimationStyle);
-                //popupWindow.setBackgroundDrawable(null);
                 popupWindow.setElevation(Utils.dpToPx(context, 4));
                 popupWindow.getContentView().measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
                 popupWindow.showAsDropDown(view, x - (popupWindow.getContentView().getMeasuredWidth() / 2), -view.getHeight() + y - popupWindow.getContentView().getMeasuredHeight() - Utils.dpToPx(context, 16));

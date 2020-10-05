@@ -13,12 +13,11 @@
     <!-- Number input -->
     <TextView
         android:id="@+id/number_input_label"
-        android:paddingTop="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:labelFor="@+id/editText_input_number"
-        android:paddingEnd="8dp"
-        android:paddingStart="8dp"
+        android:layout_margin="8dp"
+        android:textSize="16sp"
         android:text="@string/gcf_input_description" />
 
     <LinearLayout
@@ -35,8 +34,8 @@
             android:id="@+id/numbers_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="true"
-            android:clipChildren="true"
+            android:clipToPadding="false"
+            android:clipChildren="false"
             android:scrollbars="horizontal" />
 
     </LinearLayout>

@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.VerticalItemDecoration;
+import com.tycho.app.primenumberfinder.VerticalItemDecorationLast;
 import com.tycho.app.primenumberfinder.modules.TaskConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.lcm.adapters.NumbersListAdapter;
 import com.tycho.app.primenumberfinder.utils.Utils;
@@ -58,6 +60,8 @@ public class GCFConfigurationActivity extends TaskConfigurationActivity{
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(numbersListAdapter);
+        recyclerView.addItemDecoration(new VerticalItemDecoration(Utils.dpToPx(this, 8)));
+        recyclerView.addItemDecoration(new VerticalItemDecorationLast(Utils.dpToPx(this, 16)));
         recyclerView.setItemAnimator(null);
 
         //Give the root view focus to prevent EditTexts from initially getting focus

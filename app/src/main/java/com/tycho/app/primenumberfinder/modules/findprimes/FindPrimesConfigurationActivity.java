@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -22,12 +21,11 @@ import androidx.core.content.ContextCompat;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.TaskConfigurationActivity;
 import com.tycho.app.primenumberfinder.ui.CustomRadioGroup;
-import com.tycho.app.primenumberfinder.ui.ValidEditText;
+import com.tycho.app.primenumberfinder.ui.NumberInput;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
 import java.math.BigInteger;
-import java.util.Random;
 
 import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
 import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.SIEVE_OF_ERATOSTHENES;
@@ -43,10 +41,8 @@ public class FindPrimesConfigurationActivity extends TaskConfigurationActivity{
      */
     private static final String TAG = FindPrimesConfigurationActivity.class.getSimpleName();
 
-    private ValidEditText editTextSearchRangeStart;
-    private ValidEditText editTextSearchRangeEnd;
-
-    private ImageButton infinityButton;
+    private NumberInput editTextSearchRangeStart;
+    private NumberInput editTextSearchRangeEnd;
 
     private CustomRadioGroup radioGroupSearchMethod;
 
@@ -97,7 +93,8 @@ public class FindPrimesConfigurationActivity extends TaskConfigurationActivity{
 
         //Set up range end input
         editTextSearchRangeEnd = findViewById(R.id.search_range_end);
-        editTextSearchRangeEnd.setHint(NUMBER_FORMAT.format(new Random().nextInt(1_000_000)));
+        editTextSearchRangeEnd.setHint("∞");
+        editTextSearchRangeEnd.setShowRandomHint(false);
         editTextSearchRangeEnd.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -134,13 +131,6 @@ public class FindPrimesConfigurationActivity extends TaskConfigurationActivity{
         editTextSearchRangeEnd.setClearOnTouch(false);
         editTextSearchRangeEnd.overrideDefaultTextWatcher();
         editTextSearchRangeEnd.requestFocus();
-
-        //Set up infinity button
-        infinityButton = findViewById(R.id.infinity_button);
-        infinityButton.setOnClickListener(v -> {
-            editTextSearchRangeEnd.setText(getString(R.string.infinity_text), false);
-            applyConfig(searchOptions);
-        });
 
         //Set up search method
         radioGroupSearchMethod = findViewById(R.id.radio_group_search_method);
@@ -234,7 +224,7 @@ public class FindPrimesConfigurationActivity extends TaskConfigurationActivity{
         editTextSearchRangeStart.setEnabled(true);
         editTextSearchRangeStart.setText(NUMBER_FORMAT.format(searchOptions.getStartValue()), true);
         editTextSearchRangeEnd.setEnabled(true);
-        editTextSearchRangeEnd.setText(searchOptions.getEndValue() == FindPrimesTask.INFINITY ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(searchOptions.getEndValue()), true);
+        editTextSearchRangeEnd.setText(NUMBER_FORMAT.format(searchOptions.getEndValue()), true);
 
         //Thread count
         threadCountSpinner.setSelection(searchOptions.getThreadCount() - 1);
@@ -243,8 +233,6 @@ public class FindPrimesConfigurationActivity extends TaskConfigurationActivity{
         switch (searchOptions.getSearchMethod()) {
             case BRUTE_FORCE:
                 radioGroupSearchMethod.check(R.id.brute_force);
-                infinityButton.setEnabled(true);
-                infinityButton.setAlpha(1f);
                 threadCountSpinner.setEnabled(true);
                 break;
 
@@ -253,8 +241,6 @@ public class FindPrimesConfigurationActivity extends TaskConfigurationActivity{
                 if (getEndValue().compareTo(getStartValue()) <= 0) {
                     editTextSearchRangeEnd.getText().clear();
                 }
-                infinityButton.setEnabled(false);
-                infinityButton.setAlpha(0.3f);
                 threadCountSpinner.setEnabled(false);
                 threadCountSpinner.setSelection(0);
                 break;

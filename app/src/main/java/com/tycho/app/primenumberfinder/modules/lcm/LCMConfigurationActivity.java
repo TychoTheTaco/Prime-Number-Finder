@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.VerticalItemDecoration;
+import com.tycho.app.primenumberfinder.VerticalItemDecorationLast;
 import com.tycho.app.primenumberfinder.modules.TaskConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.lcm.adapters.NumbersListAdapter;
 import com.tycho.app.primenumberfinder.utils.Utils;
@@ -56,6 +58,8 @@ public class LCMConfigurationActivity extends TaskConfigurationActivity{
         //Set up number input
         final RecyclerView recyclerView = findViewById(R.id.numbers_list);
         recyclerView.setHasFixedSize(true);
+        recyclerView.addItemDecoration(new VerticalItemDecoration(Utils.dpToPx(this, 8)));
+        recyclerView.addItemDecoration(new VerticalItemDecorationLast(Utils.dpToPx(this, 16)));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(numbersListAdapter);
         recyclerView.setItemAnimator(null);
