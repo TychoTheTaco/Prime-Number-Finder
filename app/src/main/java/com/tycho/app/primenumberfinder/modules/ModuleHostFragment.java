@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
@@ -18,6 +19,7 @@ import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import easytasks.ITask;
+import easytasks.TaskAdapter;
 
 public abstract class ModuleHostFragment extends Fragment implements AbstractTaskListAdapter.EventListener {
 
@@ -113,6 +115,16 @@ public abstract class ModuleHostFragment extends Fragment implements AbstractTas
             PrimeNumberFinder.getTaskManager().unregisterTask(previousTask);
         }
         this.resultsFragment.setTask(task);
+
+        task.addTaskListener(new TaskAdapter(){
+            @Override
+            public void onTaskStopped(ITask task) {
+                final Bundle bundle = new Bundle();
+                bundle.putString("task_type", task.getClass().getSimpleName());
+                bundle.putLong("duration", task.getElapsedTime());
+                FirebaseAnalytics.getInstance(requireContext()).logEvent("task_finished", bundle);
+            }
+        });
 
         PrimeNumberFinder.getTaskManager().registerTask(task);
 

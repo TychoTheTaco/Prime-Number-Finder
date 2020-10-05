@@ -397,6 +397,9 @@ public final class Utils {
                     ((TextView) view).setText(spannableStringBuilder);
                     popupWindow.dismiss();
                 }, 500);
+
+                // Analytics
+                FirebaseAnalytics.getInstance(context).logEvent("quick_copy_used", null);
             }
 
             @Override
@@ -415,6 +418,11 @@ public final class Utils {
         final ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setTitle("Saving...");
         progressDialog.show();
+
+        // Analytics
+        final Bundle bundle = new Bundle();
+        bundle.putString("task_type", task.getClass().getSimpleName());
+        FirebaseAnalytics.getInstance(context).logEvent("task_saved", bundle);
 
         new Thread(() -> {
             final boolean saved = task.save();

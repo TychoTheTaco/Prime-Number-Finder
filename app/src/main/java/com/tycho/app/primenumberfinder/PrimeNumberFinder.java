@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
-import com.google.firebase.crashlytics.internal.common.CrashlyticsCore;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.TaskManager;
@@ -38,9 +37,6 @@ public class PrimeNumberFinder extends Application {
         FileManager.init(this);
         taskManager = new TaskManager();
         PreferenceManager.initialize(this);
-
-        //TODO:
-        // Analytics for average task time
 
         //Disable Crashlytics for debug builds
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG);
