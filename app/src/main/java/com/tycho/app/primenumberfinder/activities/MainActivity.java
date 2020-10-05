@@ -18,11 +18,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.tycho.app.primenumberfinder.ActionViewListener;
-import com.tycho.app.primenumberfinder.FloatingActionButtonHost;
-import com.tycho.app.primenumberfinder.FloatingActionButtonListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
@@ -47,7 +44,7 @@ import static com.tycho.app.primenumberfinder.utils.Utils.hideKeyboard;
  * @author Tycho Bellers
  * Date Created: 1/10/2016
  */
-public class MainActivity extends AbstractActivity implements FloatingActionButtonHost, ActionViewListener {
+public class MainActivity extends AbstractActivity implements ActionViewListener {
 
     /**
      * Tag used for logging and debugging.
@@ -68,12 +65,6 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
      * The current {@link Fragment} being displayed.
      */
     private Fragment currentFragment;
-
-    /**
-     * This is the main {@linkplain FloatingActionButton} of the activity. It can be used by any
-     * fragments that implement the {@linkplain FloatingActionButtonListener} interface.
-     */
-    private FloatingActionButton floatingActionButton;
 
     /**
      * List of modules that can be selected from the drawer.
@@ -145,14 +136,6 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         });
         actionBarDrawerToggle.syncState();
 
-        //Set up floating action button
-        floatingActionButton = findViewById(R.id.fab);
-        floatingActionButton.setOnClickListener(v -> {
-            if (currentFragment instanceof FloatingActionButtonListener) {
-                ((FloatingActionButtonListener) currentFragment).onClick(v);
-            }
-        });
-
         //Select the correct drawer item
         if (savedInstanceState != null) {
             //Restore fragment
@@ -201,14 +184,6 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
-    }
-
-    @Override
-    public FloatingActionButton getFab(int index) {
-        if (index == 0) {
-            return this.floatingActionButton;
-        }
-        return null;
     }
 
     @Override
@@ -288,13 +263,6 @@ public class MainActivity extends AbstractActivity implements FloatingActionButt
         //Commit changes
         fragmentTransaction.commitNow();
         menuItem.setChecked(true);
-
-        //Tell the fragment to initialize the floating action button
-        if (currentFragment instanceof FloatingActionButtonListener) {
-            ((FloatingActionButtonListener) currentFragment).initFab(floatingActionButton);
-        } else {
-            floatingActionButton.setVisibility(View.GONE);
-        }
 
         setTitle(menuItem.getTitle());
 
