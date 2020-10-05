@@ -1,5 +1,6 @@
 package com.tycho.app.primenumberfinder.modules.primefactorization.export;
 
+import android.app.Activity;
 import android.content.Context;
 import android.text.Editable;
 import android.text.InputType;
@@ -104,7 +105,7 @@ public class SliderOption extends Option implements SeekBar.OnSeekBarChangeListe
         if (fromUser) {
             input.setNumber(rangedSeekBar.getFloatValue());
             rangedSeekBar.requestFocus();
-            Utils.hideKeyboard(context);
+            Utils.hideKeyboard((Activity) context);
         }
     }
 

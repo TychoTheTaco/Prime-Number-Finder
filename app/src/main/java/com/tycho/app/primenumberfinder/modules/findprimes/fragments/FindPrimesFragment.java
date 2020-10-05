@@ -21,7 +21,7 @@ import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesNativeTask;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
-import com.tycho.app.primenumberfinder.ui.ValidEditText;
+import com.tycho.app.primenumberfinder.ui.NumberInput;
 import com.tycho.app.primenumberfinder.utils.Utils;
 import com.tycho.app.primenumberfinder.utils.Validator;
 
@@ -48,9 +48,9 @@ public class FindPrimesFragment extends ModuleHostFragment {
     private static final String TAG = FindPrimesFragment.class.getSimpleName();
 
     //Views
-    private ValidEditText editTextPrimalityInput;
-    private ValidEditText editTextSearchRangeStart;
-    private ValidEditText editTextSearchRangeEnd;
+    private NumberInput editTextPrimalityInput;
+    private NumberInput editTextSearchRangeStart;
+    private NumberInput editTextSearchRangeEnd;
 
     //Results fragments
     private final FindPrimesResultsFragment findPrimesResultsFragment = new FindPrimesResultsFragment();
@@ -64,7 +64,6 @@ public class FindPrimesFragment extends ModuleHostFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //setResultsFragment(new GreatestCommonFactorResultsFragment());
         setConfigurationClass(FindPrimesConfigurationActivity.class);
 
         final View rootView = super.onCreateView(inflater, container, savedInstanceState);
@@ -142,7 +141,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
 
             //Set up range end input
             editTextSearchRangeEnd = rootView.findViewById(R.id.search_range_end);
-            //editTextSearchRangeEnd.setHint(numberFormat.format(new Random().nextInt(1_000_000)));
+            editTextSearchRangeEnd.setShowRandomHint(false);
             editTextSearchRangeEnd.setHint("∞");
             editTextSearchRangeEnd.addTextChangedListener(new TextWatcher() {
 

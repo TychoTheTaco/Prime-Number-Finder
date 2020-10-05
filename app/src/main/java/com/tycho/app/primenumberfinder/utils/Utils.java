@@ -85,6 +85,10 @@ public final class Utils {
         return (int) dpToPx(context, (float) dp);
     }
 
+    public static float unitToPx(final Context context, final int unit, final float value){
+        return TypedValue.applyDimension(unit, value, context.getResources().getDisplayMetrics());
+    }
+
     public static String formatTimeHuman(final long millis, final int precision) {
 
         if (millis == -1) {
@@ -157,14 +161,13 @@ public final class Utils {
     /**
      * Hide the Android virtual keyboard.
      *
-     * @param context The activity context to use.
+     * @param activity The activity context to use.
      */
-    public static void hideKeyboard(final Context context) {
-        try {
-            final InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(((Activity) context).getCurrentFocus().getWindowToken(), 0);
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static void hideKeyboard(final Activity activity) {
+        final InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        final View view = activity.getCurrentFocus();
+        if (view != null){
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 

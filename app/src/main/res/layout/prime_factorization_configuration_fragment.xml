@@ -6,11 +6,12 @@
     android:orientation="vertical"
     android:theme="@style/PrimeFactorization">
 
-    <include
-        layout="@layout/number_input"
+    <com.tycho.app.primenumberfinder.ui.NumberInput
+        android:id="@+id/number_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:textSize="24sp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp" />
 
