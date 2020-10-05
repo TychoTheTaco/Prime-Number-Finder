@@ -22,8 +22,6 @@
         android:paddingEnd="8dp"
         android:layout_height="wrap_content">
 
-        <include layout="@layout/advanced_button"/>
-
         <Button
             android:id="@+id/button_generate_factor_tree"
             style="@style/Button"

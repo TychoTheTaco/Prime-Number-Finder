@@ -15,7 +15,6 @@ import androidx.annotation.Nullable;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ModuleHostFragment;
-import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.Utils;
@@ -46,7 +45,6 @@ public class PrimeFactorizationFragment extends ModuleHostFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         setResultsFragment(new PrimeFactorizationResultsFragment());
-        setConfigurationClass(PrimeFactorizationConfigurationActivity.class);
 
         final View rootView = super.onCreateView(inflater, container, savedInstanceState);
         if (rootView != null){

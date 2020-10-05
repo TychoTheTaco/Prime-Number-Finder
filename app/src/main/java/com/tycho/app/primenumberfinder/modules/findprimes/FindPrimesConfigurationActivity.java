@@ -3,10 +3,6 @@ package com.tycho.app.primenumberfinder.modules.findprimes;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -14,10 +10,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.TaskConfigurationActivity;
@@ -52,13 +52,10 @@ public class FindPrimesConfigurationActivity extends TaskConfigurationActivity{
 
     private Spinner threadCountSpinner;
 
-    private CheckBox notifyWhenFinishedCheckbox;
-    private CheckBox autoSaveCheckbox;
-
     /**
      * The search options currently representing the user's selection
      */
-    private final FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(0, 0, BRUTE_FORCE, 1, false, false);
+    private final FindPrimesTask.SearchOptions searchOptions = new FindPrimesTask.SearchOptions(0, 0, BRUTE_FORCE, 1);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -180,11 +177,6 @@ public class FindPrimesConfigurationActivity extends TaskConfigurationActivity{
             }
         });
 
-        notifyWhenFinishedCheckbox = findViewById(R.id.notify_when_finished);
-        notifyWhenFinishedCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> searchOptions.setNotifyWhenFinished(isChecked));
-        autoSaveCheckbox = findViewById(R.id.auto_save);
-        autoSaveCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> searchOptions.setAutoSave(isChecked));
-
         //Apply config
         applyConfig(searchOptions);
     }
@@ -266,17 +258,6 @@ public class FindPrimesConfigurationActivity extends TaskConfigurationActivity{
                 threadCountSpinner.setEnabled(false);
                 threadCountSpinner.setSelection(0);
                 break;
-        }
-
-        //Miscellaneous
-        notifyWhenFinishedCheckbox.setChecked(searchOptions.isNotifyWhenFinished());
-        autoSaveCheckbox.setChecked(searchOptions.isAutoSave());
-        if (searchOptions.getEndValue() == FindPrimesTask.INFINITY) {
-            notifyWhenFinishedCheckbox.setEnabled(false);
-            autoSaveCheckbox.setEnabled(false);
-        } else {
-            notifyWhenFinishedCheckbox.setEnabled(true);
-            autoSaveCheckbox.setEnabled(true);
         }
 
         //Set cache directory

@@ -17,7 +17,6 @@ import androidx.fragment.app.Fragment;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ModuleHostFragment;
-import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsConfigurationActivity;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
 import com.tycho.app.primenumberfinder.utils.Utils;
@@ -51,7 +50,6 @@ public class FindFactorsFragment extends ModuleHostFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         setResultsFragment(new FindFactorsResultsFragment());
-        setConfigurationClass(FindFactorsConfigurationActivity.class);
 
         final View rootView = super.onCreateView(inflater, container, savedInstanceState);
         if (rootView != null){

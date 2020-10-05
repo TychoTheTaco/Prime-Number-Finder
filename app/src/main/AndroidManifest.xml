@@ -44,14 +44,6 @@
             android:label="Configure Task" />
 
         <activity
-            android:name=".modules.findfactors.FindFactorsConfigurationActivity"
-            android:label="Configure Task" />
-
-        <activity
-            android:name=".modules.primefactorization.PrimeFactorizationConfigurationActivity"
-            android:label="Configure Task" />
-
-        <activity
             android:name=".modules.lcm.LCMConfigurationActivity"
             android:label="Configure Task" />
 

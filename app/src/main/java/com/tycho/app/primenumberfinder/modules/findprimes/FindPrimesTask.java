@@ -82,19 +82,15 @@ public interface FindPrimesTask extends ITask, Savable {
          */
         private int bufferSize = 1_000_000;
 
-        public SearchOptions(final long startValue, final long endValue, final SearchMethod searchMethod, final int threadCount, final boolean notifyWhenFinished, final boolean autoSave){
-            super(threadCount, notifyWhenFinished, autoSave);
+        public SearchOptions(final long startValue, final long endValue, final SearchMethod searchMethod, final int threadCount){
+            super(threadCount);
             this.startValue = startValue;
             this.endValue = endValue;
             this.searchMethod = searchMethod;
         }
 
-        public SearchOptions(final long startValue, final long endValue, final SearchMethod searchMethod, final int threadCount){
-            this(startValue, endValue, searchMethod, threadCount, false, false);
-        }
-
         public SearchOptions(final long startValue, final long endValue){
-            this(startValue, endValue, SearchMethod.BRUTE_FORCE, 1, false, false);
+            this(startValue, endValue, SearchMethod.BRUTE_FORCE, 1);
         }
 
         private SearchOptions(final Parcel parcel){

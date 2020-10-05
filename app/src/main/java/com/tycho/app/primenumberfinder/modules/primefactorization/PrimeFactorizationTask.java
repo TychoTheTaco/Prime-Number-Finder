@@ -2,7 +2,6 @@ package com.tycho.app.primenumberfinder.modules.primefactorization;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.SearchOptions;
@@ -144,13 +143,13 @@ public class PrimeFactorizationTask extends Task implements Savable, SearchOptio
          */
         private long number;
 
-        public SearchOptions(final long number, final int threadCount, final boolean notifyWhenFinished, final boolean autoSave) {
-            super(threadCount, notifyWhenFinished, autoSave);
+        public SearchOptions(final long number, final int threadCount) {
+            super(threadCount);
             this.number = number;
         }
 
         public SearchOptions(final long number) {
-            this(number, 1, false, false);
+            this(number, 1);
         }
 
         @Override

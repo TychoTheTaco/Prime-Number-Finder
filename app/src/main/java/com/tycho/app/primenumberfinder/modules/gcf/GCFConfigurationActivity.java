@@ -2,12 +2,12 @@ package com.tycho.app.primenumberfinder.modules.gcf;
 
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
-import android.widget.CheckBox;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.TaskConfigurationActivity;
@@ -29,8 +29,6 @@ public class GCFConfigurationActivity extends TaskConfigurationActivity{
     private static final String TAG = GCFConfigurationActivity.class.getSimpleName();
 
     private NumbersListAdapter numbersListAdapter;
-
-    private CheckBox notifyWhenFinishedCheckbox;
 
     private final GreatestCommonFactorTask.SearchOptions searchOptions = new GreatestCommonFactorTask.SearchOptions();
 
@@ -62,11 +60,6 @@ public class GCFConfigurationActivity extends TaskConfigurationActivity{
         recyclerView.setAdapter(numbersListAdapter);
         recyclerView.setItemAnimator(null);
 
-        notifyWhenFinishedCheckbox = findViewById(R.id.notify_when_finished);
-        notifyWhenFinishedCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            searchOptions.setNotifyWhenFinished(isChecked);
-        });
-
         //Give the root view focus to prevent EditTexts from initially getting focus
         findViewById(R.id.root).requestFocus();
     }
@@ -79,7 +72,6 @@ public class GCFConfigurationActivity extends TaskConfigurationActivity{
     @Override
     protected void buildReturnIntent(Intent intent){
         searchOptions.setNumbers(numbersListAdapter.getValidNumbers());
-        searchOptions.setNotifyWhenFinished(notifyWhenFinishedCheckbox.isChecked());
         intent.putExtra("searchOptions", searchOptions);
     }
 }

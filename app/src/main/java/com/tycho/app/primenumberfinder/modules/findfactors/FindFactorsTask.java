@@ -108,13 +108,13 @@ public class FindFactorsTask extends Task implements Savable, SearchOptions {
          */
         private long number;
 
-        public SearchOptions(final long number, final int threadCount, final boolean notifyWhenFinished, final boolean autoSave){
-            super(threadCount, notifyWhenFinished, autoSave);
+        public SearchOptions(final long number, final int threadCount){
+            super(threadCount);
             this.number = number;
         }
 
         public SearchOptions(final long number){
-            this(number, 1, false, false);
+            this(number, 1);
         }
 
         @Override

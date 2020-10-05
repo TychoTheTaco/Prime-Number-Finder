@@ -73,11 +73,11 @@ public class GreatestCommonFactorTask extends MultithreadedTask implements Searc
         private final List<Long> numbers = new ArrayList<>();
 
         public SearchOptions(){
-            super(1, false, false);
+            super(1);
         }
 
         public SearchOptions(final List<Long> numbers){
-            super(1, false, false);
+            super(1);
             this.numbers.addAll(numbers);
         }
 

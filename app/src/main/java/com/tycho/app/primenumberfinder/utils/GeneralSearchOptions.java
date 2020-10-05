@@ -10,20 +10,8 @@ public class GeneralSearchOptions implements Parcelable, Cloneable {
      */
     private int threadCount;
 
-    /**
-     * Show a notification when the task is finished.
-     */
-    private boolean notifyWhenFinished;
-
-    /**
-     * Automatically save the results of this task.
-     */
-    private boolean autoSave;
-
-    protected GeneralSearchOptions(int threadCount, boolean notifyWhenFinished, boolean autoSave){
+    protected GeneralSearchOptions(int threadCount){
         this.threadCount = threadCount;
-        this.notifyWhenFinished = notifyWhenFinished;
-        this.autoSave = autoSave;
     }
 
     @Override
@@ -34,8 +22,6 @@ public class GeneralSearchOptions implements Parcelable, Cloneable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.threadCount);
-        dest.writeInt(this.notifyWhenFinished ? 1 : 0);
-        dest.writeInt(this.autoSave ? 1 : 0);
     }
 
     public static final Parcelable.Creator<GeneralSearchOptions> CREATOR = new Parcelable.Creator<GeneralSearchOptions>() {
@@ -53,8 +39,6 @@ public class GeneralSearchOptions implements Parcelable, Cloneable {
 
     protected GeneralSearchOptions(final Parcel parcel) {
         this.threadCount = parcel.readInt();
-        this.notifyWhenFinished = parcel.readInt() == 1;
-        this.autoSave = parcel.readInt() == 1;
     }
 
     @Override
@@ -68,21 +52,5 @@ public class GeneralSearchOptions implements Parcelable, Cloneable {
 
     public void setThreadCount(int threadCount) {
         this.threadCount = threadCount;
-    }
-
-    public boolean isNotifyWhenFinished() {
-        return notifyWhenFinished;
-    }
-
-    public void setNotifyWhenFinished(boolean notifyWhenFinished) {
-        this.notifyWhenFinished = notifyWhenFinished;
-    }
-
-    public boolean isAutoSave() {
-        return autoSave;
-    }
-
-    public void setAutoSave(boolean autoSave) {
-        this.autoSave = autoSave;
     }
 }
