@@ -3,11 +3,7 @@ package com.tycho.app.primenumberfinder.modules;
 import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -18,6 +14,10 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.findfactors.fragments.FindFactorsResultsFragment;
@@ -26,6 +26,7 @@ import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesRe
 import com.tycho.app.primenumberfinder.modules.gcf.fragments.GreatestCommonFactorResultsFragment;
 import com.tycho.app.primenumberfinder.modules.lcm.fragments.LeastCommonMultipleResultsFragment;
 import com.tycho.app.primenumberfinder.modules.primefactorization.fragments.PrimeFactorizationResultsFragment;
+import com.tycho.app.primenumberfinder.ui.TaskControlBubble;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.UIUpdater;
 import com.tycho.app.primenumberfinder.utils.Utils;
@@ -66,11 +67,9 @@ public abstract class ResultsFragment extends TaskFragment {
     protected TextView timeElapsedTextView;
     protected ViewGroup resultsView;
 
-    //Buttons
+    // Task controls
+    protected TaskControlBubble taskControlBubble;
     protected ImageButton pauseButton;
-    protected ImageButton viewAllButton;
-    protected ImageButton saveButton;
-    protected View centerView;
 
     /**
      * Rotate animation for the circular progress bar.
@@ -91,9 +90,14 @@ public abstract class ResultsFragment extends TaskFragment {
 
     protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
 
-    @Nullable
     @Override
-    public abstract View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        this.taskControlBubble = view.findViewById(R.id.task_control_bubble);
+
+        // Set up save button
+        taskControlBubble.getRightView().setOnClickListener((v)->{if (getTask() instanceof Savable) Utils.save((Savable) getTask(), getActivity());});
+    }
 
     @Override
     public void onTaskStarted(final ITask task) {
@@ -112,21 +116,10 @@ public abstract class ResultsFragment extends TaskFragment {
                 progressBar.startAnimation(rotateAnimation);
 
                 //Buttons
-                if (centerView != null){
-                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                    layoutParams.width = Utils.dpToPx(getContext(), 64);
-                    centerView.setLayoutParams(layoutParams);
-                }
                 if (pauseButton != null){
                     pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(true);
                     pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                }
-                if (viewAllButton != null){
-                    viewAllButton.setVisibility(View.VISIBLE);
-                }
-                if (saveButton != null){
-                    saveButton.setVisibility(View.GONE);
                 }
 
                 onPostStarted();
@@ -146,21 +139,10 @@ public abstract class ResultsFragment extends TaskFragment {
                 title.setText(getString(R.string.state_pausing));
 
                 //Buttons
-                if (centerView != null){
-                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                    layoutParams.width = Utils.dpToPx(getContext(), 64);
-                    centerView.setLayoutParams(layoutParams);
-                }
                 if (pauseButton != null){
                     pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(false);
                     pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                }
-                if (viewAllButton != null){
-                    viewAllButton.setVisibility(View.VISIBLE);
-                }
-                if (saveButton != null){
-                    saveButton.setVisibility(View.GONE);
                 }
 
                 onPostPausing();
@@ -181,21 +163,10 @@ public abstract class ResultsFragment extends TaskFragment {
                 progressBar.clearAnimation();
 
                 //Buttons
-                if (centerView != null){
-                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                    layoutParams.width = Utils.dpToPx(getContext(), 64);
-                    centerView.setLayoutParams(layoutParams);
-                }
                 if (pauseButton != null){
                     pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(true);
                     pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                }
-                if (viewAllButton != null){
-                    viewAllButton.setVisibility(View.VISIBLE);
-                }
-                if (saveButton != null){
-                    saveButton.setVisibility(View.GONE);
                 }
 
                 onPostPaused();
@@ -215,21 +186,10 @@ public abstract class ResultsFragment extends TaskFragment {
                 title.setText(getString(R.string.state_resuming));
 
                 //Buttons
-                if (centerView != null){
-                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                    layoutParams.width = Utils.dpToPx(getContext(), 64);
-                    centerView.setLayoutParams(layoutParams);
-                }
                 if (pauseButton != null){
                     pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(false);
                     pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                }
-                if (viewAllButton != null){
-                    viewAllButton.setVisibility(View.VISIBLE);
-                }
-                if (saveButton != null){
-                    saveButton.setVisibility(View.GONE);
                 }
 
                 onPostResuming();
@@ -250,21 +210,10 @@ public abstract class ResultsFragment extends TaskFragment {
                 progressBar.startAnimation(rotateAnimation);
 
                 //Buttons
-                if (centerView != null){
-                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                    layoutParams.width = Utils.dpToPx(getContext(), 64);
-                    centerView.setLayoutParams(layoutParams);
-                }
                 if (pauseButton != null){
                     pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(true);
                     pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                }
-                if (viewAllButton != null){
-                    viewAllButton.setVisibility(View.VISIBLE);
-                }
-                if (saveButton != null){
-                    saveButton.setVisibility(View.GONE);
                 }
 
                 onPostResumed();
@@ -285,21 +234,10 @@ public abstract class ResultsFragment extends TaskFragment {
                 //progressBar.startAnimation(rotateAnimation);
 
                 //Buttons
-                if (centerView != null){
-                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                    layoutParams.width = Utils.dpToPx(getContext(), 64);
-                    centerView.setLayoutParams(layoutParams);
-                }
                 if (pauseButton != null){
                     pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(false);
                     pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                }
-                if (viewAllButton != null){
-                    viewAllButton.setVisibility(View.VISIBLE);
-                }
-                if (saveButton != null){
-                    saveButton.setVisibility(View.GONE);
                 }
 
                 onPostStopping();
@@ -320,20 +258,7 @@ public abstract class ResultsFragment extends TaskFragment {
                 progressBar.clearAnimation();
 
                 //Buttons
-                if (centerView != null){
-                    final ViewGroup.LayoutParams layoutParams = centerView.getLayoutParams();
-                    layoutParams.width = 0;
-                    centerView.setLayoutParams(layoutParams);
-                }
-                if (pauseButton != null){
-                    pauseButton.setVisibility(View.GONE);
-                }
-                if (viewAllButton != null){
-                    viewAllButton.setVisibility(View.VISIBLE);
-                }
-                if (saveButton != null){
-                    saveButton.setVisibility(View.VISIBLE);
-                }
+                taskControlBubble.setFinished(true);
 
                 onPostStopped();
             }
@@ -494,16 +419,14 @@ public abstract class ResultsFragment extends TaskFragment {
 
         //Buttons
         pauseButton = rootView.findViewById(R.id.pause_button);
-        viewAllButton = rootView.findViewById(R.id.view_all_button);
-        saveButton = rootView.findViewById(R.id.save_button);
-        centerView = rootView.findViewById(R.id.center);
 
-        //Fix button tint for API <22
+        //Fix button tint for API < 22
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            final ColorStateList colorStateList = createSimpleColorStateList(Utils.getAccentColor(rootView.getContext()), ContextCompat.getColor(getContext(), R.color.gray));
+            final ColorStateList colorStateList = createSimpleColorStateList(Utils.getAccentColor(rootView.getContext()), ContextCompat.getColor(requireContext(), R.color.gray));
             pauseButton.setBackgroundTintList(colorStateList);
-            if (viewAllButton != null) viewAllButton.setBackgroundTintList(colorStateList);
-            if (saveButton != null) saveButton.setBackgroundTintList(colorStateList);
+            //TODO: Verify on api < 22
+            //if (viewAllButton != null) viewAllButton.setBackgroundTintList(colorStateList);
+            //if (saveButton != null) saveButton.setBackgroundTintList(colorStateList);
         }
 
         //Set up pause button
@@ -514,11 +437,6 @@ public abstract class ResultsFragment extends TaskFragment {
                 getTask().resume();
             }
         });
-
-        //Set up save button
-        if (saveButton != null){
-            saveButton.setOnClickListener((view)->{if (getTask() instanceof Savable) Utils.save((Savable) getTask(), getActivity());});
-        }
     }
 
     protected final void initDefaultState(){
@@ -536,7 +454,6 @@ public abstract class ResultsFragment extends TaskFragment {
         noTaskView.setVisibility(View.GONE);
         progress.setVisibility(View.VISIBLE);
         pauseButton.setVisibility(View.VISIBLE);
-        if (saveButton != null) saveButton.setVisibility(View.VISIBLE);
     }
 
     protected ColorStateList createSimpleColorStateList(final int defaultColor, final int disabledColor) {
@@ -556,29 +473,29 @@ public abstract class ResultsFragment extends TaskFragment {
             default:
             case 0:
                 if (this instanceof FindPrimesResultsFragment || this instanceof CheckPrimalityResultsFragment){
-                    return ContextCompat.getColor(getContext(), R.color.purple_dark);
+                    return ContextCompat.getColor(requireContext(), R.color.purple_dark);
                 }else if (this instanceof FindFactorsResultsFragment){
-                    return ContextCompat.getColor(getContext(), R.color.orange_dark);
+                    return ContextCompat.getColor(requireContext(), R.color.orange_dark);
                 }else if (this instanceof PrimeFactorizationResultsFragment){
-                    return ContextCompat.getColor(getContext(), R.color.green_dark);
+                    return ContextCompat.getColor(requireContext(), R.color.green_dark);
                 }else if (this instanceof LeastCommonMultipleResultsFragment){
-                    return ContextCompat.getColor(getContext(), R.color.yellow_dark);
+                    return ContextCompat.getColor(requireContext(), R.color.yellow_dark);
                 }else if (this instanceof GreatestCommonFactorResultsFragment){
-                    return ContextCompat.getColor(getContext(), R.color.blue_dark);
+                    return ContextCompat.getColor(requireContext(), R.color.blue_dark);
                 }
                 break;
 
             case 1:
                 if (this instanceof FindPrimesResultsFragment || this instanceof CheckPrimalityResultsFragment){
-                    return ContextCompat.getColor(getContext(), R.color.purple_light);
+                    return ContextCompat.getColor(requireContext(), R.color.purple_light);
                 }else if (this instanceof FindFactorsResultsFragment){
-                    return ContextCompat.getColor(getContext(), R.color.orange_light);
+                    return ContextCompat.getColor(requireContext(), R.color.orange_light);
                 }else if (this instanceof PrimeFactorizationResultsFragment){
-                    return ContextCompat.getColor(getContext(), R.color.green_light);
+                    return ContextCompat.getColor(requireContext(), R.color.green_light);
                 }else if (this instanceof LeastCommonMultipleResultsFragment){
-                    return ContextCompat.getColor(getContext(), R.color.yellow_light);
+                    return ContextCompat.getColor(requireContext(), R.color.yellow_light);
                 }else if (this instanceof GreatestCommonFactorResultsFragment){
-                    return ContextCompat.getColor(getContext(), R.color.blue_light);
+                    return ContextCompat.getColor(requireContext(), R.color.blue_light);
                 }
                 break;
         }

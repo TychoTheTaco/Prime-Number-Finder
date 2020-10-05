@@ -78,7 +78,16 @@ public class FindFactorsResultsFragment extends ResultsFragment {
         subtitleTextView.setMovementMethod(LongClickLinkMovementMethod.getInstance());
         bodyTextView = rootView.findViewById(R.id.text);
 
-        viewAllButton.setOnClickListener(v -> new Thread(() -> {
+        initDefaultState();
+
+        return rootView;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        taskControlBubble.getLeftView().setOnClickListener(v -> new Thread(() -> {
 
             //Pause the task
             final Task.State state = getTask().getState();
@@ -110,12 +119,8 @@ public class FindFactorsResultsFragment extends ResultsFragment {
 
             final Intent intent = new Intent(getActivity(), DisplayFactorsActivity.class);
             intent.putExtra("filePath", file.getAbsolutePath());
-            getActivity().startActivity(intent);
+            requireActivity().startActivity(intent);
         }).start());
-
-        initDefaultState();
-
-        return rootView;
     }
 
     @Override
@@ -142,6 +147,8 @@ public class FindFactorsResultsFragment extends ResultsFragment {
 
         //Body
         bodyTextView.setVisibility(View.GONE);
+
+        taskControlBubble.showRight(true);
     }
 
     @Override

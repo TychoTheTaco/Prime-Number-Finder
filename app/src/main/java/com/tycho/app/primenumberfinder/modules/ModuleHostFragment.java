@@ -126,6 +126,11 @@ public abstract class ModuleHostFragment extends Fragment implements AbstractTas
     }
 
     protected void startTask(final ITask task){
+        final ITask previousTask = this.resultsFragment.getTask();
+        if (previousTask != null){
+            previousTask.stop();
+            PrimeNumberFinder.getTaskManager().unregisterTask(previousTask);
+        }
         this.resultsFragment.setTask(task);
 
         task.addTaskListener(new TaskAdapter() {

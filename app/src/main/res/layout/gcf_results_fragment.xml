@@ -42,62 +42,6 @@
 
     </LinearLayout>
 
-    <!-- Buttons -->
-    <RelativeLayout
-        android:id="@+id/button_layout"
-        android:layout_width="match_parent"
-        android:layout_height="72dp"
-        android:layout_marginBottom="4dp">
-
-        <!--<ImageButton
-            android:id="@+id/view_all_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_alignParentBottom="true"
-            android:layout_margin="2dp"
-            android:layout_toStartOf="@id/center"
-            android:background="@drawable/circle_white"
-            android:backgroundTint="@color/button_color"
-            android:contentDescription="@string/view_all"
-            android:elevation="2dp"
-            android:visibility="gone"
-            android:src="@drawable/ic_list_white_24dp"
-            android:tooltipText="@string/view_all" />-->
-
-        <View
-            android:id="@+id/center"
-            android:layout_width="56dp"
-            android:layout_height="0dp"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true" />
-
-        <ImageButton
-            android:id="@+id/pause_button"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="4dp"
-            android:background="@drawable/circle_white"
-            android:backgroundTint="@color/button_color"
-            android:contentDescription="Pause / Resume"
-            android:elevation="2dp"
-            android:src="@drawable/ic_pause_white_24dp"
-            android:tooltipText="Pause / Resume" />
-
-        <!--<ImageButton
-            android:id="@+id/save_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_alignParentBottom="true"
-            android:layout_margin="2dp"
-            android:layout_toEndOf="@id/center"
-            android:background="@drawable/circle_white"
-            android:backgroundTint="@color/button_color"
-            android:contentDescription="@string/save"
-            android:elevation="2dp"
-            android:src="@drawable/ic_save_white_24dp"
-            android:tooltipText="@string/save" />-->
-
-    </RelativeLayout>
+    <!-- Task controls -->
+    <com.tycho.app.primenumberfinder.ui.TaskControlBubble android:id="@+id/task_control_bubble" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 </LinearLayout>

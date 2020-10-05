@@ -12,7 +12,6 @@ import android.text.style.SuperscriptSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -141,10 +140,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
             treeView.setExportOptions(new TreeView.DarkThemeExportOptions());
         }
 
-        centerView.setVisibility(View.GONE);
-        final RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) saveButton.getLayoutParams();
-        layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        saveButton.setLayoutParams(layoutParams);
+        taskControlBubble.showRight(true);
     }
 
     @Override

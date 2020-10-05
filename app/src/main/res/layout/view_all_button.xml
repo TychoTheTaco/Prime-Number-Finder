@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/view_all_button"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/view_all"
+    android:backgroundTint="@color/button_color"
+    android:contentDescription="@string/view_all"
+    android:elevation="2dp"
+    android:drawablePadding="4dp"
+    android:textColor="@color/white"
+    android:drawableStart="@drawable/ic_list_white_24dp"
+    android:tooltipText="@string/view_all" />

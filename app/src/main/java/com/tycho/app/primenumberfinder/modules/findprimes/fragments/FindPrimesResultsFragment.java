@@ -3,7 +3,6 @@ package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +21,6 @@ import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 import easytasks.ITask;
 import easytasks.Task;
@@ -45,8 +42,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     private TextView subtitleTextView;
     private TextView bodyTextView;
 
-    private boolean showStatistics = true;
-
     /**
      * This {@link SpannableStringBuilder} is used to format any text displayed in
      * {@link FindPrimesResultsFragment#subtitleTextView}.
@@ -54,23 +49,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     final SpannableStringBuilder subtitleStringBuilder = new SpannableStringBuilder();
 
     final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-
-    /**
-     * This map holds the statistics for each task. When {@linkplain FindPrimesResultsFragment#setTask(ITask)} is called,
-     * the current task's statistics are saved to the map so that they can be used later when
-     * {@linkplain FindPrimesResultsFragment#setTask(ITask)} is called with the same task.
-     */
-    private final Map<FindPrimesTask, Statistics> statisticsMap = new HashMap<>();
-
-    /**
-     * This class keeps the statistics for a task.
-     */
-    private class Statistics {
-        private long lastPrimeCount;
-        private long lastUpdateTime = -1000;
-        private long finalNumbersPerSecond;
-        private long finalPrimesPerSecond;
-    }
 
     @Nullable
     @Override
@@ -83,7 +61,15 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         subtitleTextView.setMovementMethod(LongClickLinkMovementMethod.getInstance());
         bodyTextView = rootView.findViewById(R.id.text);
 
-        viewAllButton.setOnClickListener(v -> {
+        initDefaultState();
+
+        return rootView;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        taskControlBubble.getLeftView().setOnClickListener(v -> {
             final ProgressDialog progressDialog = new ProgressDialog(getActivity());
             progressDialog.setTitle("Loading...");
             progressDialog.show();
@@ -109,11 +95,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                 getActivity().startActivity(intent);
             }).start();
         });
-
-        Log.d(TAG, "onCreate(): init()");
-        initDefaultState();
-
-        return rootView;
     }
 
     @Override
@@ -130,6 +111,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                 !getTask().isEndless(),
                 false
         }, getTextHighlight(), getContext()));
+
+        taskControlBubble.hideRight(true);
     }
 
     @Override
@@ -139,11 +122,11 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         //Buttons
         switch (getTask().getSearchOptions().getSearchMethod()) {
             case BRUTE_FORCE:
-                viewAllButton.setVisibility(View.VISIBLE);
+                taskControlBubble.showLeft(true);
                 break;
 
             case SIEVE_OF_ERATOSTHENES:
-                viewAllButton.setVisibility(View.GONE);
+                taskControlBubble.hideLeft(true);
                 break;
         }
     }
@@ -155,13 +138,11 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         //Buttons
         switch (getTask().getSearchOptions().getSearchMethod()) {
             case BRUTE_FORCE:
-                saveButton.setVisibility(View.VISIBLE);
-                viewAllButton.setVisibility(View.VISIBLE);
+                taskControlBubble.showLeft(true);
                 break;
 
             case SIEVE_OF_ERATOSTHENES:
-                saveButton.setVisibility(View.GONE);
-                viewAllButton.setVisibility(View.GONE);
+                taskControlBubble.hideLeft(true);
                 break;
         }
     }
@@ -173,13 +154,11 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         //Buttons
         switch (getTask().getSearchOptions().getSearchMethod()) {
             case BRUTE_FORCE:
-                saveButton.setVisibility(View.VISIBLE);
-                viewAllButton.setVisibility(View.VISIBLE);
+                taskControlBubble.showLeft(true);
                 break;
 
             case SIEVE_OF_ERATOSTHENES:
-                saveButton.setVisibility(View.GONE);
-                viewAllButton.setVisibility(View.GONE);
+                taskControlBubble.hideLeft(true);
                 break;
         }
     }
@@ -191,13 +170,11 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         //Buttons
         switch (getTask().getSearchOptions().getSearchMethod()) {
             case BRUTE_FORCE:
-                saveButton.setVisibility(View.VISIBLE);
-                viewAllButton.setVisibility(View.VISIBLE);
+                taskControlBubble.showLeft(true);
                 break;
 
             case SIEVE_OF_ERATOSTHENES:
-                saveButton.setVisibility(View.GONE);
-                viewAllButton.setVisibility(View.GONE);
+                taskControlBubble.hideLeft(true);
                 break;
         }
     }
@@ -211,6 +188,9 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     protected void onPostStopped() {
         super.onPostStopped();
+
+        taskControlBubble.showLeft(true);
+        taskControlBubble.showRight(true);
 
         //Subtitle
         subtitleTextView.setText(Utils.formatSpannable(subtitleStringBuilder, getResources().getQuantityString(R.plurals.find_primes_subtitle_result, getTask().getPrimeCount()), new String[]{
@@ -273,10 +253,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     public synchronized void setTask(final ITask task) {
         super.setTask(task);
         if (getTask() != null) {
-            if (!statisticsMap.containsKey(getTask())) {
-                statisticsMap.put(getTask(), new Statistics());
-            }
-
             if (getView() != null) {
                 initDefaultState();
             }
@@ -286,7 +262,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     @Override
     protected void onResetViews() {
         super.onResetViews();
-        showStatistics = getTask().getSearchOptions().getSearchMethod() == BRUTE_FORCE;
         progress.setVisibility(getTask().isEndless() ? View.GONE : View.VISIBLE);
         bodyTextView.setVisibility(View.VISIBLE);
     }

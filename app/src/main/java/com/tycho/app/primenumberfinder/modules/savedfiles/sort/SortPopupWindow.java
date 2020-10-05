@@ -3,7 +3,6 @@ package com.tycho.app.primenumberfinder.modules.savedfiles.sort;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -84,8 +83,6 @@ public class SortPopupWindow extends PopupWindow {
     public enum SortMethod{
         DATE("Date", R.drawable.round_date_range_24),
         FILE_SIZE("Size", R.drawable.round_sort_24),
-        SEARCH_RANGE_START("Range", R.drawable.ic_width),
-        SEARCH_RANGE_END("Range", R.drawable.ic_width),
         NUMBER("Number", R.drawable.ic_numeric);
 
         private final String name;

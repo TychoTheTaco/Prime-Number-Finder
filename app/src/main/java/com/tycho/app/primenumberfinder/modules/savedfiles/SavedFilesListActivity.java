@@ -3,12 +3,6 @@ package com.tycho.app.primenumberfinder.modules.savedfiles;
 import android.app.AlertDialog;
 import android.graphics.Color;
 import android.os.Bundle;
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.appbar.CollapsingToolbarLayout;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
 import android.text.SpannableStringBuilder;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,8 +10,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.tycho.app.primenumberfinder.activities.AbstractActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.activities.AbstractActivity;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SavedFilesListAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.adapters.SelectableAdapter;
 import com.tycho.app.primenumberfinder.modules.savedfiles.sort.SortPopupWindow;
@@ -217,7 +218,6 @@ public class SavedFilesListActivity extends AbstractActivity {
                 switch (fileType) {
                     case PRIMES:
                         color = ContextCompat.getColor(this, R.color.purple_light);
-                        sortMethods.add(SortPopupWindow.SortMethod.SEARCH_RANGE_START);
                         break;
 
                     case FACTORS:
@@ -245,10 +245,6 @@ public class SavedFilesListActivity extends AbstractActivity {
 
                             case FILE_SIZE:
                                 adapterSavedFilesList.sortSize(ascending);
-                                break;
-
-                            case SEARCH_RANGE_START:
-                                adapterSavedFilesList.sortSearchRange(ascending);
                                 break;
 
                             case NUMBER:

@@ -3,8 +3,6 @@ package com.tycho.app.primenumberfinder.modules.primefactorization;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.widget.Toolbar;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -13,6 +11,9 @@ import android.text.style.StyleSpan;
 import android.text.style.SuperscriptSpan;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.activities.DisplayContentActivity;
@@ -54,6 +55,8 @@ public class DisplayPrimeFactorizationActivity extends DisplayContentActivity {
         subtitleTextView = findViewById(R.id.subtitle);
         bodyTextView = findViewById(R.id.body);
         treeView = findViewById(R.id.factor_tree);
+
+        setFlag(Flag.ALLOW_SEARCH, false);
 
         //Set up the toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);

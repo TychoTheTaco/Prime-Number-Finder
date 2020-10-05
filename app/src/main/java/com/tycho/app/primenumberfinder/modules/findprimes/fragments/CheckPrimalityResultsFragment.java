@@ -50,6 +50,12 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        taskControlBubble.hideLeft(false);
+    }
+
+    @Override
     protected void postDefaults() {
         //Format subtitle
         subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_subtitle_searching), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, new boolean[]{true}, ContextCompat.getColor(getContext(), R.color.purple_dark), getActivity()));
