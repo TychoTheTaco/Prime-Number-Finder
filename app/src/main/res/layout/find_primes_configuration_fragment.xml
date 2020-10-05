@@ -26,13 +26,12 @@
         android:paddingStart="8dp"
         android:paddingEnd="8dp">
 
-        <com.tycho.app.primenumberfinder.ui.ValidEditText
-            android:id="@id/primality_input"
-            style="@style/NumberInput"
+        <include
+            android:id="@+id/primality_input"
+            layout="@layout/number_input"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:imeOptions="actionDone" />
+            android:layout_height="wrap_content" />
 
         <Button
             android:id="@+id/check_primality_button"
@@ -64,35 +63,24 @@
         android:paddingEnd="8dp"
         android:weightSum="2">
 
-        <com.tycho.app.primenumberfinder.ui.ValidEditText
+        <include
             android:id="@+id/search_range_start"
-            style="@style/NumberInput"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            layout="@layout/number_input"
+            android:layout_width="0dp"
             android:layout_weight="1"
-            android:imeOptions="actionDone" />
+            android:layout_height="wrap_content" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/to" />
 
-        <com.tycho.app.primenumberfinder.ui.ValidEditText
+        <include
             android:id="@+id/search_range_end"
-            style="@style/NumberInput"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            layout="@layout/number_input"
+            android:layout_width="0dp"
             android:layout_weight="1"
-            android:imeOptions="actionDone" />
-
-        <ImageButton
-            android:id="@+id/infinity_button"
-            android:layout_width="32dp"
-            android:layout_height="match_parent"
-            android:background="@drawable/ripple_clear"
-            android:contentDescription="@string/format_numbers_description"
-            android:src="@drawable/ic_infinity_white_24dp"
-            android:tint="@color/text_color" />
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 

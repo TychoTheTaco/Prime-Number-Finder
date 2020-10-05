@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -184,12 +183,6 @@ public class FindPrimesFragment extends ModuleHostFragment {
                 }
             });
             editTextSearchRangeEnd.overrideDefaultTextWatcher();
-
-            //Set up infinity button
-            final ImageButton infinityButton = rootView.findViewById(R.id.infinity_button);
-            infinityButton.setOnClickListener(v -> {
-                editTextSearchRangeEnd.setText(getString(R.string.infinity_text), false);
-            });
 
             //Set up find primes button
             final Button buttonFindPrimes = rootView.findViewById(R.id.button_find_primes);

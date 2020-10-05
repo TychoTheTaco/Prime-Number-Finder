@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <Button
-        android:id="@+id/advanced_search"
-        android:drawableLeft="@drawable/ic_settings_white_24dp"
-        android:drawableTint="@color/black"
-        android:drawablePadding="4dp"
-        android:background="?selectableItemBackground"
-        android:text="Advanced"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-</merge>
+<Button xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/advanced_search"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="?selectableItemBackground"
+    android:drawableStart="@drawable/ic_settings_white_24dp"
+    android:drawablePadding="4dp"
+    android:drawableTint="@color/black"
+    android:text="Advanced" />

@@ -6,23 +6,13 @@
     android:orientation="vertical"
     android:theme="@style/PrimeFactorization">
 
-    <!-- Number input -->
-    <TextView
-        android:id="@+id/number_input_label"
+    <include
+        layout="@layout/number_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:labelFor="@+id/editText_input_number"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@string/prime_factorization_input_number_description" />
-
-    <com.tycho.app.primenumberfinder.ui.ValidEditText
-        android:id="@id/editText_input_number"
-        style="@style/NumberInput"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:imeOptions="actionDone" />
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp" />
 
     <RelativeLayout
         android:layout_width="match_parent"

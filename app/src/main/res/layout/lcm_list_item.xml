@@ -5,15 +5,6 @@
     android:background="@drawable/ripple_clear"
     android:orientation="vertical">
 
-    <com.tycho.app.primenumberfinder.ui.ValidEditText
-        android:id="@+id/input"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:layout_gravity="center_horizontal"
-        android:inputType="number"
-        android:padding="8dp"
-        android:imeOptions="actionDone"
-        android:textSize="14sp" />
+    <include layout="@layout/number_input"/>
 
 </LinearLayout>

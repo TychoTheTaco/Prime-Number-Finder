@@ -1,13 +1,14 @@
 package com.tycho.app.primenumberfinder.modules.lcm.adapters;
 
 import android.graphics.Color;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.ui.ValidEditText;
@@ -93,7 +94,7 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
 
         ViewHolder(final View view){
             super(view);
-            input = view.findViewById(R.id.input);
+            input = view.findViewById(R.id.number_input);
             input.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {

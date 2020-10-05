@@ -55,7 +55,7 @@ public class PrimeFactorizationFragment extends ModuleHostFragment {
             inflater.inflate(R.layout.prime_factorization_configuration_fragment, rootView.findViewById(R.id.configuration_container));
 
             //Set up factor input
-            editTextInput = rootView.findViewById(R.id.editText_input_number);
+            editTextInput = rootView.findViewById(R.id.number_input);
             editTextInput.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {

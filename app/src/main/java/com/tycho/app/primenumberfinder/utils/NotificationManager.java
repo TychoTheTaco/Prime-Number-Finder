@@ -13,6 +13,7 @@ import easytasks.ITask;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 
+//TODO: REMOVE NOTIFICATIONS AND AUTO SAVE (maybe auto save only for tasks that take too long)
 public class NotificationManager {
 
     public static final int TASK_TYPE_FIND_PRIMES = 0;

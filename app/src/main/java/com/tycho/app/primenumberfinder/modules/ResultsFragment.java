@@ -60,7 +60,6 @@ public abstract class ResultsFragment extends TaskFragment {
     };
 
     //Views
-    protected TextView noTaskView;
     protected TextView title;
     protected ProgressBar progressBar;
     protected TextView progress;
@@ -93,7 +92,10 @@ public abstract class ResultsFragment extends TaskFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        this.taskControlBubble = view.findViewById(R.id.task_control_bubble);
+
+        // Set up task controls
+        taskControlBubble = view.findViewById(R.id.task_control_bubble);
+        taskControlBubble.setVisibility(View.GONE);
 
         // Set up save button
         taskControlBubble.getRightView().setOnClickListener((v)->{if (getTask() instanceof Savable) Utils.save((Savable) getTask(), getActivity());});
@@ -257,10 +259,13 @@ public abstract class ResultsFragment extends TaskFragment {
                 title.setText(getString(R.string.status_finished));
                 progressBar.clearAnimation();
 
-                //Buttons
-                taskControlBubble.setFinished(true);
-
                 onPostStopped();
+
+                // Task controls
+                taskControlBubble.setFinished(true);
+                if (taskControlBubble.getLeftView().getVisibility() == View.GONE && taskControlBubble.getRightView().getVisibility() == View.GONE){
+                    taskControlBubble.setVisibility(View.GONE);
+                }
             }
         });
     }
@@ -294,7 +299,7 @@ public abstract class ResultsFragment extends TaskFragment {
     }
 
     protected void postDefaults(){
-
+        taskControlBubble.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -387,7 +392,6 @@ public abstract class ResultsFragment extends TaskFragment {
     protected void initStandardViews(final View rootView) {
 
         resultsView = rootView.findViewById(R.id.results_view);
-        noTaskView = rootView.findViewById(R.id.empty_message);
 
         //Set up top bar with status, progress, and elapsed time
         title = rootView.findViewById(R.id.title);
@@ -444,14 +448,12 @@ public abstract class ResultsFragment extends TaskFragment {
             onResetViews();
             switchState();
         } else {
-            noTaskView.setVisibility(View.VISIBLE);
             resultsView.setVisibility(View.GONE);
         }
     }
 
     protected void onResetViews(){
         resultsView.setVisibility(View.VISIBLE);
-        noTaskView.setVisibility(View.GONE);
         progress.setVisibility(View.VISIBLE);
         pauseButton.setVisibility(View.VISIBLE);
     }

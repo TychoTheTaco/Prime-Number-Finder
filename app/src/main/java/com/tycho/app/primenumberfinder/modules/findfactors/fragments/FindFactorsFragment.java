@@ -60,7 +60,7 @@ public class FindFactorsFragment extends ModuleHostFragment {
             inflater.inflate(R.layout.find_factors_configuration_fragment, rootView.findViewById(R.id.configuration_container));
 
             //Set up factor input
-            editTextNumberToFactor = rootView.findViewById(R.id.editText_input_number);
+            editTextNumberToFactor = rootView.findViewById(R.id.number_input);
             editTextNumberToFactor.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {

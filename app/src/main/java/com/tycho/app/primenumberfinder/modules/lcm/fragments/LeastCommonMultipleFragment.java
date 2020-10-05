@@ -59,9 +59,9 @@ public class LeastCommonMultipleFragment extends ModuleHostFragment {
             inflater.inflate(R.layout.lcm_configuration_fragment, rootView.findViewById(R.id.configuration_container));
 
             //Set up input
-            inputs.add(rootView.findViewById(R.id.input0).findViewById(R.id.input));
-            inputs.add(rootView.findViewById(R.id.input1).findViewById(R.id.input));
-            inputs.add(rootView.findViewById(R.id.input2).findViewById(R.id.input));
+            inputs.add(rootView.findViewById(R.id.input0).findViewById(R.id.number_input));
+            inputs.add(rootView.findViewById(R.id.input1).findViewById(R.id.number_input));
+            inputs.add(rootView.findViewById(R.id.input2).findViewById(R.id.number_input));
             for (ValidEditText editText : inputs){
                 editText.setValid(Validator.isValidLCMInput((BigInteger) editText.getNumberValue()));
                 editText.addTextChangedListener(new TextWatcher() {

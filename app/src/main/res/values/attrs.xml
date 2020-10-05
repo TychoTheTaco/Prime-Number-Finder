@@ -5,7 +5,7 @@
         <attr name="backgroundColor" format="color"/>
     </declare-styleable>
 
-    <declare-styleable name="ValidState">
+    <declare-styleable name="ValidEditText">
         <attr name="valid" format="boolean"/>
     </declare-styleable>
 

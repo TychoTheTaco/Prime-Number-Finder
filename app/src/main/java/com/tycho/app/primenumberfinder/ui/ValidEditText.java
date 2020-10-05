@@ -2,15 +2,11 @@ package com.tycho.app.primenumberfinder.ui;
 
 
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
-import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -52,8 +48,6 @@ public class ValidEditText extends FormattedEditText {
     }
 
     private void init(final Context context, final AttributeSet attributeSet) {
-        setBackgroundTintList(null);
-
         setOnTouchListener((v, event) -> {
             //Perform click
             performClick();
@@ -94,20 +88,6 @@ public class ValidEditText extends FormattedEditText {
         return super.performClick();
     }
 
-    @Override
-    public void setBackgroundTintList(@Nullable ColorStateList tint) {
-        if (tint == null){
-            setBackgroundTintList(createColorStateList(
-                    Color.GRAY,
-                    Utils.getAccentColor(getContext()),
-                    Color.GRAY,
-                    Color.RED
-            ));
-        }else{
-            super.setBackgroundTintList(tint);
-        }
-    }
-
     public void addOnTouchListener(final OnTouchListener onTouchListener) {
         if (!onTouchListeners.contains(onTouchListener)) {
             onTouchListeners.add(onTouchListener);
@@ -130,21 +110,5 @@ public class ValidEditText extends FormattedEditText {
 
     public void setClearOnTouch(boolean clearOnTouch) {
         this.clearOnTouch = clearOnTouch;
-    }
-
-    private ColorStateList createColorStateList(final int defaultColor, final int focusedColor, final int disabledColor, final int invalidColor) {
-        return new ColorStateList(
-                new int[][]{
-                        new int[]{-android.R.attr.state_enabled}, //Disabled
-                        new int[]{-R.attr.valid}, //Invalid
-                        new int[]{android.R.attr.state_focused}, //Focused
-                        new int[]{} //Default
-                        },
-                new int[]{
-                        disabledColor,
-                        invalidColor,
-                        focusedColor,
-                        defaultColor
-                });
     }
 }

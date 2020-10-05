@@ -12,8 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:labelFor="@+id/editText_input_number"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
+        android:layout_margin="8dp"
         android:text="@string/lcm_input_description" />
 
     <LinearLayout
@@ -37,6 +36,8 @@
             android:id="@+id/input1"
             layout="@layout/lcm_list_item"
             android:layout_width="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
