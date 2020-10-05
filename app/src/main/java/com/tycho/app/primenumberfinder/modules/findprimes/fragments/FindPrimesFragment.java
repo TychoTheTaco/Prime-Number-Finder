@@ -142,7 +142,8 @@ public class FindPrimesFragment extends ModuleHostFragment {
 
             //Set up range end input
             editTextSearchRangeEnd = rootView.findViewById(R.id.search_range_end);
-            editTextSearchRangeEnd.setHint(numberFormat.format(new Random().nextInt(1_000_000)));
+            //editTextSearchRangeEnd.setHint(numberFormat.format(new Random().nextInt(1_000_000)));
+            editTextSearchRangeEnd.setHint("∞");
             editTextSearchRangeEnd.addTextChangedListener(new TextWatcher() {
 
                 @Override

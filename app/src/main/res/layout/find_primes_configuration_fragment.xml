@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipChildren="false"
+    android:clipToPadding="false"
     android:orientation="vertical"
     android:theme="@style/FindPrimes">
 
@@ -14,6 +15,9 @@
         android:labelFor="@+id/primality_input"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
+        android:paddingTop="4dp"
+        android:textSize="16sp"
+        android:paddingBottom="4dp"
         android:text="@string/input_number_description" />
 
     <LinearLayout
@@ -26,12 +30,13 @@
         android:paddingStart="8dp"
         android:paddingEnd="8dp">
 
-        <include
+        <com.tycho.app.primenumberfinder.ui.NumberInput
             android:id="@+id/primality_input"
-            layout="@layout/number_input"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content" />
+            android:layout_marginEnd="4dp"
+            android:textSize="18sp"
+            android:layout_height="wrap_content"/>
 
         <Button
             android:id="@+id/check_primality_button"
@@ -50,6 +55,9 @@
         android:labelFor="@+id/editText_input_number"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
+        android:paddingTop="4dp"
+        android:textSize="16sp"
+        android:paddingBottom="4dp"
         android:text="@string/input_range_description" />
 
     <LinearLayout
@@ -63,11 +71,11 @@
         android:paddingEnd="8dp"
         android:weightSum="2">
 
-        <include
+        <com.tycho.app.primenumberfinder.ui.NumberInput
             android:id="@+id/search_range_start"
-            layout="@layout/number_input"
             android:layout_width="0dp"
             android:layout_weight="1"
+            android:textSize="18sp"
             android:layout_height="wrap_content" />
 
         <TextView
@@ -76,11 +84,11 @@
             android:layout_margin="8dp"
             android:text="@string/to" />
 
-        <include
+        <com.tycho.app.primenumberfinder.ui.NumberInput
             android:id="@+id/search_range_end"
-            layout="@layout/number_input"
             android:layout_width="0dp"
             android:layout_weight="1"
+            android:textSize="18sp"
             android:layout_height="wrap_content" />
 
     </LinearLayout>
@@ -88,8 +96,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
         android:paddingStart="8dp"
+        android:layout_marginTop="2dp"
         android:paddingEnd="8dp">
 
         <include layout="@layout/advanced_button"/>

@@ -3,7 +3,7 @@
     android:id="@+id/advanced_search"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="?selectableItemBackground"
+    style="?borderlessButtonStyle"
     android:drawableStart="@drawable/ic_settings_white_24dp"
     android:drawablePadding="4dp"
     android:drawableTint="@color/black"

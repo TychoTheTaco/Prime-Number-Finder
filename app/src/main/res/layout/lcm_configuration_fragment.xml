@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:labelFor="@+id/editText_input_number"
         android:layout_margin="8dp"
+        android:textSize="16sp"
         android:text="@string/lcm_input_description" />
 
     <LinearLayout
@@ -55,6 +56,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
+        android:layout_marginTop="2dp"
         android:paddingStart="8dp"
         android:paddingEnd="8dp">
 
