@@ -6,10 +6,9 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
-import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,11 +25,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tycho.app.primenumberfinder.LongClickableSpan;
@@ -378,12 +379,10 @@ public final class Utils {
                 //Show popup
                 final PopupWindow popupWindow = new PopupWindow(LayoutInflater.from(context).inflate(R.layout.text_copied_popup, null, false), ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
-                    for (Drawable drawable : ((TextView) popupWindow.getContentView().findViewById(R.id.text)).getCompoundDrawables()){
-                        drawable.mutate().setTint(Color.WHITE);
-                    }
+                    ((LinearLayout) popupWindow.getContentView().findViewById(R.id.text).getParent()).getBackground().setColorFilter(ContextCompat.getColor(context, R.color.green_light), PorterDuff.Mode.SRC_ATOP);
                 }
                 popupWindow.setAnimationStyle(R.style.PopupWindowAnimationStyle);
-                popupWindow.setBackgroundDrawable(null);
+                //popupWindow.setBackgroundDrawable(null);
                 popupWindow.setElevation(Utils.dpToPx(context, 4));
                 popupWindow.getContentView().measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
                 popupWindow.showAsDropDown(view, x - (popupWindow.getContentView().getMeasuredWidth() / 2), -view.getHeight() + y - popupWindow.getContentView().getMeasuredHeight() - Utils.dpToPx(context, 16));

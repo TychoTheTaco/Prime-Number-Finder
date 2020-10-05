@@ -1,7 +1,6 @@
 package com.tycho.app.primenumberfinder.modules;
 
 import android.content.res.ColorStateList;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -424,14 +423,6 @@ public abstract class ResultsFragment extends TaskFragment {
         //Buttons
         pauseButton = rootView.findViewById(R.id.pause_button);
 
-        //Fix button tint for API < 22
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            final ColorStateList colorStateList = createSimpleColorStateList(Utils.getAccentColor(rootView.getContext()), ContextCompat.getColor(requireContext(), R.color.gray));
-            pauseButton.setBackgroundTintList(colorStateList);
-            //TODO: Verify on api < 22
-            //if (viewAllButton != null) viewAllButton.setBackgroundTintList(colorStateList);
-            //if (saveButton != null) saveButton.setBackgroundTintList(colorStateList);
-        }
 
         //Set up pause button
         pauseButton.setOnClickListener(v -> {

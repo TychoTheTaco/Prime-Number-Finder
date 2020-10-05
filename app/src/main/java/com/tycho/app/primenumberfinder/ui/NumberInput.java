@@ -1,20 +1,21 @@
 package com.tycho.app.primenumberfinder.ui;
 
 import android.content.Context;
-import android.content.res.TypedArray;
+import android.os.Build;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.inputmethod.EditorInfo;
+import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
+import java.lang.reflect.Field;
 import java.util.Random;
 
 public class NumberInput extends ValidEditText {
@@ -41,12 +42,25 @@ public class NumberInput extends ValidEditText {
         setElevation(Utils.dpToPx(context, 2));
         setTextColor(ContextCompat.getColor(context, R.color.primary_text_light));
         setHintTextColor(ContextCompat.getColor(context, R.color.primary_text_very_light));
-        setTextCursorDrawable(R.drawable.cursor);
+
+        // Set cursor drawable. This requires reflection for API < 29
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+            setTextCursorDrawable(R.drawable.cursor);
+        }else{
+            try {
+                // https://github.com/android/platform_frameworks_base/blob/kitkat-release/core/java/android/widget/TextView.java#L562-564
+                Field f = TextView.class.getDeclaredField("mCursorDrawableRes");
+                f.setAccessible(true);
+                f.set(this, R.drawable.cursor);
+            } catch (Exception ignored) {
+            }
+        }
+
         setGravity(Gravity.CENTER_HORIZONTAL);
         setInputType(InputType.TYPE_CLASS_NUMBER);
         setImeOptions(EditorInfo.IME_ACTION_DONE);
 
-        // Set random hint whenever the text is cleard
+        // Set random hint whenever the text is cleared
         addTextChangedListener(new TextWatcher() {
 
             final Random random = new Random();
@@ -72,6 +86,8 @@ public class NumberInput extends ValidEditText {
                 }
             }
         });
+        setText(" ");
+        setText("");
 
     }
 

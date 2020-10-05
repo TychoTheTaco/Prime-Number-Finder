@@ -209,5 +209,6 @@
     <string name="saved">Saved</string>
     <string name="open_drawer">Open Navigation Drawer</string>
     <string name="close_drawer">Close Navigation Drawer</string>
+    <string name="advanced">Advanced</string>
 
 </resources>

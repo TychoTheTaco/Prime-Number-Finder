@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -59,7 +60,7 @@ public abstract class ModuleHostFragment extends Fragment implements AbstractTas
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        final View advanced = view.findViewById(R.id.advanced_search);
+        final TextView advanced = view.findViewById(R.id.advanced_search);
         if (advanced != null){
             advanced.setOnClickListener(new View.OnClickListener() {
                 @Override

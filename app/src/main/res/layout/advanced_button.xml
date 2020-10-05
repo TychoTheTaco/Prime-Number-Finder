@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Button xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/advanced_search"
+    style="?borderlessButtonStyle"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    style="?borderlessButtonStyle"
     android:drawableStart="@drawable/ic_settings_white_24dp"
     android:drawablePadding="4dp"
-    android:drawableTint="@color/black"
-    android:text="Advanced" />
+    android:text="@string/advanced"
+    app:drawableTint="@color/black" />

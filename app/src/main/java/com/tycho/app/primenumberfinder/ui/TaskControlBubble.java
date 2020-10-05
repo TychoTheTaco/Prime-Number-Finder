@@ -4,9 +4,13 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
+
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.ColorUtils;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.utils.Utils;
@@ -40,6 +44,17 @@ public class TaskControlBubble extends RelativeLayout {
         setPadding(0, Utils.dpToPx(context, 8), 0, Utils.dpToPx(context, 8));
         hideLeft(false);
         hideRight(false);
+
+        final View center = findViewById(R.id.pause_button);
+        final TypedValue out = new TypedValue();
+        context.getTheme().resolveAttribute(R.attr.colorAccent, out, true);
+        final int color = ContextCompat.getColor(context, out.resourceId);
+        center.setBackgroundTintList(ColorStateList.valueOf(ColorUtils.blendARGB(color, Color.BLACK, 0.3f)));
+
+        final View left = findViewById(R.id.view_all_button);
+        final View right = findViewById(R.id.save_button);
+        left.setBackgroundTintList(ColorStateList.valueOf(color));
+        right.setBackgroundTintList(ColorStateList.valueOf(color));
     }
 
     public void showLeft(final boolean animate) {
