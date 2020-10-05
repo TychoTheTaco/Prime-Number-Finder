@@ -63,6 +63,14 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
         return numbers.size();
     }
 
+    private RecyclerView recyclerView;
+
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        this.recyclerView = recyclerView;
+    }
+
     public List<BigInteger> getNumbers(){
         return numbers;
     }
@@ -125,6 +133,7 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
                     notifyItemChanged(getItemCount() - 2);
                     v.getParent().requestLayout();
                     input.requestFocus();
+                    recyclerView.scrollToPosition(getItemCount() - 1);
                 }
                 return false;
             });
