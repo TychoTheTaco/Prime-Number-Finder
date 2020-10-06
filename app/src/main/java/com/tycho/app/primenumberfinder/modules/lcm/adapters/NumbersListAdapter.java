@@ -49,12 +49,13 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
                     new int[]{},
                     new int[]{Color.LTGRAY}
             ));
+            holder.input.setShowRandomHint(false);
             holder.input.setHint("+");
             holder.input.setText("");
         }else{
+            holder.input.setShowRandomHint(true);
             holder.input.setNumber(numbers.get(position));
             holder.input.setBackgroundTintList(null);
-            holder.input.setHint("");
         }
     }
 
@@ -105,7 +106,6 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
             super(view);
             input = view.findViewById(R.id.number_input);
             input.setClearOnTouch(false);
-            input.setShowRandomHint(false);
             input.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
