@@ -38,13 +38,8 @@
     <string name="title_about">About</string>
 
     <!-- Tab titles -->
-    <string name="tasks_tab_title">Tasks</string>
-    <string name="results_tab_title">Results</string>
 
     <!-- Search Options -->
-    <string name="thread_count">Threads</string>
-    <string name="notify_when_finished">Notify when finished.</string>
-    <string name="auto_save">Auto-save when finished.</string>
 
     <!-- Find Primes page -->
     <string name="check_primality_button">Check primality</string>
@@ -62,37 +57,26 @@
     <string name="find_primes_body_text">Already found %1$s prime numbers.</string>
     <string name="find_primes_body_text_sieve_counting">Counting primes: %1$s.</string>
     <string name="find_primes_body_text_sieve_marking">Marking factors of %1$s&#8230;</string>
-    <string name="find_primes_result">%1$s primes found.</string>
     <string name="check_primality_result">%1$s is %2$s.</string>
     <string name="check_primality_result_negative">%1$s is %2$s because it is divisible by %3$s.</string>
     <string name="no_tasks_message">No tasks to display. Start one with the buttons above or the floating action button.</string>
-    <string name="no_task_selected_message">Select a task to view its status and results.</string>
-    <string name="find_primes_task_list_item_title">Primes from %1$s to %2$s</string>
     <string name="check_primality_subtitle_searching">Checking primality of %1$s.</string>
-    <string name="check_primality_task_list_title">Primality of %1$s</string>
     <string name="primes_list_toast_message">%1$s is the %2$s number.</string>
 
     <!-- Find factors page -->
-    <string name="find_factors_input_number_description">Enter a number to find its factors.</string>
     <string name="find_factors_button">Find factors</string>
     <string name="find_factors_subtitle">Finding factors of %1$s.</string>
     <string name="find_factors_body_text">Already found %1$s factors.</string>
-    <string name="find_factors_result">%1$s factors found.</string>
     <plurals name="find_factors_subtitle_results">
         <item quantity="one">%1$s has %2$s factor.</item>
         <item quantity="other">%1$s has %2$s factors.</item>
     </plurals>
     <string name="find_factors_subtitle_results_extension">This means it is %1$s.</string>
-    <string name="find_factors_task_list_item_title">Factors of %1$s</string>
     <string name="factors_list_toast_message">%1$s is the %2$s factor.</string>
 
     <!-- Prime factorization page -->
-    <string name="prime_factorization_input_number_description">Enter a number to find its prime factors.</string>
     <string name="generate_factor_tree_button">Find Prime Factors</string>
-    <string name="factor_tree_label">Factor tree</string>
     <string name="prime_factorization_subtitle">Finding prime factors of %1$s.</string>
-    <string name="prime_factorization_task_list_item_title">Prime factorization of %1$s</string>
-    <string name="prime_factorization_result">%1$s prime factors found.</string>
     <plurals name="prime_factorization_subtitle_results">
         <item quantity="one">%1$s has %2$s prime factor.</item>
         <item quantity="other">%1$s has %2$s prime factors.</item>
@@ -101,16 +85,12 @@
     <!-- Least Common Multiple page -->
     <string name="lcm_input_description">Enter at least two numbers in the boxes to calculate the least common multiple.</string>
     <string name="calculate_lcm_button">Calculate</string>
-    <string name="lcm_task_list_item_title">LCM of %1$s</string>
-    <string name="lcm_result">LCM is %1$s.</string>
     <string name="lcm_result_long">The least common multiple of %1$s is %2$s.</string>
     <string name="lcm_subtitle">Finding the least common multiple of %1$s.</string>
 
     <!-- Greatest Common Factor page -->
     <string name="gcf_input_description">Enter at least two numbers in the boxes to calculate the greatest common factor.</string>
     <string name="calculate_gcf_button">Calculate</string>
-    <string name="gcf_task_list_item_title">GCF of %1$s</string>
-    <string name="gcf_result">GCF is %1$s.</string>
     <string name="gcf_result_long">The greatest common factor of %1$s is %2$s.</string>
     <string name="gcf_subtitle">Finding the greatest common factor of %1$s.</string>
 
@@ -135,7 +115,6 @@
     <string name="developed_by_description">This application was developed by Tycho Bellers.</string>
     <string name="contact_developer">Contact Developer</string>
     <string name="changelog_title">Changelog</string>
-    <string name="new_in_version">New in version %1$s</string>
     <string name="view_old_versions">View Older Versions</string>
     <string name="credits_title">Credits</string>
     <string name="credits_description">Application icons provided by&#160;<a href="https://material.io/icons/">Material Icons</a> and&#160;<a href="https://icons8.com/">Icons8</a>.</string>
@@ -146,34 +125,20 @@
     <string name="find_primes_search_method_sieve_of_eratosthenes">Sieve of Eratosthenes</string>
 
     <!-- Statistics -->
-    <string name="statistics_title">Statistics</string>
-    <string name="time_remaining">%1$s remaining</string>
-    <string name="numbers_per_second">%1$s numbers per second</string>
-    <string name="average_numbers_per_second">%1$s average numbers per second</string>
-    <string name="primes_per_second">%1$s primes per second</string>
-    <string name="average_primes_per_second">%1$s average primes per second</string>
 
     <!-- Button text -->
     <string name="start">Start</string>
-    <string name="pause">Pause</string>
     <string name="content_description_pause_button">Pause</string>
-    <string name="resume">Resume</string>
-    <string name="content_description_resume_button">Resume</string>
-    <string name="stop">Stop</string>
-    <string name="reset">Reset</string>
     <string name="content_description_reset_button">Reset</string>
-    <string name="content_description_edit_button">Edit</string>
     <string name="view_all">View all</string>
     <string name="save">Save</string>
 
     <!-- Task status -->
-    <string name="status_ready">Ready</string>
     <string name="status_searching">Searching&#8230;</string>
     <string name="state_pausing">Pausing&#8230;</string>
     <string name="status_paused">Paused</string>
     <string name="state_resuming">Resuming&#8230;</string>
     <string name="status_stopping">Stopping</string>
-    <string name="status_stopped">Stopped</string>
     <string name="status_finished">Finished</string>
 
     <!-- Export Options -->
@@ -193,18 +158,13 @@
     <!-- Error messages -->
     <string name="error_invalid_number">Invalid number!</string>
     <string name="error_invalid_range">Invalid range!</string>
-    <string name="error_invalid_input">Invalid input!</string>
     <string name="error_invalid_configuration">Invalid configuration!</string>
 
     <!-- Miscellaneous -->
-    <string name="unicode_bullet">&#8226;</string>
     <string name="factors_list_multiply_separator">&#160;x&#160;</string>
     <string name="task_progress">%1$s%%</string>
-    <string name="saving_file">Saving file&#8230;</string>
     <string name="successfully_saved_file">Successfully saved file.</string>
     <string name="error_saving_file">Error saving file!</string>
-    <string name="general_error">An error occurred!</string>
-    <string name="loading">Loading&#8230;</string>
     <string name="hex">0x%1$s</string>
     <string name="saved">Saved</string>
     <string name="open_drawer">Open Navigation Drawer</string>

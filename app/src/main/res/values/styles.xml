@@ -65,12 +65,6 @@
         <item name="windowNoTitle">true</item>
         <item name="android:statusBarColor">?android:attr/colorPrimaryDark</item>
     </style>
-    <style name="Dark.Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
-    <style name="Dark.Dialog" parent="Base.Theme.AppCompat.Light.Dialog"/>
-    <style name="Dark.PopupOverlay">
-        <item name="android:colorBackground">@color/primary_light</item>
-        <item name="android:textColor">@android:color/white</item>
-    </style>
 
     <style name="CheckBox" parent="Widget.AppCompat.CompoundButton.CheckBox">
         <item name="android:textColor">?android:attr/textColorPrimary</item>
@@ -117,11 +111,7 @@
         <item name="colorPrimaryDark">@color/green_dark</item>
         <item name="colorAccent">@color/green</item>
     </style>
-    <style name="PrimeFactorization.Dialog" parent="Light.Dialog">
-        <item name="colorPrimary">@color/green</item>
-        <item name="colorPrimaryDark">@color/green_dark</item>
-        <item name="colorAccent">@color/green</item>
-    </style>
+
     <style name="PrimeFactorization.PopupOverlay">
         <item name="android:colorBackground">@color/green_light</item>
         <item name="android:textColor">@android:color/white</item>
@@ -133,30 +123,12 @@
         <item name="colorPrimaryDark">@color/yellow_dark</item>
         <item name="colorAccent">@color/yellow</item>
     </style>
-    <style name="LCM.Dialog" parent="Light.Dialog">
-        <item name="colorPrimary">@color/yellow</item>
-        <item name="colorPrimaryDark">@color/yellow_dark</item>
-        <item name="colorAccent">@color/yellow</item>
-    </style>
-    <style name="LCM.PopupOverlay">
-        <item name="android:colorBackground">@color/yellow_light</item>
-        <item name="android:textColor">@android:color/black</item>
-    </style>
 
     <!-- Greatest Common Factor themes-->
     <style name="GCF">
         <item name="colorPrimary">@color/lt_blue</item>
         <item name="colorPrimaryDark">@color/blue_light</item>
         <item name="colorAccent">@color/lt_blue</item>
-    </style>
-    <style name="GCF.Dialog" parent="Light.Dialog">
-        <item name="colorPrimary">@color/lt_blue</item>
-        <item name="colorPrimaryDark">@color/blue_dark</item>
-        <item name="colorAccent">@color/lt_blue</item>
-    </style>
-    <style name="GCF.PopupOverlay">
-        <item name="android:colorBackground">@color/blue_light</item>
-        <item name="android:textColor">@android:color/black</item>
     </style>
 
     <style name="Label" parent="Light">
@@ -166,13 +138,6 @@
 
     <style name="Label.Bold">
         <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="NumberInput">
-        <item name="android:textSize">16sp</item>
-        <item name="android:inputType">number</item>
-        <item name="android:gravity">center_horizontal</item>
-        <item name="android:hint">1,000,000</item>
     </style>
 
     <style name="Button">

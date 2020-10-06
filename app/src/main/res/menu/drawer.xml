@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <group
-        android:id="@+id/group_main"
-        android:checkableBehavior="single">
+    <group android:checkableBehavior="single">
 
         <item
             android:id="@+id/drawer_item_find_primes"
@@ -42,9 +40,7 @@
 
     </group>
 
-    <group
-        android:id="@+id/group_two"
-        android:checkableBehavior="single">
+    <group android:checkableBehavior="single">
 
         <item
             android:id="@+id/drawer_item_saved_files"
@@ -53,9 +49,7 @@
             android:title="@string/title_saved_files"/>
     </group>
 
-    <group
-        android:id="@+id/group_settings"
-        android:checkableBehavior="single">
+    <group android:checkableBehavior="single">
 
         <item
             android:id="@+id/drawer_item_settings"

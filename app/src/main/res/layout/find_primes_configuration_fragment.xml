@@ -9,7 +9,6 @@
 
     <!-- Check primality input -->
     <TextView
-        android:id="@+id/number_input_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:labelFor="@+id/primality_input"
@@ -49,7 +48,6 @@
 
     <!-- Range input -->
     <TextView
-        android:id="@+id/input_range_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:labelFor="@+id/editText_input_number"

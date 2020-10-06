@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:ValidEditText="http://schemas.android.com/apk/res-auto">
-    <item android:state_enabled="false" android:color="@color/divider"/>
-    <item ValidEditText:valid="true" android:color="@color/accent"/>
-    <item ValidEditText:valid="false" android:color="@color/red"/>
-    <item android:color="@color/gray"/>
-</selector>

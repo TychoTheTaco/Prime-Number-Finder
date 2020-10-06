@@ -13,7 +13,6 @@
         android:src="@drawable/cloudy_peak"/>
 
     <TextView
-        android:id="@+id/textView_appTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
