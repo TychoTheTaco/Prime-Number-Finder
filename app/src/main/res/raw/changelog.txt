@@ -151,3 +151,7 @@
 
 10/01/2020 > Prime Number Finder version 1.4.4
 - Minor bug fixes and updates
+
+10/??/2020 > Prime Number Finder version 1.5.0
+- Major UI changes to simplify usage
+- Bug fixes

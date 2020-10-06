@@ -78,6 +78,7 @@ public class LeastCommonMultipleFragment extends ModuleHostFragment {
                     @Override
                     public void afterTextChanged(Editable editable) {
                         editText.setValid(Validator.isValidLCMInput((BigInteger) editText.getNumberValue()));
+                        refreshValidity();
                     }
                 });
             }
@@ -92,7 +93,7 @@ public class LeastCommonMultipleFragment extends ModuleHostFragment {
                     LeastCommonMultipleTask task = new LeastCommonMultipleTask(new LeastCommonMultipleTask.SearchOptions(getNumbers()));
                     startTask(task);
 
-                    hideKeyboard(getActivity());
+                    hideKeyboard(requireActivity());
 
                 } else {
                     Toast.makeText(getActivity(), getString(R.string.error_invalid_number), Toast.LENGTH_SHORT).show();
@@ -100,6 +101,16 @@ public class LeastCommonMultipleFragment extends ModuleHostFragment {
             });
         }
         return rootView;
+    }
+
+    private void refreshValidity(){
+        for (ValidEditText input : inputs){
+            if (Validator.isValidLCMInput((BigInteger) input.getNumberValue())){
+                input.setValid(true);
+            }else{
+                input.setValid(getBigNumbers().size() >= 2);
+            }
+        }
     }
 
     private List<BigInteger> getBigNumbers(){
@@ -113,8 +124,7 @@ public class LeastCommonMultipleFragment extends ModuleHostFragment {
     private List<Long> getNumbers(){
         final List<Long> numbers = new ArrayList<>();
         for (ValidEditText editText : inputs){
-            System.out.println("COMPARE: " + editText + " TET: " + editText.getText() + " LONG: " + editText.getLongValue() + " VALID: " + editText.isValid());
-            if (editText.isValid()) numbers.add(editText.getLongValue());
+            if (Validator.isValidLCMInput((BigInteger) editText.getNumberValue())) numbers.add(editText.getLongValue());
         }
         return numbers;
     }

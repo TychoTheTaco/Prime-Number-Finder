@@ -126,6 +126,9 @@ public class FindPrimesConfigurationActivity extends TaskConfigurationActivity{
                 //Check if the number is valid
                 editTextSearchRangeStart.setValid(editTextSearchRangeStart.length() > 0);
                 editTextSearchRangeEnd.setValid(Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod()) && editTextSearchRangeEnd.length() != 0);
+                if (editTextSearchRangeEnd.length() == 0){
+                    editTextSearchRangeEnd.setValid(true);
+                }
             }
         });
         editTextSearchRangeEnd.setClearOnTouch(false);

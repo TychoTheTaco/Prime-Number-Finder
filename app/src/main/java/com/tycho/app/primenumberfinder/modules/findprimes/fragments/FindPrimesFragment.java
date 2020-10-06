@@ -158,15 +158,12 @@ public class FindPrimesFragment extends ModuleHostFragment {
                 @Override
                 public void afterTextChanged(Editable editable) {
 
-                    FirebaseCrashlytics.getInstance().log("Editable: '" + editable + "'");
-
                     //Check if infinity
                     if (!editable.toString().equals(getString(R.string.infinity_text))) {
 
                         //Format text
                         final String formatted = numberFormat.format(getEndValue());
                         if (editable.length() > 0 && !editable.toString().equals(formatted)) {
-                            FirebaseCrashlytics.getInstance().log("Setting text: '" + formatted + "'");
                             editTextSearchRangeEnd.setText(formatted, formatted.length() > 1);
                         } else if (editable.toString().equals(numberFormat.format(0))) {
                             editTextSearchRangeEnd.getText().clear();
@@ -175,11 +172,12 @@ public class FindPrimesFragment extends ModuleHostFragment {
 
                     searchOptions.setEndValue(getEndValue().longValue());
 
-                    FirebaseCrashlytics.getInstance().log("Checking valid...");
-
                     //Check if the number is valid
                     editTextSearchRangeStart.setValid(editTextSearchRangeStart.length() > 0);
                     editTextSearchRangeEnd.setValid(Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod()) && editTextSearchRangeEnd.length() != 0);
+                    if (editTextSearchRangeEnd.length() == 0){
+                        editTextSearchRangeEnd.setValid(true);
+                    }
                 }
             });
             editTextSearchRangeEnd.overrideDefaultTextWatcher();
