@@ -16,13 +16,19 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tycho.app.primenumberfinder.ActionViewListener;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.CheckPrimalityTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.modules.gcf.GreatestCommonFactorTask;
+import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
+import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import easytasks.ITask;
 import easytasks.TaskAdapter;
 
-public abstract class ModuleHostFragment extends Fragment implements AbstractTaskListAdapter.EventListener {
+public abstract class ModuleHostFragment extends Fragment {
 
     /**
      * Tag used for logging and debugging.
@@ -89,24 +95,19 @@ public abstract class ModuleHostFragment extends Fragment implements AbstractTas
         getChildFragmentManager().beginTransaction().replace(R.id.results_container, fragment).commit();
     }
 
-    @Override
-    public void onTaskSelected(ITask task) {
-
-    }
-
-    @Override
-    public void onPausePressed(ITask task) {
-
-    }
-
-    @Override
-    public void onTaskRemoved(ITask task) {
-
-    }
-
-    @Override
-    public void onSavePressed(ITask task){
-
+    private int getTaskType(ITask task){
+        if (task instanceof FindPrimesTask || task instanceof CheckPrimalityTask){
+            return 0;
+        }else if (task instanceof FindFactorsTask){
+            return 1;
+        }else if (task instanceof PrimeFactorizationTask){
+            return 2;
+        }else if (task instanceof LeastCommonMultipleTask){
+            return 3;
+        }else if (task instanceof GreatestCommonFactorTask){
+            return 4;
+        }
+        return -1;
     }
 
     protected void startTask(final ITask task){
@@ -119,11 +120,27 @@ public abstract class ModuleHostFragment extends Fragment implements AbstractTas
 
         task.addTaskListener(new TaskAdapter(){
             @Override
+            public void onTaskStarted(ITask task) {
+                actionViewListener.onTaskStatesChanged(getTaskType(task), true);
+            }
+
+            @Override
+            public void onTaskPaused(ITask task) {
+                actionViewListener.onTaskStatesChanged(getTaskType(task), false);
+            }
+
+            @Override
+            public void onTaskResumed(ITask task) {
+                actionViewListener.onTaskStatesChanged(getTaskType(task), true);
+            }
+
+            @Override
             public void onTaskStopped(ITask task) {
                 final Bundle bundle = new Bundle();
                 bundle.putString("task_type", task.getClass().getSimpleName());
                 bundle.putLong("duration", task.getElapsedTime());
                 FirebaseAnalytics.getInstance(requireContext()).logEvent("task_finished", bundle);
+                actionViewListener.onTaskStatesChanged(getTaskType(task), false);
             }
         });
 

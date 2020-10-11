@@ -22,7 +22,6 @@ import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.ui.TreeView;
-import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.util.Map;
@@ -136,9 +135,6 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         //Tree
         treeView.setVisibility(View.VISIBLE);
         treeView.setTree(getTask().getFactorTree().formatNumbers());
-        if (PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 1){
-            treeView.setExportOptions(new TreeView.DarkThemeExportOptions());
-        }
 
         taskControlBubble.showRight(true);
     }

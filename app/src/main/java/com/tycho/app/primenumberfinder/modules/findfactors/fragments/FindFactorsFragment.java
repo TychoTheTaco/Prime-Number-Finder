@@ -76,6 +76,7 @@ public class FindFactorsFragment extends ModuleHostFragment {
                     editTextNumberToFactor.setValid(Validator.isValidFactorInput(getNumberToFactor()));
                 }
             });
+            editTextNumberToFactor.setOnEditorActionListener((v, actionId, event) -> rootView.findViewById(R.id.button_find_factors).performClick());
 
             //Set up start button
             final Button buttonFindFactors = rootView.findViewById(R.id.button_find_factors);

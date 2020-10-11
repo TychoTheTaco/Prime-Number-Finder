@@ -22,6 +22,7 @@ public:
     }
 
     void onTaskStarted(Task* task){
+        assert(method_ids);
         call(native_task_object, method_ids[0], task);
     }
 
@@ -70,6 +71,7 @@ private:
             default:
                 break;
         }
+        assert(method_id);
         env->CallVoidMethod(object, method_id, env->NewStringUTF(listener_id.c_str()));
 
         // Detach from thread if we just attached

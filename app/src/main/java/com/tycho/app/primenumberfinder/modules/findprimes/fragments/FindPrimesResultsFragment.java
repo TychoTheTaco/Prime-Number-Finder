@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.ProgressDialog;
@@ -17,6 +19,7 @@ import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.DisplayPrimesActivity;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
+import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
@@ -50,6 +53,9 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
     final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
+    private RecyclerView recyclerView;
+    private PrimesAdapter adapter;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -60,6 +66,14 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         subtitleTextView = rootView.findViewById(R.id.subtitle);
         subtitleTextView.setMovementMethod(LongClickLinkMovementMethod.getInstance());
         bodyTextView = rootView.findViewById(R.id.text);
+
+        //Set up recycler view
+        recyclerView = rootView.findViewById(R.id.recycler_view);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        adapter = new PrimesAdapter(requireContext());
+        recyclerView.setAdapter(adapter);
+        recyclerView.setItemAnimator(null);
 
         initDefaultState();
 

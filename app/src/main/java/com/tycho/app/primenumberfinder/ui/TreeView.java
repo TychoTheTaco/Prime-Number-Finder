@@ -7,13 +7,16 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.utils.Utils;
 
 import simpletrees.Tree;
 
@@ -48,9 +51,13 @@ public class TreeView extends View {
     private float paddingTop = -2;
     private float paddingBottom = -2;
 
+    private float textSize = 16;
+
     private ExportOptions exportOptions = new ExportOptions();
 
     private boolean touchEnabled;
+
+    private float borderRadius;
 
     public TreeView(Context context) {
         super(context);
@@ -74,7 +81,9 @@ public class TreeView extends View {
 
     private void init(final Context context, final AttributeSet attributeSet) {
         paint.setAntiAlias(true);
-        paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
+        paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSize, getResources().getDisplayMetrics()));
+        paint.setFakeBoldText(true);
+        paint.setShadowLayer(30, 6, 6, Color.argb(128, 0, 0, 0));
 
         //Set custom attributes
         final TypedArray typedArray = context.getTheme().obtainStyledAttributes(attributeSet, R.styleable.TreeView, 0, 0);
@@ -84,6 +93,11 @@ public class TreeView extends View {
         }finally {
             typedArray.recycle();
         }
+
+        borderRadius = Utils.dpToPx(context, 12);
+
+        exportOptions.itemTextColor = ContextCompat.getColor(context, R.color.text_color);
+        exportOptions.primeFactorTextColor = ContextCompat.getColor(context, R.color.green);
     }
 
     private boolean generated = false;
@@ -158,8 +172,24 @@ public class TreeView extends View {
     public void draw(Canvas canvas) {
         super.draw(canvas);
 
-        //Draw background
-        canvas.drawColor(exportOptions.imageBackgroundColor);
+        //final Rect rect = canvas.getClipBounds();
+        //rect.inset(-30, -30);
+        //canvas.clipRect(rect, Region.Op.REPLACE);
+
+        // Clear canvas
+        canvas.drawColor(Color.TRANSPARENT);
+
+        // Draw background
+        paint.clearShadowLayer();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.TRANSPARENT);
+        canvas.drawRoundRect(0, 0, getWidth(), getHeight(), borderRadius, borderRadius, paint);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(ContextCompat.getColor(getContext(), R.color.text_color));
+        final float strokeWidth = Utils.dpToPx(getContext(), 1.5f);
+        paint.setStrokeWidth(strokeWidth);
+        canvas.drawRoundRect(strokeWidth, strokeWidth, getWidth() - strokeWidth, getHeight() - strokeWidth, borderRadius, borderRadius, paint);
+        paint.setShadowLayer(30, 6, 6, Color.argb(128, 0, 0, 0));
 
         canvas.save();
 
@@ -169,7 +199,7 @@ public class TreeView extends View {
             //Draw text
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.BLACK);
-            paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
+            paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSize, getResources().getDisplayMetrics()));
             final String text = "Generating...";
             canvas.drawText(text, ((canvas.getWidth() - getStringWidth(text, paint)) / 2), ((canvas.getHeight() - getStringHeight(paint)) / 2), paint);
 
@@ -201,10 +231,12 @@ public class TreeView extends View {
         canvas.restore();
 
         //Draw view border
-        paint.setStyle(Paint.Style.STROKE);
+        /*paint.setStyle(Paint.Style.STROKE);
         paint.setColor(exportOptions.imageBorderColor);
-        paint.setStrokeWidth(0);
-        canvas.drawRect(0, 0, getWidth(), getHeight(), paint);
+        final float strokeWidth = Utils.dpToPx(getContext(), 3);
+        paint.setStrokeWidth(strokeWidth);
+        canvas.drawRoundRect(strokeWidth, strokeWidth, getWidth() - strokeWidth, getHeight() - strokeWidth, Utils.dpToPx(getContext(), 8), Utils.dpToPx(getContext(), 8), paint);*/
+        //canvas.drawRect(0, 0, getWidth(), getHeight(), paint);
     }
 
     private float scrollPaddingLeft = 20;
@@ -623,7 +655,7 @@ public class TreeView extends View {
 
         //Item
         public Paint.Join itemStyle = Paint.Join.ROUND;
-        public int itemTextSize = 15;
+        public int itemTextSize = 18;
         public int itemTextColor = Color.BLACK;
         public int primeFactorTextColor = Color.argb(255, 255, 42, 42);
 

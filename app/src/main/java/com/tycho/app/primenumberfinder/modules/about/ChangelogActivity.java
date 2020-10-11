@@ -1,12 +1,14 @@
 package com.tycho.app.primenumberfinder.modules.about;
 
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
 import android.view.MenuItem;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.activities.AbstractActivity;
 
@@ -26,6 +28,8 @@ public class ChangelogActivity extends AbstractActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.changelog_activity);
+
+        FirebaseAnalytics.getInstance(this).logEvent("changelog_activity_opened", null);
 
         //Set up the toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);

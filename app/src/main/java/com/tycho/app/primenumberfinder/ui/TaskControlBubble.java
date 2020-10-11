@@ -67,9 +67,10 @@ public class TaskControlBubble extends RelativeLayout {
             return;
         }
         if (animate) {
-            view.clearAnimation();
-            view.measure(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-            view.startAnimation(new Reveal(view, view.getMeasuredWidth()));
+            showLeft(false);
+            //view.clearAnimation();
+            //view.measure(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            //view.startAnimation(new Reveal(view, view.getMeasuredWidth()));
         } else {
             view.setVisibility(VISIBLE);
         }
@@ -81,8 +82,9 @@ public class TaskControlBubble extends RelativeLayout {
             return;
         }
         if (animate) {
-            view.clearAnimation();
-            view.startAnimation(new Reveal(view, 0));
+            hideLeft(false);
+            //view.clearAnimation();
+            //view.startAnimation(new Reveal(view, 0));
         } else {
             view.setVisibility(INVISIBLE);
         }
@@ -94,9 +96,10 @@ public class TaskControlBubble extends RelativeLayout {
             return;
         }
         if (animate) {
-            view.clearAnimation();
-            view.measure(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-            view.startAnimation(new Reveal(view, view.getMeasuredWidth()));
+            showRight(false);
+            //view.clearAnimation();
+            //view.measure(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            //view.startAnimation(new Reveal(view, view.getMeasuredWidth()));
         } else {
             view.setVisibility(VISIBLE);
         }
@@ -154,8 +157,9 @@ public class TaskControlBubble extends RelativeLayout {
             return;
         }
         if (animate) {
-            view.clearAnimation();
-            view.startAnimation(new Reveal(view, 0));
+            hideRight(false);
+            //view.clearAnimation();
+            //view.startAnimation(new Reveal(view, 0));
         } else {
             view.setVisibility(INVISIBLE);
         }

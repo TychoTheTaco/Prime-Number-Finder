@@ -71,6 +71,7 @@ public class PrimeFactorizationFragment extends ModuleHostFragment {
                     editTextInput.setValid(Validator.isValidFactorInput(getNumberToFactor()));
                 }
             });
+            editTextInput.setOnEditorActionListener((v, actionId, event) -> rootView.findViewById(R.id.button_generate_factor_tree).performClick());
 
             //Set up start button
             rootView.findViewById(R.id.button_generate_factor_tree).setOnClickListener(v -> {

@@ -46,15 +46,6 @@ public abstract class TaskConfigurationActivity extends AbstractActivity{
         return true;
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-
-        //Give the root view focus to prevent EditTexts from initially getting focus
-        //findViewById(R.id.root).requestFocus();
-    }
-
-
     protected abstract void buildReturnIntent(final Intent intent);
 
     protected abstract boolean isConfigurationValid();

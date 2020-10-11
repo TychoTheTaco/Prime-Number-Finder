@@ -8,4 +8,4 @@
     android:drawableStart="@drawable/ic_settings_white_24dp"
     android:drawablePadding="4dp"
     android:text="@string/advanced"
-    app:drawableTint="@color/black" />
+    app:drawableTint="@color/text_color" />
