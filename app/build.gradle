@@ -16,6 +16,12 @@ android {
         versionCode 40
         versionName "1.5.0.DEV"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+
+        externalNativeBuild{
+            cmake {
+                arguments "-DANDROID_ARM_MODE=arm", "-DANDROID_STL=c++_shared"
+            }
+        }
     }
     buildTypes {
         release {
@@ -53,7 +59,7 @@ dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
 
     //Firebase
-    implementation 'com.google.firebase:firebase-analytics:17.5.0'
+    implementation 'com.google.firebase:firebase-analytics:17.6.0'
     implementation 'com.google.firebase:firebase-crashlytics-ndk:17.2.2'
 
     implementation 'androidx.appcompat:appcompat:1.2.0'

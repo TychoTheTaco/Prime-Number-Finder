@@ -8,31 +8,31 @@
 
 class DListener : public DebugListener {
     void onTaskStarted(Task *task) {
-        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskStarted(%d)", (int) reinterpret_cast<std::uintptr_t>(task));
+        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskStarted(%d)", (uintptr_t) task);
     }
 
     void onTaskPausing(Task *task) {
-        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskPausing(%d)", (int) reinterpret_cast<std::uintptr_t>(task));
+        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskPausing(%d)", (uintptr_t) task);
     }
 
     void onTaskPaused(Task *task) {
-        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskPaused(%d)", (int) reinterpret_cast<std::uintptr_t>(task));
+        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskPaused(%d)", (uintptr_t) task);
     }
 
     void onTaskResuming(Task *task) {
-        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskResuming(%d)", (int) reinterpret_cast<std::uintptr_t>(task));
+        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskResuming(%d)", (uintptr_t) task);
     }
 
     void onTaskResumed(Task *task) {
-        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskResumed(%d)", (int) reinterpret_cast<std::uintptr_t>(task));
+        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskResumed(%d)", (uintptr_t) task);
     }
 
     void onTaskStopping(Task *task) {
-        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskStopping(%d)", (int) reinterpret_cast<std::uintptr_t>(task));
+        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskStopping(%d)", (uintptr_t) task);
     }
 
     void onTaskStopped(Task *task) {
-        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskStopped(%d)", (int) reinterpret_cast<std::uintptr_t>(task));
+        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskStopped(%d)", (uintptr_t) task);
     }
 };
 
@@ -50,7 +50,7 @@ Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nat
                                               static_cast<FindPrimesTask::SearchMethod>(value), (unsigned int) thread_count);
 
     //Set cache directory
-    const char *string = env->GetStringUTFChars(cache_directory, 0);
+    const char *string = env->GetStringUTFChars(cache_directory, nullptr);
     __android_log_print(ANDROID_LOG_VERBOSE, TAG, "Cache dir: %s", string);
     task->setCacheDirectory(std::string(string));
     env->ReleaseStringUTFChars(cache_directory, string);
@@ -110,7 +110,7 @@ Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nat
 JNIEXPORT void JNICALL
 Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeSaveToFile(JNIEnv *env, jobject self, jlong task_ptr, jstring file_path) {
     //Get file path
-    const char *path = env->GetStringUTFChars(file_path, 0);
+    const char *path = env->GetStringUTFChars(file_path, nullptr);
     ((FindPrimesTask *) task_ptr)->saveToFile(std::string(path));
     env->ReleaseStringUTFChars(file_path, path);
 }

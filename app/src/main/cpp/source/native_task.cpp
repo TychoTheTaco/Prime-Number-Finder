@@ -57,11 +57,11 @@ private:
 
     void call(jobject object, jmethodID method_id, Task* task){
         JNIEnv* env;
-        bool detach = false;
+        bool attached = false;
         switch (jvm->GetEnv((void**) &env, JNI_VERSION_1_6)){
             case JNI_EDETACHED:
                 assert(jvm->AttachCurrentThread(&env, nullptr) == JNI_OK);
-                detach = true;
+                attached = true;
                 break;
 
             case JNI_OK:
@@ -71,7 +71,11 @@ private:
                 break;
         }
         env->CallVoidMethod(object, method_id, env->NewStringUTF(listener_id.c_str()));
-        if (detach) jvm->DetachCurrentThread();
+
+        // Detach from thread if we just attached
+        if (attached){
+            jvm->DetachCurrentThread();
+        }
     }
 };
 

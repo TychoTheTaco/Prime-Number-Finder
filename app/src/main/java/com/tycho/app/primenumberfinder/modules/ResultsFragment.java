@@ -299,6 +299,7 @@ public abstract class ResultsFragment extends TaskFragment {
 
     protected void postDefaults(){
         taskControlBubble.setVisibility(View.VISIBLE);
+        taskControlBubble.hideRight(true);
     }
 
     /**

@@ -6,6 +6,10 @@ import android.graphics.Color;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.OvershootInterpolator;
+import android.view.animation.Transformation;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 
@@ -58,34 +62,102 @@ public class TaskControlBubble extends RelativeLayout {
     }
 
     public void showLeft(final boolean animate) {
+        final View view = findViewById(R.id.view_all_button);
+        if (view.getVisibility() == VISIBLE){
+            return;
+        }
         if (animate) {
-            showLeft(false);
+            view.clearAnimation();
+            view.measure(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            view.startAnimation(new Reveal(view, view.getMeasuredWidth()));
         } else {
-            findViewById(R.id.view_all_button).setVisibility(VISIBLE);
+            view.setVisibility(VISIBLE);
         }
     }
 
     public void hideLeft(final boolean animate) {
+        final View view = findViewById(R.id.view_all_button);
+        if (view.getVisibility() != VISIBLE){
+            return;
+        }
         if (animate) {
-            hideLeft(false);
+            view.clearAnimation();
+            view.startAnimation(new Reveal(view, 0));
         } else {
-            findViewById(R.id.view_all_button).setVisibility(GONE);
+            view.setVisibility(INVISIBLE);
         }
     }
 
     public void showRight(final boolean animate) {
+        final View view = findViewById(R.id.save_button);
+        if (view.getVisibility() == VISIBLE){
+            return;
+        }
         if (animate) {
-            showRight(false);
+            view.clearAnimation();
+            view.measure(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            view.startAnimation(new Reveal(view, view.getMeasuredWidth()));
         } else {
-            findViewById(R.id.save_button).setVisibility(VISIBLE);
+            view.setVisibility(VISIBLE);
+        }
+    }
+
+    private static class Reveal extends Animation{
+
+        private final View view;
+        private final int start;
+        private final int end;
+
+        public Reveal(final View view, final int end){
+            this.view = view;
+            this.start = view.getWidth();
+            this.end = end;
+            setDuration(200);
+            setFillAfter(true);
+            setFillBefore(true);
+            if (end == 0){
+                setInterpolator(new AccelerateDecelerateInterpolator());
+            }else{
+                setInterpolator(new OvershootInterpolator());
+            }
+
+            setAnimationListener(new AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                    view.setVisibility(VISIBLE);
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    if (end == 0){
+                        view.setVisibility(INVISIBLE);
+                    }
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+        }
+
+        @Override
+        protected void applyTransformation(float interpolatedTime, Transformation t) {
+            view.getLayoutParams().width = (int) (start + ((end - start) * interpolatedTime));
+            view.requestLayout();
         }
     }
 
     public void hideRight(final boolean animate) {
+        final View view = findViewById(R.id.save_button);
+        if (view.getVisibility() != VISIBLE){
+            return;
+        }
         if (animate) {
-            hideRight(false);
+            view.clearAnimation();
+            view.startAnimation(new Reveal(view, 0));
         } else {
-            findViewById(R.id.save_button).setVisibility(GONE);
+            view.setVisibility(INVISIBLE);
         }
     }
 

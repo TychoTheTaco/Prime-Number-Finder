@@ -112,30 +112,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                 false
         }, getTextHighlight(), getContext()));
 
-        taskControlBubble.hideRight(true);
-    }
-
-    @Override
-    protected void onPostStarted() {
-        super.onPostStarted();
-
-        //Buttons
-        switch (getTask().getSearchOptions().getSearchMethod()) {
-            case BRUTE_FORCE:
-                taskControlBubble.showLeft(true);
-                break;
-
-            case SIEVE_OF_ERATOSTHENES:
-                taskControlBubble.hideLeft(true);
-                break;
-        }
-    }
-
-    @Override
-    protected void onPostPausing() {
-        super.onPostPausing();
-
-        //Buttons
         switch (getTask().getSearchOptions().getSearchMethod()) {
             case BRUTE_FORCE:
                 taskControlBubble.showLeft(true);
@@ -151,31 +127,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     protected void onPostPaused() {
         super.onPostPaused();
 
-        //Buttons
-        switch (getTask().getSearchOptions().getSearchMethod()) {
-            case BRUTE_FORCE:
-                taskControlBubble.showLeft(true);
-                break;
-
-            case SIEVE_OF_ERATOSTHENES:
-                taskControlBubble.hideLeft(true);
-                break;
-        }
-    }
-
-    @Override
-    protected void onPostResuming() {
-        super.onPostResuming();
-
-        //Buttons
-        switch (getTask().getSearchOptions().getSearchMethod()) {
-            case BRUTE_FORCE:
-                taskControlBubble.showLeft(true);
-                break;
-
-            case SIEVE_OF_ERATOSTHENES:
-                taskControlBubble.hideLeft(true);
-                break;
+        if (getTask().getEndValue() == FindPrimesTask.INFINITY){
+            taskControlBubble.showRight(true);
         }
     }
 
