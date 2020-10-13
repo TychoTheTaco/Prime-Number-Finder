@@ -3,36 +3,37 @@
 
 #include "find_primes_task.h"
 #include "debug_listener.h"
+#include "task.h"
 
 #define TAG "PrimeNumberFinder [Native]"
 
 class DListener : public DebugListener {
     void onTaskStarted(Task *task) {
-        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskStarted(%d)", (uintptr_t) task);
+        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskStarted(%d)", (int) reinterpret_cast<std::uintptr_t>(task));
     }
 
     void onTaskPausing(Task *task) {
-        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskPausing(%d)", (uintptr_t) task);
+        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskPausing(%d)", (int) reinterpret_cast<std::uintptr_t>(task));
     }
 
     void onTaskPaused(Task *task) {
-        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskPaused(%d)", (uintptr_t) task);
+        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskPaused(%d)", (int) reinterpret_cast<std::uintptr_t>(task));
     }
 
     void onTaskResuming(Task *task) {
-        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskResuming(%d)", (uintptr_t) task);
+        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskResuming(%d)", (int) reinterpret_cast<std::uintptr_t>(task));
     }
 
     void onTaskResumed(Task *task) {
-        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskResumed(%d)", (uintptr_t) task);
+        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskResumed(%d)", (int) reinterpret_cast<std::uintptr_t>(task));
     }
 
     void onTaskStopping(Task *task) {
-        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskStopping(%d)", (uintptr_t) task);
+        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskStopping(%d)", (int) reinterpret_cast<std::uintptr_t>(task));
     }
 
     void onTaskStopped(Task *task) {
-        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskStopped(%d)", (uintptr_t) task);
+        __android_log_print(ANDROID_LOG_VERBOSE, TAG, "onTaskStopped(%d)", (int) reinterpret_cast<std::uintptr_t>(task));
     }
 };
 
@@ -88,7 +89,7 @@ Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nat
     return env->NewStringUTF(((FindPrimesTask *) task_ptr)->getStatus().c_str());
 }
 
-JNIEXPORT jlong JNICALL
+JNIEXPORT jint JNICALL
 Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nativeGetCurrentFactor(JNIEnv *env, jobject self, jlong task_ptr) {
     return ((FindPrimesTask *) task_ptr)->getCurrentFactor();
 }

@@ -39,7 +39,8 @@ public class PrimeNumberFinder extends Application {
         PreferenceManager.initialize(this);
 
         //Disable Crashlytics for debug builds
-        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG);
+        //FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG);
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
 
         //Initialize analytics
         FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(PreferenceManager.getBoolean(PreferenceManager.Preference.ALLOW_ANALYTICS) && !BuildConfig.DEBUG);

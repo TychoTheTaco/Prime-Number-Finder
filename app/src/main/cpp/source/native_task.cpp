@@ -23,6 +23,7 @@ public:
 
     void onTaskStarted(Task* task){
         assert(method_ids);
+        assert(task);
         call(native_task_object, method_ids[0], task);
     }
 
@@ -52,7 +53,7 @@ public:
 
 private:
     JavaVM* jvm;
-    std::string listener_id;
+    const std::string listener_id;
     jobject native_task_object;
     jmethodID method_ids[7];
 
@@ -134,7 +135,7 @@ JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeAdd
 }
 
 JNIEXPORT jboolean JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeRemoveTaskListener(JNIEnv *env, jobject self, jlong task_ptr, jstring id) {
-    const char* string = env->GetStringUTFChars(id, 0);
+    const char* string = env->GetStringUTFChars(id, nullptr);
     NativeListener* native_listener = listener_map[string];
     listener_map.erase(string);
     env->ReleaseStringUTFChars(id, string);

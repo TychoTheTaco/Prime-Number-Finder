@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-# Creates and names a library, sets it as either STATIC
-# or SHARED, and provides the relative paths to its source code.
-# You can define multiple libraries, and CMake builds them for you.
-# Gradle automatically packages shared libraries with your APK.
+# Add Tasker library
+add_library(Tasker SHARED IMPORTED)
+set_property(TARGET Tasker PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libTasker.so")
+include_directories("src/main/cpp/include")
 
 add_library( # Sets the name of the library.
         native-utils
@@ -15,17 +15,6 @@ add_library( # Sets the name of the library.
         "src/main/cpp/source/native_task.cpp"
         "src/main/cpp/source/find_primes_native_task.cpp")
 
-set(TASKR_SOURCE_FILES
-        "src/main/cpp/EasyTasks/source/task.cpp"
-        "src/main/cpp/EasyTasks/source/task_listener.cpp"
-        "src/main/cpp/EasyTasks/source/find_primes_task.cpp"
-        "src/main/cpp/EasyTasks/source/debug_listener.cpp"
-        "src/main/cpp/EasyTasks/source/multithreaded_task.cpp"
-        )
-
-include_directories("src/main/cpp/EasyTasks/include")
-
-add_library(Taskr SHARED ${TASKR_SOURCE_FILES})
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -46,15 +35,7 @@ find_library( # Sets the name of the path variable.
 
 target_link_libraries( # Specifies the target library.
         native-utils
-        Taskr
-
-        # Links the target library to the log library
-        # included in the NDK.
-        ${log-lib})
-
-# We need to do this again or android log wont work in Taskr
-target_link_libraries( # Specifies the target library.
-        Taskr
+        Tasker
 
         # Links the target library to the log library
         # included in the NDK.

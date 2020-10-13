@@ -1,8 +1,5 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'com.google.gms.google-services'
-
-//Crashlytics
 apply plugin: 'com.google.firebase.crashlytics'
 
 android {
@@ -33,13 +30,17 @@ android {
                 strippedNativeLibsDir 'build\\intermediates\\stripped_native_libs\\release\\out\\lib'
                 unstrippedNativeLibsDir 'build\\intermediates\\cmake\\release\\obj'
             }
+
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
         }
 
         debug {
             firebaseCrashlytics {
                 nativeSymbolUploadEnabled true
-                strippedNativeLibsDir 'build\\intermediates\\stripped_native_libs\\debug\\out\\lib'
-                unstrippedNativeLibsDir 'build\\intermediates\\cmake\\debug\\obj'
+                strippedNativeLibsDir 'src\\main\\jniLibs'
+                unstrippedNativeLibsDir 'src\\main\\jniLibs'
             }
         }
     }
@@ -53,7 +54,14 @@ android {
         }
     }
     ndkVersion '21.0.6113669'
+
+    packagingOptions {
+        pickFirst '**/libTasker.so'
+    }
 }
+
+// Upload Crashlytics NDK symbols
+tasks.whenTaskAdded { task -> if (task.name.startsWith('assemble')) task.finalizedBy "uploadCrashlyticsSymbolFile" + task.name.substring('assemble'.length()) }
 
 dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
