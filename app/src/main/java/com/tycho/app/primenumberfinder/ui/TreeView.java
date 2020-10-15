@@ -172,13 +172,6 @@ public class TreeView extends View {
     public void draw(Canvas canvas) {
         super.draw(canvas);
 
-        //final Rect rect = canvas.getClipBounds();
-        //rect.inset(-30, -30);
-        //canvas.clipRect(rect, Region.Op.REPLACE);
-
-        // Clear canvas
-        canvas.drawColor(Color.TRANSPARENT);
-
         // Draw background
         paint.clearShadowLayer();
         paint.setStyle(Paint.Style.FILL);

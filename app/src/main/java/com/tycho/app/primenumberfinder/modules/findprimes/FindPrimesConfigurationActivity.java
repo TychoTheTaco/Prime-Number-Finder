@@ -58,6 +58,9 @@ public class FindPrimesConfigurationActivity extends TaskConfigurationActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.find_primes_configuration_activity);
 
+        // Set default search options
+        searchOptions.setThreadCount(Runtime.getRuntime().availableProcessors());
+
         //Set the actionbar to a custom toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -153,7 +156,7 @@ public class FindPrimesConfigurationActivity extends TaskConfigurationActivity{
 
         //Set up thread count
         threadCountSpinner = findViewById(R.id.thread_count_spinner);
-        final String[] items = new String[Runtime.getRuntime().availableProcessors()];
+        final String[] items = new String[searchOptions.getThreadCount()];
         for (int i = 0; i < items.length; i++) {
             items[i] = String.valueOf(i + 1);
         }

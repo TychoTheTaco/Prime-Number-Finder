@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -100,22 +101,21 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         taskControlBubble.getLeftView().setOnClickListener(v -> {
+
+            // Make sure task has stopped
+            if (getTask().getState() != Task.State.STOPPED){
+                Toast.makeText(getContext(), "Task must be finished!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             final ProgressDialog progressDialog = new ProgressDialog(getActivity());
             progressDialog.setTitle("Loading...");
             progressDialog.show();
 
             new Thread(() -> {
 
-                //Save to file
-                final File file;
-                if (getTask().getState() == Task.State.STOPPED && getTask().isSaved()){
-                    // Task is stopped and saved already, load saved file
-                    file = FileManager.buildFile(getTask());
-                }else{
-                    // Task has not finished or is not saved, saved to temp file
-                    file = new File(getTask().getCacheDirectory() + File.separator + "primes");
-                    getTask().saveToFile(file);
-                }
+                final File file = new File(getTask().getCacheDirectory() + File.separator + "primes");
+                getTask().saveToFile(file);
 
                 handler.post(progressDialog::dismiss);
 

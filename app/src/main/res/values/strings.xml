@@ -108,6 +108,7 @@
     </plurals>
     <string name="scroll_to_top">Scroll to top</string>
     <string name="scroll_to_bottom">Scroll to bottom</string>
+    <string name="error_loading_file_message">There was a problem loading this file!</string>
 
     <!-- About page -->
     <string name="developed_by_description">This application was developed by Tycho Bellers.</string>

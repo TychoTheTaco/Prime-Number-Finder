@@ -4,13 +4,14 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.appbar.CollapsingToolbarLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import androidx.annotation.Nullable;
+
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
@@ -142,9 +143,9 @@ public abstract class DisplayContentActivity extends AbstractActivity{
     protected void showLoadingError(){
         final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle("Error!");
-        alertDialog.setMessage("An unknown error occurred while loading this file.");
+        alertDialog.setMessage(getString(R.string.error_loading_file_message));
         alertDialog.setCancelable(false);
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Okay",
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
                 (dialog, which) -> {
                     alertDialog.dismiss();
                     finish();

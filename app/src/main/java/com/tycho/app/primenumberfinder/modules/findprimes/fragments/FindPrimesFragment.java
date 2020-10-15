@@ -74,6 +74,23 @@ public class FindPrimesFragment extends ModuleHostFragment {
 
             final NumberFormat numberFormat = NumberFormat.getNumberInstance();
 
+            //Set up check primality button
+            final Button buttonCheckPrimality = rootView.findViewById(R.id.check_primality_button);
+            buttonCheckPrimality.setOnClickListener(v -> {
+
+                //Check if the number is valid
+                if (Validator.isPrimalityInputValid(getPrimalityInput())) {
+
+                    //Create a new task
+                    final ITask task = new CheckPrimalityTask(getPrimalityInput().longValue());
+                    startTask(task);
+                    hideKeyboard(getActivity());
+
+                } else {
+                    Toast.makeText(getActivity(), getString(R.string.error_invalid_number), Toast.LENGTH_SHORT).show();
+                }
+            });
+
             //Set up number input
             editTextPrimalityInput = rootView.findViewById(R.id.primality_input);
             editTextPrimalityInput.setHint(numberFormat.format(new Random().nextInt(1_000_000)));
@@ -94,23 +111,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
                     editTextPrimalityInput.setValid(Validator.isPrimalityInputValid(getPrimalityInput()));
                 }
             });
-
-            //Set up check primality button
-            final Button buttonCheckPrimality = rootView.findViewById(R.id.check_primality_button);
-            buttonCheckPrimality.setOnClickListener(v -> {
-
-                //Check if the number is valid
-                if (Validator.isPrimalityInputValid(getPrimalityInput())) {
-
-                    //Create a new task
-                    final ITask task = new CheckPrimalityTask(getPrimalityInput().longValue());
-                    startTask(task);
-                    hideKeyboard(getActivity());
-
-                } else {
-                    Toast.makeText(getActivity(), getString(R.string.error_invalid_number), Toast.LENGTH_SHORT).show();
-                }
-            });
+            editTextPrimalityInput.setOnEditorActionListener((v, actionId, event) -> buttonCheckPrimality.performClick());
 
             //Set up range start input
             editTextSearchRangeStart = rootView.findViewById(R.id.search_range_start);

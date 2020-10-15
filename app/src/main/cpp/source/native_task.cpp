@@ -91,34 +91,42 @@ extern "C"{
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeStart(JNIEnv *env, jobject self, jlong task_ptr) {
+    __android_log_print(ANDROID_LOG_VERBOSE, TAG, "start(%d)", (int) reinterpret_cast<std::uintptr_t>((Task*) task_ptr));
     ((Task*) task_ptr)->start();
 }
 
 JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeStartOnNewThread(JNIEnv *env, jobject self, jlong task_ptr) {
+    __android_log_print(ANDROID_LOG_VERBOSE, TAG, "startOnNewThread(%d)", (int) reinterpret_cast<std::uintptr_t>((Task*) task_ptr));
     ((Task*) task_ptr)->startOnNewThread();
 }
 
 JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativePause(JNIEnv *env, jobject self, jlong task_ptr) {
+    __android_log_print(ANDROID_LOG_VERBOSE, TAG, "pause(%d)", (int) reinterpret_cast<std::uintptr_t>((Task*) task_ptr));
     ((Task*) task_ptr)->pause();
 }
 
 JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativePauseAndWait(JNIEnv *env, jobject self, jlong task_ptr) {
+    __android_log_print(ANDROID_LOG_VERBOSE, TAG, "pauseAndWait(%d)", (int) reinterpret_cast<std::uintptr_t>((Task*) task_ptr));
     ((Task*) task_ptr)->pauseAndWait();
 }
 
 JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeResume(JNIEnv *env, jobject self, jlong task_ptr) {
+    __android_log_print(ANDROID_LOG_VERBOSE, TAG, "resume(%d)", (int) reinterpret_cast<std::uintptr_t>((Task*) task_ptr));
     ((Task*) task_ptr)->resume();
 }
 
 JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeResumeAndWait(JNIEnv *env, jobject self, jlong task_ptr) {
+    __android_log_print(ANDROID_LOG_VERBOSE, TAG, "resumeAndWait(%d)", (int) reinterpret_cast<std::uintptr_t>((Task*) task_ptr));
     ((Task*) task_ptr)->resumeAndWait();
 }
 
 JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeStop(JNIEnv *env, jobject self, jlong task_ptr) {
+    __android_log_print(ANDROID_LOG_VERBOSE, TAG, "stop(%d)", (int) reinterpret_cast<std::uintptr_t>((Task*) task_ptr));
     ((Task*) task_ptr)->stop();
 }
 
 JNIEXPORT void JNICALL Java_com_tycho_app_primenumberfinder_NativeTask_nativeStopAndWait(JNIEnv *env, jobject self, jlong task_ptr) {
+    __android_log_print(ANDROID_LOG_VERBOSE, TAG, "stopAndWait(%d)", (int) reinterpret_cast<std::uintptr_t>((Task*) task_ptr));
     ((Task*) task_ptr)->stopAndWait();
 }
 
