@@ -39,8 +39,8 @@ android {
         debug {
             firebaseCrashlytics {
                 nativeSymbolUploadEnabled true
-                strippedNativeLibsDir 'src\\main\\jniLibs'
-                unstrippedNativeLibsDir 'src\\main\\jniLibs'
+                strippedNativeLibsDir 'src/main/jniLibs'
+                unstrippedNativeLibsDir 'src/main/jniLibs'
             }
         }
     }

@@ -19,12 +19,10 @@ public interface FindPrimesTask extends ITask, Savable {
 
     long getStartValue();
     long getEndValue();
-    int getCurrentFactor();
 
     int getPrimeCount();
     int getThreadCount();
 
-    String getStatus();
     File getCacheDirectory();
 
     boolean isEndless();

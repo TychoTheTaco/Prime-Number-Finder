@@ -1,128 +1,137 @@
 #pragma once
+
 #include "multithreaded_task.h"
 
 // The type of number used to store and process prime numbers. This determines the maximum prime number that can be calculated.
 using num_type = uint_fast64_t;
 
 class FindPrimesTask : public MultithreadedTask {
-	
-	public:
 
-	static const unsigned int RANGE_INFINITY = 0;
+    public:
 
-	enum SearchMethod {
-		BRUTE_FORCE,
-		SIEVE_OF_ERATOSTHENES
-	};
+    static const unsigned int RANGE_INFINITY = 0;
 
-	enum SearchMode {
-		PARTITION,
-		ALTERNATE,
-		PACKET
-	};
+    enum SearchMethod {
+        BRUTE_FORCE,
+        SIEVE_OF_ERATOSTHENES
+    };
 
-	FindPrimesTask(num_type start_value, num_type end_value, SearchMethod search_method = BRUTE_FORCE, num_type thread_count = 1);
+    enum SearchMode {
+        PARTITION,
+        ALTERNATE,
+        PACKET
+    };
 
-	virtual void run();
+    FindPrimesTask(num_type start_value, num_type end_value, SearchMethod search_method = BRUTE_FORCE, unsigned int thread_count = 1);
 
-	void saveToFile(const std::string file_path);
-	bool isEndless();
+    virtual void run();
 
-	// Getters
-	num_type getStartValue();
-	num_type getEndValue();
-	unsigned int getPrimeCount();
-	SearchMethod getSearchMethod();
-	unsigned int getThreadCount();
-	std::string getCacheDirectory();
-	std::string getStatus();
-	num_type getCurrentFactor();
+    void saveToFile(std::string file_path);
 
-	//Setters
-	void setCacheDirectory(std::string directory);
+    bool isEndless();
 
-	private:
+    // Getters
+    num_type getStartValue();
 
-	num_type start_value;
-	num_type end_value;
+    num_type getEndValue();
 
-	SearchMethod search_method;
-	SearchMode search_mode;
+    unsigned int getPrimeCount();
 
-	unsigned int thread_count;
+    SearchMethod getSearchMethod();
 
-	std::string cache_dir;
+    unsigned int getThreadCount();
 
-	void searchPartitionMode();
-	void searchAlternateMode();
-	void searchPacketMode(num_type packet_size);
-	void executeThreadPool();
+    std::string getCacheDirectory();
 
-	num_type getRange();
-	num_type bytesToNumber(char* bytes);
-	void numberToBytes(num_type number, char destination[]);
+    std::string getStatus();
 
-	class BruteForceTask : public Task {
-		friend class FindPrimesTask;
+    num_type getCurrentFactor();
 
-		public:
-		BruteForceTask(const FindPrimesTask* parent, num_type start_value, num_type end_value, num_type increment = 1);
+    //Setters
+    void setCacheDirectory(std::string directory);
 
-		virtual void run();
+    private:
 
-		virtual float getProgress();
+    num_type start_value;
+    num_type end_value;
 
-		unsigned int getPrimeCount();
+    SearchMethod search_method;
+    SearchMode search_mode;
 
-		private:
-		const FindPrimesTask* parent;
+    const unsigned int thread_count;
 
-		num_type start_value;
-		num_type end_value;
+    std::string cache_dir;
 
-		num_type increment;
+    void searchPartitionMode();
 
-		std::vector<num_type> primes;
+    void searchAlternateMode();
 
-		// Maximum buffer size before primes are saved to a cache file. Set to 0 to disable caching
-		unsigned int buffer_size = 25000;
-		unsigned int prime_count = 0;
-		num_type current_number = 0;
+    void searchPacketMode(num_type packet_size);
 
-		std::string cache_file;
+    void executeThreadPool();
 
-		void dispatchPrimeFound(num_type number);
-		void writeToCache();
-	};
+    num_type getRange();
 
-	class SieveTask : public Task {
-		friend class FindPrimesTask;
+    num_type bytesToNumber(char *bytes);
 
-		public:
-		SieveTask(num_type start_value, num_type end_value);
+    void numberToBytes(num_type number, char destination[]);
 
-		virtual void run();
+    class BruteForceTask : public Task {
+        friend class FindPrimesTask;
 
-		virtual float getProgress();
+        public:
+        BruteForceTask(const FindPrimesTask *parent, num_type start_value, num_type end_value, num_type increment = 1);
 
-		unsigned int getPrimeCount();
+        virtual void run();
 
-		std::vector<num_type> getPrimes();
+        virtual float getProgress();
 
-		std::string getStatus();
-		num_type getCurrentFactor();
+        unsigned int getPrimeCount();
 
-		private:
-		num_type start_value;
-		num_type end_value;
+        private:
+        const FindPrimesTask *parent;
 
-		std::string status = "";
-		num_type sqrt_max;
-		num_type factor;
-		num_type counter;
+        num_type start_value;
+        num_type end_value;
 
-		std::vector<num_type> primes;
-		unsigned int prime_count = 0;
-	};
+        num_type increment;
+
+        std::vector<num_type> primes;
+
+        // Maximum buffer size before primes are saved to a cache file. Set to 0 to disable caching
+        unsigned int buffer_size = 25000;
+        unsigned int prime_count = 0;
+        num_type current_number = 0;
+
+        std::string cache_file;
+
+        void dispatchPrimeFound(num_type number);
+
+        void writeToCache();
+    };
+
+    class SieveTask : public Task {
+        friend class FindPrimesTask;
+
+        public:
+        SieveTask(num_type start_value, num_type end_value);
+
+        virtual void run();
+
+        unsigned int getPrimeCount();
+
+        std::vector<num_type> getPrimes();
+
+        std::string getStatus();
+
+        num_type getCurrentFactor();
+
+        private:
+        num_type start_value;
+        num_type end_value;
+
+        std::vector<num_type> primes;
+        unsigned int prime_count = 0;
+    };
 
 };

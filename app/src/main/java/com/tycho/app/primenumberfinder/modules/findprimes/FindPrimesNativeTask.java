@@ -42,16 +42,6 @@ public class FindPrimesNativeTask extends NativeTask implements FindPrimesTask, 
     }
 
     @Override
-    public int getCurrentFactor() {
-        return nativeGetCurrentFactor(native_task_pointer);
-    }
-
-    @Override
-    public String getStatus() {
-        return nativeGetStatus(native_task_pointer);
-    }
-
-    @Override
     public FindPrimesTask.SearchOptions getSearchOptions() {
         return searchOptions;
     }
@@ -137,8 +127,6 @@ public class FindPrimesNativeTask extends NativeTask implements FindPrimesTask, 
     private native long nativeGetEndValue(final long native_task_pointer);
     private native int nativeGetThreadCount(final long native_task_pointer);
     private native int nativeGetPrimeCount(final long native_task_pointer);
-    private native int nativeGetCurrentFactor(final long native_task_pointer);
-    private native String nativeGetStatus(final long native_task_pointer);
     private native String nativeGetCacheDirectory(final long native_task_pointer);
 
     private native boolean nativeIsEndless(final long native_task_pointer);

@@ -1,5 +1,6 @@
 package com.tycho.app.primenumberfinder.modules.findprimes.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
@@ -19,14 +20,18 @@ import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.DisplayPrimesActivity;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
-import com.tycho.app.primenumberfinder.modules.findprimes.adapters.PrimesAdapter;
+import com.tycho.app.primenumberfinder.modules.findprimes.adapters.BufferedPrimesAdapter;
 import com.tycho.app.primenumberfinder.utils.FileManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import easytasks.ITask;
 import easytasks.Task;
+import easytasks.TaskAdapter;
 
 import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
 
@@ -54,7 +59,18 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
     private RecyclerView recyclerView;
-    private PrimesAdapter adapter;
+    private BufferedPrimesAdapter adapter = new BufferedPrimesAdapter(100);
+
+    private LinearLayoutManager linearLayoutManager;
+    private final CustomScrollListener scrollListener = new CustomScrollListener();
+
+    private FileManager.PrimesFile primesFile;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        linearLayoutManager = new LinearLayoutManager(context);
+    }
 
     @Nullable
     @Override
@@ -70,10 +86,10 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         //Set up recycler view
         recyclerView = rootView.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        adapter = new PrimesAdapter(requireContext());
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(null);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.addOnScrollListener(scrollListener);
 
         initDefaultState();
 
@@ -187,26 +203,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
             }
 
             //Body
-            switch (getTask().getSearchOptions().getSearchMethod()) {
-                case BRUTE_FORCE:
-                    bodyTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.find_primes_body_text), new String[]{NUMBER_FORMAT.format(getTask().getPrimeCount())}, getTextHighlight()));
-                    break;
-
-                case SIEVE_OF_ERATOSTHENES:
-                    switch (getTask().getStatus()) {
-                        default:
-                            bodyTextView.setText("Preparing...");
-                            break;
-
-                        case "counting":
-                            bodyTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.find_primes_body_text_sieve_counting), new String[]{NUMBER_FORMAT.format(getTask().getPrimeCount())}, getTextHighlight()));
-                            break;
-
-                        case "searching":
-                            bodyTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.find_primes_body_text_sieve_marking), new String[]{NUMBER_FORMAT.format(getTask().getCurrentFactor())}, getTextHighlight()));
-                            break;
-                    }
-                    break;
+            if (getTask().getSearchOptions().getSearchMethod() == BRUTE_FORCE) {
+                bodyTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.find_primes_body_text), new String[]{NUMBER_FORMAT.format(getTask().getPrimeCount())}, getTextHighlight()));
             }
         }
     }
@@ -216,10 +214,37 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         return (FindPrimesTask) super.getTask();
     }
 
+    private final Object LOCK = new Object();
+    private boolean cancel = false;
+
     @Override
     public synchronized void setTask(final ITask task) {
         super.setTask(task);
+        adapter.getPrimes().clear();
+        adapter.notifyDataSetChanged();
         if (getTask() != null) {
+            task.addTaskListener(new TaskAdapter(){
+                @Override
+                public void onTaskStopped(ITask task) {
+                    // Save to temporary file
+                    final File file = new File(getTask().getCacheDirectory() + File.separator + "primes");
+                    getTask().saveToFile(file);
+                    
+                    // Load items into adapter
+                    try {
+                        primesFile = new FileManager.PrimesFile(file);
+                        synchronized (LOCK){
+                            adapter.getPrimes().addAll(primesFile.readNumbers(0, 1000));
+                            cancel = true;
+                        }
+                        if (recyclerView != null){
+                            recyclerView.post(() -> adapter.notifyItemRangeInserted(0, adapter.getItemCount()));
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
             if (getView() != null) {
                 initDefaultState();
             }
@@ -231,5 +256,97 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         super.onResetViews();
         progress.setVisibility(getTask().isEndless() ? View.GONE : View.VISIBLE);
         bodyTextView.setVisibility(View.VISIBLE);
+    }
+
+    private class CustomScrollListener extends RecyclerView.OnScrollListener {
+
+        private int totalItemCount, lastVisibleItem, visibleThreshold = 0;
+
+        private final int INCREMENT = 250;
+        private int firstItemIndex;
+
+        @Override
+        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+            totalItemCount = linearLayoutManager.getItemCount();
+            lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+
+            if (totalItemCount == 0){
+                return;
+            }
+
+            if (totalItemCount - 1 <= (lastVisibleItem + visibleThreshold)) {
+                loadBelow();
+            } else if (linearLayoutManager.findFirstVisibleItemPosition() <= visibleThreshold) {
+                if (firstItemIndex > 0) {
+                    loadAbove();
+                }
+            }
+        }
+
+        private void loadAbove() {
+            synchronized (LOCK){
+                if (cancel){
+                    cancel = false;
+                    return;
+                }
+
+                //Try to read new numbers
+                final List<Long> numbers = new ArrayList<>();
+                try{
+                    numbers.addAll(primesFile.readNumbers(firstItemIndex - INCREMENT, INCREMENT));
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
+
+                if (numbers.size() > 0){
+                    //Remove items from end
+                    adapter.getPrimes().subList(adapter.getItemCount() - INCREMENT, adapter.getItemCount() - 1).clear();
+                    recyclerView.post(() -> adapter.notifyItemRangeRemoved(adapter.getPrimes().size(), INCREMENT));
+
+                    //Add items to beginning
+                    for (int i = numbers.size() - 1; i >= 0; i--) {
+                        adapter.getPrimes().add(0, numbers.get(i));
+                    }
+                    recyclerView.post(() -> adapter.notifyItemRangeInserted(0, numbers.size()));
+                    firstItemIndex -= numbers.size();
+                }
+            }
+        }
+
+        private void loadBelow() {
+            synchronized (LOCK){
+                if (cancel){
+                    cancel = false;
+                    return;
+                }
+
+                //Try to read new items
+                final List<Long> numbers = new ArrayList<>();
+                try{
+                    numbers.addAll(primesFile.readNumbers(firstItemIndex + totalItemCount, INCREMENT));
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+                if (numbers.size() > 0){
+                    final boolean endOfFile = numbers.size() < INCREMENT;
+
+                    if (!endOfFile) {
+                        //Remove items from beginning
+                        adapter.getPrimes().subList(0, INCREMENT).clear();
+                        recyclerView.post(() -> adapter.notifyItemRangeRemoved(0, INCREMENT));
+                    }
+
+                    //Add items to end
+                    adapter.getPrimes().addAll(numbers);
+                    recyclerView.post(() -> adapter.notifyItemRangeInserted(adapter.getItemCount(), numbers.size()));
+
+                    if (!endOfFile) {
+                        firstItemIndex += numbers.size();
+                    }
+                }
+            }
+
+        }
     }
 }

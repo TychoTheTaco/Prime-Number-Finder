@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.util.Log;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -39,8 +38,7 @@ public class PrimeNumberFinder extends Application {
         PreferenceManager.initialize(this);
 
         //Disable Crashlytics for debug builds
-        //FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG);
-        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG);
 
         //Initialize analytics
         FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(PreferenceManager.getBoolean(PreferenceManager.Preference.ALLOW_ANALYTICS) && !BuildConfig.DEBUG);
@@ -50,8 +48,7 @@ public class PrimeNumberFinder extends Application {
         try {
             return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "Error getting version name!");
-            return "unknown";
+            return "Unknown";
         }
     }
 
