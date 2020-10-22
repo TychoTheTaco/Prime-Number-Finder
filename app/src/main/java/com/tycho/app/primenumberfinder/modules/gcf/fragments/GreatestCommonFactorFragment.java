@@ -98,7 +98,7 @@ public class GreatestCommonFactorFragment extends ModuleHostFragment {
         for (ValidEditText input : inputs){
             if (Validator.isValidLCMInput((BigInteger) input.getNumberValue())){
                 input.setValid(true);
-            }else{
+            }else if (input.length() == 0){
                 input.setValid(getBigNumbers().size() >= 2);
             }
         }
@@ -107,7 +107,9 @@ public class GreatestCommonFactorFragment extends ModuleHostFragment {
     private List<BigInteger> getBigNumbers(){
         final List<BigInteger> numbers = new ArrayList<>();
         for (ValidEditText editText : inputs){
-            if (Validator.isValidLCMInput((BigInteger) editText.getNumberValue())) numbers.add((BigInteger) editText.getNumberValue());
+            if (editText.length() > 0){
+                numbers.add((BigInteger) editText.getNumberValue());
+            }
         }
         return numbers;
     }

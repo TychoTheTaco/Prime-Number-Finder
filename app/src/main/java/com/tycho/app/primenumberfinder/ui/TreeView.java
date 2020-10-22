@@ -177,11 +177,6 @@ public class TreeView extends View {
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(Color.TRANSPARENT);
         canvas.drawRoundRect(0, 0, getWidth(), getHeight(), borderRadius, borderRadius, paint);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(ContextCompat.getColor(getContext(), R.color.text_color));
-        final float strokeWidth = Utils.dpToPx(getContext(), 1.5f);
-        paint.setStrokeWidth(strokeWidth);
-        canvas.drawRoundRect(strokeWidth, strokeWidth, getWidth() - strokeWidth, getHeight() - strokeWidth, borderRadius, borderRadius, paint);
         paint.setShadowLayer(32, 6, 6, Color.argb(64, 0, 0, 0));
 
         canvas.save();
