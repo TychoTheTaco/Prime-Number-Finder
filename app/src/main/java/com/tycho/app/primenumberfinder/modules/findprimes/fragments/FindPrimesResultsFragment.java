@@ -33,6 +33,7 @@ import java.util.List;
 import easytasks.ITask;
 import easytasks.Task;
 import easytasks.TaskAdapter;
+import easytasks.TaskListener;
 
 import static com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask.SearchOptions.SearchMethod.BRUTE_FORCE;
 
@@ -217,34 +218,50 @@ public class FindPrimesResultsFragment extends ResultsFragment {
     private final Object LOCK = new Object();
     private boolean cancel = false;
 
+    private final TaskListener taskListener = new TaskAdapter(){
+        @Override
+        public void onTaskStopped(ITask task) {
+            // Save to temporary file
+            final File file = new File(getTask().getCacheDirectory() + File.separator + "primes");
+            getTask().saveToFile(file);
+
+            // Load items into adapter
+            try {
+                primesFile = new FileManager.PrimesFile(file);
+                synchronized (LOCK){
+                    final List<Long> numbers = primesFile.readNumbers(0, 1000);
+                    if (recyclerView != null){
+                        recyclerView.post(() -> {
+                            adapter.getPrimes().addAll(numbers);
+                            adapter.notifyItemRangeInserted(0, adapter.getItemCount());
+                        });
+                    }else{
+                        adapter.getPrimes().addAll(numbers);
+                    }
+                    cancel = true;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
     @Override
     public synchronized void setTask(final ITask task) {
+        if (getTask() != null){
+            getTask().removeTaskListener(taskListener);
+        }
         super.setTask(task);
-        adapter.getPrimes().clear();
-        adapter.notifyDataSetChanged();
-        if (getTask() != null) {
-            task.addTaskListener(new TaskAdapter(){
-                @Override
-                public void onTaskStopped(ITask task) {
-                    // Save to temporary file
-                    final File file = new File(getTask().getCacheDirectory() + File.separator + "primes");
-                    getTask().saveToFile(file);
-                    
-                    // Load items into adapter
-                    try {
-                        primesFile = new FileManager.PrimesFile(file);
-                        synchronized (LOCK){
-                            adapter.getPrimes().addAll(primesFile.readNumbers(0, 1000));
-                            cancel = true;
-                        }
-                        if (recyclerView != null){
-                            recyclerView.post(() -> adapter.notifyItemRangeInserted(0, adapter.getItemCount()));
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+        if (recyclerView != null){
+            recyclerView.post(() -> {
+                adapter.getPrimes().clear();
+                adapter.notifyDataSetChanged();
             });
+        }else{
+            adapter.getPrimes().clear();
+        }
+        if (getTask() != null) {
+            task.addTaskListener(taskListener);
             if (getView() != null) {
                 initDefaultState();
             }

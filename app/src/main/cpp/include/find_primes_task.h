@@ -26,31 +26,29 @@ class FindPrimesTask : public MultithreadedTask {
 
     virtual void run();
 
-    void saveToFile(std::string file_path);
+    void saveToFile(const std::string& file_path);
 
-    bool isEndless();
+    bool isEndless() const;
 
     // Getters
-    num_type getStartValue();
+    num_type getStartValue() const;
 
-    num_type getEndValue();
+    num_type getEndValue() const;
 
     unsigned int getPrimeCount();
 
     SearchMethod getSearchMethod();
 
-    unsigned int getThreadCount();
+    unsigned int getThreadCount() const;
 
     std::string getCacheDirectory();
 
-    std::string getStatus();
-
-    num_type getCurrentFactor();
-
     //Setters
-    void setCacheDirectory(std::string directory);
+    void setCacheDirectory(const std::string& directory);
 
     private:
+
+    std::mutex saveLock;
 
     num_type start_value;
     num_type end_value;
@@ -70,9 +68,9 @@ class FindPrimesTask : public MultithreadedTask {
 
     void executeThreadPool();
 
-    num_type getRange();
+    num_type getRange() const;
 
-    num_type bytesToNumber(char *bytes);
+    num_type bytesToNumber(const char *bytes);
 
     void numberToBytes(num_type number, char destination[]);
 
@@ -86,7 +84,7 @@ class FindPrimesTask : public MultithreadedTask {
 
         virtual float getProgress();
 
-        unsigned int getPrimeCount();
+        unsigned int getPrimeCount() const;
 
         private:
         const FindPrimesTask *parent;
@@ -118,13 +116,9 @@ class FindPrimesTask : public MultithreadedTask {
 
         virtual void run();
 
-        unsigned int getPrimeCount();
+        unsigned int getPrimeCount() const;
 
         std::vector<num_type> getPrimes();
-
-        std::string getStatus();
-
-        num_type getCurrentFactor();
 
         private:
         num_type start_value;

@@ -2,8 +2,9 @@ package com.tycho.app.primenumberfinder.modules;
 
 import android.os.Handler;
 import android.os.Looper;
-import androidx.fragment.app.Fragment;
 import android.util.Log;
+
+import androidx.fragment.app.Fragment;
 
 import easytasks.ITask;
 import easytasks.Task;
@@ -76,7 +77,7 @@ public abstract class TaskFragment extends Fragment implements TaskListener {
         //Remove task listener from previous task
         if (this.task != null){
             if (!this.task.removeTaskListener(this)){
-                Log.w(TAG, "Failed to remove task listener from " + this.task);
+                Log.e(TAG, "Failed to remove task listener from " + this.task);
             }
         }
 

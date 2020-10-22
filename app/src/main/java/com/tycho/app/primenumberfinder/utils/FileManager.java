@@ -116,7 +116,7 @@ public final class FileManager {
         deleteDirectory(getExportCacheDirectory(), false);
 
         //Clear cache directory //TODO: Dont do this if there are running tasks
-        deleteDirectory(new File(context.getFilesDir() + File.separator + "cache" + File.separator), false);
+        //deleteDirectory(new File(context.getFilesDir() + File.separator + "cache" + File.separator), false);
     }
 
     public static File buildFile(final ITask task) {

@@ -3,6 +3,7 @@ package com.tycho.app.primenumberfinder.modules;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,8 @@ import com.tycho.app.primenumberfinder.modules.lcm.LeastCommonMultipleTask;
 import com.tycho.app.primenumberfinder.modules.primefactorization.PrimeFactorizationTask;
 import com.tycho.app.primenumberfinder.utils.PreferenceManager;
 import com.tycho.app.primenumberfinder.utils.Utils;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import easytasks.ITask;
 import easytasks.TaskAdapter;
@@ -57,7 +60,7 @@ public abstract class ModuleHostFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.module_host_fragment, container, false);
 
         //Give the root view focus to prevent EditTexts from initially getting focus
-        rootView.requestFocus();
+        //rootView.requestFocus();
 
         return rootView;
     }
@@ -110,6 +113,8 @@ public abstract class ModuleHostFragment extends Fragment {
         return -1;
     }
 
+    private AtomicInteger taskCount = new AtomicInteger(0);
+
     protected void startTask(final ITask task){
         final ITask previousTask = this.resultsFragment.getTask();
         if (previousTask != null){
@@ -122,6 +127,7 @@ public abstract class ModuleHostFragment extends Fragment {
             @Override
             public void onTaskStarted(ITask task) {
                 actionViewListener.onTaskStatesChanged(getTaskType(task), true);
+                taskCount.getAndIncrement();
             }
 
             @Override
@@ -141,6 +147,7 @@ public abstract class ModuleHostFragment extends Fragment {
                 bundle.putLong("duration", task.getElapsedTime());
                 FirebaseAnalytics.getInstance(requireContext()).logEvent("task_finished", bundle);
                 actionViewListener.onTaskStatesChanged(getTaskType(task), false);
+                Log.e(TAG, "ACTIVE TASKS: " + taskCount.decrementAndGet());
             }
         });
 
