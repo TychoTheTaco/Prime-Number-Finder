@@ -18,7 +18,6 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.tycho.app.primenumberfinder.R;
-import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.findfactors.fragments.FindFactorsResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.fragments.CheckPrimalityResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.fragments.FindPrimesResultsFragment;
@@ -95,9 +94,6 @@ public abstract class ResultsFragment extends TaskFragment {
         // Set up task controls
         taskControlBubble = view.findViewById(R.id.task_control_bubble);
         taskControlBubble.setVisibility(View.GONE);
-
-        // Set up save button
-        taskControlBubble.getRightView().setOnClickListener((v)->{if (getTask() instanceof Savable) Utils.save((Savable) getTask(), getActivity());});
     }
 
     @Override
@@ -423,7 +419,6 @@ public abstract class ResultsFragment extends TaskFragment {
 
         //Buttons
         pauseButton = rootView.findViewById(R.id.pause_button);
-
 
         //Set up pause button
         pauseButton.setOnClickListener(v -> {

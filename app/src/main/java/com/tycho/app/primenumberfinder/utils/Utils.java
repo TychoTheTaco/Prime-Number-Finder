@@ -412,10 +412,12 @@ public final class Utils {
         return ((color & 0x00FFFFFF) | ((int) (255 * alpha) << 24));
     }
 
-    public static void save(final Savable task, final Context context) {
+    public static void save(final Savable task, final Context context, final boolean showDialog) {
         final ProgressDialog progressDialog = new ProgressDialog(context);
-        progressDialog.setTitle("Saving...");
-        progressDialog.show();
+        if (showDialog){
+            progressDialog.setTitle("Saving...");
+            progressDialog.show();
+        }
 
         // Analytics
         final Bundle bundle = new Bundle();
@@ -425,7 +427,7 @@ public final class Utils {
         new Thread(() -> {
             final boolean saved = task.save();
             new Handler(Looper.getMainLooper()).post(() -> {Toast.makeText(context.getApplicationContext(), saved ? context.getString(R.string.successfully_saved_file) : context.getString(R.string.error_saving_file), Toast.LENGTH_SHORT).show();});
-            progressDialog.dismiss();
+            if (showDialog) progressDialog.dismiss();
         }).start();
     }
 }

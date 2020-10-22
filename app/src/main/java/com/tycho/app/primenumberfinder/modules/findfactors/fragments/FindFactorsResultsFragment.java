@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findfactors.DisplayFactorsActivity;
 import com.tycho.app.primenumberfinder.modules.findfactors.FindFactorsTask;
@@ -55,7 +56,7 @@ public class FindFactorsResultsFragment extends ResultsFragment {
     private final SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         adapter = new FactorsListAdapter(context);
     }
@@ -121,6 +122,9 @@ public class FindFactorsResultsFragment extends ResultsFragment {
             intent.putExtra("filePath", file.getAbsolutePath());
             requireActivity().startActivity(intent);
         }).start());
+
+        // Set up save button
+        taskControlBubble.getRightView().setOnClickListener((v)->{if (getTask() instanceof Savable) Utils.save((Savable) getTask(), getActivity(), false);});
     }
 
     @Override

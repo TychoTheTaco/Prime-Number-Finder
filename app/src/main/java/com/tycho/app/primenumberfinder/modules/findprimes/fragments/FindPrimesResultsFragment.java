@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.tycho.app.primenumberfinder.LongClickLinkMovementMethod;
 import com.tycho.app.primenumberfinder.ProgressDialog;
 import com.tycho.app.primenumberfinder.R;
+import com.tycho.app.primenumberfinder.Savable;
 import com.tycho.app.primenumberfinder.modules.ResultsFragment;
 import com.tycho.app.primenumberfinder.modules.findprimes.DisplayPrimesActivity;
 import com.tycho.app.primenumberfinder.modules.findprimes.FindPrimesTask;
@@ -126,6 +127,9 @@ public class FindPrimesResultsFragment extends ResultsFragment {
                 getActivity().startActivity(intent);
             }).start();
         });
+
+        // Set up save button
+        taskControlBubble.getRightView().setOnClickListener((v)->{if (getTask() instanceof Savable) Utils.save((Savable) getTask(), getActivity(), true);});
     }
 
     @Override
