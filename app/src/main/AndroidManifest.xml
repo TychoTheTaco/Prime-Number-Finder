@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.tycho.app.primenumberfinder">
 
-    <!-- Required by Crashlytics -->
+    <!-- Required by Firebase Analytics -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
