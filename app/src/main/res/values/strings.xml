@@ -57,7 +57,6 @@
     <string name="find_primes_body_text">Already found %1$s prime numbers.</string>
     <string name="check_primality_result">%1$s is %2$s.</string>
     <string name="check_primality_result_negative">%1$s is %2$s because it is divisible by %3$s.</string>
-    <string name="no_tasks_message">No tasks to display. Start one with the buttons above or the floating action button.</string>
     <string name="check_primality_subtitle_searching">Checking primality of %1$s.</string>
     <string name="primes_list_toast_message">%1$s is the %2$s number.</string>
 
@@ -127,8 +126,6 @@
 
     <!-- Button text -->
     <string name="start">Start</string>
-    <string name="content_description_pause_button">Pause</string>
-    <string name="content_description_reset_button">Reset</string>
     <string name="view_all">View all</string>
     <string name="save">Save</string>
 
@@ -161,11 +158,9 @@
 
     <!-- Miscellaneous -->
     <string name="factors_list_multiply_separator">&#160;x&#160;</string>
-    <string name="task_progress">%1$s%%</string>
     <string name="successfully_saved_file">Successfully saved file.</string>
     <string name="error_saving_file">Error saving file!</string>
     <string name="hex">0x%1$s</string>
-    <string name="saved">Saved</string>
     <string name="open_drawer">Open Navigation Drawer</string>
     <string name="close_drawer">Close Navigation Drawer</string>
     <string name="advanced">Advanced</string>
