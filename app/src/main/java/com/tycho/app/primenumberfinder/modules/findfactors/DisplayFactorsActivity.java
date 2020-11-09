@@ -1,14 +1,15 @@
 package com.tycho.app.primenumberfinder.modules.findfactors;
 
 import android.os.Bundle;
-import com.google.android.material.appbar.AppBarLayout;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
 import android.text.SpannableStringBuilder;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.activities.DisplayContentActivity;
@@ -19,6 +20,8 @@ import com.tycho.app.primenumberfinder.utils.Utils;
 
 import java.io.File;
 import java.text.NumberFormat;
+
+import static com.tycho.app.primenumberfinder.activities.DisplayContentActivity.Flag.ALLOW_SEARCH;
 
 /**
  * @author Tycho Bellers
@@ -43,6 +46,8 @@ public class DisplayFactorsActivity extends DisplayContentActivity {
         super.onCreate(savedInstanceState);
         setTheme(R.style.FindFactors);
         setContentView(R.layout.display_factors_activity);
+
+        setFlag(ALLOW_SEARCH, false);
 
         //Set up the toolbar
         final Toolbar toolbar = findViewById(R.id.toolbar);
@@ -88,7 +93,7 @@ public class DisplayFactorsActivity extends DisplayContentActivity {
         headerTextView.setText(Utils.formatSpannable(new SpannableStringBuilder(), getResources().getQuantityString(R.plurals.find_factors_subtitle_results, factorsFile.getTotalNumbers()), new String[]{
                 NUMBER_FORMAT.format(factorsFile.getNumber()),
                 NUMBER_FORMAT.format(factorsFile.getTotalNumbers()),
-        }, ContextCompat.getColor(getBaseContext(), R.color.white)));
+        }, ContextCompat.getColor(this, R.color.primary_text_very_light)));
 
         resizeCollapsingToolbar();
 

@@ -111,7 +111,8 @@
 
     <!-- About page -->
     <string name="developed_by_description">This application was developed by Tycho Bellers.</string>
-    <string name="contact_developer">Contact Developer</string>
+    <string name="email">Email</string>
+    <string name="github">Github</string>
     <string name="changelog_title">Changelog</string>
     <string name="view_old_versions">View Older Versions</string>
     <string name="credits_title">Credits</string>
@@ -164,5 +165,6 @@
     <string name="open_drawer">Open Navigation Drawer</string>
     <string name="close_drawer">Close Navigation Drawer</string>
     <string name="advanced">Advanced</string>
+    <string name="copied">Copied!</string>
 
 </resources>

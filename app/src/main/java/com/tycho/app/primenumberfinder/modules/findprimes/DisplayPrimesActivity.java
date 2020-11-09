@@ -2,7 +2,6 @@ package com.tycho.app.primenumberfinder.modules.findprimes;
 
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -258,7 +257,7 @@ public class DisplayPrimesActivity extends DisplayContentActivity {
                 NUMBER_FORMAT.format(primesFile.getTotalNumbers()),
                 NUMBER_FORMAT.format(primesFile.getStartValue()),
                 primesFile.getEndValue() == 0 ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(primesFile.getEndValue()),
-        }, ContextCompat.getColor(getBaseContext(), R.color.white)));
+        }, ContextCompat.getColor(this, R.color.primary_text_very_light)));
 
         resizeCollapsingToolbar();
 

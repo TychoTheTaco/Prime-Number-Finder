@@ -84,7 +84,7 @@ public class DisplayPrimeFactorizationActivity extends DisplayContentActivity {
 
         treeView.setTree(factorTree.formatNumbers());
         if (PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 1) {
-            treeView.setExportOptions(new TreeView.DarkThemeExportOptions());
+            treeView.setExportOptions(TreeView.DarkThemeExportOptions.create(this));
         }
 
         final Map<Long, Integer> map = new TreeMap<>();

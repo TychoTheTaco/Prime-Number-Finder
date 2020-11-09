@@ -2,13 +2,13 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:ValidEditText="http://schemas.android.com/apk/res-auto">
     <item ValidEditText:valid="true">
         <shape android:shape="rectangle">
-            <solid android:color="#242424" />
+            <solid android:color="@color/background_dark_light" />
             <corners android:radius="8dp" />
         </shape>
     </item>
     <item ValidEditText:valid="false">
         <shape android:shape="rectangle">
-            <solid android:color="#242424" />
+            <solid android:color="@color/background_dark_light" />
             <stroke android:width="2dp" android:color="@color/red" />
             <corners android:radius="8dp" />
         </shape>

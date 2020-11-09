@@ -127,7 +127,7 @@ public class SavedFilesListAdapter extends SelectableAdapter<SavedFilesListAdapt
 
         if (holder.isSelected()){
             holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(holder.itemView.getContext(), R.color.accent)));
-            holder.fileSize.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.secondary_text));
+            holder.fileSize.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), android.R.color.secondary_text_light));
         }else{
             holder.fileSize.setTextColor(Color.parseColor("#bebebe"));
         }

@@ -1,9 +1,6 @@
 package com.tycho.app.primenumberfinder.modules.savedfiles.sort;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
-import androidx.core.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,13 +39,13 @@ public class SortMethodView implements View.OnClickListener{
         ascendingView.setVisibility(selected ? View.VISIBLE : View.INVISIBLE);
 
         //Apply tint to icons
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        /*if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             for (Drawable drawable : nameTextView.getCompoundDrawables()) {
                 if (drawable != null) {
-                    drawable.mutate().setTint(ContextCompat.getColor(context, R.color.white));
+                    drawable.mutate().setTint(Utils.getColor(android.R.attr.textColorPrimary, this));
                 }
             }
-        }
+        }*/
 
         view.setOnClickListener(this);
 

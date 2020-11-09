@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:includeFontPadding="false"
         android:text="px."
-        android:textColor="@color/secondary_text"
+        android:textColor="?android:textColorSecondary"
         android:textSize="14sp" />
 
     <com.tycho.app.primenumberfinder.ui.RangedSeekBar

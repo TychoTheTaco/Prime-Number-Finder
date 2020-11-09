@@ -83,7 +83,7 @@ public class TreeView extends View {
         paint.setAntiAlias(true);
         paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSize, getResources().getDisplayMetrics()));
         paint.setFakeBoldText(true);
-        paint.setShadowLayer(30, 6, 6, Color.argb(128, 0, 0, 0));
+        paint.setShadowLayer(30, 6, 6, Color.argb(64, 0, 0, 0));
 
         //Set custom attributes
         final TypedArray typedArray = context.getTheme().obtainStyledAttributes(attributeSet, R.styleable.TreeView, 0, 0);
@@ -96,7 +96,7 @@ public class TreeView extends View {
 
         borderRadius = Utils.dpToPx(context, 12);
 
-        exportOptions.itemTextColor = ContextCompat.getColor(context, R.color.text_color);
+        exportOptions.itemTextColor = Utils.getColor(android.R.attr.textColorPrimary,context);
         exportOptions.primeFactorTextColor = ContextCompat.getColor(context, R.color.green);
     }
 
@@ -667,16 +667,23 @@ public class TreeView extends View {
     }
 
     public static class DarkThemeExportOptions extends ExportOptions{
-        public DarkThemeExportOptions(){
+        private DarkThemeExportOptions(){
             this.imageBackgroundColor = Color.argb(255, 74, 74, 74);
 
             this.branchColor = Color.argb(187, 172, 172, 172);
 
             this.itemTextColor = Color.argb(255, 230, 230, 230);
-            this.primeFactorTextColor = Color.argb(255, 255, 43, 43);
+            this.primeFactorTextColor = Color.GREEN;
 
             this.itemBackgroundColor = Color.BLACK;
             this.itemBorderColor = Color.argb(255, 230, 243, 230);
+        }
+
+        public static DarkThemeExportOptions create(final Context context){
+            final DarkThemeExportOptions options = new DarkThemeExportOptions();
+            options.itemTextColor = Utils.getColor(android.R.attr.textColorPrimary, context);
+            options.primeFactorTextColor = ContextCompat.getColor(context, R.color.green_light);
+            return options;
         }
     }
 

@@ -36,7 +36,7 @@
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
                 android:paddingBottom="8dp"
-                android:textColor="@color/primary_text_light" />
+                android:textColor="@color/primary_text_very_light" />
 
             <TextView
                 android:id="@+id/right_message"
@@ -47,7 +47,7 @@
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
                 android:paddingBottom="8dp"
-                android:textColor="@color/primary_text_light" />
+                android:textColor="@color/primary_text_very_light" />
 
         </RelativeLayout>
 

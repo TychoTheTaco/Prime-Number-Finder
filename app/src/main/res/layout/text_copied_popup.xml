@@ -10,12 +10,12 @@
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:drawableStart="@drawable/round_check_24"
-        app:drawableTint="@color/white"
+        app:drawableTint="@color/primary_text_very_light"
         android:paddingEnd="4dp"
+        android:textColor="@color/primary_text_light"
         android:gravity="center_vertical"
         android:paddingStart="4dp"
-        android:text="Copied!"
-        android:textColor="@color/white" />
+        android:text="@string/copied"
+        app:drawableStartCompat="@drawable/round_check_24" />
 
 </LinearLayout>

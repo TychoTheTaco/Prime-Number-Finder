@@ -91,6 +91,37 @@ public class FindPrimesFragment extends ModuleHostFragment {
                 }
             });
 
+            //Set up find primes button
+            final Button buttonFindPrimes = rootView.findViewById(R.id.button_find_primes);
+            buttonFindPrimes.setOnClickListener(v -> {
+
+                //Determine best search method
+                searchOptions.setSearchMethod(determineBestSearchMethod());
+
+                //Check if the range is valid
+                if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
+
+                    //Create a new task
+                    searchOptions.setThreadCount(1);
+
+                    searchOptions.setCacheDirectory(getActivity().getCacheDir());
+
+                    try {
+                        startTask(new FindPrimesNativeTask((FindPrimesTask.SearchOptions) searchOptions.clone()));
+                    } catch (CloneNotSupportedException e) {
+                        e.printStackTrace();
+                    }
+
+                    //Reset search options
+                    searchOptions.setSearchMethod(BRUTE_FORCE);
+
+                    hideKeyboard(getActivity());
+
+                } else {
+                    Toast.makeText(getActivity(), getString(R.string.error_invalid_range), Toast.LENGTH_SHORT).show();
+                }
+            });
+
             //Set up number input
             editTextPrimalityInput = rootView.findViewById(R.id.primality_input);
             editTextPrimalityInput.setHint(numberFormat.format(new Random().nextInt(1_000_000)));
@@ -182,37 +213,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
                 }
             });
             editTextSearchRangeEnd.overrideDefaultTextWatcher();
-
-            //Set up find primes button
-            final Button buttonFindPrimes = rootView.findViewById(R.id.button_find_primes);
-            buttonFindPrimes.setOnClickListener(v -> {
-
-                //Determine best search method
-                searchOptions.setSearchMethod(determineBestSearchMethod());
-
-                //Check if the range is valid
-                if (Validator.isFindPrimesRangeValid(getStartValue(), getEndValue(), searchOptions.getSearchMethod())) {
-
-                    //Create a new task
-                    searchOptions.setThreadCount(1);
-
-                    searchOptions.setCacheDirectory(getActivity().getCacheDir());
-
-                    try {
-                        startTask(new FindPrimesNativeTask((FindPrimesTask.SearchOptions) searchOptions.clone()));
-                    } catch (CloneNotSupportedException e) {
-                        e.printStackTrace();
-                    }
-
-                    //Reset search options
-                    searchOptions.setSearchMethod(BRUTE_FORCE);
-
-                    hideKeyboard(getActivity());
-
-                } else {
-                    Toast.makeText(getActivity(), getString(R.string.error_invalid_range), Toast.LENGTH_SHORT).show();
-                }
-            });
+            editTextSearchRangeEnd.setOnEditorActionListener((v, actionId, event) -> buttonFindPrimes.performClick());
         }
 
         return rootView;

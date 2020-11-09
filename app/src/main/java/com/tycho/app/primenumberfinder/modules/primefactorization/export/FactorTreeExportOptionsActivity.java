@@ -5,10 +5,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.appcompat.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -17,6 +13,11 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.jaredrummler.android.colorpicker.ColorPickerDialog;
@@ -81,7 +82,7 @@ public class FactorTreeExportOptionsActivity extends DisplayContentActivity impl
         treeView = findViewById(R.id.factor_tree_preview);
         exportOptions = treeView.getDefaultExportOptions();
         if (PreferenceManager.getInt(PreferenceManager.Preference.THEME) == 1) {
-            exportOptions = new TreeView.DarkThemeExportOptions();
+            exportOptions = TreeView.DarkThemeExportOptions.create(this);
         }
         treeView.setExportOptions(exportOptions);
 

@@ -95,11 +95,11 @@ public class MainActivity extends AbstractActivity implements ActionViewListener
         //Set up navigation drawer
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
-        switch (PreferenceManager.getInt(PreferenceManager.Preference.THEME)){
+        /*switch (PreferenceManager.getInt(PreferenceManager.Preference.THEME)){
             case 1:
                 navigationView.setBackgroundResource(R.color.background_dark_3);
                 break;
-        }
+        }*/
         for (int i = 0; i < navigationView.getMenu().size(); i++) {
             //Apply icon tint
             /*if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O){

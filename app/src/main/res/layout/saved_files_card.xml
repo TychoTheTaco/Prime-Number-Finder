@@ -2,7 +2,7 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:cardBackgroundColor="?attr/colorBackgroundFloating"
+    app:cardBackgroundColor="?cardBackgroundColor"
     android:layout_height="wrap_content">
 
     <LinearLayout
@@ -23,18 +23,18 @@
                 android:paddingEnd="@dimen/title_padding_end"
                 android:paddingStart="@dimen/title_padding_start"
                 android:paddingTop="@dimen/title_padding_top"
-                android:textColor="@color/white"
+                android:textColor="@color/primary_text_very_light"
                 android:textSize="24sp"/>
 
             <TextView
                 android:id="@+id/subtitle"
                 android:layout_width="match_parent"
+                android:textColor="@color/primary_text_very_light"
                 android:layout_height="wrap_content"
                 android:paddingBottom="@dimen/sub_title_padding_bottom"
                 android:paddingEnd="@dimen/sub_title_padding_end"
                 android:paddingStart="@dimen/sub_title_padding_start"
                 android:paddingTop="@dimen/sub_title_padding_top"
-                android:textColor="@color/white"
                 android:textSize="14sp"/>
 
         </LinearLayout>

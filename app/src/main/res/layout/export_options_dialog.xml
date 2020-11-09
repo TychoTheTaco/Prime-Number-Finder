@@ -63,7 +63,7 @@
             android:layout_height="wrap_content"
             android:gravity="start"
             android:text="@string/item_separator_description"
-            android:textColor="@color/secondary_text"
+            android:textColor="?android:textColorSecondary"
             android:textSize="12sp" />
 
         <com.tycho.app.primenumberfinder.ui.CustomRadioGroup

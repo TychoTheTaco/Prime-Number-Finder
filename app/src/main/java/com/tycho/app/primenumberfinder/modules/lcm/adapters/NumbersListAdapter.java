@@ -1,6 +1,5 @@
 package com.tycho.app.primenumberfinder.modules.lcm.adapters;
 
-import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -8,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tycho.app.primenumberfinder.R;
@@ -34,7 +34,7 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
     /**
      * List of numbers in this adapter.
      */
-    private List<BigInteger> numbers = new ArrayList<>();
+    private final List<BigInteger> numbers = new ArrayList<>();
 
     @NonNull
     @Override
@@ -47,7 +47,7 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
         if (position == getItemCount() - 1){
             holder.input.setBackgroundTintList(Utils.generateColorStateList(
                     new int[]{},
-                    new int[]{Color.LTGRAY}
+                    new int[]{ContextCompat.getColor(holder.itemView.getContext(), android.R.color.secondary_text_light_nodisable)} // TODO: Make different color for light/dark theme
             ));
             holder.input.setShowRandomHint(false);
             holder.input.setHint("+");

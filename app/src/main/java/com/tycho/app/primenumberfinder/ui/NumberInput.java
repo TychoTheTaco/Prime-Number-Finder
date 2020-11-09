@@ -41,7 +41,7 @@ public class NumberInput extends ValidEditText {
         setBackgroundResource(R.drawable.number_input_background);
         setElevation(Utils.dpToPx(context, 2));
         setTextColor(ContextCompat.getColor(context, R.color.primary_text_light));
-        setHintTextColor(ContextCompat.getColor(context, R.color.primary_text_very_light));
+        setHintTextColor(ContextCompat.getColor(context, R.color.secondary_text_light));
 
         // Set cursor drawable. This requires reflection for API < 29
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
