@@ -113,7 +113,7 @@ public abstract class ModuleHostFragment extends Fragment {
         return -1;
     }
 
-    private AtomicInteger taskCount = new AtomicInteger(0);
+    private final AtomicInteger taskCount = new AtomicInteger(0);
 
     protected void startTask(final ITask task){
         final ITask previousTask = this.resultsFragment.getTask();

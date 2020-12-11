@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import easytasks.ITask;
-import easytasks.Task;
 import easytasks.TaskAdapter;
 import easytasks.TaskListener;
 
@@ -104,12 +102,6 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         super.onViewCreated(view, savedInstanceState);
         taskControlBubble.getLeftView().setOnClickListener(v -> {
 
-            // Make sure task has stopped
-            if (getTask().getState() != Task.State.STOPPED){
-                Toast.makeText(getContext(), "Task must be finished!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
             final ProgressDialog progressDialog = new ProgressDialog(getActivity());
             progressDialog.setTitle("Loading...");
             progressDialog.show();
@@ -129,7 +121,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
         });
 
         // Set up save button
-        taskControlBubble.getRightView().setOnClickListener((v)->{if (getTask() instanceof Savable) Utils.save((Savable) getTask(), getActivity(), true);});
+        taskControlBubble.getRightView().setOnClickListener((v)->{if (getTask() != null) Utils.save((Savable) getTask(), getActivity(), true);});
     }
 
     @Override

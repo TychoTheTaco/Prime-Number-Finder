@@ -245,7 +245,7 @@ public class FindPrimesFragment extends ModuleHostFragment {
             return BRUTE_FORCE;
         }
 
-        //Make sure we have enough heap memory to use the sieve
+        //Make sure we have enough memory to use the sieve
         if (getStartValue().compareTo(BigInteger.ZERO) >= 0 && hasEnoughMemoryForSieve()) {
             return SIEVE_OF_ERATOSTHENES;
         }
