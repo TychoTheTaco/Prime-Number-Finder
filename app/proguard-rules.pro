@@ -15,3 +15,6 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+# Ensure mapping.txt can be used to deobfuscate compiled code (https://developer.android.com/studio/build/shrink-code#decode-stack-trace)
+-keepattributes LineNumberTable,SourceFile
