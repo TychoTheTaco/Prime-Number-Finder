@@ -26,7 +26,7 @@ public abstract class ConfigurationActivity<T extends Task> extends AbstractActi
         getMenuInflater().inflate(R.menu.task_configuration_menu, menu);
 
         if (task != null) {
-            menu.findItem(R.id.start).setIcon(R.drawable.ic_save_white_24dp);
+            menu.findItem(R.id.start).setIcon(R.drawable.ic_save);
         }
 
         return true;

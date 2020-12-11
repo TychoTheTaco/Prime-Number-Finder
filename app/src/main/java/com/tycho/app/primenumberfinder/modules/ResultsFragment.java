@@ -116,7 +116,7 @@ public abstract class ResultsFragment extends TaskFragment {
                 if (pauseButton != null){
                     pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(true);
-                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                    pauseButton.setImageResource(R.drawable.ic_pause);
                 }
 
                 onPostStarted();
@@ -139,7 +139,7 @@ public abstract class ResultsFragment extends TaskFragment {
                 if (pauseButton != null){
                     pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(false);
-                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                    pauseButton.setImageResource(R.drawable.ic_pause);
                 }
 
                 onPostPausing();
@@ -163,7 +163,7 @@ public abstract class ResultsFragment extends TaskFragment {
                 if (pauseButton != null){
                     pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(true);
-                    pauseButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+                    pauseButton.setImageResource(R.drawable.ic_pause);
                 }
 
                 onPostPaused();
@@ -186,7 +186,7 @@ public abstract class ResultsFragment extends TaskFragment {
                 if (pauseButton != null){
                     pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(false);
-                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                    pauseButton.setImageResource(R.drawable.ic_pause);
                 }
 
                 onPostResuming();
@@ -210,7 +210,7 @@ public abstract class ResultsFragment extends TaskFragment {
                 if (pauseButton != null){
                     pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(true);
-                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                    pauseButton.setImageResource(R.drawable.ic_pause);
                 }
 
                 onPostResumed();
@@ -234,7 +234,7 @@ public abstract class ResultsFragment extends TaskFragment {
                 if (pauseButton != null){
                     pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(false);
-                    pauseButton.setImageResource(R.drawable.ic_pause_white_24dp);
+                    pauseButton.setImageResource(R.drawable.ic_pause);
                 }
 
                 onPostStopping();

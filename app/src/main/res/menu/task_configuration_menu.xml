@@ -5,7 +5,7 @@
         android:id="@+id/start"
         android:orderInCategory="0"
         app:showAsAction="always"
-        android:icon="@drawable/ic_play_arrow_white_24dp"
+        android:icon="@drawable/ic_play"
         android:title="@string/start"/>
 
 </menu>

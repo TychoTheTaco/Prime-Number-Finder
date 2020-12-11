@@ -35,7 +35,7 @@ public class SortMethodView implements View.OnClickListener{
         nameTextView.setCompoundDrawablesWithIntrinsicBounds(drawableRes, 0, 0, 0);
 
         ascendingView = view.findViewById(R.id.direction);
-        ascendingView.setImageResource(ascending ? R.drawable.ic_keyboard_arrow_up_white_24dp : R.drawable.ic_keyboard_arrow_down_white_24dp);
+        ascendingView.setImageResource(ascending ? R.drawable.ic_arrow_up : R.drawable.ic_arrow_down);
         ascendingView.setVisibility(selected ? View.VISIBLE : View.INVISIBLE);
 
         //Apply tint to icons
@@ -61,7 +61,7 @@ public class SortMethodView implements View.OnClickListener{
         this.selected = selected;
         if (selected) this.ascending = ascending;
         if (ascendingView != null){
-            ascendingView.setImageResource(ascending ? R.drawable.ic_keyboard_arrow_up_white_24dp : R.drawable.ic_keyboard_arrow_down_white_24dp);
+            ascendingView.setImageResource(ascending ? R.drawable.ic_arrow_up : R.drawable.ic_arrow_down);
             ascendingView.setVisibility(selected ? View.VISIBLE : View.INVISIBLE);
         }
     }

@@ -20,7 +20,7 @@
         android:layout_gravity="end|top"
         android:layout_marginBottom="72dp"
         android:elevation="@dimen/fab_elevation"
-        android:src="@drawable/ic_keyboard_arrow_up_white_24dp"
+        android:src="@drawable/ic_arrow_up"
         android:tooltipText="@string/scroll_to_top"
         android:visibility="gone"
         app:fabSize="mini"
@@ -34,7 +34,7 @@
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/fab_margin"
         android:elevation="@dimen/fab_elevation"
-        android:src="@drawable/ic_keyboard_arrow_down_white_24dp"
+        android:src="@drawable/ic_arrow_down"
         android:tooltipText="@string/scroll_to_bottom"
         android:visibility="gone"
         app:fabSize="mini" />

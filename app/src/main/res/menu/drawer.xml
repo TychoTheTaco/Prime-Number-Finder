@@ -44,7 +44,7 @@
 
         <item
             android:id="@+id/drawer_item_saved_files"
-            android:icon="@drawable/ic_insert_drive_file_white_24dp"
+            android:icon="@drawable/ic_file"
             android:iconTint="?android:textColorPrimary"
             android:title="@string/title_saved_files"/>
     </group>
@@ -53,13 +53,13 @@
 
         <item
             android:id="@+id/drawer_item_settings"
-            android:icon="@drawable/ic_settings_white_24dp"
+            android:icon="@drawable/ic_settings"
             android:iconTint="?android:textColorPrimary"
             android:title="@string/title_settings"/>
 
         <item
             android:id="@+id/drawer_item_about"
-            android:icon="@drawable/ic_info_outline_white_24dp"
+            android:icon="@drawable/ic_info"
             android:iconTint="?android:textColorPrimary"
             android:title="@string/title_about"/>
     </group>

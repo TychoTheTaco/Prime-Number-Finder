@@ -179,7 +179,7 @@ public class TaskControlBubble extends RelativeLayout {
             button.setImageResource(R.drawable.round_check_24);
             button.setImageTintList(ColorStateList.valueOf(Color.WHITE));
         }else{
-            button.setImageResource(R.drawable.ic_pause_white_24dp);
+            button.setImageResource(R.drawable.ic_pause);
         }
 
         if (getLeftView().getVisibility() != VISIBLE && getRightView().getVisibility() != VISIBLE){

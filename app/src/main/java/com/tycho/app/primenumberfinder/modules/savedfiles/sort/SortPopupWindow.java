@@ -82,7 +82,7 @@ public class SortPopupWindow extends PopupWindow {
 
     public enum SortMethod{
         DATE("Date", R.drawable.round_date_range_24),
-        FILE_SIZE("Size", R.drawable.round_sort_24),
+        FILE_SIZE("Size", R.drawable.ic_sort),
         NUMBER("Number", R.drawable.ic_numeric);
 
         private final String name;
