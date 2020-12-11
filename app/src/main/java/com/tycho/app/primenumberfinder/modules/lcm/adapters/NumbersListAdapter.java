@@ -47,7 +47,7 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
         if (position == getItemCount() - 1){
             holder.input.setBackgroundTintList(Utils.generateColorStateList(
                     new int[]{},
-                    new int[]{ContextCompat.getColor(holder.itemView.getContext(), android.R.color.secondary_text_light_nodisable)} // TODO: Make different color for light/dark theme
+                    new int[]{ContextCompat.getColor(holder.itemView.getContext(), R.color.list_view_add_new_item_background)}
             ));
             holder.input.setShowRandomHint(false);
             holder.input.setHint("+");
@@ -125,8 +125,7 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
                 }
             });
 
-            input.addOnTouchListener((v, event) -> {
-                v.performClick();
+            input.setOnClickListener(v -> {
                 if (getAdapterPosition() == getItemCount() - 1){
                     numbers.add(BigInteger.ZERO);
                     notifyItemInserted(getItemCount());
@@ -135,7 +134,6 @@ public class NumbersListAdapter extends RecyclerView.Adapter<NumbersListAdapter.
                     input.requestFocus();
                     recyclerView.scrollToPosition(getItemCount() - 1);
                 }
-                return false;
             });
         }
 

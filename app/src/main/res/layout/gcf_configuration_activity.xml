@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:id="@+id/root"
     android:focusableInTouchMode="true"
-    android:theme="@style/GCF"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:theme="@style/GCF">
 
     <include layout="@layout/app_bar" />
 
@@ -14,29 +14,18 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:labelFor="@+id/editText_input_number"
         android:layout_margin="8dp"
-        android:textSize="16sp"
-        android:text="@string/gcf_input_description" />
+        android:labelFor="@+id/editText_input_number"
+        android:text="@string/gcf_input_description"
+        android:textSize="16sp" />
 
-    <LinearLayout
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/numbers_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingEnd="8dp"
-        android:gravity="center_horizontal"
-        android:clipChildren="false"
         android:clipToPadding="false"
-        android:paddingStart="8dp">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/numbers_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:clipChildren="false"
-            android:scrollbars="horizontal" />
-
-    </LinearLayout>
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:scrollbars="horizontal" />
 
 </LinearLayout>

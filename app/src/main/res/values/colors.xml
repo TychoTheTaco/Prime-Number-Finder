@@ -59,6 +59,7 @@
     <color name="background_light">#fafafa</color>
     <color name="background_dark">#202124</color>
     <color name="background_dark_light">#303134</color>
+    <color name="list_view_add_new_item_background">#303134</color>
 
     <!-- Miscellaneous -->
     <color name="divider">#B6B6B6</color>

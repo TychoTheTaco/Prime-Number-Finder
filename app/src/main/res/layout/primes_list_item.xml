@@ -12,6 +12,15 @@
         android:visibility="invisible"/>
 
     <TextView
+        android:id="@+id/index"
+        android:layout_width="match_parent"
+        android:layout_height="26dp"
+        android:gravity="start|center_vertical"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/secondary_text_light"
+        android:textSize="12sp" />
+
+    <TextView
         android:id="@+id/number"
         android:layout_width="match_parent"
         android:layout_height="26dp"

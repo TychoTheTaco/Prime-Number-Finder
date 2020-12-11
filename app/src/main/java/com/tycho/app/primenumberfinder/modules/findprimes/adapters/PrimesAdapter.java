@@ -4,8 +4,6 @@ import android.animation.Animator;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -13,6 +11,9 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.tycho.app.primenumberfinder.R;
 import com.tycho.app.primenumberfinder.utils.Utils;
@@ -68,6 +69,7 @@ public class PrimesAdapter extends RecyclerView.Adapter<PrimesAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        holder.indexTextView.setText(NUMBER_FORMAT.format(position + 1 + offset));
         holder.number.setText(NUMBER_FORMAT.format(primes.get(position)));
 
         if (position == highlightedPosition) {
@@ -107,6 +109,7 @@ public class PrimesAdapter extends RecyclerView.Adapter<PrimesAdapter.ViewHolder
 
         private final TextView number;
         private final View background;
+        private final TextView indexTextView;
 
         private static final long ANIMATION_DURATION_MILLIS = 500;
 
@@ -114,6 +117,7 @@ public class PrimesAdapter extends RecyclerView.Adapter<PrimesAdapter.ViewHolder
             super(view);
             number = view.findViewById(R.id.number);
             background = view.findViewById(R.id.background);
+            indexTextView = view.findViewById(R.id.index);
 
             itemView.setOnClickListener(v -> Toast.makeText(context, context.getString(R.string.primes_list_toast_message,
                     NUMBER_FORMAT.format(primes.get(getAdapterPosition())),

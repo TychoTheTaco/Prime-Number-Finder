@@ -19,24 +19,13 @@
         android:textSize="16sp"
         android:text="@string/lcm_input_description" />
 
-    <LinearLayout
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/numbers_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clipChildren="false"
         android:clipToPadding="false"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
+        android:paddingStart="8dp"
         android:paddingEnd="8dp"
-        android:paddingStart="8dp">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/numbers_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:scrollbars="horizontal" />
-
-    </LinearLayout>
+        android:scrollbars="horizontal" />
 
 </LinearLayout>

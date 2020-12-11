@@ -86,7 +86,6 @@ public class NumberInput extends ValidEditText {
                 }
             }
         });
-        setText(" ");
         setText("");
 
     }

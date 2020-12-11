@@ -44,6 +44,7 @@ public class BufferedPrimesAdapter extends RecyclerView.Adapter<BufferedPrimesAd
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        //holder.indexTextView.setText(NUMBER_FORMAT.format(position + 1));
         holder.number.setText(NUMBER_FORMAT.format(primes.get(position)));
     }
 
@@ -66,10 +67,12 @@ public class BufferedPrimesAdapter extends RecyclerView.Adapter<BufferedPrimesAd
     class ViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView number;
+        private final TextView indexTextView;
 
         ViewHolder(final View view) {
             super(view);
             number = view.findViewById(R.id.number);
+            indexTextView = view.findViewById(R.id.index);
         }
 
     }

@@ -49,9 +49,6 @@ public class ValidEditText extends FormattedEditText {
 
     private void init(final Context context, final AttributeSet attributeSet) {
         setOnTouchListener((v, event) -> {
-            //Perform click
-            performClick();
-
             //Clear text
             if (clearOnTouch) {
                 getText().clear();
@@ -60,7 +57,11 @@ public class ValidEditText extends FormattedEditText {
             //Notify listeners
             sendOnTouch(v, event);
 
-            //Do not consume event
+            // Perform click
+            if (event.getAction() == MotionEvent.ACTION_UP){
+                performClick();
+            }
+
             return false;
         });
     }
