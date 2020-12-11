@@ -10,8 +10,8 @@ android {
         applicationId "com.tycho.app.primenumberfinder"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 40
-        versionName "1.5.0.DEV"
+        versionCode 41
+        versionName "1.5.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
         externalNativeBuild{
@@ -27,8 +27,10 @@ android {
 
             firebaseCrashlytics {
                 nativeSymbolUploadEnabled true
-                strippedNativeLibsDir 'build\\intermediates\\stripped_native_libs\\release\\out\\lib'
-                unstrippedNativeLibsDir 'build\\intermediates\\cmake\\release\\obj'
+                //strippedNativeLibsDir 'build\\intermediates\\stripped_native_libs\\release\\out\\lib'
+                //unstrippedNativeLibsDir 'build\\intermediates\\cmake\\release\\obj'
+                strippedNativeLibsDir 'src/main/jniLibs'
+                unstrippedNativeLibsDir 'src/main/jniLibs'
             }
 
             ndk {
