@@ -29,8 +29,6 @@ public class PrimeNumberFinder extends Application {
      */
     private static TaskManager taskManager;
 
-    //TODO: Change action bar color on dark theme saved files page
-
     @Override
     public void onCreate() {
         super.onCreate();

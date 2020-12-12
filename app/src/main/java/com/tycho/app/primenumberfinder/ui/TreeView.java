@@ -80,10 +80,12 @@ public class TreeView extends View {
     }
 
     private void init(final Context context, final AttributeSet attributeSet) {
+        // Set the layer type to software. This is required otherwise we get an ANR on API <= 21 due to setShadowLayer().
+        setLayerType(LAYER_TYPE_SOFTWARE, null);
+
         paint.setAntiAlias(true);
         paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSize, getResources().getDisplayMetrics()));
         paint.setFakeBoldText(true);
-        paint.setShadowLayer(30, 6, 6, Color.argb(64, 0, 0, 0));
 
         //Set custom attributes
         final TypedArray typedArray = context.getTheme().obtainStyledAttributes(attributeSet, R.styleable.TreeView, 0, 0);
