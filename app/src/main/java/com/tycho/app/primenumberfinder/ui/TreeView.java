@@ -12,6 +12,7 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
@@ -148,7 +149,7 @@ public class TreeView extends View {
         canvas.drawText(text, textX, textY, paint);
     }
 
-    private Rect clipBounds = new Rect();
+    private final Rect clipBounds = new Rect();
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
@@ -168,7 +169,7 @@ public class TreeView extends View {
 
     private boolean threadStarted = false;
 
-    private Tree<Item> itemTree;
+    private Tree<NodeView> itemTree;
 
     @Override
     public void draw(Canvas canvas) {
@@ -191,7 +192,7 @@ public class TreeView extends View {
             paint.setColor(Color.BLACK);
             paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSize, getResources().getDisplayMetrics()));
             final String text = "Generating...";
-            canvas.drawText(text, ((canvas.getWidth() - getStringWidth(text, paint)) / 2), ((canvas.getHeight() - getStringHeight(paint)) / 2), paint);
+            canvas.drawText(text, ((getWidth() - getStringWidth(text, paint)) / 2), ((getHeight() - getStringHeight(paint)) / 2), paint);
 
             if (!threadStarted){
                 new Thread(() -> {
@@ -212,7 +213,7 @@ public class TreeView extends View {
 
         if (!dirty && tree != null && itemTree != null) {
             //Draw tree contents
-            canvas.translate(getWidth() / 2, 0);
+            canvas.translate((float) getWidth() / 2, 0);
             canvas.translate(translationX, translationY);
             drawItemBackgrounds(itemTree, canvas, exportOptions);
             drawContents(itemTree, canvas, exportOptions);
@@ -273,8 +274,8 @@ public class TreeView extends View {
 
                     final Rect bounds = getBoundingRect(itemTree);
 
-                    final float maxTranslationX = -(bounds.right - (getWidth() / 2)) - scrollPaddingRight;
-                    final float minTranslationX = -(bounds.left + (getWidth() / 2)) + scrollPaddingLeft;
+                    final float maxTranslationX = -(bounds.right - ((float) getWidth() / 2)) - scrollPaddingRight;
+                    final float minTranslationX = -(bounds.left + ((float) getWidth() / 2)) + scrollPaddingLeft;
                     final float minTranslationY = 0 + scrollPaddingTop;
                     final float maxTranslationY = getHeight() - Math.abs(bounds.height()) - scrollPaddingBottom;
 
@@ -316,20 +317,15 @@ public class TreeView extends View {
                     break;
                 }
 
-                case MotionEvent.ACTION_UP: {
+                case MotionEvent.ACTION_UP:
+                    performClick();
+                case MotionEvent.ACTION_CANCEL:
                     mActivePointerId = INVALID_POINTER_ID;
                     break;
-                }
-
-                case MotionEvent.ACTION_CANCEL: {
-                    mActivePointerId = INVALID_POINTER_ID;
-                    break;
-                }
 
                 case MotionEvent.ACTION_POINTER_UP: {
                     // Extract the index of the pointer that left the touch sensor
-                    final int pointerIndex = (action & MotionEvent.ACTION_POINTER_INDEX_MASK)
-                            >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+                    final int pointerIndex = (action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
                     final int pointerId = event.getPointerId(pointerIndex);
                     if (pointerId == mActivePointerId) {
                         // This was our active pointer going up. Choose a new
@@ -347,22 +343,22 @@ public class TreeView extends View {
         return true;
     }
 
-    private boolean checkChildren(Tree<Item> itemTree, int level) {
+    private boolean checkChildren(Tree<NodeView> itemTree, int level) {
 
         if (fixOverlaps(itemTree, level)) return true;
 
-        for (Tree<Item> child : itemTree.getChildren()) {
+        for (Tree<NodeView> child : itemTree.getChildren()) {
             if (fixOverlaps(child, level + 1)) return true;
         }
 
-        for (Tree<Item> child : itemTree.getChildren()) {
+        for (Tree<NodeView> child : itemTree.getChildren()) {
             if (checkChildren(child, level + 1)) return true;
         }
 
         return false;
     }
 
-    private void drawItemBackgrounds(final Tree<Item> itemTree, final Canvas canvas, final ExportOptions options) {
+    private void drawItemBackgrounds(final Tree<NodeView> itemTree, final Canvas canvas, final ExportOptions options) {
         if (options.itemBackgrounds){
 
             //Draw item background
@@ -378,14 +374,14 @@ public class TreeView extends View {
             canvas.drawRect(itemTree.getValue().bounds, paint);
             paint.setStrokeJoin(Paint.Join.BEVEL);
 
-            for (Tree<Item> child : itemTree.getChildren()) {
+            for (Tree<NodeView> child : itemTree.getChildren()) {
                 drawItemBackgrounds(child, canvas, options);
             }
 
         }
     }
 
-    private Tree<Item> generateRectangleTree(final Tree<?> tree, final ExportOptions options){
+    private Tree<NodeView> generateRectangleTree(final Tree<?> tree, final ExportOptions options){
         final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, options.itemTextSize, getResources().getDisplayMetrics()));
         return generateRectangleTree(0, 0, tree, 0, paint, options);
@@ -393,7 +389,7 @@ public class TreeView extends View {
 
     //TODO: item heights can be slightly different, use getStringHeight instead to calculate height and just center the text vertically
 
-    private Tree<Item> generateRectangleTree(final float centerX, final float topY, final Tree<?> tree, int level, final Paint paint, final ExportOptions options) {
+    private Tree<NodeView> generateRectangleTree(final float centerX, final float topY, final Tree<?> tree, int level, final Paint paint, final ExportOptions options) {
 
         //Calculate text bounds
         final String text = tree.getValue().toString();
@@ -412,7 +408,7 @@ public class TreeView extends View {
         final float textX = bounds.left - left;
         final float textY = bounds.bottom - bottom + 1 + ((stringHeight - height) / 2);
 
-        final Tree<Item> itemTree = new Tree<>(new Item(text, bounds, textX, textY));
+        final Tree<NodeView> itemTree = new Tree<>(new NodeView(text, bounds, textX, textY));
 
         //Apply padding
         bounds.left -= paddingLeft;
@@ -440,14 +436,14 @@ public class TreeView extends View {
         return itemTree;
     }
 
-    private void drawContents(final Tree<Item> itemTree, final Canvas canvas, final ExportOptions options) {
+    private void drawContents(final Tree<NodeView> itemTree, final Canvas canvas, final ExportOptions options) {
         //Draw text
         paint.setStyle(Paint.Style.FILL);
         paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, options.itemTextSize, getResources().getDisplayMetrics()));
         paint.setColor(itemTree.getChildren().size() == 0 ? options.primeFactorTextColor : options.itemTextColor);
         canvas.drawText(itemTree.getValue().text, itemTree.getValue().textX, itemTree.getValue().textY, paint);
 
-        for (Tree<Item> child : itemTree.getChildren()) {
+        for (Tree<NodeView> child : itemTree.getChildren()) {
 
             //Draw branches connecting nodes to parent
             paint.setColor(options.branchColor);
@@ -471,7 +467,7 @@ public class TreeView extends View {
         }
     }
 
-    private boolean fixOverlaps(final Tree<Item> itemTree, int level) {
+    private boolean fixOverlaps(final Tree<NodeView> itemTree, int level) {
         final float border = itemTree.getValue().bounds.exactCenterX();
         boolean overlap = false;
         for (int i = 0; i < itemTree.getChildren().size(); i++) {
@@ -485,7 +481,7 @@ public class TreeView extends View {
         return getBoundingRect(itemTree);
     }
 
-    private Rect getBoundingRect(final Tree<Item> itemTree) {
+    private Rect getBoundingRect(final Tree<NodeView> itemTree) {
         final float left = findLeft(itemTree, 0);
         final float right = findRight(itemTree, 0);
         final float bottom = findBottom(itemTree, 0);
@@ -493,7 +489,7 @@ public class TreeView extends View {
         return new Rect((int) left, (int) top, (int) right, (int) bottom);
     }
 
-    private float findLeft(final Tree<Item> itemTree, float value) {
+    private float findLeft(final Tree<NodeView> itemTree, float value) {
 
         float smallest = value;
 
@@ -502,7 +498,7 @@ public class TreeView extends View {
         }
 
         float smallerChild;
-        for (Tree<Item> child : itemTree.getChildren()) {
+        for (Tree<NodeView> child : itemTree.getChildren()) {
             smallerChild = findLeft(child, smallest);
             if (smallerChild < smallest) {
                 smallest = smallerChild;
@@ -512,7 +508,7 @@ public class TreeView extends View {
         return smallest;
     }
 
-    private float findRight(final Tree<Item> itemTree, float value) {
+    private float findRight(final Tree<NodeView> itemTree, float value) {
 
         float largest = value;
 
@@ -521,7 +517,7 @@ public class TreeView extends View {
         }
 
         float largestChild;
-        for (Tree<Item> child : itemTree.getChildren()) {
+        for (Tree<NodeView> child : itemTree.getChildren()) {
             largestChild = findRight(child, largest);
             if (largestChild > largest) {
                 largest = largestChild;
@@ -531,7 +527,7 @@ public class TreeView extends View {
         return largest;
     }
 
-    private float findBottom(final Tree<Item> itemTree, float value) {
+    private float findBottom(final Tree<NodeView> itemTree, float value) {
 
         float smallest = value;
 
@@ -540,7 +536,7 @@ public class TreeView extends View {
         }
 
         float smallestChild;
-        for (Tree<Item> child : itemTree.getChildren()) {
+        for (Tree<NodeView> child : itemTree.getChildren()) {
             smallestChild = findBottom(child, smallest);
             if (smallestChild > smallest) {
                 smallest = smallestChild;
@@ -550,7 +546,7 @@ public class TreeView extends View {
         return smallest;
     }
 
-    private float findTop(final Tree<Item> itemTree, float value) {
+    private float findTop(final Tree<NodeView> itemTree, float value) {
 
         float largest = value;
 
@@ -559,7 +555,7 @@ public class TreeView extends View {
         }
 
         float largestChild;
-        for (Tree<Item> child : itemTree.getChildren()) {
+        for (Tree<NodeView> child : itemTree.getChildren()) {
             largestChild = findTop(child, largest);
             if (largestChild < largest) {
                 largest = largestChild;
@@ -569,7 +565,7 @@ public class TreeView extends View {
         return largest;
     }
 
-    private boolean checkOverlaps(final Tree<Item> itemTree, final float border, final int level, int side) {
+    private boolean checkOverlaps(final Tree<NodeView> itemTree, final float border, final int level, int side) {
         final Rect rect = itemTree.getValue().bounds;
 
         float off = 0;
@@ -662,8 +658,9 @@ public class TreeView extends View {
         public float branchPadding = 5;
         public float branchLength = 0.85f;
 
+        @NonNull
         @Override
-        public ExportOptions clone() throws CloneNotSupportedException {
+        protected ExportOptions clone() throws CloneNotSupportedException {
             return (ExportOptions) super.clone();
         }
     }
@@ -689,16 +686,16 @@ public class TreeView extends View {
         }
     }
 
-    private static class Item{
+    private static class NodeView {
 
-        private String text;
+        private final String text;
 
-        private Rect bounds;
+        private final Rect bounds;
 
-        private float textX;
-        private float textY;
+        private final float textX;
+        private final float textY;
 
-        public Item(final String text, final Rect bounds, final float textX, final float textY){
+        public NodeView(final String text, final Rect bounds, final float textX, final float textY){
             this.text = text;
             this.bounds = bounds;
             this.textX = textX;

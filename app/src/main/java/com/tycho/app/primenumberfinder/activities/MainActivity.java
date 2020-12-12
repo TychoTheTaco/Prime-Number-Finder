@@ -96,17 +96,7 @@ public class MainActivity extends AbstractActivity implements ActionViewListener
         //Set up navigation drawer
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
-        /*switch (PreferenceManager.getInt(PreferenceManager.Preference.THEME)){
-            case 1:
-                navigationView.setBackgroundResource(R.color.background_dark_3);
-                break;
-        }*/
         for (int i = 0; i < navigationView.getMenu().size(); i++) {
-            //Apply icon tint
-            /*if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
-                navigationView.setItemIconTintList(createColorStateList(Color.BLACK, ContextCompat.getColor(this, R.color.accent)));
-            }*/
-
             //Hide action view
             try {
                 setActionViewVisibility(navigationView.getMenu().getItem(i), false);
@@ -144,7 +134,7 @@ public class MainActivity extends AbstractActivity implements ActionViewListener
             selectDrawerItem(getIntent().getIntExtra("taskType", 0));
         }
 
-        //Show a dialog while upgrading to the newest version
+        //Show a dialog while upgrading to the newest version (can be removed after everyone is on >= 1.4.0)
         if (PreferenceManager.getInt(PreferenceManager.Preference.FILE_VERSION) < PreferenceManager.CURRENT_VERSION) {
             upgrade(this);
         }

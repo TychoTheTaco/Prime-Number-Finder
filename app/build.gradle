@@ -6,6 +6,14 @@ android {
     compileSdkVersion 30
     buildToolsVersion '29.0.3'
 
+    // Android App Bundle
+    bundle {
+        // Do not create a new APK for each language
+        language {
+            enableSplit = false;
+        }
+    }
+
     defaultConfig {
         applicationId "com.tycho.app.primenumberfinder"
         minSdkVersion 21
@@ -18,6 +26,11 @@ android {
             cmake {
                 arguments "-DANDROID_ARM_MODE=arm", "-DANDROID_STL=c++_shared"
             }
+        }
+
+        // Only build libraries for these architectures
+        ndk {
+            abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
         }
     }
     buildTypes {
@@ -69,8 +82,8 @@ dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
 
     //Firebase
-    implementation 'com.google.firebase:firebase-analytics:17.6.0'
-    implementation 'com.google.firebase:firebase-crashlytics-ndk:17.2.2'
+    implementation 'com.google.firebase:firebase-analytics:18.0.0'
+    implementation 'com.google.firebase:firebase-crashlytics-ndk:17.3.0'
 
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.preference:preference:1.1.1'

@@ -394,7 +394,7 @@ public final class FileManager {
         final Matcher matcher = pattern.matcher(file.getName());
         for (int i = 0; i < 2; i++) {
             if (matcher.find()) {
-                range[i] = Long.valueOf(matcher.group());
+                range[i] = Long.parseLong(matcher.group());
             }
         }
 
@@ -405,7 +405,7 @@ public final class FileManager {
         final Pattern pattern = Pattern.compile("\\d+");
         final Matcher matcher = pattern.matcher(file.getName());
         if (matcher.find()) {
-            return Long.valueOf(matcher.group());
+            return Long.parseLong(matcher.group());
         }
         return 0;
     }

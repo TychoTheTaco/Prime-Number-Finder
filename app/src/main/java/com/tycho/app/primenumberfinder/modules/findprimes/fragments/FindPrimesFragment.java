@@ -221,20 +221,18 @@ public class FindPrimesFragment extends ModuleHostFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_CODE_NEW_TASK:
-                if (data != null && data.getExtras() != null) {
-                    final FindPrimesTask task = (FindPrimesTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) data.getExtras().get("taskId"));
-                    final FindPrimesTask.SearchOptions searchOptions = data.getExtras().getParcelable("searchOptions");
-                    if (searchOptions != null) {
-                        if (task == null) {
-                            startTask(new FindPrimesNativeTask(searchOptions));
-                        } else {
-                            task.setSearchOptions(searchOptions);
-                        }
+        if (requestCode == REQUEST_CODE_NEW_TASK) {
+            if (data != null && data.getExtras() != null) {
+                final FindPrimesTask task = (FindPrimesTask) PrimeNumberFinder.getTaskManager().findTaskById((UUID) data.getExtras().get("taskId"));
+                final FindPrimesTask.SearchOptions searchOptions = data.getExtras().getParcelable("searchOptions");
+                if (searchOptions != null) {
+                    if (task == null) {
+                        startTask(new FindPrimesNativeTask(searchOptions));
+                    } else {
+                        task.setSearchOptions(searchOptions);
                     }
                 }
-                break;
+            }
         }
     }
 
