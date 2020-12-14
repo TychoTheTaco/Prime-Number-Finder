@@ -11,7 +11,7 @@ class Task {
 
     public:
 
-    virtual ~Task() = default;
+    virtual ~Task();
 
     enum State {
         NOT_STARTED,

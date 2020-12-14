@@ -7,8 +7,6 @@ class MultithreadedTask : public Task {
 
     public:
 
-    ~MultithreadedTask();
-
     void run() override = 0;
 
     void pause() override;
@@ -29,7 +27,7 @@ class MultithreadedTask : public Task {
 
     void addSubTask(Task* task);
 
-    std::vector<Task*> getTasks();
+    const std::vector<std::unique_ptr<Task>> &getTasks();
 
     void startSubTasks();
 
@@ -41,5 +39,5 @@ class MultithreadedTask : public Task {
     private:
 
     // List of sub-tasks
-    std::vector<Task*> tasks;
+    std::vector<std::unique_ptr<Task>> tasks;
 };

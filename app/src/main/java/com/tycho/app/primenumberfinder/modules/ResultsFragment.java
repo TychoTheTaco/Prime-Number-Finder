@@ -1,6 +1,5 @@
 package com.tycho.app.primenumberfinder.modules;
 
-import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -228,7 +227,6 @@ public abstract class ResultsFragment extends TaskFragment {
 
                 //Title
                 title.setText(getString(R.string.status_stopping));
-                //progressBar.startAnimation(rotateAnimation);
 
                 //Buttons
                 if (pauseButton != null){
@@ -443,18 +441,6 @@ public abstract class ResultsFragment extends TaskFragment {
         resultsView.setVisibility(View.VISIBLE);
         progress.setVisibility(View.VISIBLE);
         pauseButton.setVisibility(View.VISIBLE);
-    }
-
-    protected ColorStateList createSimpleColorStateList(final int defaultColor, final int disabledColor) {
-        return new ColorStateList(
-                new int[][]{
-                        new int[]{-android.R.attr.state_enabled}, //Disabled
-                        new int[]{} //Default
-                },
-                new int[]{
-                        disabledColor,
-                        defaultColor
-                });
     }
 
     protected int getTextHighlight(){

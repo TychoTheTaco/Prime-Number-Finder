@@ -160,7 +160,7 @@
 - Updated icons
 - Fixed rare startup crash on some devices
 
-12/??/2020 > Prime Number Finder version 1.5.2
+12/14/2020 > Prime Number Finder version 1.5.2
 - Fixed a bug that caused the app to freeze on older versions of Android when finding the prime factorization of a number
 - Fixed a bug that caused the incorrect icon to show when a task was paused
 - Fixed a bug that caused the app to crash when finding prime numbers
