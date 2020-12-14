@@ -86,7 +86,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         //Subtitle
         subtitle.setText(Utils.formatSpannable(subtitleStringBuilder,
                 getString(R.string.prime_factorization_subtitle),
-                new String[]{NUMBER_FORMAT.format(getTask().getNumber())},
+                new String[]{numberFormat.format(getTask().getNumber())},
                 new boolean[]{true},
                 getTextHighlight(),
                 getContext()
@@ -100,7 +100,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         //Subtitle
         subtitle.setText(Utils.formatSpannable(subtitleStringBuilder,
                 getResources().getQuantityString(R.plurals.prime_factorization_subtitle_results, getTask().getPrimeFactors().size()),
-                new String[]{NUMBER_FORMAT.format(getTask().getNumber()), NUMBER_FORMAT.format(getTask().getPrimeFactors().size())},
+                new String[]{numberFormat.format(getTask().getNumber()), numberFormat.format(getTask().getPrimeFactors().size())},
                 new boolean[]{true, true},
                 getTextHighlight(),
                 getContext()
@@ -109,7 +109,7 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         //Body
         spannableStringBuilder.clear();
         spannableStringBuilder.clearSpans();
-        spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumber()));
+        spannableStringBuilder.append(numberFormat.format(getTask().getNumber()));
         spannableStringBuilder.setSpan(new ForegroundColorSpan(getTextHighlight()), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         Utils.applyCopySpan(spannableStringBuilder, 0, spannableStringBuilder.length(), getContext());
@@ -119,14 +119,14 @@ public class PrimeFactorizationResultsFragment extends ResultsFragment {
         final Map map = getTask().getPrimeFactors();
         for (Object factor : map.keySet()){
             position = spannableStringBuilder.length();
-            String content = NUMBER_FORMAT.format(factor);
+            String content = numberFormat.format(factor);
             spannableStringBuilder.append(content);
             spannableStringBuilder.setSpan(new ForegroundColorSpan(getTextHighlight()), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
             spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
             Utils.applyCopySpan(spannableStringBuilder, position, spannableStringBuilder.length(), getContext());
 
             position = spannableStringBuilder.length();
-            content = NUMBER_FORMAT.format(map.get(factor));
+            content = numberFormat.format(map.get(factor));
             spannableStringBuilder.append(content);
             spannableStringBuilder.setSpan(new SuperscriptSpan(), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
             spannableStringBuilder.setSpan(new RelativeSizeSpan(0.8f), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);

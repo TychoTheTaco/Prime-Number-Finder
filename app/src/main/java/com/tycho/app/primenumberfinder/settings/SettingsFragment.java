@@ -2,16 +2,14 @@ package com.tycho.app.primenumberfinder.settings;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import androidx.preference.SwitchPreference;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
+
 import androidx.core.content.ContextCompat;
 import androidx.preference.CheckBoxPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
-import android.text.SpannableStringBuilder;
-import android.text.style.ForegroundColorSpan;
-import android.widget.Toast;
-
-import com.google.android.gms.measurement.module.Analytics;
+import androidx.preference.SwitchPreference;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tycho.app.primenumberfinder.PrimeNumberFinder;
 import com.tycho.app.primenumberfinder.R;

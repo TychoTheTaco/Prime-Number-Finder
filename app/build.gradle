@@ -40,7 +40,7 @@ android {
 
             firebaseCrashlytics {
                 nativeSymbolUploadEnabled true
-                //strippedNativeLibsDir 'build\\intermediates\\stripped_native_libs\\release\\out\\lib'
+                //strippedNativeLibsDir 'build\\intermediates\\stripped_native_libs\\release\\out\\lib' //TODO: add symbols for native-utils
                 //unstrippedNativeLibsDir 'build\\intermediates\\cmake\\release\\obj'
                 strippedNativeLibsDir 'src/main/jniLibs'
                 unstrippedNativeLibsDir 'src/main/jniLibs'
@@ -82,8 +82,9 @@ dependencies {
     api fileTree(include: ['*.jar'], dir: 'libs')
 
     //Firebase
-    implementation 'com.google.firebase:firebase-analytics:18.0.0'
-    implementation 'com.google.firebase:firebase-crashlytics-ndk:17.3.0'
+    implementation platform('com.google.firebase:firebase-bom:26.1.1')
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-crashlytics-ndk'
 
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.preference:preference:1.1.1'

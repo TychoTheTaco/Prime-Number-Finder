@@ -85,7 +85,7 @@ public abstract class ResultsFragment extends TaskFragment {
      */
     private float rotation;
 
-    protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.getDefault());
+    protected final NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -163,7 +163,7 @@ public abstract class ResultsFragment extends TaskFragment {
                 if (pauseButton != null){
                     pauseButton.setVisibility(View.VISIBLE);
                     pauseButton.setEnabled(true);
-                    pauseButton.setImageResource(R.drawable.ic_pause);
+                    pauseButton.setImageResource(R.drawable.ic_play);
                 }
 
                 onPostPaused();

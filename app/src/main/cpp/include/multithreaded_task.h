@@ -1,34 +1,45 @@
 #pragma once
+
 #include "task.h"
 #include <vector>
 
 class MultithreadedTask : public Task {
 
-	public:
+    public:
 
-	virtual void run() = 0;
+    ~MultithreadedTask();
 
-	virtual void pause();
-	virtual void pauseAndWait();
-	virtual void resume();
-	virtual void resumeAndWait();
-	virtual void stop();
-	virtual void stopAndWait();
+    void run() override = 0;
 
-	virtual float getProgress();
+    void pause() override;
 
-	protected:
+    void pauseAndWait() override;
 
-	void addSubTask(Task* task);
-	std::vector<Task*> getTasks();
-	void startSubTasks();
-	void finishSubTasks();
+    void resume() override;
 
-	// Calculate the average progress of all attached sub-tasks.
-	float getAverageProgress();
+    void resumeAndWait() override;
 
-	private:
-	
-	// List of sub-tasks
-	std::vector<Task*> tasks;
+    void stop() override;
+
+    void stopAndWait() override;
+
+    float getProgress() override;
+
+    protected:
+
+    void addSubTask(Task* task);
+
+    std::vector<Task*> getTasks();
+
+    void startSubTasks();
+
+    void finishSubTasks();
+
+    // Calculate the average progress of all attached sub-tasks.
+    float getAverageProgress();
+
+    private:
+
+    // List of sub-tasks
+    std::vector<Task*> tasks;
 };

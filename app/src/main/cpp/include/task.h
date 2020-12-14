@@ -1,4 +1,5 @@
 #pragma once
+
 #include <mutex>
 #include <vector>
 #include <condition_variable>
@@ -8,96 +9,126 @@
 
 class Task {
 
-	public:
+    public:
 
-	enum State {
-		NOT_STARTED,
-		STARTING,
-		RUNNING,
-		PAUSING,
-		PAUSED,
-		RESUMING,
-		STOPPING,
-		STOPPED
-	};
+    virtual ~Task() = default;
 
-	virtual void start();
-	virtual std::thread* startOnNewThread();
-	virtual void pause();
-	virtual void pauseAndWait();
-	virtual void resume();
-	virtual void resumeAndWait();
-	virtual void stop();
-	virtual void stopAndWait();
+    enum State {
+        NOT_STARTED,
+        STARTING,
+        RUNNING,
+        PAUSING,
+        PAUSED,
+        RESUMING,
+        STOPPING,
+        STOPPED
+    };
 
-	/*
-	Wait for the task to finish, blocking the current thread until it finishes.
-	*/
-	void finish();
+    virtual void start();
 
-	bool addTaskListener(TaskListener* listener);
-	bool removeTaskListener(TaskListener* listener);
+    virtual std::thread startOnNewThread();
 
-	long getId() const;
-	int64_t getStartTime() const;
-	int64_t getEndTime() const;
-	int64_t getElapsedTime() const;
-	int64_t getEstimatedTimeRemaining();
-	State getState() const;
+    virtual void pause();
 
-	virtual float getProgress();
+    virtual void pauseAndWait();
 
-	protected:
+    virtual void resume();
 
-	Task();
+    virtual void resumeAndWait();
 
-	State state = State::NOT_STARTED;
+    virtual void stop();
 
-	State requested_state = State::NOT_STARTED;
+    virtual void stopAndWait();
 
-	std::recursive_mutex state_lock;
-	std::condition_variable_any condition_variable;
+    /*
+    Wait for the task to finish, blocking the current thread until it finishes.
+    */
+    void finish();
 
-	virtual void run() = 0;
-	void tryPause();
-	bool shouldStop();
-	bool isRunning();
+    bool addTaskListener(TaskListener* listener);
 
-	void dispatchPausing();
-	void dispatchPaused();
-	void dispatchResuming();
-	void dispatchResumed();
-	void dispatchStopping();
+    bool removeTaskListener(TaskListener* listener);
 
-	private:
+    long getId() const;
 
-	static long next_id;
-	long id;
+    int64_t getStartTime() const;
 
-	int64_t start_time = 0;
-	int64_t last_pause_time = 0;
-	int64_t total_pause_time = 0;
-	int64_t end_time = 0;
+    int64_t getEndTime() const;
 
-	// TODO: Thread safe? Java uses CopyOnWriteArrayList.
-	std::vector<TaskListener*> task_listeners;
+    int64_t getElapsedTime() const;
 
-	// This mutex is used to ensure that all listeners for a given state are executed in order and not mixed together.
-	std::recursive_mutex listener_mutex;
+    int64_t getEstimatedTimeRemaining();
 
-	void pauseThread();
-	void processRequestedState();
-	void dispatchStarting();
-	void dispatchStarted();
-	void dispatchStopped();
+    State getState() const;
 
-	void notifyOnTaskStarted();
-	void notifyOnTaskPausing();
-	void notifyOnTaskPaused();
-	void notifyOnTaskResuming();
-	void notifyOnTaskResumed();
-	void notifyOnTaskStopping();
-	void notifyOnTaskStopped();
+    virtual float getProgress();
 
-	int64_t currentTimeMillis() const;
+    protected:
+
+    Task();
+
+    State state = State::NOT_STARTED;
+
+    State requested_state = State::NOT_STARTED;
+
+    std::recursive_mutex state_lock;
+    std::condition_variable_any condition_variable;
+
+    virtual void run() = 0;
+
+    void tryPause();
+
+    bool shouldStop();
+
+    bool isRunning();
+
+    void dispatchPausing();
+
+    void dispatchPaused();
+
+    void dispatchResuming();
+
+    void dispatchResumed();
+
+    void dispatchStopping();
+
+    private:
+
+    static std::atomic<int> nextId;
+    const int id;
+
+    int64_t start_time = 0;
+    int64_t last_pause_time = 0;
+    int64_t total_pause_time = 0;
+    int64_t end_time = 0;
+
+    // This mutex is used to ensure that all listeners for a given state are executed in order and not mixed together.
+    std::vector<TaskListener*> task_listeners;
+    std::mutex listener_mutex;
+
+    void pauseThread();
+
+    void processRequestedState();
+
+    void dispatchStarting();
+
+    void dispatchStarted();
+
+    void dispatchStopped();
+
+    void notifyOnTaskStarted();
+
+    void notifyOnTaskPausing();
+
+    void notifyOnTaskPaused();
+
+    void notifyOnTaskResuming();
+
+    void notifyOnTaskResumed();
+
+    void notifyOnTaskStopping();
+
+    void notifyOnTaskStopped();
+
+    int64_t currentTimeMillis() const;
 };

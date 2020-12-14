@@ -19,14 +19,19 @@ class FindPrimesTask : public MultithreadedTask {
     enum SearchMode {
         PARTITION,
         ALTERNATE,
+
+        /**
+         * This method searches for prime numbers using sequential "packets" of numbers. For example, if the packet size is 100, the search space will be divided into packets of
+         * 100 and they will be worked on by the thread pool. Each packet is a block of sequential numbers.
+         */
         PACKET
     };
 
     FindPrimesTask(num_type start_value, num_type end_value, SearchMethod search_method = BRUTE_FORCE, unsigned int thread_count = 1);
 
-    virtual void run();
+    void run() override;
 
-    void saveToFile(const std::string& file_path);
+    void saveToFile(const std::string &file_path);
 
     bool isEndless() const;
 
@@ -44,7 +49,7 @@ class FindPrimesTask : public MultithreadedTask {
     std::string getCacheDirectory();
 
     //Setters
-    void setCacheDirectory(const std::string& directory);
+    void setCacheDirectory(const std::string &directory);
 
     private:
 
@@ -70,27 +75,36 @@ class FindPrimesTask : public MultithreadedTask {
 
     num_type getRange() const;
 
-    num_type bytesToNumber(const char *bytes);
+    num_type bytesToNumber(const char* bytes);
 
     void numberToBytes(num_type number, char destination[]);
 
-    class BruteForceTask : public Task {
+    class PrimesTask : public Task {
+
+        public:
+        PrimesTask(num_type startValue, num_type endValue);
+
+        virtual size_t getPrimeCount() const = 0;
+
+        protected:
+        const num_type startValue;
+        const num_type endValue;
+    };
+
+    class BruteForceTask : public PrimesTask {
         friend class FindPrimesTask;
 
         public:
-        BruteForceTask(const FindPrimesTask *parent, num_type start_value, num_type end_value, num_type increment = 1);
+        BruteForceTask(const FindPrimesTask* parent, num_type start_value, num_type end_value, num_type increment = 1);
 
-        virtual void run();
+        void run() override;
 
-        virtual float getProgress();
+        float getProgress() override;
 
-        unsigned int getPrimeCount() const;
+        size_t getPrimeCount() const override;
 
         private:
-        const FindPrimesTask *parent;
-
-        num_type start_value;
-        num_type end_value;
+        const FindPrimesTask* parent;
 
         num_type increment;
 
@@ -108,21 +122,19 @@ class FindPrimesTask : public MultithreadedTask {
         void writeToCache();
     };
 
-    class SieveTask : public Task {
+    class SieveTask : public PrimesTask {
         friend class FindPrimesTask;
 
         public:
-        SieveTask(num_type start_value, num_type end_value);
+        SieveTask(num_type startValue, num_type endValue);
 
-        virtual void run();
+        void run() override;
 
-        unsigned int getPrimeCount() const;
+        size_t getPrimeCount() const override;
 
         std::vector<num_type> getPrimes();
 
         private:
-        num_type start_value;
-        num_type end_value;
 
         std::vector<num_type> primes;
         unsigned int prime_count = 0;

@@ -121,7 +121,7 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
         spannableStringBuilder.append(getString(R.string.gcf_subtitle).split("%\\d+\\$s")[0]);
         for (int i = 0; i < getTask().getNumbers().size(); i++){
             position = spannableStringBuilder.length();
-            spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumbers().get(i)), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_dark)), 0);
+            spannableStringBuilder.append(numberFormat.format(getTask().getNumbers().get(i)), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_dark)), 0);
             spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
             Utils.applyCopySpan(spannableStringBuilder, position, spannableStringBuilder.length(), getContext());
             Utils.separateNumbers(spannableStringBuilder, getTask().getNumbers(), i, ",");
@@ -134,13 +134,13 @@ public class GreatestCommonFactorResultsFragment extends ResultsFragment {
         spannableStringBuilder.append(getString(R.string.gcf_result_long).split("%\\d+\\$s")[0]);
         for (int i = 0; i < getTask().getNumbers().size(); i++){
             final int position = spannableStringBuilder.length();
-            spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getNumbers().get(i)), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_dark)), 0);
+            spannableStringBuilder.append(numberFormat.format(getTask().getNumbers().get(i)), new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_dark)), 0);
             Utils.applyCopySpan(spannableStringBuilder, position, spannableStringBuilder.length(), getContext());
             Utils.separateNumbers(spannableStringBuilder, getTask().getNumbers(), i, ",");
         }
         spannableStringBuilder.append(getString(R.string.gcf_result_long).split("%\\d+\\$s")[1]);
         final int position = spannableStringBuilder.length();
-        spannableStringBuilder.append(NUMBER_FORMAT.format(getTask().getGcf()),  new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_dark)), 0);
+        spannableStringBuilder.append(numberFormat.format(getTask().getGcf()),  new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.blue_dark)), 0);
         spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), position, spannableStringBuilder.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         Utils.applyCopySpan(spannableStringBuilder, position, spannableStringBuilder.length(), getContext());
         return spannableStringBuilder.append('.');

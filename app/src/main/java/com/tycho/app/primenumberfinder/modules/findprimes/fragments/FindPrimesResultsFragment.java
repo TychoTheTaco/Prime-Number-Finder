@@ -130,8 +130,8 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
         //Subtitle
         subtitleTextView.setText(Utils.formatSpannable(subtitleStringBuilder, getString(R.string.find_primes_subtitle), new String[]{
-                NUMBER_FORMAT.format(getTask().getStartValue()),
-                getTask().isEndless() ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),
+                numberFormat.format(getTask().getStartValue()),
+                getTask().isEndless() ? getString(R.string.infinity_text) : numberFormat.format(getTask().getEndValue()),
                 getTask().getSearchOptions().getSearchMethod() == BRUTE_FORCE ? "brute force" : "the sieve of Eratosthenes"
         }, new boolean[]{
                 true,
@@ -174,9 +174,9 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
         //Subtitle
         subtitleTextView.setText(Utils.formatSpannable(subtitleStringBuilder, getResources().getQuantityString(R.plurals.find_primes_subtitle_result, getTask().getPrimeCount()), new String[]{
-                NUMBER_FORMAT.format(getTask().getPrimeCount()),
-                NUMBER_FORMAT.format(getTask().getStartValue()),
-                getTask().isEndless() ? getString(R.string.infinity_text) : NUMBER_FORMAT.format(getTask().getEndValue()),
+                numberFormat.format(getTask().getPrimeCount()),
+                numberFormat.format(getTask().getStartValue()),
+                getTask().isEndless() ? getString(R.string.infinity_text) : numberFormat.format(getTask().getEndValue()),
         }, new boolean[]{
                 true,
                 true,
@@ -201,7 +201,7 @@ public class FindPrimesResultsFragment extends ResultsFragment {
 
             //Body
             if (getTask().getSearchOptions().getSearchMethod() == BRUTE_FORCE) {
-                bodyTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.find_primes_body_text), new String[]{NUMBER_FORMAT.format(getTask().getPrimeCount())}, getTextHighlight()));
+                bodyTextView.setText(Utils.formatSpannableColor(spannableStringBuilder, getString(R.string.find_primes_body_text), new String[]{numberFormat.format(getTask().getPrimeCount())}, getTextHighlight()));
             }
         }
     }

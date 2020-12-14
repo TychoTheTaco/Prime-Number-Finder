@@ -132,7 +132,7 @@ public class FindFactorsResultsFragment extends ResultsFragment {
         super.postDefaults();
 
         //Subtitle
-        subtitleTextView.setText(Utils.formatSpannable(subtitleStringBuilder, getString(R.string.find_factors_subtitle), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, new boolean[]{true}, ContextCompat.getColor(getActivity(), R.color.orange_dark), getContext()));
+        subtitleTextView.setText(Utils.formatSpannable(subtitleStringBuilder, getString(R.string.find_factors_subtitle), new String[]{numberFormat.format(getTask().getNumber())}, new boolean[]{true}, ContextCompat.getColor(getActivity(), R.color.orange_dark), getContext()));
     }
 
     @Override
@@ -140,7 +140,7 @@ public class FindFactorsResultsFragment extends ResultsFragment {
         super.onPostStopped();
 
         //Subtitle
-        Utils.formatSpannable(subtitleStringBuilder, getResources().getQuantityString(R.plurals.find_factors_subtitle_results, getTask().getFactors().size()), new String[]{NUMBER_FORMAT.format(getTask().getNumber()), NUMBER_FORMAT.format(getTask().getFactors().size())}, new boolean[]{true, true}, ContextCompat.getColor(getActivity(), R.color.orange_dark), getContext());
+        Utils.formatSpannable(subtitleStringBuilder, getResources().getQuantityString(R.plurals.find_factors_subtitle_results, getTask().getFactors().size()), new String[]{numberFormat.format(getTask().getNumber()), numberFormat.format(getTask().getFactors().size())}, new boolean[]{true, true}, ContextCompat.getColor(getActivity(), R.color.orange_dark), getContext());
         if (getTask().getFactors().size() != 2) {
             subtitleTextView.setText(subtitleStringBuilder);
         } else {
@@ -164,7 +164,7 @@ public class FindFactorsResultsFragment extends ResultsFragment {
             progressBar.setProgress((int) (getTask().getProgress() * 100));
 
             //Body
-            bodyTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_body_text), new String[]{NUMBER_FORMAT.format(getTask().getFactors().size())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
+            bodyTextView.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.find_factors_body_text), new String[]{numberFormat.format(getTask().getFactors().size())}, ContextCompat.getColor(getActivity(), R.color.orange_dark)));
 
             //Update recyclerView
             if (lastAdapterSize != adapter.getItemCount()) {

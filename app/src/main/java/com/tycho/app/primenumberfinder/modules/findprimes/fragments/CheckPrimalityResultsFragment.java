@@ -58,7 +58,7 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
     @Override
     protected void postDefaults() {
         //Format subtitle
-        subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_subtitle_searching), new String[]{NUMBER_FORMAT.format(getTask().getNumber())}, new boolean[]{true}, ContextCompat.getColor(getContext(), R.color.purple_dark), getActivity()));
+        subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_subtitle_searching), new String[]{numberFormat.format(getTask().getNumber())}, new boolean[]{true}, ContextCompat.getColor(getContext(), R.color.purple_dark), getActivity()));
     }
 
     @Override
@@ -68,7 +68,7 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
         //Format subtitle
         if (getTask().isPrime()){
             subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_result), new String[]{
-                    NUMBER_FORMAT.format(getTask().getNumber()),
+                    numberFormat.format(getTask().getNumber()),
                     "prime"
             }, new boolean[]{
                     true,
@@ -76,9 +76,9 @@ public class CheckPrimalityResultsFragment extends ResultsFragment {
             }, getTextHighlight(), getActivity()));
         }else{
             subtitle.setText(Utils.formatSpannable(spannableStringBuilder, getString(R.string.check_primality_result_negative), new String[]{
-                    NUMBER_FORMAT.format(getTask().getNumber()),
+                    numberFormat.format(getTask().getNumber()),
                     "not prime",
-                    NUMBER_FORMAT.format(getTask().getFactor())
+                    numberFormat.format(getTask().getFactor())
             }, new boolean[]{
                     true,
                     false,

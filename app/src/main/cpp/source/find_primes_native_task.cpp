@@ -47,8 +47,7 @@ Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nat
     jmethodID id = env->GetMethodID(env->GetObjectClass(search_method), "ordinal", "()I");
     int value = (int) env->CallIntMethod(search_method, id);
 
-    FindPrimesTask *task = new FindPrimesTask((unsigned long) start_value, (unsigned long) end_value,
-                                              static_cast<FindPrimesTask::SearchMethod>(value), (unsigned int) thread_count);
+    FindPrimesTask *task = new FindPrimesTask(start_value, end_value, static_cast<FindPrimesTask::SearchMethod>(value), thread_count);
 
     //Set cache directory
     const char *string = env->GetStringUTFChars(cache_directory, nullptr);
@@ -56,7 +55,6 @@ Java_com_tycho_app_primenumberfinder_modules_findprimes_FindPrimesNativeTask_nat
     task->setCacheDirectory(std::string(string));
     env->ReleaseStringUTFChars(cache_directory, string);
 
-    task->addTaskListener(new DListener());
     return (long) task;
 }
 
