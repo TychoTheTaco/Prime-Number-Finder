@@ -114,16 +114,8 @@ public class TreeView extends View {
 
     public Bitmap drawToBitmap(final ExportOptions options) {
         final Rect bounds = getBoundingRect(itemTree);
-        final Paint creditsPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-        float size = options.itemTextSize >= 30 ? (options.itemTextSize / 2.5f) : 12;
-        final String text = "Created with Prime Number Finder on Android";
-        while(getStringWidth(text, paint) > (Math.abs(bounds.width()) + (borderPadding * 2))){
-            size -= 0.25f;
-            paint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, size, getResources().getDisplayMetrics()));
-        }
-
-        final Bitmap bitmap = Bitmap.createBitmap((int) (Math.abs(bounds.width()) + (borderPadding * 2)), (int) (Math.abs(bounds.height()) + (borderPadding * 2) + getStringHeight(creditsPaint) + borderPadding), Bitmap.Config.ARGB_8888);
+        final Bitmap bitmap = Bitmap.createBitmap((int) (Math.abs(bounds.width()) + (borderPadding * 2)), (int) (Math.abs(bounds.height()) + (borderPadding * 2) + borderPadding), Bitmap.Config.ARGB_8888);
         final Canvas canvas = new Canvas(bitmap);
 
         //Draw tree
@@ -133,20 +125,8 @@ public class TreeView extends View {
         drawItemBackgrounds(itemTree, canvas, options);
         drawContents(itemTree, canvas, options);
         canvas.restore();
-        drawCredits(canvas, creditsPaint, options);
 
         return bitmap;
-    }
-
-    private void drawCredits(final Canvas canvas, final Paint paint, final ExportOptions options){
-        final String text = "Created with Prime Number Finder on Android";
-
-        //Draw text
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.BLACK);
-        float textX = canvas.getWidth() - getStringWidth(text, paint) - borderPadding;
-        float textY = canvas.getHeight() - borderPadding;
-        canvas.drawText(text, textX, textY, paint);
     }
 
     private final Rect clipBounds = new Rect();
