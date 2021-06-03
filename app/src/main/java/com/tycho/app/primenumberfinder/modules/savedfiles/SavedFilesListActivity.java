@@ -202,105 +202,97 @@ public class SavedFilesListActivity extends AbstractActivity {
     private SortPopupWindow.SortMethod lastSortMethod;
     private boolean lasSortAscending;
 
-    private SortPopupWindow sortPopupWindow;
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        final int itemId = item.getItemId();
+        if (itemId == R.id.sort){
+            final int color;
 
-        switch (item.getItemId()) {
-            case R.id.sort:
-                final int color;
+            final List<SortPopupWindow.SortMethod> sortMethods = new ArrayList<>();
+            sortMethods.add(SortPopupWindow.SortMethod.DATE);
+            sortMethods.add(SortPopupWindow.SortMethod.FILE_SIZE);
 
-                final List<SortPopupWindow.SortMethod> sortMethods = new ArrayList<>();
-                sortMethods.add(SortPopupWindow.SortMethod.DATE);
-                sortMethods.add(SortPopupWindow.SortMethod.FILE_SIZE);
+            switch (fileType) {
+                case PRIMES:
+                    color = ContextCompat.getColor(this, R.color.purple_light);
+                    break;
 
-                switch (fileType) {
-                    case PRIMES:
-                        color = ContextCompat.getColor(this, R.color.purple_light);
-                        break;
+                case FACTORS:
+                    color = ContextCompat.getColor(this, R.color.orange_light);
+                    sortMethods.add(SortPopupWindow.SortMethod.NUMBER);
+                    break;
 
-                    case FACTORS:
-                        color = ContextCompat.getColor(this, R.color.orange_light);
-                        sortMethods.add(SortPopupWindow.SortMethod.NUMBER);
-                        break;
+                case TREE:
+                    color = ContextCompat.getColor(this, R.color.green_light);
+                    sortMethods.add(SortPopupWindow.SortMethod.NUMBER);
+                    break;
 
-                    case TREE:
-                        color = ContextCompat.getColor(this, R.color.green_light);
-                        sortMethods.add(SortPopupWindow.SortMethod.NUMBER);
-                        break;
+                default:
+                    color = ContextCompat.getColor(this, R.color.primary_light);
+                    break;
+            }
 
-                    default:
-                        color = ContextCompat.getColor(this, R.color.primary_light);
-                        break;
-                }
+            final SortPopupWindow sortPopupWindow = new SortPopupWindow(this, color, sortMethods) {
+                @Override
+                protected void onSortMethodSelected(SortMethod sortMethod, boolean ascending) {
+                    switch (sortMethod) {
+                        case DATE:
+                            adapterSavedFilesList.sortDate(ascending);
+                            break;
 
-                sortPopupWindow = new SortPopupWindow(this, color, sortMethods) {
-                    @Override
-                    protected void onSortMethodSelected(SortMethod sortMethod, boolean ascending) {
-                        switch (sortMethod) {
-                            case DATE:
-                                adapterSavedFilesList.sortDate(ascending);
-                                break;
+                        case FILE_SIZE:
+                            adapterSavedFilesList.sortSize(ascending);
+                            break;
 
-                            case FILE_SIZE:
-                                adapterSavedFilesList.sortSize(ascending);
-                                break;
-
-                            case NUMBER:
-                                adapterSavedFilesList.sortNumber(ascending);
-                                break;
-                        }
-                        lastSortMethod = sortMethod;
-                        lasSortAscending = ascending;
+                        case NUMBER:
+                            adapterSavedFilesList.sortNumber(ascending);
+                            break;
                     }
-                };
-                sortPopupWindow.getContentView().measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-                sortPopupWindow.showAsDropDown(findViewById(R.id.sort), -(sortPopupWindow.getContentView().getMeasuredWidth() - (int) Utils.dpToPx(this, 45)), (int) Utils.dpToPx(this, -48));
-                sortPopupWindow.setSearchMethod(lastSortMethod != null ? lastSortMethod : SortPopupWindow.SortMethod.DATE, lasSortAscending);
-                break;
+                    lastSortMethod = sortMethod;
+                    lasSortAscending = ascending;
+                }
+            };
+            sortPopupWindow.getContentView().measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            sortPopupWindow.showAsDropDown(findViewById(R.id.sort), -(sortPopupWindow.getContentView().getMeasuredWidth() - (int) Utils.dpToPx(this, 45)), (int) Utils.dpToPx(this, -48));
+            sortPopupWindow.setSearchMethod(lastSortMethod != null ? lastSortMethod : SortPopupWindow.SortMethod.DATE, lasSortAscending);
+        } else if (itemId == R.id.delete){
+            //Show warning dialog
+            final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+            alertDialog.setTitle("Warning");
+            alertDialog.setMessage(getResources().getQuantityString(R.plurals.delete_warning, adapterSavedFilesList.getSelectedItemCount(), adapterSavedFilesList.getSelectedItemCount()));
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Delete",
+                    (dialog, which) -> {
 
-            case R.id.delete:
-                //Show warning dialog
-                final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-                alertDialog.setTitle("Warning");
-                alertDialog.setMessage(getResources().getQuantityString(R.plurals.delete_warning, adapterSavedFilesList.getSelectedItemCount(), adapterSavedFilesList.getSelectedItemCount()));
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Delete",
-                        (dialog, which) -> {
+                        //Get the files to be deleted
+                        final int[] selectedItemIndexes = adapterSavedFilesList.getSelectedItemIndexes();
+                        final List<File> files = new ArrayList<>();
+                        for (int i : selectedItemIndexes) {
+                            files.add(adapterSavedFilesList.getFiles().get(i));
+                        }
 
-                            //Get the files to be deleted
-                            final int[] selectedItemIndexes = adapterSavedFilesList.getSelectedItemIndexes();
-                            final List<File> files = new ArrayList<>();
-                            for (int i : selectedItemIndexes) {
-                                files.add(adapterSavedFilesList.getFiles().get(i));
-                            }
+                        final Iterator<File> iterator = files.iterator();
+                        int position = 0;
+                        while (iterator.hasNext()) {
+                            final File file = iterator.next();
 
-                            final Iterator<File> iterator = files.iterator();
-                            int position = 0;
-                            while (iterator.hasNext()) {
-                                final File file = iterator.next();
+                            //Delete the file
+                            file.delete();
+                            adapterSavedFilesList.getFiles().remove(file);
+                            adapterSavedFilesList.notifyItemRemoved(selectedItemIndexes[position] - position);
+                            position++;
+                        }
+                        adapterSavedFilesList.setSelectionMode(false);
+                        alertDialog.dismiss();
 
-                                //Delete the file
-                                file.delete();
-                                adapterSavedFilesList.getFiles().remove(file);
-                                adapterSavedFilesList.notifyItemRemoved(selectedItemIndexes[position] - position);
-                                position++;
-                            }
-                            adapterSavedFilesList.setSelectionMode(false);
-                            alertDialog.dismiss();
-
-                            if (adapterSavedFilesList.getItemCount() == 0) {
-                                finish();
-                            }
-                        });
-                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
-                        (dialog, which) -> alertDialog.dismiss());
-                alertDialog.show();
-                break;
-
-            case android.R.id.home:
-                onBackPressed();
-                break;
+                        if (adapterSavedFilesList.getItemCount() == 0) {
+                            finish();
+                        }
+                    });
+            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
+                    (dialog, which) -> alertDialog.dismiss());
+            alertDialog.show();
+        } else if (itemId == android.R.id.home){
+            onBackPressed();
         }
 
         return super.onOptionsItemSelected(item);

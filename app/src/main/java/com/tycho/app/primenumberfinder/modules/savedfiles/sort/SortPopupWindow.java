@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
 
+import androidx.core.content.res.ResourcesCompat;
+
 import com.tycho.app.primenumberfinder.R;
 
 import java.util.ArrayList;
@@ -34,7 +36,7 @@ public class SortPopupWindow extends PopupWindow {
          */
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
             getContentView().setBackgroundColor(Color.RED); //Required for setBackgroundTintList()
-            setBackgroundDrawable(context.getResources().getDrawable(R.drawable.round_rectangle_white, null)); //Required for setOutsideTouchable()
+            setBackgroundDrawable(ResourcesCompat.getDrawable(context.getResources(), R.drawable.round_rectangle_white, null)); //Required for setOutsideTouchable()
         }
 
         getContentView().setBackgroundTintList(new ColorStateList(

@@ -19,7 +19,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 46
-        versionName "1.5.3"
+        versionName "1.5.3.DEV"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
         externalNativeBuild{
